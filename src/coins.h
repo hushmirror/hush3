@@ -245,7 +245,9 @@ public:
 
     //! check whether a particular output is still available
     bool IsAvailable(unsigned int nPos) const {
-        fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li, vout[%d].IsNull()=%d", nPos, vout.size(), nPos, vout[nPos].IsNull() );
+        //fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li, vout[%d].IsNull()=%d", nPos, vout.size(), nPos, vout[nPos].IsNull() );
+        //fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li, vout[%d]=%d", nPos, vout.size(), nPos, vout[nPos] );
+        fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li", nPos, vout.size() );
         return (nPos < vout.size() && !vout[nPos].IsNull());
     }
 
