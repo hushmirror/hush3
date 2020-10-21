@@ -1,4 +1,5 @@
 // Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
 // Released under the GPLv3
 
 #include <gmock/gmock.h>

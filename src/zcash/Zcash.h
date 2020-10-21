@@ -1,4 +1,6 @@
 // Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #ifndef ZC_ZCASH_H_
 #define ZC_ZCASH_H_
 
