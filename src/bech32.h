@@ -1,8 +1,9 @@
 // Copyright (c) 2017 Pieter Wuille
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-// Bech32 is a string encoding format used in newer address types.
+// Bech32 is a string encoding format used in Sapling zaddrs
 // The output consists of a human-readable part (alphanumeric), a
 // separator character (1), and a base32 data section, the last
 // 6 characters of which are a checksum.

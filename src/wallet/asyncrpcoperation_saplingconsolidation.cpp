@@ -1,7 +1,7 @@
-// Copyright (c) 2020 The Hush developers
+// Copyright (c) 2019-2020 The Hush developers
 // Copyright (c) 2019 CryptoForge
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include "assert.h"
 #include "boost/variant/static_visitor.hpp"
@@ -78,7 +78,7 @@ void AsyncRPCOperation_saplingconsolidation::main() {
 bool AsyncRPCOperation_saplingconsolidation::main_impl() {
     bool status=true;
     auto opid=getId();
-    LogPrint("zrpcunsafe", "%s: Beginning AsyncRPCOperation_saplingconsolidation.\n", opid);
+    LogPrintf("%s: Beginning AsyncRPCOperation_saplingconsolidation.\n", __func__, opid);
     auto consensusParams = Params().GetConsensus();
     auto nextActivationHeight = NextActivationHeight(targetHeight_, consensusParams);
     if (nextActivationHeight && targetHeight_ + CONSOLIDATION_EXPIRY_DELTA >= nextActivationHeight.get()) {
@@ -87,24 +87,30 @@ bool AsyncRPCOperation_saplingconsolidation::main_impl() {
         return status;
     }
 
-    std::vector<CSproutNotePlaintextEntry> sproutEntries;
     std::vector<SaplingNoteEntry> saplingEntries;
     std::set<libzcash::SaplingPaymentAddress> addresses;
     {
         LOCK2(cs_main, pwalletMain->cs_wallet);
         // We set minDepth to 11 to avoid unconfirmed notes and in anticipation of specifying
-        // an anchor at height N-10 for each Sprout JoinSplit description
+        // an anchor at height N-10 for each SpendDescription
         // Consider, should notes be sorted?
-        pwalletMain->GetFilteredNotes(sproutEntries, saplingEntries, "", 11);
+        pwalletMain->GetFilteredNotes(saplingEntries, "", 11);
+
+        if(saplingEntries.size() == 0) {
+            LogPrint("zrpcunsafe", "%s: Nothing to consolidate, done.\n",opid);
+            return true;
+        }
+
         if (fConsolidationMapUsed) {
             const vector<string>& v = mapMultiArgs["-consolidatesaplingaddress"];
             for(int i = 0; i < v.size(); i++) {
                 auto zAddress = DecodePaymentAddress(v[i]);
                 if (boost::get<libzcash::SaplingPaymentAddress>(&zAddress) != nullptr) {
                     libzcash::SaplingPaymentAddress saplingAddress = boost::get<libzcash::SaplingPaymentAddress>(zAddress);
-                    addresses.insert(saplingAddress );
+                    addresses.insert(saplingAddress);
                 } else {
-                    //TODO: how to handle invalid zaddrs?
+                    LogPrint("zrpcunsafe", "%s: Invalid zaddr, exiting\n", opid);
+                    return false;
                 }
             }
         } else {
@@ -155,7 +161,7 @@ bool AsyncRPCOperation_saplingconsolidation::main_impl() {
             auto builder = TransactionBuilder(consensusParams, targetHeight_, pwalletMain);
             //builder.SetExpiryHeight(targetHeight_ + CONSOLIDATION_EXPIRY_DELTA);
             auto actualAmountToSend = amountToSend < fConsolidationTxFee ? 0 : amountToSend - fConsolidationTxFee;
-            LogPrint("zrpcunsafe", "%s: Beginning to create transaction with Sapling output amount=%s\n", opid, FormatMoney(actualAmountToSend));
+            LogPrintf("%s: %s Beginning to create transaction with Sapling output amount=%s\n", __func__, opid, FormatMoney(actualAmountToSend));
 
             // Select Sapling notes
             std::vector<SaplingOutPoint> ops;

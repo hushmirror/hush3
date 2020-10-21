@@ -1,6 +1,7 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
@@ -145,7 +146,7 @@ class CCryptoKeyStore : public CBasicKeyStore
 private:
     std::pair<uint256, std::vector<unsigned char>> cryptedHDSeed;
     CryptedKeyMap mapCryptedKeys;
-    CryptedSproutSpendingKeyMap mapCryptedSproutSpendingKeys;
+    //CryptedSproutSpendingKeyMap mapCryptedSproutSpendingKeys;
     CryptedSaplingSpendingKeyMap mapCryptedSaplingSpendingKeys;
 
     CKeyingMaterial vMasterKey;
@@ -218,37 +219,6 @@ public:
         setAddress.clear();
         CryptedKeyMap::const_iterator mi = mapCryptedKeys.begin();
         while (mi != mapCryptedKeys.end())
-        {
-            setAddress.insert((*mi).first);
-            mi++;
-        }
-    }
-    virtual bool AddCryptedSproutSpendingKey(
-        const libzcash::SproutPaymentAddress &address,
-        const libzcash::ReceivingKey &rk,
-        const std::vector<unsigned char> &vchCryptedSecret);
-    bool AddSproutSpendingKey(const libzcash::SproutSpendingKey &sk);
-    bool HaveSproutSpendingKey(const libzcash::SproutPaymentAddress &address) const
-    {
-        {
-            LOCK(cs_SpendingKeyStore);
-            if (!IsCrypted())
-                return CBasicKeyStore::HaveSproutSpendingKey(address);
-            return mapCryptedSproutSpendingKeys.count(address) > 0;
-        }
-        return false;
-    }
-    bool GetSproutSpendingKey(const libzcash::SproutPaymentAddress &address, libzcash::SproutSpendingKey &skOut) const;
-    void GetSproutPaymentAddresses(std::set<libzcash::SproutPaymentAddress> &setAddress) const
-    {
-        if (!IsCrypted())
-        {
-            CBasicKeyStore::GetSproutPaymentAddresses(setAddress);
-            return;
-        }
-        setAddress.clear();
-        CryptedSproutSpendingKeyMap::const_iterator mi = mapCryptedSproutSpendingKeys.begin();
-        while (mi != mapCryptedSproutSpendingKeys.end())
         {
             setAddress.insert((*mi).first);
             mi++;

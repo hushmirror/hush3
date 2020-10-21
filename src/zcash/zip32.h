@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Zcash developers
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #ifndef ZCASH_ZIP32_H
 #define ZCASH_ZIP32_H
@@ -134,7 +135,7 @@ struct SaplingExtendedSpendingKey {
     }
 };
 
-typedef boost::variant<InvalidEncoding, SproutSpendingKey, SaplingExtendedSpendingKey> SpendingKey;
+typedef boost::variant<InvalidEncoding, SaplingExtendedSpendingKey> SpendingKey;
 
 }
 

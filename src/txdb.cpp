@@ -2,8 +2,8 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Copyright (c) 2019-2020 The Hush developers
 
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
@@ -66,18 +66,6 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize, bool fMemory, bool fWipe) : db(Get
 {
 }
 
-
-bool CCoinsViewDB::GetSproutAnchorAt(const uint256 &rt, SproutMerkleTree &tree) const {
-    if (rt == SproutMerkleTree::empty_root()) {
-        SproutMerkleTree new_tree;
-        tree = new_tree;
-        return true;
-    }
-
-    bool read = db.Read(make_pair(DB_SPROUT_ANCHOR, rt), tree);
-
-    return read;
-}
 
 bool CCoinsViewDB::GetSaplingAnchorAt(const uint256 &rt, SaplingMerkleTree &tree) const {
     if (rt == SaplingMerkleTree::empty_root()) {
@@ -735,6 +723,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->nPayments              = diskindex.nPayments;
                 pindexNew->nShieldedTx            = diskindex.nShieldedTx;
                 pindexNew->nShieldedOutputs       = diskindex.nShieldedOutputs;
+                pindexNew->nShieldedSpends        = diskindex.nShieldedSpends;
                 pindexNew->nShieldedPayments      = diskindex.nShieldedPayments;
                 pindexNew->nShieldingTx           = diskindex.nShieldingTx;
                 pindexNew->nShieldingPayments     = diskindex.nShieldingPayments;

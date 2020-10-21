@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 #
-# Distributed under the MIT/X11 software license, see the accompanying
-# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+# Distributed under the GPLv3/X11 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #
 
 from test_framework.mininode import CBlockHeader, CInv, NodeConn, NodeConnCB, \

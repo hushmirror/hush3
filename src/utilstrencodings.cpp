@@ -1,7 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include "utilstrencodings.h"
 
@@ -20,7 +20,8 @@ static const string CHARS_ALPHA_NUM = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNO
 static const string SAFE_CHARS[] =
 {
     CHARS_ALPHA_NUM + " .,;_/:?@()", // SAFE_CHARS_DEFAULT
-    CHARS_ALPHA_NUM + " .,;_?@" // SAFE_CHARS_UA_COMMENT
+    CHARS_ALPHA_NUM + " .,;_?@", // SAFE_CHARS_UA_COMMENT
+    CHARS_ALPHA_NUM + "!*'();:@&=+$,/?#[]-_.~%" // SAFE_CHARS_URI
 };
 
 string SanitizeString(const string& str, int rule)

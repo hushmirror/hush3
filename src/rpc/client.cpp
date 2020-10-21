@@ -1,8 +1,8 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Copyright (c) 2019-2020 The Hush developers
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
@@ -139,6 +139,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "z_listunspent", 2 },
     { "z_listunspent", 3 },
     { "z_getbalance", 1},
+    { "z_getnotescount", 0},
     { "z_gettotalbalance", 0},
     { "z_gettotalbalance", 1},
     { "z_gettotalbalance", 2},
@@ -163,18 +164,16 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "kvupdate", 4 },
     { "z_importkey", 2 },
     { "z_importviewingkey", 2 },
-    { "z_getpaymentdisclosure", 1},
-    { "z_getpaymentdisclosure", 2},
     { "z_listsentbyaddress", 1},
     { "z_listsentbyaddress", 2},
     { "z_listsentbyaddress", 3},
     { "z_listsentbyaddress", 4},
     { "z_listsentbyaddress", 5},
-    { "z_listreceivedbyaddress", 1},
-    { "z_listreceivedbyaddress", 2},
-    { "z_listreceivedbyaddress", 3},
-    { "z_listreceivedbyaddress", 4},
-    { "z_listreceivedbyaddress", 5},
+    { "z_listreceivedaddress", 1},
+    { "z_listreceivedaddress", 2},
+    { "z_listreceivedaddress", 3},
+    { "z_listreceivedaddress", 4},
+    { "z_listreceivedaddress", 5},
 
     // crosschain
     { "assetchainproof", 1},
