@@ -202,8 +202,19 @@ void zsTxReceivedToJSON(const CWalletTx& wtx, UniValue& received, CAmount& total
 
           if (pt) {
             auto note = pt.get();
+            auto pt_unwrapped = pt.get();
+            auto memo = pt_unwrapped.memo();
             obj.push_back(Pair("address",EncodePaymentAddress(addr)));
             obj.push_back(Pair("amount", ValueFromAmount(CAmount(note.value()))));
+            obj.push_back(Pair("memo", HexStr(memo)));
+
+              if (memo[0] <= 0xf4) {
+                  auto end = std::find_if(memo.rbegin(), memo.rend(), [](unsigned char v) { return v != 0; });
+                  std::string memoStr(memo.begin(), end.base());
+                if (utf8::is_valid(memoStr)) {
+                obj.push_back(Pair("memoStr", memoStr));
+            }
+        }
             obj.push_back(Pair("shieldedOutputIndex",i));
 
             //Check Change Status
