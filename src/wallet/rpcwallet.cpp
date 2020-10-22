@@ -1,8 +1,8 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Copyright (c) 2019-2020 The Hush developers
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or https://www.opensource.org/licenses/mit-license.php
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
@@ -3401,6 +3401,8 @@ UniValue z_listreceivedaddress(const UniValue& params, bool fHelp,const CPubKey&
         "       \"saplingReceived\": [{               An Array of utxos/notes received for sapling addresses\n"
         "           \"address\": \"zeroaddress\",         (string) Shielded address (z-address)\n"
         "           \"amount\": x.xxxx,                 (numeric) Value of output being received " + CURRENCY_UNIT + ", positive for receives\n"
+        "           \"memo\": xxxxx,            (string) hexademical string representation of memo field\n"
+        "           \"memoStr\" : \"memo\",             (string) Only returned if memo contains valid UTF-8 text.\n"
         "           \"sheildedOutputIndex\": n,         (numeric) The index of the ShieledOutput\n"
         "           \"change\": true/false              (string) The note is change. This can result from sending funds\n"
         "                                                        to the same address they came from, or incomplete useage\n"

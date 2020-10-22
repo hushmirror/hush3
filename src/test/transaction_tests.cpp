@@ -1,7 +1,7 @@
 // Copyright (c) 2019-2020 The Hush developers
 // Copyright (c) 2011-2014 The Bitcoin Core developers
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or https://www.opensource.org/licenses/mit-license.php
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include "data/tx_invalid.json.h"
 #include "data/tx_valid.json.h"
