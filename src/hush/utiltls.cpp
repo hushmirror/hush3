@@ -14,7 +14,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 
-#include "util.h"
+#include "../util.h"
 #include "utiltls.h"
 
 namespace hush {
@@ -95,6 +95,42 @@ static EVP_PKEY* GenerateRsaKey(int bits, BN_ULONG uPublicKey)
 
                 if(!evpPrivKey) // EVP_PKEY_assign_RSA uses the supplied key internally
                     RSA_free(privKey);
+            }
+        }
+        BN_free(pubKey);
+    }
+
+    return evpPrivKey;
+}
+
+// Generates EC keypair
+//
+static EVP_PKEY* GenerateEcKey(int bits, BN_ULONG uPublicKey)
+{
+    EVP_PKEY *evpPrivKey = NULL;
+
+    BIGNUM *pubKey = BN_new();
+    if (pubKey)
+    {
+        if (BN_set_word(pubKey, uPublicKey))
+        {
+            EC_KEY *privKey = EC_KEY_new_by_curve_name(NID_secp256k1);
+            if (privKey)
+            {
+                if (EC_KEY_generate_key(privKey))
+                {
+                    if ((evpPrivKey = EVP_PKEY_new()))
+                    {
+                        if (!EVP_PKEY_assign_EC_KEY(evpPrivKey, privKey))
+                        {
+                            EVP_PKEY_free(evpPrivKey);
+                            evpPrivKey = NULL;
+                        }
+                    }
+                }
+
+                if(!evpPrivKey)
+                    EC_KEY_free(privKey);
             }
         }
         BN_free(pubKey);
@@ -305,8 +341,16 @@ static bool CheckCredentials(EVP_PKEY *key, X509 *cert)
             }
             break;
         }
-
-        // Currently only RSA keys are supported.
+        case EVP_PKEY_EC:
+        {
+            EC_KEY *eccKey = EVP_PKEY_get1_EC_KEY(key);
+            if (eccKey)
+            {
+                bIsOk = (EC_KEY_check_key(eccKey) == 1);
+                EC_KEY_free(eccKey);
+            }
+        }
+        // Currently only RSA & EC keys are supported.
         // Other key types can be added here in further.
 
         default:
@@ -400,15 +444,34 @@ bool ValidatePeerCertificate(SSL *ssl)
     X509 *cert = SSL_get_peer_certificate (ssl);
     if (cert)
     {
-        // NOTE: SSL_get_verify_result() is only useful in connection with SSL_get_peer_certificate (https://www.openssl.org/docs/man1.0.2/ssl/SSL_get_verify_result.html)
-        //
-        bIsOk = (SSL_get_verify_result(ssl) == X509_V_OK);
+        // NOTE: SSL_get_verify_result() is only useful in connection with SSL_get_peer_certificate
+        // (https://www.openssl.org/docs/man1.1.1/ssl/SSL_get_verify_result.html)
+        long errCode = SSL_get_verify_result(ssl);
+        if (errCode != X509_V_OK)
+        {
+            LogPrint("tls", "TLS: %s: %s():%d - Certificate Verification ERROR=%d: [%s]\n",
+                __FILE__, __func__, __LINE__, errCode, X509_verify_cert_error_string(errCode));
+        }
+        else
+        {
+            bIsOk = true;
+
+            char    buf[256];
+            X509_NAME_oneline(X509_get_subject_name(cert), buf, 256);
+            LogPrint("tls", "TLS: %s: %s():%d - subj name=%s\n",
+                __FILE__, __func__, __LINE__, buf);
+ 
+            X509_NAME_oneline(X509_get_issuer_name(cert), buf, 256);
+            LogPrint("tls", "TLS: %s: %s():%d - issuer name=%s\n",
+                __FILE__, __func__, __LINE__, buf);
+        }
+
         X509_free(cert);
     }
     else
     {
-        LogPrint("net", "TLS: Peer does not have certificate\n");
-        bIsOk = false;
+        LogPrint("tls", "TLS: %s: %s():%d - WARNING: Peer does not have certificate\n",
+            __FILE__, __func__, __LINE__);
     }
     return bIsOk;
 }
