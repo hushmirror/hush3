@@ -1,7 +1,7 @@
 
 # Hush Core (hushd) Software Contribution Guidelines
 
-Thank you for reaching out and trying to make Hush an even better software application and blockchain platform. These contribution guidelines shall help you figuring out where you can be helpful and how to easily get started.
+Thank you for reaching out and trying to make Hush an even better software application and cryptocoin platform. These contribution guidelines shall help you figuring out where you can be helpful and how to easily get started.
 
 ## Table of Contents
 
@@ -20,7 +20,7 @@ There are many ways you can directly contribute to Hush:
 * Find and fix bugs
 * Improve suboptimal code
 * Extend our software
-* Perform a secure code review of Hush Core and other Hush-related software
+* Perform a secure code review of Hush Full Node and other Hush-related software
 
 Interested in making a contribution? Read on!
 
@@ -42,7 +42,8 @@ If you don't see your idea listed, and you think it can contribute to Hush, do o
 * **If your contribution is major,** such as a new feature or bugfix, start by opening an issue first. That way, other contributors can weigh in on the discussion before you do any work.
 
 ## Style guide
-Write clear, clean and consistent code. Follow well-known and established style guidelines like [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html) or [Bjarne Stroustrup's C++ Style FAQ](http://www.stroustrup.com/bs_faq2.html).
+
+Don't write shitty code.
 
 ## Setting up your environment
 
@@ -50,10 +51,4 @@ The Hush Core (hushd) is mainly written in C++ with specific modules written in 
 
 ## Contribution review process
 
-Our team and community will review your contribution and start a transparent testing and quality assurance process. As soon as your contribution has undergone sucessful review and QA signoff it gets merged into the Hush sourcecode. 
-
-## Community
-
-Discussions about Hush's development take place on our [discord server](https://myhush.org/discord/)
-
-This contribution guideline is adapted from the Open Source Guides.
+We will tell you if we like your stuff.
