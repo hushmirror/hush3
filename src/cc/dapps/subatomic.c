@@ -1,3 +1,4 @@
+// Copyright (c) 2019-2020 The Hush developers
 /******************************************************************************
  * Copyright © 2014-2020 The SuperNET Developers.                             *
  *                                                                            *
@@ -43,9 +44,7 @@
 #define SUBATOMIC_TIMEOUT 60
 #define SUBATOMIC_LOCKTIME 3600
 #define SUBATOMIC_TXFEE 10000
-
 #define SUBATOMIC_PRIORITY 5
-
 #define SUBATOMIC_OPENREQUEST 1
 #define SUBATOMIC_APPROVED 2
 #define SUBATOMIC_OPENED 3
@@ -130,16 +129,9 @@ char *subatomic_checkname(char *tmpstr,struct msginfo *mp,int32_t baserel,char *
             }
         if ( ptr->isexternal == 0 )
         {
-            if ( strcmp(coin,"KMD") != 0 )
-            {
                 strcpy(ptr->acname,coin);
                 strcpy(ptr->coinstr,"");
-            }
-            else
-            {
-                strcpy(ptr->coinstr,coin);
                 strcpy(ptr->acname,"");
-            }
         }
         else
         {
@@ -153,7 +145,6 @@ char *subatomic_checkname(char *tmpstr,struct msginfo *mp,int32_t baserel,char *
         for (i=1; coin[i]!=0; i++)
             if ( isupper(coin[i]) == 0 )
                 return(coin);
-        if ( strcmp(coin+1,"KMD") != 0 )
             ptr->iszaddr = 1;
         return(coin+1);
     }
@@ -229,11 +220,7 @@ cJSON *_subatomic_rawtransaction(struct coininfo *coin,bits256 txid)
 int64_t subatomic_getbalance(struct coininfo *coin)
 {
     char *coinstr,*acname=""; FILE *fp; int64_t retval = 0;
-    if ( strcmp(coin->coin,"KMD") != 0 )
-    {
-        acname = coin->coin;
-        coinstr = "";
-    } else coinstr = coin->coin;
+    coinstr = coin->coin;
     if ( coin->isfile != 0 )
     {
         if ( (fp= fopen(coin->name+1,"rb")) != 0 ) // if alice, add bob pubkey to fname
@@ -327,11 +314,7 @@ bits256 subatomic_coinpayment(uint32_t origid,int32_t OTCmode,struct coininfo *c
     }
     else
     {
-        if ( strcmp(coin->coin,"KMD") != 0 )
-        {
-            acname = coin->coin;
-            coinstr = "";
-        } else coinstr = coin->coin;
+        coinstr = coin->coin;
         if ( coin->istoken != 0 )
             txid = tokentransfer(coinstr,acname,coin->tokenid,destpub,paytoshis/SATOSHIDEN);
         else if ( coin->isexternal == 0 )
@@ -356,11 +339,7 @@ cJSON *subatomic_txidwait(struct coininfo *coin,bits256 txid,char *hexstr,int32_
         // if matches, sendrawtransaction if OTC mode, decoode and return if channels mode
     }
     zflag = (subatomic_zonly(coin) != 0);
-    if ( strcmp(coin->coin,"KMD") != 0 )
-    {
-        acname = coin->coin;
-        coinstr = "";
-    } else coinstr = coin->coin;
+    coinstr = coin->coin;
     for (i=0; i<numseconds; i++)
     {
         if ( coin->isfile != 0 )
@@ -421,11 +400,7 @@ int64_t subatomic_verifypayment(struct coininfo *coin,cJSON *rawtx,uint64_t dest
             item = jitem(array,0);
             if ( (sobj= jobj(item,"scriptPubKey")) != 0 && (a= jarray(&m,sobj,"addresses")) != 0 && m == 1 )
             {
-                if ( strcmp(coin->coin,"KMD") != 0 )
-                {
-                    acname = coin->coin;
-                    coinstr = "";
-                } else coinstr = coin->coin;
+                coinstr = coin->coin;
                 if ( get_tokenaddress(coinstr,acname,tokenaddr) != 0 )
                 {
                     //fprintf(stderr,"tokenaddr.%s\n",tokenaddr);
@@ -775,11 +750,6 @@ int32_t subatomic_approved(struct msginfo *mp,cJSON *approval,cJSON *msgjson,cha
     if ( mp->OTCmode == 0 )
     {
         coin = (mp->bobflag != 0) ? mp->base.coin : mp->rel.coin; // the other side gets this coin
-        if ( strcmp(coin,"KMD") != 0 )
-        {
-            acname = coin;
-            coin = "";
-        }
         if ( get_createmultisig2(coin,acname,mp->msigaddr,mp->redeemscript,mp->alice.secp,mp->bob.secp) != 0 )
         {
             subatomic_redeemscript(redeemscript,mp->locktime,mp->alice.secp,mp->bob.secp);
@@ -1233,7 +1203,7 @@ void subatomic_filesregister(int32_t priority)
             file = jitem(files,i);
             if ( file != 0 )
             {
-                // {"filename":"komodod",prices:[{"KMD":0.1}, {"PIRATE:1"}]}
+                // {"filename":"hushd",prices:[{"HUSH":1}, {"ZEC:1"}]}
                 fname = jstr(file,"filename");
                 if ( (prices= jarray(&m,file,"prices")) != 0 && m > 0 )
                 {
@@ -1343,14 +1313,10 @@ int32_t main(int32_t argc,char **argv)
             return(-1);
         }
         coin = (char *)argv[1];
-        if ( argv[2][0] != 0 )
+        if ( argv[2][0] != 0 ) {
             REFCOIN_CLI = (char *)argv[2];
-        else
-        {
-            if ( strcmp(coin,"KMD") != 0 )
-            {
-                acname = coin;
-            }
+        } else {
+            acname = coin;
         }
         hashstr = (char *)argv[3];
         strcpy(M.rel.coin,subatomic_checkname(tmpstr,&M,1,coin));
