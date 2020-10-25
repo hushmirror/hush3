@@ -298,7 +298,7 @@ static const CRPCCommand vRPCCommands[] =
   //  --------------------- ------------------------  -----------------------  ----------
     /* Overall control/query calls */
     { "control",            "help",                   &help,                   true  },
-    { "control",            "getiguanajson",          &getiguanajson,          true  },
+    { "control",            "getdragonjson",          &getdragonjson,          true  },
     { "control",            "getnotarysendmany",      &getnotarysendmany,      true  },
     { "control",            "geterablockheights",     &geterablockheights,     true  },
     { "control",            "stop",                   &stop,                   true  },

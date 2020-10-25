@@ -265,7 +265,7 @@ static const char *notaries_elected[NUM_KMD_SEASONS][NUM_KMD_NOTARIES][2] =
         {"decker_AR", "03ffdf1a116300a78729608d9930742cd349f11a9d64fcc336b8f18592dd9c91bc" }, // 63
     },
     {
-        // Season 3.5 third party NN pubkeys from https://github.com/KomodoPlatform/dPoW/blob/master/iguana/3rd_party
+        // Season 3.5 third party NN pubkeys from https://github.com/KomodoPlatform/dPoW/blob/master/dragon/3rd_party
         {"madmax_NA", "02ef81a360411adf71184ff04d0c5793fc41fd1d7155a28dd909f21f35f4883ac1" },
         {"alright_AR", "036a6bca1c2a8166f79fa8a979662892742346cc972b432f8e61950a358d705517" },
         {"strob_NA", "02049202f3872877e81035549f6f3a0f868d0ad1c9b0e0d2b48b1f30324255d26d" },
@@ -332,7 +332,7 @@ static const char *notaries_elected[NUM_KMD_SEASONS][NUM_KMD_NOTARIES][2] =
         {"decker_AR", "02a85540db8d41c7e60bf0d33d1364b4151cad883dd032878ea4c037f67b769635" }
     },
     {
-        // Season 4 https://github.com/KomodoPlatform/dPoW/blob/s4/iguana/3rd_party
+        // Season 4 https://github.com/KomodoPlatform/dPoW/blob/s4/dragon/3rd_party
         {"alien_AR", "024f20c096b085308e21893383f44b4faf1cdedea9ad53cc7d7e7fbfa0c30c1e71" },
         {"alien_EU", "022b85908191788f409506ebcf96a892f3274f352864c3ed566c5a16de63953236" },
         {"alien_NA", "022f62b56ddfd07c9860921c701285ac39bb3ac8f6f083d1b59c8f4943be3de162" },

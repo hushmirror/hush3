@@ -391,7 +391,7 @@ extern UniValue validateaddress(const UniValue& params, bool fHelp, const CPubKe
 extern UniValue txnotarizedconfirmed(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue decodeccopret(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue getiguanajson(const UniValue& params, bool fHelp, const CPubKey& mypk);
+extern UniValue getdragonjson(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getnotarysendmany(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue geterablockheights(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue setpubkey(const UniValue& params, bool fHelp, const CPubKey& mypk);

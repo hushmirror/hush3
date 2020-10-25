@@ -98,10 +98,10 @@ int32_t getera(int timestamp)
     return(0);
 }
 
-UniValue getiguanajson(const UniValue& params, bool fHelp, const CPubKey& mypk)
+UniValue getdragonjson(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     if (fHelp || params.size() != 0)
-      throw runtime_error("getiguanajson\nreturns json for iguana, for the current ERA.");
+      throw runtime_error("getdragonjson\nreturns json for dragon, for the current ERA.");
 
     UniValue json(UniValue::VOBJ);
     UniValue seeds(UniValue::VARR);
@@ -113,7 +113,7 @@ UniValue getiguanajson(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     // loop over seeds array and push back to json array for seeds
     for (int8_t i = 0; i < 8; i++) {
-        seeds.push_back(iguanaSeeds[i][0]);
+        seeds.push_back(dragonSeeds[i][0]);
     }
 
     // loop over era's notaries and push back each pair to the notary array
@@ -123,14 +123,14 @@ UniValue getiguanajson(const UniValue& params, bool fHelp, const CPubKey& mypk)
         notaries.push_back(notary);
     }
 
-    // get the min sigs .. this always rounds UP so min sigs in iguana is +1 min sigs in komodod, due to some rounding error.
+    // get the min sigs .. this always rounds UP so min sigs in dragon is +1 min sigs in komodod, due to some rounding error.
     int minsigs;
     if ( num_notaries_STAKED[era]/5 > overrideMinSigs )
         minsigs = (num_notaries_STAKED[era] / 5) + 1;
     else
         minsigs = overrideMinSigs;
 
-    json.push_back(Pair("port",iguanaPort));
+    json.push_back(Pair("port",dragonPort));
     json.push_back(Pair("BTCminsigs",BTCminsigs));
     json.push_back(Pair("minsigs",minsigs));
     json.push_back(Pair("seeds",seeds));

@@ -309,8 +309,8 @@ int32_t myGet_mempool_txs(std::vector<CTransaction> &txs,uint8_t evalcode,uint8_
 /// \endcond
 
 /// \cond INTERNAL
-int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
-int32_t iguana_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp);
+int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
+int32_t dragon_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp);
 /// \endcond
 
 CScript GetScriptForMultisig(int nRequired, const std::vector<CPubKey>& keys);

@@ -637,13 +637,13 @@ int32_t NSPV_mempooltxids(struct NSPV_mempoolresp *ptr,char *coinaddr,uint8_t is
                 for (i=0; i<ptr->numtxids; i++)
                 {
                     tmp = txids[i];
-                    iguana_rwbignum(0,(uint8_t *)&tmp,sizeof(*ptr->txids),(uint8_t *)&ptr->txids[i]);
+                    dragon_rwbignum(0,(uint8_t *)&tmp,sizeof(*ptr->txids),(uint8_t *)&ptr->txids[i]);
                 }
             }
             if ( funcid == NSPV_MEMPOOL_ADDRESS )
             {
                 memcpy(&tmp,&satoshis,sizeof(tmp));
-                iguana_rwbignum(0,(uint8_t *)&tmp,sizeof(ptr->txid),(uint8_t *)&ptr->txid);
+                dragon_rwbignum(0,(uint8_t *)&tmp,sizeof(ptr->txid),(uint8_t *)&ptr->txid);
             }
             len = (int32_t)(sizeof(*ptr) + sizeof(*ptr->txids)*ptr->numtxids - sizeof(ptr->txids));
             return(len);
@@ -883,7 +883,7 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
             {
                 struct NSPV_inforesp I;
                 if ( len == 1+sizeof(reqheight) )
-                    iguana_rwnum(0,&request[1],sizeof(reqheight),&reqheight);
+                    dragon_rwnum(0,&request[1],sizeof(reqheight),&reqheight);
                 else reqheight = 0;
                 //fprintf(stderr,"request height.%d\n",reqheight);
                 memset(&I,0,sizeof(I));
@@ -918,13 +918,13 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                     else if ( request[1] == len-7 )
                     {
                         isCC = (request[len-5] != 0);
-                        iguana_rwnum(0,&request[len-4],sizeof(skipcount),&skipcount);
+                        dragon_rwnum(0,&request[len-4],sizeof(skipcount),&skipcount);
                     }
                     else
                     {
                         isCC = (request[len-9] != 0);
-                        iguana_rwnum(0,&request[len-8],sizeof(skipcount),&skipcount);
-                        iguana_rwnum(0,&request[len-4],sizeof(filter),&filter);
+                        dragon_rwnum(0,&request[len-8],sizeof(skipcount),&skipcount);
+                        dragon_rwnum(0,&request[len-4],sizeof(filter),&filter);
                     }
                     if ( 0 && isCC != 0 )
                         fprintf(stderr,"utxos %s isCC.%d skipcount.%d filter.%x\n",coinaddr,isCC,skipcount,filter);
@@ -958,13 +958,13 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                     else if ( request[1] == len-7 )
                     {
                         isCC = (request[len-5] != 0);
-                        iguana_rwnum(0,&request[len-4],sizeof(skipcount),&skipcount);
+                        dragon_rwnum(0,&request[len-4],sizeof(skipcount),&skipcount);
                     }
                     else
                     {
                         isCC = (request[len-9] != 0);
-                        iguana_rwnum(0,&request[len-8],sizeof(skipcount),&skipcount);
-                        iguana_rwnum(0,&request[len-4],sizeof(filter),&filter);
+                        dragon_rwnum(0,&request[len-8],sizeof(skipcount),&skipcount);
+                        dragon_rwnum(0,&request[len-4],sizeof(filter),&filter);
                     }
                     if ( 0 && isCC != 0 )
                         fprintf(stderr,"txids %s isCC.%d skipcount.%d filter.%d\n",coinaddr,isCC,skipcount,filter);
@@ -993,10 +993,10 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                 {
                     int32_t vout; uint256 txid; uint8_t funcid,isCC = 0;
                     n = 1;
-                    n += iguana_rwnum(0,&request[n],sizeof(isCC),&isCC);
-                    n += iguana_rwnum(0,&request[n],sizeof(funcid),&funcid);
-                    n += iguana_rwnum(0,&request[n],sizeof(vout),&vout);
-                    n += iguana_rwbignum(0,&request[n],sizeof(txid),(uint8_t *)&txid);
+                    n += dragon_rwnum(0,&request[n],sizeof(isCC),&isCC);
+                    n += dragon_rwnum(0,&request[n],sizeof(funcid),&funcid);
+                    n += dragon_rwnum(0,&request[n],sizeof(vout),&vout);
+                    n += dragon_rwbignum(0,&request[n],sizeof(txid),(uint8_t *)&txid);
                     slen = request[n++];
                     if ( slen < 63 )
                     {
@@ -1028,7 +1028,7 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                 struct NSPV_ntzsresp N; int32_t height;
                 if ( len == 1+sizeof(height) )
                 {
-                    iguana_rwnum(0,&request[1],sizeof(height),&height);
+                    dragon_rwnum(0,&request[1],sizeof(height),&height);
                     memset(&N,0,sizeof(N));
                     if ( (slen= NSPV_getntzsresp(&N,height)) > 0 )
                     {
@@ -1051,8 +1051,8 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                 struct NSPV_ntzsproofresp P; uint256 prevntz,nextntz;
                 if ( len == 1+sizeof(prevntz)+sizeof(nextntz) )
                 {
-                    iguana_rwbignum(0,&request[1],sizeof(prevntz),(uint8_t *)&prevntz);
-                    iguana_rwbignum(0,&request[1+sizeof(prevntz)],sizeof(nextntz),(uint8_t *)&nextntz);
+                    dragon_rwbignum(0,&request[1],sizeof(prevntz),(uint8_t *)&prevntz);
+                    dragon_rwbignum(0,&request[1+sizeof(prevntz)],sizeof(nextntz),(uint8_t *)&nextntz);
                     memset(&P,0,sizeof(P));
                     if ( (slen= NSPV_getntzsproofresp(&P,prevntz,nextntz)) > 0 )
                     {
@@ -1076,9 +1076,9 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                 struct NSPV_txproof P; uint256 txid; int32_t height,vout;
                 if ( len == 1+sizeof(txid)+sizeof(height)+sizeof(vout) )
                 {
-                    iguana_rwnum(0,&request[1],sizeof(height),&height);
-                    iguana_rwnum(0,&request[1+sizeof(height)],sizeof(vout),&vout);
-                    iguana_rwbignum(0,&request[1+sizeof(height)+sizeof(vout)],sizeof(txid),(uint8_t *)&txid);
+                    dragon_rwnum(0,&request[1],sizeof(height),&height);
+                    dragon_rwnum(0,&request[1+sizeof(height)],sizeof(vout),&vout);
+                    dragon_rwbignum(0,&request[1+sizeof(height)+sizeof(vout)],sizeof(txid),(uint8_t *)&txid);
                     //fprintf(stderr,"got txid %s/v%d ht.%d\n",txid.GetHex().c_str(),vout,height);
                     memset(&P,0,sizeof(P));
                     if ( (slen= NSPV_gettxproof(&P,vout,txid,height)) > 0 )
@@ -1104,8 +1104,8 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                 struct NSPV_spentinfo S; int32_t vout; uint256 txid;
                 if ( len == 1+sizeof(txid)+sizeof(vout) )
                 {
-                    iguana_rwnum(0,&request[1],sizeof(vout),&vout);
-                    iguana_rwbignum(0,&request[1+sizeof(vout)],sizeof(txid),(uint8_t *)&txid);
+                    dragon_rwnum(0,&request[1],sizeof(vout),&vout);
+                    dragon_rwbignum(0,&request[1+sizeof(vout)],sizeof(txid),(uint8_t *)&txid);
                     memset(&S,0,sizeof(S));
                     if ( (slen= NSPV_getspentinfo(&S,txid,vout)) > 0 )
                     {
@@ -1128,8 +1128,8 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                 struct NSPV_broadcastresp B; uint32_t n,offset; uint256 txid;
                 if ( len > 1+sizeof(txid)+sizeof(n) )
                 {
-                    iguana_rwbignum(0,&request[1],sizeof(txid),(uint8_t *)&txid);
-                    iguana_rwnum(0,&request[1+sizeof(txid)],sizeof(n),&n);
+                    dragon_rwbignum(0,&request[1],sizeof(txid),(uint8_t *)&txid);
+                    dragon_rwnum(0,&request[1+sizeof(txid)],sizeof(n),&n);
                     memset(&B,0,sizeof(B));
                     offset = 1 + sizeof(txid) + sizeof(n);
                     if ( n < MAX_TX_SIZE_AFTER_SAPLING && request.size() == offset+n && (slen= NSPV_sendrawtransaction(&B,&request[offset],n)) > 0 )
@@ -1152,7 +1152,7 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
             {
                 struct NSPV_remoterpcresp R; int32_t p;
                 p = 1;
-                p+=iguana_rwnum(0,&request[p],sizeof(slen),&slen);
+                p+=dragon_rwnum(0,&request[p],sizeof(slen),&slen);
                 memset(&R,0,sizeof(R));
                 if (request.size() == p+slen && (slen=NSPV_remoterpc(&R,(char *)&request[p],slen))>0 )
                 {
@@ -1191,9 +1191,9 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                         memcpy(coinaddr, &request[n], addrlen);
                         coinaddr[addrlen] = 0;
                         n += addrlen;
-                        iguana_rwnum(0, &request[n], sizeof(amount), &amount);
+                        dragon_rwnum(0, &request[n], sizeof(amount), &amount);
                         n += sizeof(amount);
-                        iguana_rwnum(0, &request[n], sizeof(evalcode), &evalcode);
+                        dragon_rwnum(0, &request[n], sizeof(evalcode), &evalcode);
                         n += sizeof(evalcode);
 
                         int32_t funcidslen = request[n++];
@@ -1202,7 +1202,7 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
                             memcpy(funcids, &request[n], funcidslen);
                             funcids[funcidslen] = 0;
                             n += funcidslen;
-                            iguana_rwbignum(0, &request[n], sizeof(filtertxid), (uint8_t *)&filtertxid);
+                            dragon_rwbignum(0, &request[n], sizeof(filtertxid), (uint8_t *)&filtertxid);
                             std::cerr << __func__ << " " << "request addr=" << coinaddr << " amount=" << amount << " evalcode=" << (int)evalcode << " funcids=" << funcids << " filtertxid=" << filtertxid.GetHex() << std::endl;
 
                             memset(&U, 0, sizeof(U));

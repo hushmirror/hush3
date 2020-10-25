@@ -293,7 +293,7 @@ void komodo_nSPV(CNode *pto) // polling loop from SendMessages
             reqht = 0;
             len = 0;
             msg[len++] = NSPV_INFO;
-            len += iguana_rwnum(1,&msg[len],sizeof(reqht),&reqht);
+            len += dragon_rwnum(1,&msg[len],sizeof(reqht),&reqht);
             //fprintf(stderr,"issue getinfo\n");
             NSPV_req(pto,msg,len,NODE_NSPV,NSPV_INFO>>1);
         }
@@ -556,7 +556,7 @@ UniValue NSPV_getinfo_req(int32_t reqht)
     uint8_t msg[512]; int32_t i,iter,len = 0; struct NSPV_inforesp I;
     NSPV_inforesp_purge(&NSPV_inforesult);
     msg[len++] = NSPV_INFO;
-    len += iguana_rwnum(1,&msg[len],sizeof(reqht),&reqht);
+    len += dragon_rwnum(1,&msg[len],sizeof(reqht),&reqht);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
@@ -609,8 +609,8 @@ UniValue NSPV_addressutxos(char *coinaddr,int32_t CCflag,int32_t skipcount,int32
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
     msg[len++] = (CCflag != 0);
-    len += iguana_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
-    len += iguana_rwnum(1,&msg[len],sizeof(filter),&filter);
+    len += dragon_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
+    len += dragon_rwnum(1,&msg[len],sizeof(filter),&filter);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(0,msg,len,NODE_ADDRINDEX,msg[0]>>1) != 0 )
     {
@@ -646,8 +646,8 @@ UniValue NSPV_addresstxids(char *coinaddr,int32_t CCflag,int32_t skipcount,int32
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
     msg[len++] = (CCflag != 0);
-    len += iguana_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
-    len += iguana_rwnum(1,&msg[len],sizeof(filter),&filter);
+    len += dragon_rwnum(1,&msg[len],sizeof(skipcount),&skipcount);
+    len += dragon_rwnum(1,&msg[len],sizeof(filter),&filter);
     //fprintf(stderr,"skipcount.%d\n",skipcount);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(0,msg,len,NODE_ADDRINDEX,msg[0]>>1) != 0 )
@@ -681,9 +681,9 @@ UniValue NSPV_ccaddresstxids(char *coinaddr,int32_t CCflag,int32_t skipcount,uin
     vout=skipcount << 16 | evalcode << 8 | func;
     msg[len++] = NSPV_MEMPOOL;
     msg[len++] = (CCflag != 0);
-    len += iguana_rwnum(1,&msg[len],sizeof(funcid),&funcid);
-    len += iguana_rwnum(1,&msg[len],sizeof(vout),&vout);
-    len += iguana_rwbignum(1,&msg[len],sizeof(filtertxid),(uint8_t *)&filtertxid);
+    len += dragon_rwnum(1,&msg[len],sizeof(funcid),&funcid);
+    len += dragon_rwnum(1,&msg[len],sizeof(vout),&vout);
+    len += dragon_rwbignum(1,&msg[len],sizeof(filtertxid),(uint8_t *)&filtertxid);
     slen = (int32_t)strlen(coinaddr);
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
@@ -719,9 +719,9 @@ UniValue NSPV_mempooltxids(char *coinaddr,int32_t CCflag,uint8_t funcid,uint256 
     }
     msg[len++] = NSPV_MEMPOOL;
     msg[len++] = (CCflag != 0);
-    len += iguana_rwnum(1,&msg[len],sizeof(funcid),&funcid);
-    len += iguana_rwnum(1,&msg[len],sizeof(vout),&vout);
-    len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
+    len += dragon_rwnum(1,&msg[len],sizeof(funcid),&funcid);
+    len += dragon_rwnum(1,&msg[len],sizeof(vout),&vout);
+    len += dragon_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     slen = (int32_t)strlen(coinaddr);
     msg[len++] = slen;
     memcpy(&msg[len],coinaddr,slen), len += slen;
@@ -792,7 +792,7 @@ UniValue NSPV_notarizations(int32_t reqheight)
         return(NSPV_ntzsresp_json(ptr));
     }
     msg[len++] = NSPV_NTZS;
-    len += iguana_rwnum(1,&msg[len],sizeof(reqheight),&reqheight);
+    len += dragon_rwnum(1,&msg[len],sizeof(reqheight),&reqheight);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
@@ -819,8 +819,8 @@ UniValue NSPV_txidhdrsproof(uint256 prevtxid,uint256 nexttxid)
     }
     NSPV_ntzsproofresp_purge(&NSPV_ntzsproofresult);
     msg[len++] = NSPV_NTZSPROOF;
-    len += iguana_rwbignum(1,&msg[len],sizeof(prevtxid),(uint8_t *)&prevtxid);
-    len += iguana_rwbignum(1,&msg[len],sizeof(nexttxid),(uint8_t *)&nexttxid);
+    len += dragon_rwbignum(1,&msg[len],sizeof(prevtxid),(uint8_t *)&prevtxid);
+    len += dragon_rwbignum(1,&msg[len],sizeof(nexttxid),(uint8_t *)&nexttxid);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
     {
@@ -857,9 +857,9 @@ UniValue NSPV_txproof(int32_t vout,uint256 txid,int32_t height)
     }
     NSPV_txproof_purge(&NSPV_txproofresult);
     msg[len++] = NSPV_TXPROOF;
-    len += iguana_rwnum(1,&msg[len],sizeof(height),&height);
-    len += iguana_rwnum(1,&msg[len],sizeof(vout),&vout);
-    len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
+    len += dragon_rwnum(1,&msg[len],sizeof(height),&height);
+    len += dragon_rwnum(1,&msg[len],sizeof(vout),&vout);
+    len += dragon_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     fprintf(stderr,"req txproof %s/v%d at height.%d\n",txid.GetHex().c_str(),vout,height);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(0,msg,len,NODE_NSPV,msg[0]>>1) != 0 )
@@ -881,8 +881,8 @@ UniValue NSPV_spentinfo(uint256 txid,int32_t vout)
     uint8_t msg[512]; int32_t i,iter,len = 0; struct NSPV_spentinfo I;
     NSPV_spentinfo_purge(&NSPV_spentresult);
     msg[len++] = NSPV_SPENTINFO;
-    len += iguana_rwnum(1,&msg[len],sizeof(vout),&vout);
-    len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
+    len += dragon_rwnum(1,&msg[len],sizeof(vout),&vout);
+    len += dragon_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
     for (iter=0; iter<3; iter++)
     if ( NSPV_req(0,msg,len,NODE_SPENTINDEX,msg[0]>>1) != 0 )
     {
@@ -907,8 +907,8 @@ UniValue NSPV_broadcast(char *hex)
     txid = NSPV_doublesha256(data,n);
     msg = (uint8_t *)malloc(1 + sizeof(txid) + sizeof(n) + n);
     msg[len++] = NSPV_BROADCAST;
-    len += iguana_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
-    len += iguana_rwnum(1,&msg[len],sizeof(n),&n);
+    len += dragon_rwbignum(1,&msg[len],sizeof(txid),(uint8_t *)&txid);
+    len += dragon_rwnum(1,&msg[len],sizeof(n),&n);
     memcpy(&msg[len],data,n), len += n;
     free(data);
     //fprintf(stderr,"send txid.%s\n",txid.GetHex().c_str());
@@ -953,14 +953,14 @@ UniValue NSPV_ccmoduleutxos(char *coinaddr, int64_t amount, uint8_t evalcode, st
     msg[len++] = slen;
     memcpy(&msg[len], coinaddr, slen), len += slen;
 
-    len += iguana_rwnum(1, &msg[len], sizeof(amount), &amount);
-    len += iguana_rwnum(1, &msg[len], sizeof(evalcode), &evalcode);
+    len += dragon_rwnum(1, &msg[len], sizeof(amount), &amount);
+    len += dragon_rwnum(1, &msg[len], sizeof(evalcode), &evalcode);
 
     slen = (int32_t)(funcids.size());
     msg[len++] = slen;
     memcpy(&msg[len], funcids.data(), slen), len += slen;
 
-    len += iguana_rwbignum(1, &msg[len], sizeof(filtertxid), (uint8_t *)&filtertxid);
+    len += dragon_rwbignum(1, &msg[len], sizeof(filtertxid), (uint8_t *)&filtertxid);
     for (iter = 0; iter<3; iter++)
         if (NSPV_req(0, msg, len, NODE_ADDRINDEX, msg[0] >> 1) != 0)
         {
