@@ -14,18 +14,18 @@
  *                                                                            *
  ******************************************************************************/
 
-// build subatomic and put in path: git pull; gcc cc/dapps/subatomic.c -lm -o subatomic; cp subatomic /usr/bin
+// build hushdex and put in path: git pull; gcc cc/dapps/hushdex.c -lm -o hushdex; cp hushdex /usr/bin
 // alice sends relcoin and gets basecoin
 
 #define DEXP2P_CHAIN ((char *)"DEX")
-#define DEXP2P_PUBKEYS ((char *)"subatomic")
+#define DEXP2P_PUBKEYS ((char *)"hushdex")
 #include "dappinc.h"
 
 // for OTC mode, the following 4 functions are the only ones that should be needed to support a new "coin"
-//int64_t subatomic_getbalance(char *coin);
-//bits256 subatomic_coinpayment(int32_t OTCmode,char *coin,char *destaddr,uint64_t paytoshis,char *memostr);
-//cJSON *subatomic_txidwait(char *coin,bits256 txid,char *hexstr,int32_t numseconds);
-//int64_t subatomic_verifypayment(char *coin,cJSON *rawtx,uint64_t destsatoshis,char *destaddr);
+//int64_t hushdex_getbalance(char *coin);
+//bits256 hushdex_coinpayment(int32_t OTCmode,char *coin,char *destaddr,uint64_t paytoshis,char *memostr);
+//cJSON *hushdex_txidwait(char *coin,bits256 txid,char *hexstr,int32_t numseconds);
+//int64_t hushdex_verifypayment(char *coin,cJSON *rawtx,uint64_t destsatoshis,char *destaddr);
 
 // TODO:
 // address conversion
@@ -79,12 +79,12 @@ struct msginfo
     struct abinfo alice,bob;
 } *Messages;
 
-uint64_t subatomic_txfee(char *coin)
+uint64_t hushdex_txfee(char *coin)
 {
     return(SUBATOMIC_TXFEE);
 }
 
-char *subatomic_checkname(char *tmpstr,struct msginfo *mp,int32_t baserel,char *coin)
+char *hushdex_checkname(char *tmpstr,struct msginfo *mp,int32_t baserel,char *coin)
 {
     int32_t i,n; cJSON *external,*item; char *coinstr,*clistr; struct coininfo *ptr;
     ptr = (baserel == 0) ? &mp->base : &mp->rel;
@@ -150,21 +150,21 @@ char *subatomic_checkname(char *tmpstr,struct msginfo *mp,int32_t baserel,char *
     }
 }
 
-int32_t subatomic_zonly(struct coininfo *coin)
+int32_t hushdex_zonly(struct coininfo *coin)
 {
     if ( strcmp(coin->coin,"PIRATE") == 0 )
         return(1);
     else return(coin->iszaddr);
 }
 
-// //////////////////////////////// the four key functions needed to support a new item for subatomics
+// //////////////////////////////// the four key functions needed to support a new item for hushdexs
 
-int64_t _subatomic_getbalance(struct coininfo *coin)
+int64_t _hushdex_getbalance(struct coininfo *coin)
 {
     cJSON *retjson; char *retstr,cmpstr[64]; int64_t amount=0;
-    if ( (retjson= subatomic_cli(coin->cli,&retstr,"getbalance","","","","","","","")) != 0 )
+    if ( (retjson= hushdex_cli(coin->cli,&retstr,"getbalance","","","","","","","")) != 0 )
     {
-        fprintf(stderr,"_subatomic_getbalance.(%s) %s returned json!\n",coin->coinstr,coin->cli);
+        fprintf(stderr,"_hushdex_getbalance.(%s) %s returned json!\n",coin->coinstr,coin->cli);
         free_json(retjson);
     }
     else if ( retstr != 0 )
@@ -179,14 +179,14 @@ int64_t _subatomic_getbalance(struct coininfo *coin)
     return (amount);
 }
 
-bits256 _subatomic_sendtoaddress(struct coininfo *coin,char *destaddr,int64_t satoshis)
+bits256 _hushdex_sendtoaddress(struct coininfo *coin,char *destaddr,int64_t satoshis)
 {
     char numstr[32],*retstr,str[65]; cJSON *retjson; bits256 txid;
     memset(txid.bytes,0,sizeof(txid));
     sprintf(numstr,"%.8f",(double)satoshis/SATOSHIDEN);
-    if ( (retjson= subatomic_cli(coin->cli,&retstr,"sendtoaddress",destaddr,numstr,"false","","","","")) != 0 )
+    if ( (retjson= hushdex_cli(coin->cli,&retstr,"sendtoaddress",destaddr,numstr,"false","","","","")) != 0 )
     {
-        fprintf(stderr,"unexpected _subatomic_sendtoaddress json.(%s)\n",jprint(retjson,0));
+        fprintf(stderr,"unexpected _hushdex_sendtoaddress json.(%s)\n",jprint(retjson,0));
         free_json(retjson);
     }
     else if ( retstr != 0 )
@@ -196,28 +196,28 @@ bits256 _subatomic_sendtoaddress(struct coininfo *coin,char *destaddr,int64_t sa
             retstr[64] = 0;
             decode_hex(txid.bytes,32,retstr);
         }
-        fprintf(stderr,"_subatomic_sendtoaddress %s %.8f txid.(%s)\n",destaddr,(double)satoshis/SATOSHIDEN,bits256_str(str,txid));
+        fprintf(stderr,"_hushdex_sendtoaddress %s %.8f txid.(%s)\n",destaddr,(double)satoshis/SATOSHIDEN,bits256_str(str,txid));
         free(retstr);
     }
     return(txid);
 }
 
-cJSON *_subatomic_rawtransaction(struct coininfo *coin,bits256 txid)
+cJSON *_hushdex_rawtransaction(struct coininfo *coin,bits256 txid)
 {
     cJSON *retjson; char *retstr,str[65];
-    if ( (retjson= subatomic_cli(coin->cli,&retstr,"getrawtransaction",bits256_str(str,txid),"1","","","","","")) != 0 )
+    if ( (retjson= hushdex_cli(coin->cli,&retstr,"getrawtransaction",bits256_str(str,txid),"1","","","","","")) != 0 )
     {
         return(retjson);
     }
     else if ( retstr != 0 )
     {
-        fprintf(stderr,"_subatomic_rawtransaction.(%s) %s error.(%s)\n",coin->coin,coin->name,retstr);
+        fprintf(stderr,"_hushdex_rawtransaction.(%s) %s error.(%s)\n",coin->coin,coin->name,retstr);
         free(retstr);
     }
     return(0);
 }
 
-int64_t subatomic_getbalance(struct coininfo *coin)
+int64_t hushdex_getbalance(struct coininfo *coin)
 {
     char *coinstr,*acname=""; FILE *fp; int64_t retval = 0;
     coinstr = coin->coin;
@@ -230,7 +230,7 @@ int64_t subatomic_getbalance(struct coininfo *coin)
         }
         return(retval);
     }
-    else if ( subatomic_zonly(coin) != 0 )
+    else if ( hushdex_zonly(coin) != 0 )
         return(z_getbalance(coinstr,acname,DPOW_recvZaddr));
     else
     {
@@ -246,11 +246,11 @@ int64_t subatomic_getbalance(struct coininfo *coin)
         }
         else if ( coin->isexternal == 0 )
             return(get_getbalance(coinstr,acname));
-        else return(_subatomic_getbalance(coin));
+        else return(_hushdex_getbalance(coin));
     }
 }
 
-bits256 subatomic_coinpayment(uint32_t origid,int32_t OTCmode,struct coininfo *coin,char *destaddr,uint64_t paytoshis,char *memostr,char *destpub,char *senderpub)
+bits256 hushdex_coinpayment(uint32_t origid,int32_t OTCmode,struct coininfo *coin,char *destaddr,uint64_t paytoshis,char *memostr,char *destpub,char *senderpub)
 {
     bits256 txid; char opidstr[128],opretstr[32],str[65],*status,*coinstr,*acname=""; cJSON *retjson,*retjson2,*item,*res; int32_t i,pending=0;
     memset(&txid,0,sizeof(txid));
@@ -275,7 +275,7 @@ bits256 subatomic_coinpayment(uint32_t origid,int32_t OTCmode,struct coininfo *c
         fprintf(stderr,"end broadcast of (%s) to %s\n",coin->coin+1,senderpub);
         return(txid);
     }
-    else if ( subatomic_zonly(coin) != 0 )
+    else if ( hushdex_zonly(coin) != 0 )
     {
         if ( memostr[0] == 0 )
             memostr = "beef";
@@ -321,13 +321,13 @@ bits256 subatomic_coinpayment(uint32_t origid,int32_t OTCmode,struct coininfo *c
         {
             sprintf(opretstr,"%08x",origid);
             txid = sendtoaddress(coinstr,acname,destaddr,paytoshis,opretstr);
-        } else txid = _subatomic_sendtoaddress(coin,destaddr,paytoshis);
+        } else txid = _hushdex_sendtoaddress(coin,destaddr,paytoshis);
         printf("%u got txid.%s\n",origid,bits256_str(str,txid));
     }
     return(txid);
 }
 
-cJSON *subatomic_txidwait(struct coininfo *coin,bits256 txid,char *hexstr,int32_t numseconds,char *senderpub)
+cJSON *hushdex_txidwait(struct coininfo *coin,bits256 txid,char *hexstr,int32_t numseconds,char *senderpub)
 {
     int32_t i,zflag; char *coinstr,str[65],*acname=""; cJSON *rawtx; bits256 z; bits256 filehash;
     memset(&z,0,sizeof(z));
@@ -338,7 +338,7 @@ cJSON *subatomic_txidwait(struct coininfo *coin,bits256 txid,char *hexstr,int32_
         // compare against txid
         // if matches, sendrawtransaction if OTC mode, decoode and return if channels mode
     }
-    zflag = (subatomic_zonly(coin) != 0);
+    zflag = (hushdex_zonly(coin) != 0);
     coinstr = coin->coin;
     for (i=0; i<numseconds; i++)
     {
@@ -359,7 +359,7 @@ cJSON *subatomic_txidwait(struct coininfo *coin,bits256 txid,char *hexstr,int32_
             rawtx = get_z_viewtransaction(coinstr,acname,txid);
         else if ( coin->isexternal == 0 )
             rawtx = get_rawtransaction(coinstr,acname,txid);
-        else rawtx = _subatomic_rawtransaction(coin,txid);
+        else rawtx = _hushdex_rawtransaction(coin,txid);
         if ( rawtx != 0 )
             return(rawtx);
         sleep(1);
@@ -368,7 +368,7 @@ cJSON *subatomic_txidwait(struct coininfo *coin,bits256 txid,char *hexstr,int32_
     return(0);
 }
 
-int64_t subatomic_verifypayment(struct coininfo *coin,cJSON *rawtx,uint64_t destsatoshis,char *destaddr,bits256 txid)
+int64_t hushdex_verifypayment(struct coininfo *coin,cJSON *rawtx,uint64_t destsatoshis,char *destaddr,bits256 txid)
 {
     int32_t i,n,m,valid=0; bits256 tokenid,filehash,checkhash; cJSON *array,*item,*sobj,*a; char *addr,*acname,*coinstr,tokenaddr[64],*hex; uint8_t hexbuf[512],pub33[33]; uint64_t netval,recvsatoshis = 0;
     if ( coin->isfile != 0 )
@@ -381,7 +381,7 @@ int64_t subatomic_verifypayment(struct coininfo *coin,cJSON *rawtx,uint64_t dest
             return(SATOSHIDEN);
         } else return(0);
     }
-    else if ( subatomic_zonly(coin) != 0 )
+    else if ( hushdex_zonly(coin) != 0 )
     {
         if ( (array= jarray(&n,rawtx,"outputs")) != 0 && n > 0 )
         {
@@ -448,14 +448,14 @@ int64_t subatomic_verifypayment(struct coininfo *coin,cJSON *rawtx,uint64_t dest
 }
 // //////////// end
 
-struct msginfo *subatomic_find(uint32_t origid)
+struct msginfo *hushdex_find(uint32_t origid)
 {
     struct msginfo *mp;
     HASH_FIND(hh,Messages,&origid,sizeof(origid),mp);
     return(mp);
 }
 
-struct msginfo *subatomic_add(uint32_t origid)
+struct msginfo *hushdex_add(uint32_t origid)
 {
     struct msginfo *mp = calloc(1,sizeof(*mp));
     mp->origid = origid;
@@ -463,7 +463,7 @@ struct msginfo *subatomic_add(uint32_t origid)
     return(mp);
 }
 
-int32_t subatomic_status(struct msginfo *mp,int32_t status)
+int32_t hushdex_status(struct msginfo *mp,int32_t status)
 {
     static FILE *fp;
     if ( fp == 0 )
@@ -501,9 +501,9 @@ int32_t subatomic_status(struct msginfo *mp,int32_t status)
                     exit(-1);
                 }
                 //fprintf(stderr,"%u <- %d\n",oid,s);
-                if ( (m= subatomic_find(oid)) == 0 )
+                if ( (m= hushdex_find(oid)) == 0 )
                 {
-                    m = subatomic_add(oid);
+                    m = hushdex_add(oid);
                     count++;
                 }
                 if ( s > m->status )
@@ -524,18 +524,18 @@ int32_t subatomic_status(struct msginfo *mp,int32_t status)
     return(0);
 }
 
-struct msginfo *subatomic_tracker(uint32_t origid)
+struct msginfo *hushdex_tracker(uint32_t origid)
 {
     struct msginfo *mp;
-    if ( (mp= subatomic_find(origid)) == 0 )
+    if ( (mp= hushdex_find(origid)) == 0 )
     {
-        mp = subatomic_add(origid);
-        subatomic_status(mp,0);
+        mp = hushdex_add(origid);
+        hushdex_status(mp,0);
     }
     return(mp);
 }
 
-char *subatomic_hexstr(char *jsonstr)
+char *hushdex_hexstr(char *jsonstr)
 {
     char *hexstr; int32_t i,c,n = (int32_t)strlen(jsonstr);
     hexstr = malloc(2*n + 3);
@@ -552,7 +552,7 @@ char *subatomic_hexstr(char *jsonstr)
     return(hexstr);
 }
 
-cJSON *subatomic_mpjson(struct msginfo *mp)
+cJSON *hushdex_mpjson(struct msginfo *mp)
 {
     cJSON *item;
     item = cJSON_CreateObject();
@@ -573,12 +573,12 @@ cJSON *subatomic_mpjson(struct msginfo *mp)
     jaddstr(item,"alicesecp",mp->alice.secp);
     jaddstr(item,"bob",mp->bob.pubkey);
     jaddstr(item,"bobsecp",mp->bob.secp);
-    if ( subatomic_zonly(&mp->rel) != 0 )
+    if ( hushdex_zonly(&mp->rel) != 0 )
         jaddstr(item,"bobZaddr",mp->bob.recvZaddr);
     else jaddstr(item,"bobaddr",mp->bob.recvaddr);
     if ( mp->rel.istoken != 0 )
         jaddstr(item,"bobtoken",mp->rel.tokenid);
-    if ( subatomic_zonly(&mp->base) != 0 )
+    if ( hushdex_zonly(&mp->base) != 0 )
         jaddstr(item,"aliceZaddr",mp->alice.recvZaddr);
     else jaddstr(item,"aliceaddr",mp->alice.recvaddr);
     if ( mp->base.istoken != 0 )
@@ -586,19 +586,19 @@ cJSON *subatomic_mpjson(struct msginfo *mp)
     return(item);
 }
 
-uint64_t subatomic_orderbook_mpset(struct msginfo *mp,char *basecheck)
+uint64_t hushdex_orderbook_mpset(struct msginfo *mp,char *basecheck)
 {
     cJSON *retjson; char *tagA,*tagB,*senderpub,*str,tmpstr[32]; int32_t matches=0; double volA,volB; int64_t txfee=0;
     strcpy(mp->base.name,basecheck);
-    strcpy(mp->base.coin,subatomic_checkname(tmpstr,mp,0,basecheck));
-    mp->rel.txfee = subatomic_txfee(mp->rel.coin);
+    strcpy(mp->base.coin,hushdex_checkname(tmpstr,mp,0,basecheck));
+    mp->rel.txfee = hushdex_txfee(mp->rel.coin);
     if ( (retjson= dpow_get(mp->origid)) != 0 )
     {
         //fprintf(stderr,"dpow_get.(%s) (%s/%s)\n",jprint(retjson,0),mp->base.coin,mp->rel.coin);
         if ( (senderpub= jstr(retjson,"senderpub")) != 0 && is_hexstr(senderpub,0) == 66 && (tagA= jstr(retjson,"tagA")) != 0 && (tagB= jstr(retjson,"tagB")) != 0 && strncmp(tagB,mp->rel.name,strlen(mp->rel.name)) == 0 && strlen(tagA) < sizeof(mp->base.name) )
         {
             strcpy(mp->base.name,tagA);
-            strcpy(mp->base.coin,subatomic_checkname(tmpstr,mp,0,tagA));
+            strcpy(mp->base.coin,hushdex_checkname(tmpstr,mp,0,tagA));
             if ( basecheck[0] == 0 || strncmp(basecheck,tagA,strlen(basecheck)) == 0 )
                 matches = 1;
             else if ( strcmp(tagA,mp->base.name) == 0 )
@@ -610,7 +610,7 @@ uint64_t subatomic_orderbook_mpset(struct msginfo *mp,char *basecheck)
                 if ( (str= jstr(retjson,"decrypted")) != 0 && strlen(str) < 128 )
                     strcpy(mp->payload,str);
                 mp->locktime = juint(retjson,"timestamp") + SUBATOMIC_LOCKTIME;
-                mp->base.txfee = subatomic_txfee(mp->base.coin);
+                mp->base.txfee = hushdex_txfee(mp->base.coin);
                 strcpy(mp->senderpub,senderpub);
                 volB = jdouble(retjson,"amountB");
                 volA = jdouble(retjson,"amountA");
@@ -640,7 +640,7 @@ char *randhashstr(char *str)
     return(str);
 }
 
-void subatomic_extrafields(cJSON *dest,cJSON *src)
+void hushdex_extrafields(cJSON *dest,cJSON *src)
 {
     char *str;
     if ( (str= jstr(src,"approval")) != 0 )
@@ -669,12 +669,12 @@ void subatomic_extrafields(cJSON *dest,cJSON *src)
         jaddstr(dest,"bobtoken",str);
 }
 
-char *subatomic_submit(cJSON *argjson,int32_t tobob)
+char *hushdex_submit(cJSON *argjson,int32_t tobob)
 {
     char *jsonstr,*hexstr;
     jaddnum(argjson,"tobob",tobob != 0);
     jsonstr = jprint(argjson,1);
-    hexstr = subatomic_hexstr(jsonstr);
+    hexstr = hushdex_hexstr(jsonstr);
     free(jsonstr);
     return(hexstr);
 }
@@ -695,7 +695,7 @@ char *subatomic_submit(cJSON *argjson,int32_t tobob)
 #define SCRIPT_OP_CHECKMULTISIGVERIFY 0xaf
 #define SCRIPT_OP_CHECKLOCKTIMEVERIFY 0xb1
 
-int32_t subatomic_redeemscript(char *redeemscript,uint32_t locktime,char *pubkeyA,char *pubkeyB) // not needed
+int32_t hushdex_redeemscript(char *redeemscript,uint32_t locktime,char *pubkeyA,char *pubkeyB) // not needed
 {
     // if ( refund ) OP_HASH160 <2of2 multisig hash> OP_EQUAL   // standard multisig
     // else <locktime> CLTV OP_DROP <pubkeyA> OP_CHECKSIG // standard spend
@@ -743,16 +743,16 @@ int32_t subatomic_redeemscript(char *redeemscript,uint32_t locktime,char *pubkey
     return(n);
 }
 
-int32_t subatomic_approved(struct msginfo *mp,cJSON *approval,cJSON *msgjson,char *senderpub)
+int32_t hushdex_approved(struct msginfo *mp,cJSON *approval,cJSON *msgjson,char *senderpub)
 {
     char *hexstr,numstr[32],redeemscript[1024],*coin,*acname=""; cJSON *retjson,*decodejson; int32_t i,retval = 0;
-    subatomic_extrafields(approval,msgjson);
+    hushdex_extrafields(approval,msgjson);
     if ( mp->OTCmode == 0 )
     {
         coin = (mp->bobflag != 0) ? mp->base.coin : mp->rel.coin; // the other side gets this coin
         if ( get_createmultisig2(coin,acname,mp->msigaddr,mp->redeemscript,mp->alice.secp,mp->bob.secp) != 0 )
         {
-            subatomic_redeemscript(redeemscript,mp->locktime,mp->alice.secp,mp->bob.secp);
+            hushdex_redeemscript(redeemscript,mp->locktime,mp->alice.secp,mp->bob.secp);
             if ( (decodejson= get_decodescript(coin,acname,redeemscript)) != 0 )
             {
                 fprintf(stderr,"%s %s msigaddr.%s %s -> %s %s\n",mp->bobflag!=0?"bob":"alice",(mp->bobflag != 0) ? mp->base.coin : mp->rel.coin,mp->msigaddr,mp->redeemscript,redeemscript,jprint(decodejson,0));
@@ -767,51 +767,51 @@ int32_t subatomic_approved(struct msginfo *mp,cJSON *approval,cJSON *msgjson,cha
     i++;
     mp->approval[i<<1] = 0;
     jaddstr(approval,"approval",mp->approval);
-    hexstr = subatomic_submit(approval,!mp->bobflag);
+    hexstr = hushdex_submit(approval,!mp->bobflag);
     if ( (retjson= dpow_broadcast(SUBATOMIC_PRIORITY,hexstr,(char *)"inbox",(char *)"approved",senderpub,"","")) != 0 )
     {
         if ( (mp->approvalid= juint(retjson,"id")) != 0 )
             retval = 1;
         printf("%u approvalid.%u (%s)\n",mp->origid,mp->approvalid,senderpub);
-        subatomic_status(mp,SUBATOMIC_APPROVED);
+        hushdex_status(mp,SUBATOMIC_APPROVED);
         free_json(retjson);
     }
     free(hexstr);
     return(retval);
 }
 
-int32_t subatomic_opened(struct msginfo *mp,cJSON *opened,cJSON *msgjson,char *senderpub)
+int32_t hushdex_opened(struct msginfo *mp,cJSON *opened,cJSON *msgjson,char *senderpub)
 {
     char *hexstr,channelstr[65]; cJSON *retjson; int32_t retval = 0;
-    subatomic_extrafields(opened,msgjson);
+    hushdex_extrafields(opened,msgjson);
     jaddstr(opened,"opened",randhashstr(channelstr));
-    hexstr = subatomic_submit(opened,!mp->bobflag);
+    hexstr = hushdex_submit(opened,!mp->bobflag);
     if ( (retjson= dpow_broadcast(SUBATOMIC_PRIORITY,hexstr,(char *)"inbox",(char *)"opened",senderpub,"","")) != 0 )
     {
         if ( (mp->openedid= juint(retjson,"id")) != 0 )
             retval = 1;
         printf("%u openedid.%u\n",mp->origid,mp->openedid);
-        subatomic_status(mp,SUBATOMIC_OPENED);
+        hushdex_status(mp,SUBATOMIC_OPENED);
         free_json(retjson);
     }
     free(hexstr);
     return(retval);
 }
 
-int32_t subatomic_payment(struct msginfo *mp,cJSON *payment,cJSON *msgjson,char *senderpub)
+int32_t hushdex_payment(struct msginfo *mp,cJSON *payment,cJSON *msgjson,char *senderpub)
 {
     bits256 txid; uint64_t paytoshis; cJSON *retjson; char numstr[32],*coin,*dest,*hexstr; int32_t retval = 0;
     if ( mp->bobflag == 0 )
     {
         coin = mp->rel.name;
         paytoshis = mp->rel.satoshis;
-        if ( subatomic_zonly(&mp->rel) != 0 )
+        if ( hushdex_zonly(&mp->rel) != 0 )
             dest = mp->bob.recvZaddr;
         else dest = mp->bob.recvaddr;
         sprintf(numstr,"%llu",(long long)paytoshis);
         jaddstr(payment,"alicepays",numstr);
         jaddstr(payment,"bobdestaddr",dest);
-        txid = subatomic_coinpayment(mp->origid,mp->OTCmode,&mp->rel,dest,paytoshis,mp->approval,mp->bob.secp,senderpub);
+        txid = hushdex_coinpayment(mp->origid,mp->OTCmode,&mp->rel,dest,paytoshis,mp->approval,mp->bob.secp,senderpub);
         jaddbits256(payment,"alicepayment",txid);
         mp->alicepayment = txid;
         hexstr = 0; // get it from rawtransaction of txid
@@ -821,60 +821,60 @@ int32_t subatomic_payment(struct msginfo *mp,cJSON *payment,cJSON *msgjson,char 
     {
         coin = mp->base.name;
         paytoshis = mp->base.satoshis;
-        if ( subatomic_zonly(&mp->base) != 0 )
+        if ( hushdex_zonly(&mp->base) != 0 )
             dest = mp->alice.recvZaddr;
         else dest = mp->alice.recvaddr;
         sprintf(numstr,"%llu",(long long)paytoshis);
         jaddstr(payment,"bobpays",numstr);
         jaddstr(payment,"alicedestaddr",dest);
-        txid = subatomic_coinpayment(mp->origid,mp->OTCmode,&mp->base,dest,paytoshis,mp->approval,mp->alice.secp,senderpub);
+        txid = hushdex_coinpayment(mp->origid,mp->OTCmode,&mp->base,dest,paytoshis,mp->approval,mp->alice.secp,senderpub);
         jaddbits256(payment,"bobpayment",txid);
         mp->bobpayment = txid;
         hexstr = 0; // get it from rawtransaction of txid
         jaddstr(payment,"bobtx",hexstr);
     }
-    hexstr = subatomic_submit(payment,!mp->bobflag);
+    hexstr = hushdex_submit(payment,!mp->bobflag);
     if ( (retjson= dpow_broadcast(SUBATOMIC_PRIORITY,hexstr,(char *)"inbox",(char *)"payment",senderpub,"","")) != 0 )
     {
         if ( (mp->paymentids[0]= juint(retjson,"id")) != 0 )
             retval = 1;
         printf("%u: %.8f %s -> %s, paymentid[0] %u\n",mp->origid,dstr(paytoshis),coin,dest,mp->paymentids[0]);
-        subatomic_status(mp,SUBATOMIC_PAYMENT);
+        hushdex_status(mp,SUBATOMIC_PAYMENT);
         free_json(retjson);
     }
     free(hexstr);
     return(retval);
 }
 
-int32_t subatomic_paidinfull(struct msginfo *mp,cJSON *paid,cJSON *msgjson,char *senderpub)
+int32_t hushdex_paidinfull(struct msginfo *mp,cJSON *paid,cJSON *msgjson,char *senderpub)
 {
     char *hexstr; cJSON *retjson; int32_t retval = 0;
     jaddstr(paid,"paid","in full");
-    subatomic_extrafields(paid,msgjson);
-    hexstr = subatomic_submit(paid,!mp->bobflag);
+    hushdex_extrafields(paid,msgjson);
+    hexstr = hushdex_submit(paid,!mp->bobflag);
     if ( (retjson= dpow_broadcast(SUBATOMIC_PRIORITY,hexstr,(char *)"inbox",(char *)"paid",senderpub,"","")) != 0 )
     {
         if ( (mp->paidid= juint(retjson,"id")) != 0 )
             retval = 1;
         printf("%u paidid.%u\n",mp->origid,mp->paidid);
-        subatomic_status(mp,SUBATOMIC_PAIDINFULL);
+        hushdex_status(mp,SUBATOMIC_PAIDINFULL);
         free_json(retjson);
     }
     free(hexstr);
     return(retval);
 }
 
-int32_t subatomic_closed(struct msginfo *mp,cJSON *closed,cJSON *msgjson,char *senderpub)
+int32_t hushdex_closed(struct msginfo *mp,cJSON *closed,cJSON *msgjson,char *senderpub)
 {
     char *hexstr; cJSON *retjson; int32_t retval = 0;
     jaddnum(closed,"closed",mp->origid);
-    subatomic_extrafields(closed,msgjson);
-    hexstr = subatomic_submit(closed,!mp->bobflag);
+    hushdex_extrafields(closed,msgjson);
+    hexstr = hushdex_submit(closed,!mp->bobflag);
     if ( (retjson= dpow_broadcast(SUBATOMIC_PRIORITY,hexstr,(char *)"inbox",(char *)"closed",senderpub,"","")) != 0 )
     {
         if ( (mp->closedid= juint(retjson,"id")) != 0 )
             retval = 1;
-        subatomic_status(mp,SUBATOMIC_CLOSED);
+        hushdex_status(mp,SUBATOMIC_CLOSED);
         printf("%u closedid.%u\n",mp->origid,mp->closedid);
         free_json(retjson);
     }
@@ -882,25 +882,25 @@ int32_t subatomic_closed(struct msginfo *mp,cJSON *closed,cJSON *msgjson,char *s
     return(retval);
 }
 
-uint32_t subatomic_alice_openrequest(struct msginfo *origmp)
+uint32_t hushdex_alice_openrequest(struct msginfo *origmp)
 {
     struct msginfo *mp; cJSON *retjson,*openrequest; char *hexstr,*str,tmpstr[32];
-    mp = subatomic_tracker(origmp->origid);
+    mp = hushdex_tracker(origmp->origid);
     mp->origid = origmp->origid;
     mp->rel.satoshis = origmp->rel.satoshis;
     mp->rel.istoken = origmp->rel.istoken;
     strcpy(mp->rel.tokenid,origmp->rel.tokenid);
     strcpy(mp->rel.name,origmp->rel.name);
-    strcpy(mp->rel.coin,subatomic_checkname(tmpstr,mp,1,origmp->rel.name));
+    strcpy(mp->rel.coin,hushdex_checkname(tmpstr,mp,1,origmp->rel.name));
     strcpy(mp->alice.pubkey,DPOW_pubkeystr);
     strcpy(mp->alice.secp,DPOW_secpkeystr);
     strcpy(mp->alice.recvZaddr,DPOW_recvZaddr);
     strcpy(mp->alice.recvaddr,DPOW_recvaddr);
     printf("rel.%s/%s %s openrequest %u status.%d (%s/%s)\n",mp->rel.name,mp->rel.coin,mp->rel.tokenid,mp->origid,mp->status,mp->alice.recvaddr,mp->alice.recvZaddr);
-    if ( mp->status == 0 && subatomic_orderbook_mpset(mp,"") != 0 )
+    if ( mp->status == 0 && hushdex_orderbook_mpset(mp,"") != 0 )
     {
         strcpy(mp->bob.pubkey,mp->senderpub);
-        if ( subatomic_zonly(&mp->base) != 0 || subatomic_zonly(&mp->rel) != 0 )
+        if ( hushdex_zonly(&mp->base) != 0 || hushdex_zonly(&mp->rel) != 0 )
             mp->OTCmode = 1;
         else mp->OTCmode = SUBATOMIC_OTCDEFAULT;
         strcpy(origmp->base.name,mp->base.name);
@@ -918,14 +918,14 @@ uint32_t subatomic_alice_openrequest(struct msginfo *origmp)
             printf("%u cant do zaddr or fractional base %s.%s tokens %.8f\n",mp->origid,mp->base.coin,mp->base.tokenid,dstr(mp->base.satoshis));
             return(0);
         }
-        else if ( (openrequest= subatomic_mpjson(mp)) != 0 )
+        else if ( (openrequest= hushdex_mpjson(mp)) != 0 )
         {
-            hexstr = subatomic_submit(openrequest,!mp->bobflag);
+            hexstr = hushdex_submit(openrequest,!mp->bobflag);
             if ( (retjson= dpow_broadcast(SUBATOMIC_PRIORITY,hexstr,(char *)"inbox",(char *)"openrequest",mp->bob.pubkey,"","")) != 0 )
             {
                 mp->openrequestid = juint(retjson,"id");
                 printf("%u openrequest.%u -> (%s)\n",mp->origid,mp->openrequestid,mp->bob.pubkey);
-                subatomic_status(mp,SUBATOMIC_OPENREQUEST);
+                hushdex_status(mp,SUBATOMIC_OPENREQUEST);
                 free_json(retjson);
             }
             free(hexstr);
@@ -934,15 +934,15 @@ uint32_t subatomic_alice_openrequest(struct msginfo *origmp)
     return(mp->openrequestid);
 }
 
-void subatomic_bob_gotopenrequest(uint32_t inboxid,char *senderpub,cJSON *msgjson,char *basename,char *relname)
+void hushdex_bob_gotopenrequest(uint32_t inboxid,char *senderpub,cJSON *msgjson,char *basename,char *relname)
 {
     struct msginfo *mp; cJSON *approval; int32_t origid; char *addr,tmpstr[32],*coin,*acname="";
     origid = juint(msgjson,"origid");
-    mp = subatomic_tracker(origid);
+    mp = hushdex_tracker(origid);
     strcpy(mp->base.name,basename);
-    strcpy(mp->base.coin,subatomic_checkname(tmpstr,mp,0,basename));
+    strcpy(mp->base.coin,hushdex_checkname(tmpstr,mp,0,basename));
     strcpy(mp->rel.name,relname);
-    strcpy(mp->rel.coin,subatomic_checkname(tmpstr,mp,1,relname));
+    strcpy(mp->rel.coin,hushdex_checkname(tmpstr,mp,1,relname));
     mp->origid = origid;
     mp->rel.satoshis = j64bits(msgjson,"relsatoshis");
     mp->bobflag = 1;
@@ -956,42 +956,42 @@ void subatomic_bob_gotopenrequest(uint32_t inboxid,char *senderpub,cJSON *msgjso
         strcpy(mp->alice.recvZaddr,addr);
     if ( (addr= jstr(msgjson,"alicesecp")) != 0 )
         strcpy(mp->alice.secp,addr);
-    if ( subatomic_zonly(&mp->base) != 0 || subatomic_zonly(&mp->rel) != 0 )
+    if ( hushdex_zonly(&mp->base) != 0 || hushdex_zonly(&mp->rel) != 0 )
         mp->OTCmode = 1;
     else mp->OTCmode = SUBATOMIC_OTCDEFAULT;
     printf("%u got open request\n",mp->origid);
-    if ( mp->status == 0 && subatomic_orderbook_mpset(mp,basename) != 0 && (approval= subatomic_mpjson(mp)) != 0 )
+    if ( mp->status == 0 && hushdex_orderbook_mpset(mp,basename) != 0 && (approval= hushdex_mpjson(mp)) != 0 )
     {
         if ( mp->rel.istoken != 0 && ((mp->rel.satoshis % SATOSHIDEN) != 0 || mp->rel.iszaddr != 0) )
         {
             printf("%u cant do zaddr or fractional rel %s.%s tokens %.8f\n",mp->origid,mp->rel.coin,mp->rel.tokenid,dstr(mp->rel.satoshis));
-            subatomic_closed(mp,approval,msgjson,senderpub);
+            hushdex_closed(mp,approval,msgjson,senderpub);
             return;
         }
         else if ( mp->base.istoken != 0 && ((mp->base.satoshis % SATOSHIDEN) != 0 || mp->base.iszaddr != 0 ) )
         {
             printf("%u cant do zaddr or fractional base %s.%s tokens %.8f\n",mp->origid,mp->base.coin,mp->base.tokenid,dstr(mp->base.satoshis));
-            subatomic_closed(mp,approval,msgjson,senderpub);
+            hushdex_closed(mp,approval,msgjson,senderpub);
             return;
         }
-        else if ( subatomic_getbalance(&mp->base) < mp->base.satoshis )
+        else if ( hushdex_getbalance(&mp->base) < mp->base.satoshis )
         {
-            printf("%u bob node low on %s funds! %.8f not enough for %.8f\n",mp->origid,mp->base.coin,dstr(subatomic_getbalance(&mp->base)),dstr(mp->base.satoshis));
-            subatomic_closed(mp,approval,msgjson,senderpub);
+            printf("%u bob node low on %s funds! %.8f not enough for %.8f\n",mp->origid,mp->base.coin,dstr(hushdex_getbalance(&mp->base)),dstr(mp->base.satoshis));
+            hushdex_closed(mp,approval,msgjson,senderpub);
         }
         else
         {
             printf("%u bob (%s/%s) gotopenrequest origid.%u status.%d (%s/%s) SENDERPUB.(%s)\n",mp->origid,mp->base.name,mp->rel.name,mp->origid,mp->status,mp->bob.recvaddr,mp->bob.recvZaddr,senderpub);
-            subatomic_approved(mp,approval,msgjson,senderpub);
+            hushdex_approved(mp,approval,msgjson,senderpub);
         }
     }
 }
 
-int32_t subatomic_channelapproved(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
+int32_t hushdex_channelapproved(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
 {
     struct msginfo *mp; cJSON *approval; char *addr,*coin,*acname; int32_t retval = 0;
-    mp = subatomic_tracker(juint(msgjson,"origid"));
-    if ( subatomic_orderbook_mpset(mp,mp->base.name) != 0 && (approval= subatomic_mpjson(mp)) != 0 )
+    mp = hushdex_tracker(juint(msgjson,"origid"));
+    if ( hushdex_orderbook_mpset(mp,mp->base.name) != 0 && (approval= hushdex_mpjson(mp)) != 0 )
     {
         printf("%u iambob.%d (%s/%s) channelapproved origid.%u status.%d\n",mp->origid,mp->bobflag,mp->base.name,mp->rel.name,mp->origid,mp->status);
         if ( mp->bobflag == 0 && mp->status == SUBATOMIC_OPENREQUEST )
@@ -1002,46 +1002,46 @@ int32_t subatomic_channelapproved(uint32_t inboxid,char *senderpub,cJSON *msgjso
                 strcpy(mp->bob.recvZaddr,addr);
             if ( (addr= jstr(msgjson,"bobsecp")) != 0 )
                 strcpy(mp->bob.secp,addr);
-            retval = subatomic_approved(mp,approval,msgjson,senderpub);
+            retval = hushdex_approved(mp,approval,msgjson,senderpub);
         }
         else if ( mp->bobflag != 0 && mp->status == SUBATOMIC_APPROVED )
-            retval = subatomic_opened(mp,approval,msgjson,senderpub);
+            retval = hushdex_opened(mp,approval,msgjson,senderpub);
     }
     return(retval);
 }
 
-int32_t subatomic_incomingopened(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
+int32_t hushdex_incomingopened(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
 {
     struct msginfo *mp; cJSON *payment; int32_t retval = 0;
-    mp = subatomic_tracker(juint(msgjson,"origid"));
-    if ( subatomic_orderbook_mpset(mp,mp->base.name) != 0 && (payment= subatomic_mpjson(mp)) != 0 )
+    mp = hushdex_tracker(juint(msgjson,"origid"));
+    if ( hushdex_orderbook_mpset(mp,mp->base.name) != 0 && (payment= hushdex_mpjson(mp)) != 0 )
     {
         printf("%u iambob.%d (%s/%s) incomingchannel status.%d\n",mp->origid,mp->bobflag,mp->base.name,mp->rel.name,mp->status);
         if ( mp->bobflag == 0 && mp->status == SUBATOMIC_APPROVED )
-            retval = subatomic_payment(mp,payment,msgjson,senderpub);
+            retval = hushdex_payment(mp,payment,msgjson,senderpub);
         else if ( mp->bobflag != 0 && mp->status == SUBATOMIC_OPENED )
             retval = 1; // nothing to do
     }
     return(retval);
 }
 
-int32_t subatomic_incomingpayment(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
+int32_t hushdex_incomingpayment(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
 {
     static FILE *fp;
     struct msginfo *mp; cJSON *pay,*rawtx,*retjson; bits256 txid; char str[65],*hexstr; int32_t retval = 0;
-    mp = subatomic_tracker(juint(msgjson,"origid"));
-    if ( subatomic_orderbook_mpset(mp,mp->base.name) != 0 && (pay= subatomic_mpjson(mp)) != 0 )
+    mp = hushdex_tracker(juint(msgjson,"origid"));
+    if ( hushdex_orderbook_mpset(mp,mp->base.name) != 0 && (pay= hushdex_mpjson(mp)) != 0 )
     {
         printf("%u iambob.%d (%s/%s) incomingpayment status.%d\n",mp->origid,mp->bobflag,mp->base.name,mp->rel.name,mp->status);
         if ( mp->bobflag == 0 )
         {
             txid = jbits256(msgjson,"bobpayment");
             jaddbits256(msgjson,"alicepayment",mp->alicepayment);
-            printf("%u alice waits for %s.%s to be in mempool (%.8f -> %s)\n",mp->origid,mp->base.name,bits256_str(str,txid),dstr(mp->base.satoshis),subatomic_zonly(&mp->base) == 0 ? mp->alice.recvaddr : mp->alice.recvZaddr);
+            printf("%u alice waits for %s.%s to be in mempool (%.8f -> %s)\n",mp->origid,mp->base.name,bits256_str(str,txid),dstr(mp->base.satoshis),hushdex_zonly(&mp->base) == 0 ? mp->alice.recvaddr : mp->alice.recvZaddr);
             hexstr = jstr(msgjson,"bobtx");
-            if ( (rawtx= subatomic_txidwait(&mp->base,txid,hexstr,SUBATOMIC_TIMEOUT,senderpub)) != 0 )
+            if ( (rawtx= hushdex_txidwait(&mp->base,txid,hexstr,SUBATOMIC_TIMEOUT,senderpub)) != 0 )
             {
-                if ( subatomic_verifypayment(&mp->base,rawtx,mp->base.satoshis,subatomic_zonly(&mp->base) == 0 ? mp->alice.recvaddr : mp->alice.recvZaddr,txid) >= 0 )
+                if ( hushdex_verifypayment(&mp->base,rawtx,mp->base.satoshis,hushdex_zonly(&mp->base) == 0 ? mp->alice.recvaddr : mp->alice.recvZaddr,txid) >= 0 )
                     mp->gotpayment = 1;
                 free_json(rawtx);
             }
@@ -1073,28 +1073,28 @@ int32_t subatomic_incomingpayment(uint32_t inboxid,char *senderpub,cJSON *msgjso
                     if ( (retjson= dpow_broadcast(SUBATOMIC_PRIORITY,bits256_str(str,mp->alicepayment),(char *)"incomplete",str,DPOW_pubkeystr,"","")) != 0 )
                         free_json(retjson);
                 }
-                subatomic_closed(mp,pay,msgjson,senderpub);
+                hushdex_closed(mp,pay,msgjson,senderpub);
                 exit(-1);
             }
         }
         if ( mp->gotpayment != 0 )
-            retval = subatomic_paidinfull(mp,pay,msgjson,senderpub);
+            retval = hushdex_paidinfull(mp,pay,msgjson,senderpub);
         else
         {
             if ( mp->bobflag != 0 && mp->status == SUBATOMIC_OPENED )
             {
                 txid = jbits256(msgjson,"alicepayment");
-                printf("%u bob waits for %s.%s to be in mempool (%.8f -> %s)\n",mp->origid,mp->rel.name,bits256_str(str,txid),dstr(mp->rel.satoshis),subatomic_zonly(&mp->rel) == 0 ? mp->bob.recvaddr : mp->bob.recvZaddr);
+                printf("%u bob waits for %s.%s to be in mempool (%.8f -> %s)\n",mp->origid,mp->rel.name,bits256_str(str,txid),dstr(mp->rel.satoshis),hushdex_zonly(&mp->rel) == 0 ? mp->bob.recvaddr : mp->bob.recvZaddr);
                 hexstr = jstr(msgjson,"alicetx");
-                if ( (rawtx= subatomic_txidwait(&mp->rel,txid,hexstr,SUBATOMIC_TIMEOUT,senderpub)) != 0 )
+                if ( (rawtx= hushdex_txidwait(&mp->rel,txid,hexstr,SUBATOMIC_TIMEOUT,senderpub)) != 0 )
                 {
-                    if ( subatomic_verifypayment(&mp->rel,rawtx,mp->rel.satoshis,subatomic_zonly(&mp->rel) == 0 ? mp->bob.recvaddr : mp->bob.recvZaddr,txid) >= 0 )
+                    if ( hushdex_verifypayment(&mp->rel,rawtx,mp->rel.satoshis,hushdex_zonly(&mp->rel) == 0 ? mp->bob.recvaddr : mp->bob.recvZaddr,txid) >= 0 )
                         mp->gotpayment = 1;
                     free_json(rawtx);
                 }
                 if ( mp->gotpayment != 0 )
                 {
-                    retval = subatomic_payment(mp,pay,msgjson,senderpub);
+                    retval = hushdex_payment(mp,pay,msgjson,senderpub);
                     jaddbits256(msgjson,"bobpayment",mp->bobpayment);
                     if ( mp->rel.iszaddr == 0 )
                     {
@@ -1121,42 +1121,42 @@ int32_t subatomic_incomingpayment(uint32_t inboxid,char *senderpub,cJSON *msgjso
     return(retval);
 }
 
-int32_t subatomic_incomingfullypaid(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
+int32_t hushdex_incomingfullypaid(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
 {
     struct msginfo *mp; cJSON *closed; int32_t retval = 0;
-    mp = subatomic_tracker(juint(msgjson,"origid"));
-    if ( subatomic_orderbook_mpset(mp,mp->base.name) != 0 && (closed= subatomic_mpjson(mp)) != 0 )
+    mp = hushdex_tracker(juint(msgjson,"origid"));
+    if ( hushdex_orderbook_mpset(mp,mp->base.name) != 0 && (closed= hushdex_mpjson(mp)) != 0 )
     {
         printf("%u iambob.%d (%s/%s) incomingfullypaid status.%d\n",mp->origid,mp->bobflag,mp->base.name,mp->rel.name,mp->status);
         // error check msgjson vs M
         if ( mp->bobflag == 0 && mp->status == SUBATOMIC_PAIDINFULL )
-            retval = subatomic_closed(mp,closed,msgjson,senderpub);
+            retval = hushdex_closed(mp,closed,msgjson,senderpub);
         else if ( mp->bobflag != 0 && mp->status == SUBATOMIC_PAYMENT )
-            retval = subatomic_paidinfull(mp,closed,msgjson,senderpub);
+            retval = hushdex_paidinfull(mp,closed,msgjson,senderpub);
     }
     return(retval);
 }
 
-int32_t subatomic_incomingclosed(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
+int32_t hushdex_incomingclosed(uint32_t inboxid,char *senderpub,cJSON *msgjson,struct msginfo *origmp)
 {
     struct msginfo *mp; cJSON *closed; int32_t retval = 0;
-    mp = subatomic_tracker(juint(msgjson,"origid"));
-    if ( subatomic_orderbook_mpset(mp,mp->base.name) != 0 && (closed= subatomic_mpjson(mp)) != 0 )
+    mp = hushdex_tracker(juint(msgjson,"origid"));
+    if ( hushdex_orderbook_mpset(mp,mp->base.name) != 0 && (closed= hushdex_mpjson(mp)) != 0 )
     {
         printf("%u iambob.%d (%s/%s) incomingclose status.%d\n",mp->origid,mp->bobflag,mp->base.name,mp->rel.name,mp->status);
         if ( mp->bobflag != 0 )
             dpow_cancel(mp->origid);
         if ( mp->status < SUBATOMIC_CLOSED )
         {
-            retval = subatomic_closed(mp,closed,msgjson,senderpub);
-            subatomic_status(mp,SUBATOMIC_CLOSED);
+            retval = hushdex_closed(mp,closed,msgjson,senderpub);
+            hushdex_status(mp,SUBATOMIC_CLOSED);
         }
         retval = 1;
     }
     return(retval);
 }
 
-int32_t subatomic_ismine(int32_t bobflag,cJSON *json,char *basename,char *relname)
+int32_t hushdex_ismine(int32_t bobflag,cJSON *json,char *basename,char *relname)
 {
     char *base,*rel;
     if ( (base= jstr(json,"base")) != 0 && (rel= jstr(json,"rel")) != 0 )
@@ -1173,7 +1173,7 @@ int32_t subatomic_ismine(int32_t bobflag,cJSON *json,char *basename,char *relnam
     return(0);
 }
 
-void subatomic_tokensregister(int32_t priority)
+void hushdex_tokensregister(int32_t priority)
 {
     char *token_name,*tokenid,existing[65]; cJSON *tokens,*token; int32_t i,numtokens;
     if ( SUBATOMIC_json != 0 && (tokens= jarray(&numtokens,SUBATOMIC_json,"tokens")) != 0 )
@@ -1193,7 +1193,7 @@ void subatomic_tokensregister(int32_t priority)
     }
 }
 
-void subatomic_filesregister(int32_t priority)
+void hushdex_filesregister(int32_t priority)
 {
     char *fname,*tokenid,*coin,existing[512]; int64_t price; cJSON *files,*file,*prices; int32_t i,j,m,numfiles;
     if ( SUBATOMIC_json != 0 && (files= jarray(&numfiles,SUBATOMIC_json,"files")) != 0 )
@@ -1221,12 +1221,12 @@ void subatomic_filesregister(int32_t priority)
     }
 }
 
-void subatomic_loop(struct msginfo *mp)
+void hushdex_loop(struct msginfo *mp)
 {
     static char *tagBs[] = { "openrequest", "approved", "opened", "payment", "paid", "closed" };
     static uint32_t stopats[sizeof(tagBs)/sizeof(*tagBs)];
     struct inboxinfo **ptrs,*ptr; char *tagB; int32_t i,iter,n,msgs=0,mask=0; cJSON *inboxjson;
-    fprintf(stderr,"start subatomic_loop iambob.%d %s -> %s, %u %llu %u\n",mp->bobflag,mp->base.name,mp->rel.name,mp->origid,(long long)mp->rel.satoshis,mp->openrequestid);
+    fprintf(stderr,"start hushdex_loop iambob.%d %s -> %s, %u %llu %u\n",mp->bobflag,mp->base.name,mp->rel.name,mp->origid,(long long)mp->rel.satoshis,mp->openrequestid);
     while ( 1 )
     {
         if ( msgs == 0 )
@@ -1236,8 +1236,8 @@ void subatomic_loop(struct msginfo *mp)
             if ( mp->bobflag != 0 )
             {
                 dpow_pubkeyregister(SUBATOMIC_PRIORITY);
-                subatomic_tokensregister(SUBATOMIC_PRIORITY);
-                subatomic_filesregister(SUBATOMIC_PRIORITY);
+                hushdex_tokensregister(SUBATOMIC_PRIORITY);
+                hushdex_filesregister(SUBATOMIC_PRIORITY);
             }
         }
         msgs = 0;
@@ -1255,24 +1255,24 @@ void subatomic_loop(struct msginfo *mp)
                         {
                             if ( jint(inboxjson,"tobob") != mp->bobflag )
                                 continue;
-                            if ( subatomic_ismine(mp->bobflag,inboxjson,mp->base.name,mp->rel.name) != 0 )
+                            if ( hushdex_ismine(mp->bobflag,inboxjson,mp->base.name,mp->rel.name) != 0 )
                             {
                                 if ( strcmp(tagB,"openrequest") == 0 && mp->bobflag != 0 )
-                                    subatomic_bob_gotopenrequest(ptr->shorthash,ptr->senderpub,inboxjson,mp->base.name,mp->rel.name);
+                                    hushdex_bob_gotopenrequest(ptr->shorthash,ptr->senderpub,inboxjson,mp->base.name,mp->rel.name);
                                 else if ( strcmp(tagB,"approved") == 0 )
-                                    mask |= subatomic_channelapproved(ptr->shorthash,ptr->senderpub,inboxjson,mp) << 0;
+                                    mask |= hushdex_channelapproved(ptr->shorthash,ptr->senderpub,inboxjson,mp) << 0;
                                 else if ( strcmp(tagB,"opened") == 0 )
-                                    mask |= subatomic_incomingopened(ptr->shorthash,ptr->senderpub,inboxjson,mp) << 1;
+                                    mask |= hushdex_incomingopened(ptr->shorthash,ptr->senderpub,inboxjson,mp) << 1;
                                 else if ( strcmp(tagB,"payment") == 0 )
-                                    mask |= subatomic_incomingpayment(ptr->shorthash,ptr->senderpub,inboxjson,mp) << 2;
+                                    mask |= hushdex_incomingpayment(ptr->shorthash,ptr->senderpub,inboxjson,mp) << 2;
                                 else if ( strcmp(tagB,"paid") == 0 )
-                                    mask |= subatomic_incomingfullypaid(ptr->shorthash,ptr->senderpub,inboxjson,mp) << 3;
+                                    mask |= hushdex_incomingfullypaid(ptr->shorthash,ptr->senderpub,inboxjson,mp) << 3;
                                 else if ( strcmp(tagB,"closed") == 0 )
-                                    mask |= subatomic_incomingclosed(ptr->shorthash,ptr->senderpub,inboxjson,mp) * 0x1f;
+                                    mask |= hushdex_incomingclosed(ptr->shorthash,ptr->senderpub,inboxjson,mp) * 0x1f;
                                 else fprintf(stderr,"iambob.%d unknown unexpected tagB.(%s)\n",mp->bobflag,tagB);
                             }
                             free_json(inboxjson);
-                        } else fprintf(stderr,"subatomic iambob.%d loop got unparseable(%s)\n",mp->bobflag,ptr->jsonstr);
+                        } else fprintf(stderr,"hushdex iambob.%d loop got unparseable(%s)\n",mp->bobflag,ptr->jsonstr);
                         free(ptr);
                         ptrs[i] = 0;
                     }
@@ -1290,21 +1290,21 @@ void subatomic_loop(struct msginfo *mp)
 
 int32_t main(int32_t argc,char **argv)
 {
-    char *fname = "subatomic.json";
-    int32_t i,height; char *coin,*kcli,*subatomic,*hashstr,*acname=(char *)""; cJSON *retjson; bits256 blockhash; char checkstr[65],str[65],str2[65],tmpstr[32]; long fsize; struct msginfo M;
+    char *fname = "hushdex.json";
+    int32_t i,height; char *coin,*kcli,*hushdex,*hashstr,*acname=(char *)""; cJSON *retjson; bits256 blockhash; char checkstr[65],str[65],str2[65],tmpstr[32]; long fsize; struct msginfo M;
     memset(&M,0,sizeof(M));
     srand((int32_t)time(NULL));
-    if ( (subatomic= filestr(&fsize,fname)) == 0 )
+    if ( (hushdex= filestr(&fsize,fname)) == 0 )
     {
         fprintf(stderr,"cant load %s file\n",fname);
         exit(-1);
     }
-    if ( (SUBATOMIC_json= cJSON_Parse(subatomic)) == 0 )
+    if ( (SUBATOMIC_json= cJSON_Parse(hushdex)) == 0 )
     {
-        fprintf(stderr,"cant parse subatomic.json file (%s)\n",subatomic);
+        fprintf(stderr,"cant parse hushdex.json file (%s)\n",hushdex);
         exit(-1);
     }
-    free(subatomic);
+    free(hushdex);
     if ( argc >= 4 )
     {
         if ( dpow_pubkey() < 0 )
@@ -1319,7 +1319,7 @@ int32_t main(int32_t argc,char **argv)
             acname = coin;
         }
         hashstr = (char *)argv[3];
-        strcpy(M.rel.coin,subatomic_checkname(tmpstr,&M,1,coin));
+        strcpy(M.rel.coin,hushdex_checkname(tmpstr,&M,1,coin));
         strcpy(M.rel.name,coin);
         if ( argc == 4 && strlen(hashstr) == 64 ) // for blocknotify usage, seems not needed
         {
@@ -1370,24 +1370,24 @@ int32_t main(int32_t argc,char **argv)
                         mult = SATOSHIDEN;
                         break;
                     }
-                if ( subatomic_getbalance(&M.rel) < M.rel.satoshis/mult )
+                if ( hushdex_getbalance(&M.rel) < M.rel.satoshis/mult )
                 {
-                    fprintf(stderr,"not enough balance %s %.8f for %.8f\n",M.rel.coin,dstr(subatomic_getbalance(&M.rel)),dstr(M.rel.satoshis/mult));
+                    fprintf(stderr,"not enough balance %s %.8f for %.8f\n",M.rel.coin,dstr(hushdex_getbalance(&M.rel)),dstr(M.rel.satoshis/mult));
                     return(-1);
                 }
-                fprintf(stderr,"subatomic_channel_alice (%s/%s) %s %u with %.8f %llu\n",M.rel.name,M.rel.coin,hashstr,M.origid,atof(argv[4]),(long long)M.rel.satoshis);
+                fprintf(stderr,"hushdex_channel_alice (%s/%s) %s %u with %.8f %llu\n",M.rel.name,M.rel.coin,hashstr,M.origid,atof(argv[4]),(long long)M.rel.satoshis);
                 dpow_pubkeyregister(SUBATOMIC_PRIORITY);
-                M.openrequestid = subatomic_alice_openrequest(&M);
+                M.openrequestid = hushdex_alice_openrequest(&M);
                 if ( M.openrequestid != 0 )
-                    subatomic_loop(&M);
+                    hushdex_loop(&M);
             } else fprintf(stderr,"checkstr mismatch %s %s != %s\n",coin,hashstr,checkstr);
         }
         else
         {
             M.bobflag = 1;
             strcpy(M.base.name,hashstr);
-            strcpy(M.base.coin,subatomic_checkname(tmpstr,&M,0,hashstr));
-            subatomic_loop(&M); // while ( 1 ) loop for each relcoin -> basecoin
+            strcpy(M.base.coin,hushdex_checkname(tmpstr,&M,0,hashstr));
+            hushdex_loop(&M); // while ( 1 ) loop for each relcoin -> basecoin
         }
     }
     return(SUBATOMIC_retval);
