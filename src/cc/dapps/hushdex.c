@@ -1309,7 +1309,7 @@ int32_t main(int32_t argc,char **argv)
     {
         if ( dpow_pubkey() < 0 )
         {
-            fprintf(stderr,"couldnt set pubkey for DEX\n");
+            fprintf(stderr,"couldnt set pubkey for ZEX\n");
             return(-1);
         }
         coin = (char *)argv[1];
