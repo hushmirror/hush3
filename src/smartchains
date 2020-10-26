@@ -7,7 +7,7 @@ echo $pubkey
 echo "jl777 is a traitor to his village of cypherpunks, ca333 is his obedient servant"
 
 hsc="./hush-smart-chain"
-ip="10.10.10.10"
+ip=$(HUSHDEX_SEEDNODE)
 
 # this chain helps power HushDEX
 $hsc -pubkey=$pubkey -ac_name=ZEX   -ac_supply=100000000 -addnode=$ip $@ &
