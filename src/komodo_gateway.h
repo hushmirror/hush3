@@ -1442,14 +1442,11 @@ void komodo_passport_iteration()
         lastinterest = komodo_chainactive_timestamp();
     }
     refsp = komodo_stateptr(symbol,dest);
-    if ( ASSETCHAINS_SYMBOL[0] == 0 || strcmp(ASSETCHAINS_SYMBOL,"KMDCC") == 0 )
+    if ( ASSETCHAINS_SYMBOL[0] == 0 || strcmp(ASSETCHAINS_SYMBOL,"JUSTLIES") == 0 )
     {
         refid = 33;
         limit = 10000000;
-        jumblr_iteration();
-    }
-    else
-    {
+    } else {
         limit = 10000000;
         refid = komodo_baseid(ASSETCHAINS_SYMBOL)+1; // illegal base -> baseid.-1 -> 0
         if ( refid == 0 )
@@ -1458,11 +1455,6 @@ void komodo_passport_iteration()
             return;
         }
     }
-    /*if ( KOMODO_PAX == 0 )
-    {
-        KOMODO_PASSPORT_INITDONE = 1;
-        return;
-    }*/
     starttime = (uint32_t)time(NULL);
     if ( callcounter++ < 1 )
         limit = 10000;

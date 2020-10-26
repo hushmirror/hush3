@@ -403,11 +403,6 @@ extern UniValue getdeprecationinfo(const UniValue& params, bool fHelp, const CPu
 extern UniValue setmocktime(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue resendwallettransactions(const UniValue& params, bool fHelp, const CPubKey& mypk);
 
-extern UniValue jumblr_deposit(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue jumblr_secret(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue jumblr_pause(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue jumblr_resume(const UniValue& params, bool fHelp, const CPubKey& mypk);
-
 extern UniValue getrawtransaction(const UniValue& params, bool fHelp, const CPubKey& mypk); // in rcprawtransaction.cpp
 extern UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue lockunspent(const UniValue& params, bool fHelp, const CPubKey& mypk);
