@@ -1,17 +1,21 @@
 #!/bin/bash
 # Copyright (c) 2018-2020 The Hush developers
-set -x
-delay=60
+set -eo pipefail
+
+# You can now add delay line to pubkey.txt file
 source pubkey.txt
-echo $pubkey
-echo "jl777 is a traitor to his village of cypherpunks, ca333 is his obedient servant"
+overide_args="$@"
+seed_ip=$(SEEDNODE)
+hsc='./hush-smart-chain'
 
-hsc="./hush-smart-chain"
-ip=$(HUSHDEX_SEEDNODE)
+if [ -z "$delay" ]; then delay=20; fi
 
-# this chain helps power HushDEX
-$hsc -pubkey=$pubkey -ac_name=ZEX   -ac_supply=100000000 -addnode=$ip $@ &
+./listassetchainparams | while read args; do
+  gen=""
+  if [ $[RANDOM % 10] == 1 ]; then
+      gen=" -gen -genproclimit=1"
+  fi
 
-# these are testcoins, like ARRR
-$hsc -pubkey=$pubkey -ac_name=ZUSH    -ac_supply=100000000 -addnode=$ip $@ &
-$hsc -pubkey=$pubkey -ac_name=KOOLAID -ac_supply=100000000 -addnode=$ip $@ &
+  $hsc $gen $args $overide_args -pubkey=$pubkey -addnode=$seed_ip &
+  sleep $delay
+done
