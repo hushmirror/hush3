@@ -7262,8 +7262,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         uint64_t nNonce = 1;
         int nVersion;           // use temporary for version, don't set version number until validated as connected
         int minVersion = MIN_PEER_PROTO_VERSION;
-        if ( is_STAKED(ASSETCHAINS_SYMBOL) != 0 )
-            minVersion = STAKEDMIN_PEER_PROTO_VERSION;
         vRecv >> nVersion >> pfrom->nServices >> nTime >> addrMe;
         if (nVersion == 10300)
             nVersion = 300;
