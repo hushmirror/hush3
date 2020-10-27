@@ -105,35 +105,27 @@ static EVP_PKEY* GenerateRsaKey(int bits, BN_ULONG uPublicKey)
 
 // Generates EC keypair
 //
-static EVP_PKEY* GenerateEcKey(int bits, BN_ULONG uPublicKey)
+static EVP_PKEY* GenerateEcKey(int nid = NID_X9_62_prime256v1)
 {
     EVP_PKEY *evpPrivKey = NULL;
-
-    BIGNUM *pubKey = BN_new();
-    if (pubKey)
+    EC_KEY *privKey = EC_KEY_new_by_curve_name(nid);
+    if (privKey)
     {
-        if (BN_set_word(pubKey, uPublicKey))
+        EC_KEY_set_asn1_flag(privKey, OPENSSL_EC_NAMED_CURVE);
+        if (EC_KEY_generate_key(privKey))
         {
-            EC_KEY *privKey = EC_KEY_new_by_curve_name(NID_secp256k1);
-            if (privKey)
+            if ((evpPrivKey = EVP_PKEY_new()))
             {
-                if (EC_KEY_generate_key(privKey))
+                if (!EVP_PKEY_assign_EC_KEY(evpPrivKey, privKey))
                 {
-                    if ((evpPrivKey = EVP_PKEY_new()))
-                    {
-                        if (!EVP_PKEY_assign_EC_KEY(evpPrivKey, privKey))
-                        {
-                            EVP_PKEY_free(evpPrivKey);
-                            evpPrivKey = NULL;
-                        }
-                    }
+                    EVP_PKEY_free(evpPrivKey);
+                    evpPrivKey = NULL;
                 }
-
-                if(!evpPrivKey)
-                    EC_KEY_free(privKey);
             }
         }
-        BN_free(pubKey);
+
+        if(!evpPrivKey)
+            EC_KEY_free(privKey);
     }
 
     return evpPrivKey;
@@ -349,6 +341,7 @@ static bool CheckCredentials(EVP_PKEY *key, X509 *cert)
                 bIsOk = (EC_KEY_check_key(eccKey) == 1);
                 EC_KEY_free(eccKey);
             }
+            break;
         }
         // Currently only RSA & EC keys are supported.
         // Other key types can be added here in further.
@@ -408,7 +401,9 @@ bool GenerateCredentials(
 
     // Generating RSA key and the self-signed certificate for it
     //
-    key = GenerateRsaKey(TLS_RSA_KEY_SIZE, RSA_F4);
+    //key = GenerateRsaKey(TLS_RSA_KEY_SIZE, RSA_F4);
+    //key = GenerateEcKey(NID_secp256k1);
+    key = GenerateEcKey();
     if (key)
     {
         cert = GenerateCertificate(key);

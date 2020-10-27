@@ -70,10 +70,10 @@ using namespace hush;
 
 #define USE_TLS
 
-#if defined(USE_TLS) && !defined(TLS1_2_VERSION)
-    // minimum secure protocol is 1.2
-    // TLS1_2_VERSION is defined in openssl/tls1.h
-    #error "ERROR: Your OpenSSL version does not support TLS v1.2"
+#if defined(USE_TLS) && !defined(TLS1_3_VERSION)
+    // minimum secure protocol is 1.3
+    // TLS1_3_VERSION is defined in openssl/tls1.h
+    #error "ERROR: Your OpenSSL version does not support TLS v1.3"
 #endif
 
 
@@ -456,7 +456,8 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
  
                 NODE_ADDR nodeAddr(addrConnect.ToStringIP());
             
-                bool bUseTLS = (find(vNonTLSNodesOutbound.begin(),
+                bool bUseTLS = ((GetBoolArg("-tls", true) || GetArg("-tls", "") == "only")
+                    && find(vNonTLSNodesOutbound.begin(),
                                      vNonTLSNodesOutbound.end(),
                                      nodeAddr) == vNonTLSNodesOutbound.end());
                 unsigned long err_code = 0;
@@ -1208,7 +1209,8 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
 
         NODE_ADDR nodeAddr(addr.ToStringIP());
         
-        bool bUseTLS = (find(vNonTLSNodesInbound.begin(),
+        bool bUseTLS = ((GetBoolArg("-tls", true) || GetArg("-tls", "") == "only")
+            && find(vNonTLSNodesInbound.begin(),
                              vNonTLSNodesInbound.end(),
                              nodeAddr) == vNonTLSNodesInbound.end());
         unsigned long err_code = 0;
@@ -2450,7 +2452,7 @@ bool CNode::GetTlsFallbackNonTls()
     if (tlsFallbackNonTls == eTlsOption::FALLBACK_UNSET)
     {
         // one time only setting of static class attribute
-        if ( GetBoolArg("-tlsfallbacknontls", true))
+        if ( GetArg("-tls", "") != "only" )
         {
             LogPrint("tls", "%s():%d - Non-TLS connections will be used in case of failure of TLS\n",
                 __func__, __LINE__);
