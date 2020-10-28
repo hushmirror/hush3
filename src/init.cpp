@@ -77,7 +77,8 @@
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/thread.hpp>
 #include <chrono>
-#include <openssl/crypto.h>
+#include <wolfssl/options.h>
+#include <wolfssl/ssl.h>
 #include <thread>
 
 #if ENABLE_ZMQ
@@ -1435,7 +1436,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     if (fPrintToDebugLog)
         OpenDebugLog();
-    LogPrintf("Using OpenSSL version %s\n", SSLeay_version(SSLEAY_VERSION));
+    LogPrintf("Using WolfSSL version %s\n", wolfSSL_lib_version());
 #ifdef ENABLE_WALLET
     LogPrintf("Using BerkeleyDB version %s\n", DbEnv::version(0, 0, 0));
 #endif

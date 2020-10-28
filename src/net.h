@@ -46,9 +46,9 @@
 #include <boost/foreach.hpp>
 #include <boost/signals2/signal.hpp>
 
-// Enable OpenSSL Support for Hush
-#include <openssl/bio.h>
-#include <openssl/ssl.h>
+// Enable WolfSSL Support for Hush
+#include <wolfssl/options.h>
+#include <wolfssl/ssl.h>
 
 class CAddrMan;
 class CBlockIndex;

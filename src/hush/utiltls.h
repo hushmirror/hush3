@@ -37,20 +37,20 @@ bool GenerateCredentials(
 // Validates peer certificate using a chain of CA certificates.
 // If some of intermediate CA certificates are absent in the trusted certificates store, then validation status will be 'false')
 //
-bool ValidatePeerCertificate(SSL *ssl);
+bool ValidatePeerCertificate(WOLFSSL *ssl);
 
 // Check if a given context is set up with a cert that can be validated by this context
 //
-bool ValidateCertificate(SSL_CTX *ssl_ctx);
+bool ValidateCertificate(WOLFSSL_CTX *ssl_ctx);
 
-// Creates the list of available OpenSSL default directories for trusted certificates storage
+// Creates the list of available default directories for trusted certificates storage
 //
 std::vector<boost::filesystem::path> GetDefaultTrustedDirectories();
 
 // Loads default root certificates (placed in the 'defaultRootCerts') into the specified context.
 // Returns the number of loaded certificates.
 //
-int LoadDefaultRootCertificates(SSL_CTX *ctx);
+int LoadDefaultRootCertificates(WOLFSSL_CTX *ctx);
 
 }
 

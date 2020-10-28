@@ -44,9 +44,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 
-#include <openssl/conf.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
+#include <wolfssl/options.h>
+#include <wolfssl/ssl.h>
 #include <hush/tlsmanager.cpp>
 using namespace hush;
 
@@ -747,7 +746,7 @@ void CNode::copyStats(CNodeStats &stats, const std::vector<bool> &m_asmap)
     // If ssl != NULL it means TLS connection was established successfully
     {
         LOCK(cs_hSocket);
-        stats.fTLSEstablished = (ssl != NULL) && (SSL_get_state(ssl) == TLS_ST_OK);
+        stats.fTLSEstablished = (ssl != NULL) && (wolfSSL_is_init_finished(ssl) == 1);
         stats.fTLSVerified = (ssl != NULL) && ValidatePeerCertificate(ssl);
     }
 }
