@@ -6,15 +6,13 @@
 #include <stdio.h>
 #include <vector>
 
-#include <openssl/rsa.h>
-#include <openssl/x509.h>
-#include <openssl/pem.h>
-#include <openssl/rand.h>
-#include <openssl/ssl.h>
+#include <wolfssl/options.h>
+#include <wolfssl/ssl.h>
+#include <wolfssl/wolfcrypt/rsa.h>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 
-#include "util.h"
+#include "../util.h"
 #include "utiltls.h"
 
 namespace hush {
@@ -67,37 +65,56 @@ static const char defaultRootCerts[] =
 };
 
 // Generates RSA keypair (a private key of 'bits' length for a specified 'uPublicKey')
-//
-static EVP_PKEY* GenerateRsaKey(int bits, BN_ULONG uPublicKey)
+// obsolete since we use EC instead of RSA
+static WOLFSSL_EVP_PKEY* GenerateRsaKey(int bits, WOLFSSL_BN_ULONG uPublicKey)
 {
-    EVP_PKEY *evpPrivKey = NULL;
-
-    BIGNUM *pubKey = BN_new();
-    if (pubKey)
-    {
-        if (BN_set_word(pubKey, uPublicKey))
-        {
-            RSA *privKey = RSA_new();
-            if (privKey)
-            {
-                if (RAND_poll() &&  // The pseudo-random number generator must be seeded prior to calling RSA_generate_key_ex(). (https://www.openssl.org/docs/man1.1.0/crypto/RSA_generate_key.html)
-                    RSA_generate_key_ex(privKey, bits, pubKey, NULL))
-                {
-                    if ((evpPrivKey = EVP_PKEY_new()))
-                    {
-                        if (!EVP_PKEY_assign_RSA(evpPrivKey, privKey))
-                        {
-                            EVP_PKEY_free(evpPrivKey);
+    WOLFSSL_EVP_PKEY *evpPrivKey = NULL;
+    
+    WOLFSSL_BIGNUM *pubKey = wolfSSL_BN_new();
+    if (pubKey) {
+        if (wolfSSL_BN_set_word(pubKey, uPublicKey)) {
+            WOLFSSL_RSA *privKey = wolfSSL_RSA_new();
+            if (privKey) {
+                if (wolfSSL_RAND_poll() &&  wolfSSL_RSA_generate_key_ex(privKey, bits, pubKey, NULL)) {
+                    if ((evpPrivKey = wolfSSL_EVP_PKEY_new())) {
+                        if (!wolfSSL_EVP_PKEY_assign_RSA(evpPrivKey, privKey)) {
+                            wolfSSL_EVP_PKEY_free(evpPrivKey);
                             evpPrivKey = NULL;
                         }
                     }
                 }
 
-                if(!evpPrivKey) // EVP_PKEY_assign_RSA uses the supplied key internally
-                    RSA_free(privKey);
+                if(!evpPrivKey) {
+                    wolfSSL_RSA_free(privKey);
+                }   
             }
         }
-        BN_free(pubKey);
+        wolfSSL_BN_free(pubKey);
+    }
+
+    return evpPrivKey;
+}
+
+// Generates EC keypair
+//
+static WOLFSSL_EVP_PKEY* GenerateEcKey(int nid = NID_X9_62_prime256v1)
+{
+    WOLFSSL_EVP_PKEY *evpPrivKey = NULL;
+    WOLFSSL_EC_KEY *privKey = wolfSSL_EC_KEY_new_by_curve_name(nid);
+    if (privKey) {
+        wolfSSL_EC_KEY_set_asn1_flag(privKey, OPENSSL_EC_NAMED_CURVE);
+        if (wolfSSL_EC_KEY_generate_key(privKey)) {
+            if ((evpPrivKey = wolfSSL_EVP_PKEY_new())) {
+                if (!wolfSSL_EVP_PKEY_assign_EC_KEY(evpPrivKey, privKey)) {
+                    wolfSSL_EVP_PKEY_free(evpPrivKey);
+                    evpPrivKey = NULL;
+                }
+            }
+        }
+
+        if(!evpPrivKey) {
+            wolfSSL_EC_KEY_free(privKey);
+        }   
     }
 
     return evpPrivKey;
@@ -105,42 +122,30 @@ static EVP_PKEY* GenerateRsaKey(int bits, BN_ULONG uPublicKey)
 
 // Generates certificate for a specified public key using a corresponding private key (both of them should be specified in the 'keypair').
 //
-static X509* GenerateCertificate(EVP_PKEY *keypair)
+static WOLFSSL_X509* GenerateCertificate(WOLFSSL_EVP_PKEY *keypair)
 {
-    if (!keypair)
+    if (!keypair) {
         return NULL;
+    } 
 
-    X509 *cert = X509_new();
-    if (cert)
-    {
+    WOLFSSL_X509 *cert = wolfSSL_X509_new();
+    if (cert) {
         bool bCertSigned = false;
         long sn = 0;
-
-        if (RAND_bytes((unsigned char*)&sn, sizeof sn) &&
-            ASN1_INTEGER_set(X509_get_serialNumber(cert), sn))
-        {
-            X509_gmtime_adj(X509_get_notBefore(cert), 0);
-            X509_gmtime_adj(X509_get_notAfter(cert), (60 * 60 * 24 * CERT_VALIDITY_DAYS));
+        
+        if (wolfSSL_RAND_bytes((unsigned char*)&sn, sizeof(sn)) &&wolfSSL_ASN1_INTEGER_set(wolfSSL_X509_get_serialNumber(cert), sn)) {
+            wolfSSL_X509_gmtime_adj(wolfSSL_X509_get_notBefore(cert), 0);
+            wolfSSL_X509_gmtime_adj(wolfSSL_X509_get_notAfter(cert), (60 * 60 * 24 * CERT_VALIDITY_DAYS));
 
             // setting a public key from the keypair
-            if (X509_set_pubkey(cert, keypair))
-            {
-                X509_NAME *subjectName = X509_get_subject_name(cert);
-                if (subjectName)
-                {
-                    // an issuer name is the same as a subject name, due to certificate is self-signed
-                    if (X509_set_issuer_name(cert, subjectName))
-                    {
-                        // private key from keypair is used; signature will be set inside of the cert
-                        bCertSigned = X509_sign(cert, keypair, EVP_sha512());
-                    }
-                }
+            if (wolfSSL_X509_set_pubkey(cert, keypair)) {
+                // private key from keypair is used; signature will be set inside of the cert
+                bCertSigned = wolfSSL_X509_sign(cert, keypair, wolfSSL_EVP_sha512());
             }
         }
 
-        if (!bCertSigned)
-        {
-            X509_free(cert);
+        if (!bCertSigned) {
+            wolfSSL_X509_free(cert);
             cert = NULL;
         }
     }
@@ -150,7 +155,7 @@ static X509* GenerateCertificate(EVP_PKEY *keypair)
 
 // Stores key to file, specified by the 'filePath'
 //
-static bool StoreKey(EVP_PKEY *key, const boost::filesystem::path &filePath, const std::string &passphrase)
+static bool StoreKey(WOLFSSL_EVP_PKEY *key, const boost::filesystem::path &filePath, const std::string &passphrase)
 {
     if (!key)
         return false;
@@ -160,12 +165,17 @@ static bool StoreKey(EVP_PKEY *key, const boost::filesystem::path &filePath, con
     FILE *keyfd = fopen(filePath.string().c_str(), "wb");
     if (keyfd)
     {
-        const EVP_CIPHER* pCipher = NULL;
+        WOLFSSL_EC_KEY *ec_key = NULL;
+        ec_key = wolfSSL_EVP_PKEY_get0_EC_KEY(key);
+        if (ec_key != NULL)
+        {
+            const WOLFSSL_EVP_CIPHER* pCipher = NULL;
 
-        if (passphrase.length() && (pCipher = EVP_aes_256_cbc()))
-            bStored = PEM_write_PrivateKey(keyfd, key, pCipher, NULL, 0, NULL, (void*)passphrase.c_str());
-        else
-            bStored = PEM_write_PrivateKey(keyfd, key, NULL, NULL, 0, NULL, NULL);
+            if (passphrase.length() && (pCipher = wolfSSL_EVP_aes_256_cbc()))
+                bStored = wolfSSL_PEM_write_ECPrivateKey(keyfd, ec_key, pCipher, NULL, 0, NULL, (void*)passphrase.c_str());
+            else
+                bStored = wolfSSL_PEM_write_ECPrivateKey(keyfd, ec_key, NULL, NULL, 0, NULL, NULL);
+        }
 
         fclose(keyfd);
     }
@@ -175,7 +185,7 @@ static bool StoreKey(EVP_PKEY *key, const boost::filesystem::path &filePath, con
 
 // Stores certificate to file, specified by the 'filePath'
 //
-static bool StoreCertificate(X509 *cert, const boost::filesystem::path &filePath)
+static bool StoreCertificate(WOLFSSL_X509 *cert, const boost::filesystem::path &filePath)
 {
     if (!cert)
         return false;
@@ -185,7 +195,7 @@ static bool StoreCertificate(X509 *cert, const boost::filesystem::path &filePath
     FILE *certfd = fopen(filePath.string().c_str(), "wb");
     if (certfd)
     {
-        bStored = PEM_write_X509(certfd, cert);
+        bStored = wolfSSL_PEM_write_X509(certfd, cert);
         fclose(certfd);
     }
 
@@ -194,17 +204,57 @@ static bool StoreCertificate(X509 *cert, const boost::filesystem::path &filePath
 
 // Loads key from file, specified by the 'filePath'
 //
-static EVP_PKEY* LoadKey(const boost::filesystem::path &filePath, const std::string &passphrase)
+static WOLFSSL_EVP_PKEY* old_LoadKey(const boost::filesystem::path &filePath, const std::string &passphrase)
 {
     if (!boost::filesystem::exists(filePath))
         return NULL;
 
-    EVP_PKEY *key = NULL;
+    WOLFSSL_EVP_PKEY *key = wolfSSL_EVP_PKEY_new();
     FILE *keyfd = fopen(filePath.string().c_str(), "rb");
     if (keyfd)
     {
-        key = PEM_read_PrivateKey(keyfd, NULL, NULL, passphrase.length() ? (void*)passphrase.c_str() : NULL);
+        key = wolfSSL_PEM_read_PrivateKey(keyfd, NULL, NULL, passphrase.length() ? (void*)passphrase.c_str() : NULL);
         fclose(keyfd);
+    }
+
+    return key;
+}
+
+// Loads key from file, specified by the 'filePath'
+//
+static WOLFSSL_EVP_PKEY* LoadKey(const boost::filesystem::path &filePath, const std::string &passphrase)
+{
+    if (!boost::filesystem::exists(filePath))
+        return NULL;
+
+    WOLFSSL_EVP_PKEY *key = NULL;
+    FILE *keyfd = fopen(filePath.string().c_str(), "rb");
+    byte der[4096];
+    byte pem[4096];
+    WOLFSSL_EC_KEY *ecKey;
+    ecKey = wolfSSL_EC_KEY_new();
+    word32 idx = 0;
+
+    if (keyfd)
+    {
+        int fileSz = fread(pem, 1, 4096, keyfd);
+        fclose(keyfd);
+
+        if (fileSz > 0)
+        {
+            if (ecKey)
+            {
+                int derSz = wc_KeyPemToDer(pem, fileSz, der, 4096, passphrase.c_str());
+                int ret_decode = wc_EccPrivateKeyDecode(der, &idx, (ecc_key*)ecKey->internal, derSz);
+                if (ret_decode == 0)
+                {
+                    if (key = wolfSSL_EVP_PKEY_new())
+                    {
+                        wolfSSL_EVP_PKEY_assign_EC_KEY(key, ecKey); 
+                    }
+                }
+            }
+        } 
     }
 
     return key;
@@ -212,16 +262,16 @@ static EVP_PKEY* LoadKey(const boost::filesystem::path &filePath, const std::str
 
 // Loads certificate from file, specified by the 'filePath'
 //
-static X509* LoadCertificate(const boost::filesystem::path &filePath)
+static WOLFSSL_X509* LoadCertificate(const boost::filesystem::path &filePath)
 {
     if (!boost::filesystem::exists(filePath))
         return NULL;
 
-    X509 *cert = NULL;
+    WOLFSSL_X509 *cert = NULL;
     FILE *certfd = fopen(filePath.string().c_str(), "rb");
     if (certfd)
     {
-        cert = PEM_read_X509(certfd, NULL, NULL, NULL);
+        cert = wolfSSL_PEM_read_X509(certfd, NULL, NULL, NULL);
         fclose(certfd);
     }
 
@@ -231,59 +281,24 @@ static X509* LoadCertificate(const boost::filesystem::path &filePath)
 // Verifies if the private key in 'key' matches the public key in 'cert'
 // (Signs random bytes on 'key' and verifies signature correctness on public key from 'cert')
 //
-static bool IsMatching(EVP_PKEY *key, X509 *cert)
+static bool IsMatching(WOLFSSL_EVP_PKEY *key, WOLFSSL_X509 *cert)
 {
     if (!key || !cert)
         return false;
 
-    bool bIsMatching = false;
-
-    EVP_PKEY_CTX *ctxSign = EVP_PKEY_CTX_new(key, NULL);
-    if (ctxSign)
+    if (wolfSSL_X509_verify(cert, key) == WOLFSSL_SUCCESS)
     {
-        if (EVP_PKEY_sign_init(ctxSign) == 1 &&
-            EVP_PKEY_CTX_set_signature_md(ctxSign, EVP_sha512()) > 0)
-        {
-            unsigned char digest[SHA512_DIGEST_LENGTH] = { 0 };
-            size_t digestSize = sizeof digest, signatureSize = 0;
-
-            if (RAND_bytes((unsigned char*)&digest, digestSize) && // set random bytes as a digest
-                EVP_PKEY_sign(ctxSign, NULL, &signatureSize, digest, digestSize) == 1) // determine buffer length
-            {
-                unsigned char *signature = (unsigned char*)OPENSSL_malloc(signatureSize);
-                if (signature)
-                {
-                    if (EVP_PKEY_sign(ctxSign, signature, &signatureSize, digest, digestSize) == 1)
-                    {
-                        EVP_PKEY *pubkey = X509_get_pubkey(cert);
-                        if (pubkey)
-                        {
-                            EVP_PKEY_CTX *ctxVerif = EVP_PKEY_CTX_new(pubkey, NULL);
-                            if (ctxVerif)
-                            {
-                                if (EVP_PKEY_verify_init(ctxVerif) == 1 &&
-                                    EVP_PKEY_CTX_set_signature_md(ctxVerif, EVP_sha512()) > 0)
-                                {
-                                    bIsMatching = (EVP_PKEY_verify(ctxVerif, signature, signatureSize, digest, digestSize) == 1);
-                                }
-                                EVP_PKEY_CTX_free(ctxVerif);
-                            }
-                            EVP_PKEY_free(pubkey);
-                        }
-                    }
-                    OPENSSL_free(signature);
-                }
-            }
-        }
-        EVP_PKEY_CTX_free(ctxSign);
+        return true;
     }
-
-    return bIsMatching;
+    
+    LogPrintf("Loaded key and certificate do not match, delete them to generate new credentials!!!\n");
+    
+    return false;
 }
 
 // Checks the correctness of a private-public key pair and the validity of a certificate using public key from key pair
 //
-static bool CheckCredentials(EVP_PKEY *key, X509 *cert)
+static bool CheckCredentials(WOLFSSL_EVP_PKEY *key, WOLFSSL_X509 *cert)
 {
     if (!key || !cert)
         return false;
@@ -292,22 +307,29 @@ static bool CheckCredentials(EVP_PKEY *key, X509 *cert)
 
     // Validating the correctness of a private-public key pair, depending on a key type
     //
-    switch (EVP_PKEY_base_id(key))
+    switch (wolfSSL_EVP_PKEY_base_id(key))
     {
         case EVP_PKEY_RSA:
         case EVP_PKEY_RSA2:
         {
-            RSA *rsaKey = EVP_PKEY_get1_RSA(key);
+            WOLFSSL_RSA *rsaKey = wolfSSL_EVP_PKEY_get1_RSA(key);
             if (rsaKey)
             {
-                bIsOk = (RSA_check_key(rsaKey) == 1);
-                RSA_free(rsaKey);
+                bIsOk = (wc_CheckRsaKey((RsaKey*)rsaKey->internal) == 0);
+                wolfSSL_RSA_free(rsaKey);
             }
             break;
         }
-
-        // Currently only RSA keys are supported.
-        // Other key types can be added here in further.
+        case EVP_PKEY_EC:
+        {
+            WOLFSSL_EC_KEY *eccKey = wolfSSL_EVP_PKEY_get1_EC_KEY(key);
+            if (eccKey)
+            {
+                bIsOk = (wc_ecc_check_key((ecc_key*)eccKey->internal) == 0);
+                wolfSSL_EC_KEY_free(eccKey);
+            }
+            break;
+        }
 
         default:
             bIsOk = false;
@@ -329,24 +351,28 @@ CredentialsStatus VerifyCredentials(
 {
     CredentialsStatus status = credAbsent;
 
-    EVP_PKEY *key = NULL;
-    X509 *cert = NULL;
+    WOLFSSL_EVP_PKEY *key = NULL;
+    WOLFSSL_X509 *cert = NULL;
 
     key  = LoadKey(keyPath, passphrase);
     cert = LoadCertificate(certPath);
     
-    if (key && cert)
+    if (key && cert) {
         status = CheckCredentials(key, cert) ? credOk : credNonConsistent;
-    else if (!key && !cert)
+    } else if (!key && !cert) {
         status = credAbsent;
-    else
+    } else {
         status = credPartiallyAbsent;
-
-    if (key)
-        EVP_PKEY_free(key);
-    if (cert)
-        X509_free(cert);
-
+    }
+    
+    if (key) {
+        wolfSSL_EVP_PKEY_free(key);
+    }
+        
+    if (cert) {
+       wolfSSL_X509_free(cert); 
+    }
+    
     return status;
 }
 
@@ -359,27 +385,31 @@ bool GenerateCredentials(
 {
     bool bGenerated = false;
 
-    EVP_PKEY *key = NULL;
-    X509 *cert = NULL;
+    WOLFSSL_EVP_PKEY *key = NULL;
+    WOLFSSL_X509 *cert = NULL;
 
-    // Generating RSA key and the self-signed certificate for it
+    // Generating key and the self-signed certificate for it
     //
-    key = GenerateRsaKey(TLS_RSA_KEY_SIZE, RSA_F4);
+    //key = GenerateRsaKey(TLS_RSA_KEY_SIZE, RSA_F4);
+    //key = GenerateEcKey(NID_secp256k1);
+    key = GenerateEcKey();
     if (key)
     {
         cert = GenerateCertificate(key);
         if (cert)
         {
-            if (StoreKey(key, keyPath, passphrase) &&
-                StoreCertificate(cert, certPath))
+            bool bKey = StoreKey(key, keyPath, passphrase);
+            bool bCert = StoreCertificate(cert, certPath);
+
+            if ( bKey && bCert )
             {
                 bGenerated = true;
                 LogPrintStr("TLS: New private key and self-signed certificate were generated successfully\n");
             }
 
-            X509_free(cert);
+            wolfSSL_X509_free(cert);
         }
-        EVP_PKEY_free(key);
+        wolfSSL_EVP_PKEY_free(key);
     }
 
     return bGenerated;
@@ -390,49 +420,58 @@ bool GenerateCredentials(
 // Validates peer certificate using a chain of CA certificates.
 // If some of intermediate CA certificates are absent in the trusted certificates store, then validation status will be 'false')
 //
-bool ValidatePeerCertificate(SSL *ssl)
+bool ValidatePeerCertificate(WOLFSSL *ssl)
 {
     if (!ssl)
         return false;
 
     bool bIsOk = false;
 
-    X509 *cert = SSL_get_peer_certificate (ssl);
-    if (cert)
-    {
-        // NOTE: SSL_get_verify_result() is only useful in connection with SSL_get_peer_certificate (https://www.openssl.org/docs/man1.0.2/ssl/SSL_get_verify_result.html)
-        //
-        bIsOk = (SSL_get_verify_result(ssl) == X509_V_OK);
-        X509_free(cert);
-    }
-    else
-    {
-        LogPrint("net", "TLS: Peer does not have certificate\n");
-        bIsOk = false;
+    WOLFSSL_X509 *cert = wolfSSL_get_peer_certificate (ssl);
+    if (cert) {
+        long errCode = wolfSSL_get_verify_result(ssl);
+        if (errCode != X509_V_OK)
+        {
+            LogPrint("tls", "TLS: %s: %s():%d - Certificate Verification ERROR=%d: [%s]\n",
+                __FILE__, __func__, __LINE__, errCode, wolfSSL_X509_verify_cert_error_string(errCode));
+        } else {
+            bIsOk = true;
+
+            char buf[256];
+            wolfSSL_X509_NAME_oneline(wolfSSL_X509_get_subject_name(cert), buf, 256);
+            LogPrint("tls", "TLS: %s: %s():%d - subj name=%s\n",
+                __FILE__, __func__, __LINE__, buf);
+ 
+            wolfSSL_X509_NAME_oneline(wolfSSL_X509_get_issuer_name(cert), buf, 256);
+            LogPrint("tls", "TLS: %s: %s():%d - issuer name=%s\n",
+                __FILE__, __func__, __LINE__, buf);
+        }
+
+        wolfSSL_X509_free(cert);
+    } else {
+        LogPrint("tls", "TLS: %s: %s():%d - WARNING: Peer does not have certificate\n",
+            __FILE__, __func__, __LINE__);
     }
     return bIsOk;
 }
 
 // Check if a given context is set up with a cert that can be validated by this context
 //
-bool ValidateCertificate(SSL_CTX *ssl_ctx)
+bool ValidateCertificate(WOLFSSL_CTX *ssl_ctx)
 {
-    if (!ssl_ctx)
+    if (!ssl_ctx) {
         return false;
-
+    }
+    
     bool bIsOk = false;
 
-    X509_STORE *store = SSL_CTX_get_cert_store(ssl_ctx);
+    WOLFSSL_X509_STORE *store = wolfSSL_CTX_get_cert_store(ssl_ctx);
 
-    if (store)
-    {
-        X509_STORE_CTX *ctx = X509_STORE_CTX_new();
-        if (ctx)
-        {
-            if (X509_STORE_CTX_init(ctx, store, SSL_CTX_get0_certificate(ssl_ctx), NULL) == 1)
-                bIsOk = X509_verify_cert(ctx) == 1;
-
-            X509_STORE_CTX_free(ctx);
+    if (store) {
+        WOLFSSL_X509_STORE_CTX *ctx = wolfSSL_X509_STORE_CTX_new();
+        if (ctx) {
+            bIsOk = (wolfSSL_X509_verify_cert(ctx) == WOLFSSL_SUCCESS);
+            wolfSSL_X509_STORE_CTX_free(ctx);
         }
     }
 
@@ -446,20 +485,14 @@ std::vector<boost::filesystem::path> GetDefaultTrustedDirectories()
     namespace fs = boost::filesystem;
     std::vector<fs::path> defaultDirectoriesList;
 
-    // Default certificates directory specified in OpenSSL build
-    fs::path libDefaultDir = X509_get_default_cert_dir();
-
-    if (fs::exists(libDefaultDir))
-        defaultDirectoriesList.push_back(libDefaultDir);
-
     // Check and set all possible standard default directories
     for (const char *dir : defaultTrustedDirs)
     {
         fs::path defaultDir(dir);
 
-        if (defaultDir != libDefaultDir &&
-            fs::exists(defaultDir))
+        if (fs::exists(defaultDir)) {
             defaultDirectoriesList.push_back(defaultDir);
+        } 
     }
 
     return defaultDirectoriesList;
@@ -468,26 +501,27 @@ std::vector<boost::filesystem::path> GetDefaultTrustedDirectories()
 // Loads default root certificates (placed in the 'defaultRootCerts') into the specified context.
 // Returns the number of loaded certificates.
 //
-int LoadDefaultRootCertificates(SSL_CTX *ctx)
+int LoadDefaultRootCertificates(WOLFSSL_CTX *ctx)
 {
-    if (!ctx)
+    if (!ctx) {
         return 0;
+    }
 
     int certsLoaded = 0;
 
     // Certificate text buffer 'defaultRootCerts' is a C string with certificates in PEM format
-    BIO *memBuf = BIO_new_mem_buf(defaultRootCerts, -1);
-    if (memBuf)
-    {
-        X509 *cert = NULL;
-        while ((cert = PEM_read_bio_X509(memBuf, NULL, 0, NULL)))
+    WOLFSSL_BIO *memBuf = wolfSSL_BIO_new_mem_buf(defaultRootCerts, -1);
+    if (memBuf) {
+        WOLFSSL_X509 *cert = NULL;
+        while ((cert = wolfSSL_PEM_read_bio_X509(memBuf, NULL, 0, NULL)))
         {
-            if (X509_STORE_add_cert(SSL_CTX_get_cert_store(ctx), cert) > 0)
+            if (wolfSSL_X509_STORE_add_cert(wolfSSL_CTX_get_cert_store(ctx), cert) > 0) {
                 certsLoaded++;
+            }
 
-            X509_free(cert);
+            wolfSSL_X509_free(cert);
         }
-        BIO_free(memBuf);
+        wolfSSL_BIO_free(memBuf);
     }
 
     return certsLoaded;
