@@ -104,12 +104,6 @@ X509 *generate_x509(EVP_PKEY *pkey);
 bool write_to_disk(EVP_PKEY *pkey, X509 *x509);
 void configure_context(SSL_CTX *ctx, bool server_side);
 
-// OpenSSL related variables for metrics.cpp
-static std::string routingsecrecy;
-static std::string cipherdescription;
-static std::string securitylevel;
-static std::string validationdescription;
-
 typedef int NodeId;
 
 class CNodeStats;

@@ -15,6 +15,8 @@
 using namespace std;
 namespace hush
 {
+    static WOLFSSL_EVP_PKEY *mykey;
+    static WOLFSSL_X509 *mycert;
 
 // this is the 'dh crypto environment' to be shared between two peers and it is meant to be public, therefore
 // it is OK to hard code it (or as an alternative to read it from a file)
@@ -56,13 +58,15 @@ static WOLFSSL_DH *get_dh2048(void)
     
     WOLFSSL_DH *dh = wolfSSL_DH_new();
     
-    if (dh == NULL)
+    if (dh == NULL) {
         return NULL;
+    }
 
     if (wc_DhSetKey((DhKey*)dh->internal, dhp_2048, sizeof(dhp_2048), dhg_2048, sizeof(dhg_2048)) != 0) {
         wolfSSL_DH_free(dh);
         return NULL;
     }
+
     return dh;
 }
 
@@ -74,93 +78,11 @@ DH *tmp_dh_callback(WOLFSSL *ssl, int is_export, int keylength)
     return get_dh2048();
 }
 
-/** if 'tls' debug category is enabled, collect info about certificates relevant to the passed context and print them on logs */
-static void dumpCertificateDebugInfo(int preverify_ok, WOLFSSL_X509_STORE_CTX* chainContext)
-{
-    if (!LogAcceptCategory("tls")) {
-        return;
-    }
-
-    char    buf[256] = {};
-    WOLFSSL_X509   *cert;
-    int     err, depth;
-
-    cert = wolfSSL_X509_STORE_CTX_get_current_cert(chainContext);
-    err = wolfSSL_X509_STORE_CTX_get_error(chainContext);
-    depth = wolfSSL_X509_STORE_CTX_get_error_depth(chainContext);
-
-    LogPrintf("TLS: %s: %s():%d - preverify_ok=%d, errCode=%d, depth=%d\n",
-        __FILE__, __func__, __LINE__, preverify_ok, err, depth);
-
-    // is not useful checking preverify_ok because, after the chain root verification, it is set accordingly
-    // to the return value of this callback, and we choose to always return 1
-    if (err != X509_V_OK ) {
-        LogPrintf("TLS: %s: %s():%d - Certificate Verification ERROR=%d: [%s] at chain depth=%d\n",
-            __FILE__, __func__, __LINE__, err, wolfSSL_X509_verify_cert_error_string(err), depth);
-
-        if (cert && err == X509_V_ERR_CERT_HAS_EXPIRED) {
-            char time_buf[MAX_TIME_STRING_SZ];
-            ASN1_TIME * at = wolfSSL_X509_get_notAfter(cert);
-            if (wolfSSL_ASN1_TIME_to_string(at, time_buf, sizeof(time_buf)) != NULL) {
-                LogPrintf("TLS: %s: %s():%d - expired on=%s\n",
-                    __FILE__, __func__, __LINE__, buf);
-            }
-        }
-    } else if (cert) {
-        wolfSSL_X509_NAME_oneline(wolfSSL_X509_get_subject_name(cert), buf, 256);
-        LogPrintf("TLS: %s: %s():%d - subj name=%s\n",
-            __FILE__, __func__, __LINE__, buf);
-
-        wolfSSL_X509_NAME_oneline(wolfSSL_X509_get_issuer_name(cert), buf, 256);
-        LogPrintf("TLS: %s: %s():%d - issuer name=%s\n",
-            __FILE__, __func__, __LINE__, buf);
-
-        char time_buf[MAX_TIME_STRING_SZ];
-        WOLFSSL_ASN1_TIME * at = wolfSSL_X509_get_notAfter(cert);
-        if (wolfSSL_ASN1_TIME_to_string(at, time_buf, sizeof(time_buf)) != NULL) {
-            LogPrintf("TLS: %s: %s():%d - expiring on=%s\n",
-                __FILE__, __func__, __LINE__, buf);
-        }
-    } else {
-        // should never happen
-        LogPrintf("TLS: %s: %s():%d - invalid cert/err\n", __FILE__, __func__, __LINE__);
-    }
-}
-
-/**
-* @brief If verify_callback always returns 1, the TLS/SSL handshake will not be terminated with respect to verification failures and the connection will be established.
-* 
-* @param preverify_ok 
-* @param chainContext 
-* @return int 
-*/
-int tlsCertVerificationCallback(int preverify_ok, WOLFSSL_X509_STORE_CTX* chainContext)
-{
-    dumpCertificateDebugInfo(preverify_ok, chainContext);
-
-    /* The return value controls the strategy of the further verification process. If it returns 0
-     * the verification process is immediately stopped with "verification failed" state.
-     * If SSL_VERIFY_PEER has been set in set_verify, a verification failure alert is sent to the peer and the TLS/SSL
-     * handshake is terminated.
-     * If it returns 1, the verification process is continued.
-     * Here we choose to continue the verification process by returning 1 and to leave the optional cert
-     * verification if we call ValidatePeerCertificate().
-     */
-    return 1;
-}
-/**
- * @brief Wait for a given SSL connection event.
- * 
- * @param eRoutine a SSLConnectionRoutine value which determines the type of the event.
- * @param hSocket 
- * @param ssl pointer to an SSL instance.
- * @param timeoutSec timeout in seconds.
- * @return int returns nError corresponding to the connection event.
- */
 int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* ssl, int timeoutSec, unsigned long& err_code)
 {
     int retOp = 0;
     err_code = 0;
+    char err_buffer[1024];
 
     while (true)
     {
@@ -173,9 +95,9 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
                 retOp = wolfSSL_connect(ssl);
                 if (retOp == 0) {
                     err_code = wolfSSL_ERR_get_error();
-                    const char* error_str = wolfSSL_ERR_error_string(err_code, NULL);
+                    const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
                     LogPrint("tls", "TLS: WARNING: %s: %s():%d - SSL_CONNECT err: %s\n",
-                        __FILE__, __func__, __LINE__, error_str);
+                        __FILE__, __func__, __LINE__, err_buffer);
                     return -1;
                 }
             }
@@ -186,9 +108,9 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
                 retOp = wolfSSL_accept(ssl);
                 if (retOp == 0) {
                     err_code = wolfSSL_ERR_get_error();
-                    const char* error_str = wolfSSL_ERR_error_string(err_code, NULL);
+                    const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
                     LogPrint("tls", "TLS: WARNING: %s: %s():%d - SSL_ACCEPT err: %s\n",
-                        __FILE__, __func__, __LINE__, error_str);
+                        __FILE__, __func__, __LINE__, err_buffer);
                     return -1;
                 }
             }
@@ -239,10 +161,10 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
 
         if (sslErr != WOLFSSL_ERROR_WANT_READ && sslErr != WOLFSSL_ERROR_WANT_WRITE) {
             err_code = wolfSSL_ERR_get_error();
-            const char* error_str = wolfSSL_ERR_error_string(err_code, NULL);
+            const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
             LogPrint("tls", "TLS: WARNING: %s: %s():%d - routine(%d), sslErr[0x%x], retOp[%d], errno[0x%x], lib[0x%x], func[0x%x], reas[0x%x]-> err: %s\n",
                 __FILE__, __func__, __LINE__,
-                eRoutine, sslErr, retOp, errno, wolfSSL_ERR_GET_LIB(err_code), ERR_GET_FUNC(err_code), wolfSSL_ERR_GET_REASON(err_code), error_str);
+                eRoutine, sslErr, retOp, errno, wolfSSL_ERR_GET_LIB(err_code), ERR_GET_FUNC(err_code), wolfSSL_ERR_GET_REASON(err_code), err_buffer);
             retOp = -1;
             break;
         }
@@ -302,6 +224,7 @@ WOLFSSL* TLSManager::connect(SOCKET hSocket, const CAddress& addrConnect, unsign
     LogPrint("tls", "TLS: establishing connection (tid = %X), (peerid = %s)\n", pthread_self(), addrConnect.ToString());
 
     err_code = 0;
+    char err_buffer[1024];
     WOLFSSL* ssl = NULL;
     bool bConnectedTLS = false;
 
@@ -317,9 +240,9 @@ WOLFSSL* TLSManager::connect(SOCKET hSocket, const CAddress& addrConnect, unsign
     else
     {
         err_code = wolfSSL_ERR_get_error();
-        const char* error_str = wolfSSL_ERR_error_string(err_code, NULL);
+        const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
         LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n",
-            __FILE__, __func__, __LINE__, error_str);
+            __FILE__, __func__, __LINE__, err_buffer);
     }
 
     if (bConnectedTLS) {
@@ -346,21 +269,20 @@ WOLFSSL* TLSManager::connect(SOCKET hSocket, const CAddress& addrConnect, unsign
  * @param trustedDirs trusted directories
  * @return WOLSSL_CTX* returns the context.
  */
-WOLFSSL_CTX* TLSManager::initCtx(
-    TLSContextType ctxType,
-    const boost::filesystem::path& privateKeyFile,
-    const boost::filesystem::path& certificateFile,
-    const std::vector<boost::filesystem::path>& trustedDirs)
+WOLFSSL_CTX* TLSManager::initCtx(TLSContextType ctxType)
 {
     LogPrintf("TLS: %s: %s():%d - Initializing %s context\n", 
          __FILE__, __func__, __LINE__, ctxType == SERVER_CONTEXT ? "server" : "client");
 
-    if (!boost::filesystem::exists(privateKeyFile) || !boost::filesystem::exists(certificateFile)) {
+    if (!mykey || !mycert) {
         return NULL;   
     }
     
     bool bInitialized = false;
     WOLFSSL_CTX* tlsCtx = NULL;
+
+    byte *pem;
+    int plen = 0;
 
     if ((tlsCtx = wolfSSL_CTX_new(ctxType == SERVER_CONTEXT ? wolfTLSv1_3_server_method() : wolfTLSv1_3_client_method()))) {
         wolfSSL_CTX_set_mode(tlsCtx, SSL_MODE_AUTO_RETRY);
@@ -389,53 +311,40 @@ WOLFSSL_CTX* TLSManager::initCtx(
                 LogPrintf("%s: Setting preferred cipher failed !!!\n", __func__);
             }
         }
-        
-        // TLSv1.3 has ephemeral Diffie-Hellman as the only key exchange mechanism, so that perfect forward secrecy is ensured.
-        
+
         if (ctxType == SERVER_CONTEXT) {
-            // amongst the Cl/Srv mutually-acceptable set, pick the one that the server prefers most instead of the one that
-            // the client prefers most
+            // In case server and client prefered ciphers are different, server preference has priority
             wolfSSL_CTX_set_options(tlsCtx, SSL_OP_CIPHER_SERVER_PREFERENCE);
 
             LogPrintf("TLS: %s: %s():%d - setting dh callback\n", __FILE__, __func__, __LINE__);
             SSL_CTX_set_tmp_dh_callback(tlsCtx, tmp_dh_callback);
         }
+  
+        // No certificate verification, all should be self-signed
+        wolfSSL_CTX_set_verify(tlsCtx, WOLFSSL_VERIFY_NONE, NULL);
         
-        // Fix for Secure Client-Initiated Renegotiation DoS threat:
-        // In WolfSSL library renegotiation is disabled by default build config
+        WOLFSSL_EC_KEY *ec_key = NULL;
         
-        // Support for TLSv1.3 should be the only one compiled
-        // ./configure --disable-oldtls --disable-tlsv12
+        ec_key = wolfSSL_EVP_PKEY_get0_EC_KEY(mykey);
 
-        int rootCertsNum = LoadDefaultRootCertificates(tlsCtx);
-        int trustedPathsNum = 0;
-
-        for (boost::filesystem::path trustedDir : trustedDirs)
-        {
-            if (wolfSSL_CTX_load_verify_locations(tlsCtx, NULL, trustedDir.string().c_str()) == 1) {
-                trustedPathsNum++;
-            }    
-        }
-
-        if (rootCertsNum == 0 && trustedPathsNum == 0) {
-            LogPrintf("TLS: WARNING: %s: %s: failed to set up verified certificates. It will be impossible to verify peer certificates. \n", __FILE__, __func__);
-        } 
-
-        wolfSSL_CTX_set_verify(tlsCtx, WOLFSSL_VERIFY_PEER, tlsCertVerificationCallback);
-
-        if (wolfSSL_CTX_use_certificate_file(tlsCtx, certificateFile.string().c_str(), WOLFSSL_FILETYPE_PEM) > 0) {
-            if (wolfSSL_CTX_use_PrivateKey_file(tlsCtx, privateKeyFile.string().c_str(), WOLFSSL_FILETYPE_PEM) > 0) {
-                if (wolfSSL_CTX_check_private_key(tlsCtx)) {
-                    bInitialized = true;
+        if (ec_key != NULL && wolfSSL_PEM_write_mem_ECPrivateKey(ec_key, NULL, NULL, 0, &pem, &plen)) {
+            if (wolfSSL_CTX_use_certificate(tlsCtx, mycert) > 0) {
+                if (wolfSSL_CTX_use_PrivateKey_buffer(tlsCtx, pem, plen, SSL_FILETYPE_PEM) > 0) {
+                    
+                    free(pem);
+                    
+                    if (wolfSSL_CTX_check_private_key(tlsCtx)) {
+                        bInitialized = true;
+                    } else {
+                        LogPrintf("TLS: ERROR: %s: %s: private key does not match the certificate public key\n", __FILE__, __func__);
+                    }
                 } else {
-                    LogPrintf("TLS: ERROR: %s: %s: private key does not match the certificate public key\n", __FILE__, __func__);
+                    LogPrintf("TLS: ERROR: %s: %s: failed to use private key file\n", __FILE__, __func__); 
                 }
             } else {
-                LogPrintf("TLS: ERROR: %s: %s: failed to use privateKey file\n", __FILE__, __func__); 
+                LogPrintf("TLS: ERROR: %s: %s: failed to use certificate file\n", __FILE__, __func__);
+                wolfSSL_ERR_dump_errors_fp(stderr);
             }
-        } else {
-            LogPrintf("TLS: ERROR: %s: %s: failed to use certificate file\n", __FILE__, __func__);
-            wolfSSL_ERR_dump_errors_fp(stderr);
         }
     } else {
         LogPrintf("TLS: ERROR: %s: %s: failed to create TLS context\n", __FILE__, __func__);
@@ -451,42 +360,65 @@ WOLFSSL_CTX* TLSManager::initCtx(
     return tlsCtx;
 }
 /**
- * @brief load the certificate credentials from file.
+ * @brief generates certificate credentials.
  * 
  * @return true returns true is successful.
  * @return false returns false if an error has occured.
  */
 bool TLSManager::prepareCredentials()
 {
-    boost::filesystem::path
-        defaultKeyPath(GetDataDir() / TLS_KEY_FILE_NAME),
-        defaultCertPath(GetDataDir() / TLS_CERT_FILE_NAME);
+    mykey = NULL;
+    mycert = NULL;
 
-    CredentialsStatus credStatus =
-        VerifyCredentials(
-            boost::filesystem::path(GetArg("-tlskeypath", defaultKeyPath.string())),
-            boost::filesystem::path(GetArg("-tlscertpath", defaultCertPath.string())),
-            GetArg("-tlskeypwd", ""));
-
-    bool bPrepared = (credStatus == credOk);
-
-    if (!bPrepared) {
-        if (!mapArgs.count("-tlskeypath") && !mapArgs.count("-tlscertpath")) {
-            // Default paths were used
-
-            if (credStatus == credAbsent) {
-                // Generate new credentials (key and self-signed certificate on it) only if credentials were absent previously
-                //
-                bPrepared = GenerateCredentials(
-                    defaultKeyPath,
-                    defaultCertPath,
-                    GetArg("-tlskeypwd", ""));
+    // Generating key and the self-signed certificate for it
+    //
+    mykey = GenerateEcKey();
+    if (mykey) {
+        mycert = GenerateCertificate(mykey);
+        if (mycert) {
+            if (CheckKeyCert()) {
+                LogPrintStr("TLS: New private key and self-signed certificate were generated successfully\n");
+                            
+                return true;
             }
+            //wolfSSL_X509_free(mycert);
         }
+        //wolfSSL_EVP_PKEY_free(mykey);
     }
 
-    return bPrepared;
+    return false;
 }
+
+bool TLSManager::CheckKeyCert()
+{
+    if (!mykey) {
+        LogPrintf("Key is not generated!!!\n");
+        return false;
+    }
+
+    if (!mycert) {
+        LogPrintf("Certificate is not generated!!!\n");
+        return false;
+    }        
+
+    WOLFSSL_EC_KEY *eccKey = wolfSSL_EVP_PKEY_get1_EC_KEY(mykey);
+    if (eccKey && wc_ecc_check_key((ecc_key*)eccKey->internal) == 0) {
+        wolfSSL_EC_KEY_free(eccKey);
+    } else {
+        LogPrintf("Generated ECC key check failed!!!\n");
+        return false;
+    }
+
+    if (wolfSSL_X509_verify(mycert, mykey) == WOLFSSL_SUCCESS) {
+        return true;
+    }
+    
+    LogPrintf("Generated key and certificate do not match!!!\n");
+    
+    return false;
+}
+
+
 /**
  * @brief accept a TLS connection
  * 
@@ -500,6 +432,7 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
     LogPrint("tls", "TLS: accepting connection from %s (tid = %X)\n", addr.ToString(), pthread_self());
 
     err_code = 0; 
+    char err_buffer[1024];
     WOLFSSL* ssl = NULL;
     bool bAcceptedTLS = false;
 
@@ -515,9 +448,9 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
     else
     {
         err_code = wolfSSL_ERR_get_error();
-        const char* error_str = wolfSSL_ERR_error_string(err_code, NULL);
+        const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
         LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n",
-            __FILE__, __func__, __LINE__, error_str);
+            __FILE__, __func__, __LINE__, err_buffer);
     }
 
     if (bAcceptedTLS) {
@@ -541,6 +474,7 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
 
     return ssl;
 }
+
 /**
  * @brief Determines whether a string exists in the non-TLS address pool.
  * 
@@ -555,6 +489,7 @@ bool TLSManager::isNonTLSAddr(const string& strAddr, const vector<NODE_ADDR>& vP
     LOCK(cs);
     return (find(vPool.begin(), vPool.end(), NODE_ADDR(strAddr)) != vPool.end());
 }
+
 /**
  * @brief Removes non-TLS node addresses based on timeout.
  * 
@@ -702,8 +637,10 @@ int TLSManager::threadSocketHandler(CNode* pnode, fd_set& fdsetRecv, fd_set& fds
         if (lockSend)
             SocketSendData(pnode);
     }
+
     return 0;
 }
+
 /**
  * @brief Initialization of the server and client contexts
  * 
@@ -714,40 +651,17 @@ bool TLSManager::initialize()
 {
     bool bInitializationStatus = false;
     
-    // Initialization routines for the OpenSSL library
+    // Initialization routines for the WolfSSL library
     //
     wolfSSL_load_error_strings();
     wolfSSL_ERR_load_crypto_strings();
     wolfSSL_library_init();
 
-    namespace fs = boost::filesystem;
-    fs::path certFile = GetArg("-tlscertpath", "");
-    if (!fs::exists(certFile))
-            certFile = (GetDataDir() / TLS_CERT_FILE_NAME);
-    
-    fs::path privKeyFile = GetArg("-tlskeypath", "");
-    if (!fs::exists(privKeyFile)) {
-        privKeyFile = (GetDataDir() / TLS_KEY_FILE_NAME);
-    }
-    
-    std::vector<fs::path> trustedDirs;
-    fs::path trustedDir = GetArg("-tlstrustdir", "");
-    if (fs::exists(trustedDir)) {
-        // Use only the specified trusted directory
-        trustedDirs.push_back(trustedDir);
-    } else {
-        // If specified directory can't be used, then setting the default trusted directories
-        trustedDirs = GetDefaultTrustedDirectories();
-    }
-
-    for (fs::path dir : trustedDirs)
-        LogPrintf("TLS: trusted directory '%s' will be used\n", dir.string().c_str());
-
     // Initialization of the server and client contexts
     //
-    if ((tls_ctx_server = TLSManager::initCtx(SERVER_CONTEXT, privKeyFile, certFile, trustedDirs)))
+    if ((tls_ctx_server = TLSManager::initCtx(SERVER_CONTEXT)))
     {
-        if ((tls_ctx_client = TLSManager::initCtx(CLIENT_CONTEXT, privKeyFile, certFile, trustedDirs)))
+        if ((tls_ctx_client = TLSManager::initCtx(CLIENT_CONTEXT)))
         {
             LogPrint("tls", "TLS: contexts are initialized\n");
             bInitializationStatus = true;

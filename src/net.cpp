@@ -72,7 +72,7 @@ using namespace hush;
 #if defined(USE_TLS) && !defined(TLS1_3_VERSION)
     // minimum secure protocol is 1.3
     // TLS1_3_VERSION is defined in openssl/tls1.h
-    #error "ERROR: Your OpenSSL version does not support TLS v1.3"
+    #error "ERROR: Your WolfSSL version does not support TLS v1.3"
 #endif
 
 
@@ -138,8 +138,8 @@ static boost::condition_variable messageHandlerCondition;
 static CNodeSignals g_signals;
 CNodeSignals& GetNodeSignals() { return g_signals; }
 
-// OpenSSL server and client contexts
-SSL_CTX *tls_ctx_server, *tls_ctx_client;
+// WolfSSL server and client contexts
+WOLFSSL_CTX *tls_ctx_server, *tls_ctx_client;
 
 static bool operator==(_NODE_ADDR a, _NODE_ADDR b)
 {
@@ -442,7 +442,7 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
 
         addrman.Attempt(addrConnect);
 
-        SSL *ssl = NULL;
+        WOLFSSL *ssl = NULL;
         
 #ifdef USE_TLS
         /* TCP connection is ready. Do client side SSL. */
@@ -509,19 +509,6 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
             }
         }
         
-        // certificate validation is disabled by default    
-        if (CNode::GetTlsValidate())
-        {
-            if (ssl && !ValidatePeerCertificate(ssl))
-            {
-                LogPrintf ("TLS: ERROR: Wrong server certificate from %s. Connection will be closed.\n", addrConnect.ToString());
-        
-                SSL_shutdown(ssl);
-                CloseSocket(hSocket);
-                SSL_free(ssl);
-                return NULL;
-            }
-        }
 #endif  // USE_TLS
 
         // Add node
@@ -569,7 +556,7 @@ void CNode::CloseSocketDisconnect()
             {
                 unsigned long err_code = 0;
                 tlsmanager.waitFor(SSL_SHUTDOWN, hSocket, ssl, (DEFAULT_CONNECT_TIMEOUT / 1000), err_code);
-                SSL_free(ssl);
+                wolfSSL_free(ssl);
                 ssl = NULL;
             }
             CloseSocket(hSocket);
@@ -747,7 +734,6 @@ void CNode::copyStats(CNodeStats &stats, const std::vector<bool> &m_asmap)
     {
         LOCK(cs_hSocket);
         stats.fTLSEstablished = (ssl != NULL) && (wolfSSL_is_init_finished(ssl) == 1);
-        stats.fTLSVerified = (ssl != NULL) && ValidatePeerCertificate(ssl);
     }
 }
 
@@ -863,9 +849,9 @@ void SocketSendData(CNode *pnode)
             
             if (bIsSSL)
             {
-                ERR_clear_error(); // clear the error queue, otherwise we may be reading an old error that occurred previously in the current thread
-                nBytes = SSL_write(pnode->ssl, &data[pnode->nSendOffset], data.size() - pnode->nSendOffset);
-                nRet = SSL_get_error(pnode->ssl, nBytes);
+                wolfSSL_ERR_clear_error(); // clear the error queue, otherwise we may be reading an old error that occurred previously in the current thread
+                nBytes = wolfSSL_write(pnode->ssl, &data[pnode->nSendOffset], data.size() - pnode->nSendOffset);
+                nRet = wolfSSL_get_error(pnode->ssl, nBytes);
             }
             else
             {
@@ -893,9 +879,9 @@ void SocketSendData(CNode *pnode)
                 //
                 if (bIsSSL)
                 {
-                    if (nRet != SSL_ERROR_WANT_READ && nRet != SSL_ERROR_WANT_WRITE)
+                    if (nRet != WOLFSSL_ERROR_WANT_READ && nRet != WOLFSSL_ERROR_WANT_WRITE)
                     {
-                        LogPrintf("ERROR: SSL_write %s; closing connection\n", ERR_error_string(nRet, NULL));
+                        LogPrintf("ERROR: SSL_write %s; closing connection\n", wolfSSL_ERR_error_string(nRet, NULL));
                         pnode->CloseSocketDisconnect();
                     }
                     else
@@ -1194,7 +1180,7 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
     setsockopt(hSocket, IPPROTO_TCP, TCP_NODELAY, (void*)&set, sizeof(int));
 #endif
 
-    SSL *ssl = NULL;
+    WOLFSSL *ssl = NULL;
     
     SetSocketNonBlocking(hSocket, true);
     
@@ -1260,20 +1246,7 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
             return;
         }
     }
-    
-    // certificate validation is disabled by default    
-    if (CNode::GetTlsValidate())
-    {
-        if (ssl && !ValidatePeerCertificate(ssl))
-        {
-            LogPrintf ("TLS: ERROR: Wrong client certificate from %s. Connection will be closed.\n", addr.ToString());
-        
-            SSL_shutdown(ssl);
-            CloseSocket(hSocket);
-            SSL_free(ssl);
-            return;
-        }
-    }
+
 #endif // USE_TLS
 
     CNode* pnode = new CNode(hSocket, addr, "", true, ssl);
@@ -2090,7 +2063,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     
     if (!tlsmanager.prepareCredentials())
     {
-        LogPrintf("TLS: ERROR: %s: %s: Credentials weren't loaded. Node can't be started.\n", __FILE__, __func__);
+        LogPrintf("TLS: ERROR: %s: %s: Credentials weren't generated. Node can't be started.\n", __FILE__, __func__);
         return;
     }
     
@@ -2388,7 +2361,7 @@ bool CAddrDB::Read(CAddrMan& addr)
 unsigned int ReceiveFloodSize() { return 1000*GetArg("-maxreceivebuffer", 5*1000); }
 unsigned int SendBufferSize() { return 1000*GetArg("-maxsendbuffer", 1*1000); }
 
-CNode::CNode(SOCKET hSocketIn, const CAddress& addrIn, const std::string& addrNameIn, bool fInboundIn, SSL *sslIn) :
+CNode::CNode(SOCKET hSocketIn, const CAddress& addrIn, const std::string& addrNameIn, bool fInboundIn, WOLFSSL *sslIn) :
     ssSend(SER_NETWORK, INIT_PROTO_VERSION),
     addrKnown(5000, 0.001),
     setInventoryKnown(SendBufferSize() / 1000)
@@ -2500,7 +2473,7 @@ CNode::~CNode()
             unsigned long err_code = 0;
             tlsmanager.waitFor(SSL_SHUTDOWN, hSocket, ssl, (DEFAULT_CONNECT_TIMEOUT / 1000), err_code);
             
-            SSL_free(ssl);
+            wolfSSL_free(ssl);
             ssl = NULL;
         }
         

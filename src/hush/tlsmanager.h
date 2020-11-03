@@ -40,25 +40,21 @@ bool operator==(const _NODE_ADDR b) const
 class TLSManager
 {
 public:
-     /* This is set as a custom error number which is not an error in OpenSSL protocol.
-        A true (not null) OpenSSL error returned by ERR_get_error() consists of a library number,
+    /*  This is set as a custom error number which is not an error in SSL protocol.
+        A true (not null) SSL error returned by ERR_get_error() consists of a library number,
         function code and reason code. */
-     static const long SELECT_TIMEDOUT = 0xFFFFFFFF;
+    static const long SELECT_TIMEDOUT = 0xFFFFFFFF;
 
-     int waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* ssl, int timeoutSec, unsigned long& err_code);
+    int waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* ssl, int timeoutSec, unsigned long& err_code);
 
-     WOLFSSL* connect(SOCKET hSocket, const CAddress& addrConnect, unsigned long& err_code);
-     WOLFSSL_CTX* initCtx(
-        TLSContextType ctxType,
-        const boost::filesystem::path& privateKeyFile,
-        const boost::filesystem::path& certificateFile,
-        const std::vector<boost::filesystem::path>& trustedDirs);
-
-     bool prepareCredentials();
-     WOLFSSL* accept(SOCKET hSocket, const CAddress& addr, unsigned long& err_code);
-     bool isNonTLSAddr(const string& strAddr, const vector<NODE_ADDR>& vPool, CCriticalSection& cs);
-     void cleanNonTLSPool(std::vector<NODE_ADDR>& vPool, CCriticalSection& cs);
-     int threadSocketHandler(CNode* pnode, fd_set& fdsetRecv, fd_set& fdsetSend, fd_set& fdsetError);
-     bool initialize();
+    WOLFSSL* connect(SOCKET hSocket, const CAddress& addrConnect, unsigned long& err_code);
+    WOLFSSL_CTX* initCtx(TLSContextType ctxType);
+    bool prepareCredentials();
+    WOLFSSL* accept(SOCKET hSocket, const CAddress& addr, unsigned long& err_code);
+    bool isNonTLSAddr(const string& strAddr, const vector<NODE_ADDR>& vPool, CCriticalSection& cs);
+    void cleanNonTLSPool(std::vector<NODE_ADDR>& vPool, CCriticalSection& cs);
+    int threadSocketHandler(CNode* pnode, fd_set& fdsetRecv, fd_set& fdsetSend, fd_set& fdsetError);
+    bool initialize();
+    bool CheckKeyCert();
 };
 }
