@@ -665,7 +665,7 @@ if test x$use_pkgconfig = xyes; then
     [PKG_CHECK_MODULES],
     [
       PKG_CHECK_MODULES([SSL], [wolfssl],, [AC_MSG_ERROR(WolfSSL not found.)])
-      #PKG_CHECK_MODULES([CRYPTO], [libcrypto],,[AC_MSG_ERROR(libcrypto  not found.)])
+      PKG_CHECK_MODULES([CRYPTO], [wolfssl],,[AC_MSG_ERROR(libcrypto  not found.)])
       if test x$build_bitcoin_utils$build_bitcoind$bitcoin_enable_qt$use_tests != xnononono; then
         PKG_CHECK_MODULES([EVENT], [libevent],, [AC_MSG_ERROR(libevent not found.)])
         if test x$TARGET_OS != xwindows; then
@@ -689,7 +689,7 @@ else
   echo 'BUG: configure does not yet check for the following dependencies if pkg-config is not on the system: libcrypto++, gmp'
 
   AC_CHECK_HEADER([wolfssl/openssl/crypto.h],,AC_MSG_ERROR(libcrypto headers missing))
-  AC_CHECK_LIB([crypto],      [main],CRYPTO_LIBS=-lcrypto, AC_MSG_ERROR(libcrypto missing))
+  AC_CHECK_LIB([crypto],      [main],CRYPTO_LIBS=-lwolfssl, AC_MSG_ERROR(libcrypto missing))
 
   AC_CHECK_HEADER([wolfssl/ssl.h],, AC_MSG_ERROR(libssl headers missing),)
   AC_CHECK_LIB([wolfssl],         [main],SSL_LIBS=-lwolfssl, AC_MSG_ERROR(libwolfssl missing))
