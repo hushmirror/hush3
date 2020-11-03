@@ -1,15 +1,12 @@
 // Copyright (c) 2019-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-#include <openssl/conf.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include "utiltls.h"
+#include <wolfssl/options.h>
+#include <wolfssl/ssl.h>
 #include "tlsenums.h"
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 #include "../util.h"
-#include "../protocol.h"
 #include "../net.h"
 #include "sync.h"
 #include <boost/filesystem/path.hpp>
@@ -43,19 +40,21 @@ bool operator==(const _NODE_ADDR b) const
 class TLSManager
 {
 public:
-     int waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, SSL* ssl, int timeoutSec);
-     SSL* connect(SOCKET hSocket, const CAddress& addrConnect);
-     SSL_CTX* initCtx(
-        TLSContextType ctxType,
-        const boost::filesystem::path& privateKeyFile,
-        const boost::filesystem::path& certificateFile,
-        const std::vector<boost::filesystem::path>& trustedDirs);
+    /*  This is set as a custom error number which is not an error in SSL protocol.
+        A true (not null) SSL error returned by ERR_get_error() consists of a library number,
+        function code and reason code. */
+    static const long SELECT_TIMEDOUT = 0xFFFFFFFF;
 
-     bool prepareCredentials();
-     SSL* accept(SOCKET hSocket, const CAddress& addr);
-     bool isNonTLSAddr(const string& strAddr, const vector<NODE_ADDR>& vPool, CCriticalSection& cs);
-     void cleanNonTLSPool(std::vector<NODE_ADDR>& vPool, CCriticalSection& cs);
-     int threadSocketHandler(CNode* pnode, fd_set& fdsetRecv, fd_set& fdsetSend, fd_set& fdsetError);
-     bool initialize();
+    int waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* ssl, int timeoutSec, unsigned long& err_code);
+
+    WOLFSSL* connect(SOCKET hSocket, const CAddress& addrConnect, unsigned long& err_code);
+    WOLFSSL_CTX* initCtx(TLSContextType ctxType);
+    bool prepareCredentials();
+    WOLFSSL* accept(SOCKET hSocket, const CAddress& addr, unsigned long& err_code);
+    bool isNonTLSAddr(const string& strAddr, const vector<NODE_ADDR>& vPool, CCriticalSection& cs);
+    void cleanNonTLSPool(std::vector<NODE_ADDR>& vPool, CCriticalSection& cs);
+    int threadSocketHandler(CNode* pnode, fd_set& fdsetRecv, fd_set& fdsetSend, fd_set& fdsetError);
+    bool initialize();
+    bool CheckKeyCert();
 };
 }

@@ -19,7 +19,7 @@
 #include "crosschain.h"
 #include "primitives/transaction.h"
 #include "cc/CCinclude.h"
-#include <openssl/sha.h>
+#include <wolfssl/wolfcrypt/sha.h>
 #include "cc/CCtokens.h"
 
 #include "key_io.h"
