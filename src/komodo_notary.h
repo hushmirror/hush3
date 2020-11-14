@@ -96,7 +96,7 @@ int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestam
         timestamp = 0;
     }
 
-    // If this chain is not a staked chain, use the normal Komodo logic to determine notaries. This allows KMD to still sync and use its proper pubkeys for dPoW.
+    // Find the correct DPoW Notary pubkeys for this season
     int32_t hush_season = 0;
     bool ishush3        = strncmp(ASSETCHAINS_SYMBOL, "HUSH3",5) == 0 ? true : false;
     hush_season         = ishush3 ? gethushseason(height) : getacseason(timestamp);
@@ -144,8 +144,8 @@ int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestam
     if ( (n < 64 && mask == ((1LL << n)-1)) || (n == 64 && mask == 0xffffffffffffffffLL) )
         return(n);
     printf("error retrieving notaries ht.%d got mask.%llx for n.%d\n",height,(long long)mask,n);
-    return(-1);
     */
+    return(-1);
 }
 
 int32_t komodo_electednotary(int32_t *numnotariesp,uint8_t *pubkey33,int32_t height,uint32_t timestamp)
