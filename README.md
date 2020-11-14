@@ -4,8 +4,8 @@
 
 ![Logo](doc/hush/hush.png "Logo")
 
-HUSH (originally Zdash) is a code fork of [ZCash](https://z.cash/) which has
-it's own genesis block. It is not a fork of another network.  Based on
+HUSH (originally Zdash) is a source code fork of [ZCash](https://z.cash/) and has
+it's own genesis block. It is not a chain fork of another coin.  Based on
 Bitcoin's code, it intends to offer a far higher standard of privacy through a
 sophisticated zero-knowledge proving scheme that preserves confidentiality of
 transaction metadata.
@@ -17,10 +17,12 @@ or more once the blockchain has reached a significant size.
 
 **HUSH is unfinished and highly experimental.** Use at your own risk!
 
-## Discord
+## Telegram
 
-Please feel free to join us on Discord at https://myhush.org/discord
-There are many channels, some you might enjoy are #general, #support and #mining.
+Please feel free to join us on Telegram :
+    * Main group: https://hush.is/telegram
+    * Support group: https://hush.is/telegram_support
+    * Mining group: https://hush.is/telegram_support
 
 ## Claiming Funds From Old Hush Wallets
 
