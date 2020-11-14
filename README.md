@@ -96,27 +96,6 @@ You can also transport funds one address at a time via private keys.
 Agama Desktop Wallet WIF-to-WIF Tool can convert between old HUSH and new HUSH3
 private keys.
 
-### Web Wallet Seed Phrase
-
-Nothing needs to be done, and if you use the Hush web wallet with a seed phrase,
-you can unlock your new funds on the new Hush mainnet with the same seedphrase.
-
-This web wallet is hosted on a best-effort basis to give newcomers an easy way
-to make addresses for mining and other uses. Please heed this advice to keep
-your funds safe:
-
- * DO NOT USE FOR LARGE AMOUNTS, use a full node or light wallet
- * ALWAYS ACCESS VIA https://
- * DO NOT USE FROM PUBLIC WIFI
- * DO NOT USE ON A COMPUTER OTHER PEOPLE USE
- * BACK UP YOUR SEED PHRASE (multiple paper copies)
-
-Even if you follow all those rules, due to web wallets relying on DNS and IP
-addresss, there are still potential attacks. You have been warned: https://wallet.myhush.org
-
-The source code for the Hush web wallet is here: https://github.com/MyHush/myhushwallet
-
-
 Installing
 ----------
 
