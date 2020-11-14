@@ -160,8 +160,6 @@ RPC_WALLET_INSUFFICIENT_FUNDS (-6) | _Not enough funds in wallet or account_
 
 RPC_WALLET_ERROR (-4) | _Unspecified problem with wallet_
 ----------------------| -------------------------------------
-"Could not find previous JoinSplit anchor" | Try restarting node with `-reindex`.
-"Error decrypting output note of previous JoinSplit: __"  |
 "Could not find witness for note commitment" | Try restarting node with `-rescan`.
 "Witness for note commitment is null" | Missing witness for note commitment.
 "Witness for spendable note does not have same anchor as change input" | Invalid anchor for spendable note witness.
