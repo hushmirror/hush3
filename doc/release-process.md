@@ -2,24 +2,22 @@
 
 ## Pre-release
 
-### Github Issues
+### Git Issues
 
-Looks for Github issues that should be fixed in the next release.
+Look for Git issues that should be fixed in the next release.
 
 ### Pre-release checklist:
-
-...
+  * Is this release changing consensus rules?
 
 ### Protocol Safety Checks:
 
+  * Does MIN_PROTO_VERSION need to change?
+
 ## Release dependencies
 
-Instal deps on Linxu:
+Install deps on Linux:
 
 	apt-get install help2man debchange
-
-You can optionally install the `progressbar2` Python module with pip to have a
-progress bar displayed during the build process.
 
 ## Release process
 
