@@ -10,7 +10,7 @@
  * or distributed except according to the terms contained in the GPLv3        *
  *                                                                            *
  * Removal or modification of this copyright notice is prohibited.            *
- * https://myhush.org                                                         *
+ * https://hush.is
  *                                                                            *
  ******************************************************************************/
 
@@ -40,7 +40,7 @@ SendManyRecipient newSietchRecipient(string zaddr) {
 
 string randomSietchZaddr() {
     auto sk    = libzcash::SaplingSpendingKey::random();
-    auto expsk = sk.expanded_spending_key();
+    //auto expsk = sk.expanded_spending_key();
     auto zdust = sk.default_address();
     return EncodePaymentAddress(zdust);
 }
