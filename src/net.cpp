@@ -861,13 +861,13 @@ void SocketSendData(CNode *pnode)
         }
         if (nBytes > 0)
         {
-            pnode->nLastSend = GetTime();
-            pnode->nSendBytes += nBytes;
+            pnode->nLastSend    = GetTime();
+            pnode->nSendBytes  += nBytes;
             pnode->nSendOffset += nBytes;
             pnode->RecordBytesSent(nBytes);
             if (pnode->nSendOffset == data.size()) {
                 pnode->nSendOffset = 0;
-                pnode->nSendSize -= data.size();
+                pnode->nSendSize  -= data.size();
                 it++;
             } else {
                 // could not send full message; stop sending more
@@ -876,23 +876,17 @@ void SocketSendData(CNode *pnode)
         } else {
             if (nBytes <= 0) {
                 // error
-                //
                 if (bIsSSL)
                 {
                     if (nRet != WOLFSSL_ERROR_WANT_READ && nRet != WOLFSSL_ERROR_WANT_WRITE)
                     {
                         LogPrintf("ERROR: SSL_write %s; closing connection\n", wolfSSL_ERR_error_string(nRet, NULL));
                         pnode->CloseSocketDisconnect();
-                    }
-                    else
-                    {
+                    } else {
                         // preventive measure from exhausting CPU usage
-                        //
                         MilliSleep(1);    // 1 msec
                     }
-                }
-                else
-                {
+                } else {
                     if (nRet != WSAEWOULDBLOCK && nRet != WSAEMSGSIZE && nRet != WSAEINTR && nRet != WSAEINPROGRESS)
                     {
                         LogPrintf("ERROR: send %s; closing connection\n", NetworkErrorString(nRet));
