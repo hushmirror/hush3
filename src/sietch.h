@@ -19,7 +19,7 @@
 
 string newSietchZaddr() {
     bool addToWallet = false;
-    auto zaddr = EncodePaymentAddress(pwalletMain->GenerateNewSaplingZKey(addToWallet));
+    auto zaddr       = EncodePaymentAddress(pwalletMain->GenerateNewSaplingZKey(addToWallet));
     return zaddr;
 }
 
@@ -39,9 +39,7 @@ SendManyRecipient newSietchRecipient(string zaddr) {
 }
 
 string randomSietchZaddr() {
-    auto sk    = libzcash::SaplingSpendingKey::random();
-    //auto expsk = sk.expanded_spending_key();
-    auto zdust = sk.default_address();
+    auto zdust = libzcash::SaplingSpendingKey::random().default_address();
     return EncodePaymentAddress(zdust);
 }
 
