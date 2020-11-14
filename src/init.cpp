@@ -756,7 +756,7 @@ void NoParamsShutdown(void)
     LogPrintf("Could not find valid Sapling params anywhere! Exiting...");
     uiInterface.ThreadSafeMessageBox(strprintf(
         _("Cannot find the Sapling network parameters! Something is very wrong.\n"
-            "Please join our Discord for help: https://myhush.org/discord/")),
+            "Please join our Telegram for help: https://hush.is/telegram_support")),
         "", CClientUIInterface::MSG_ERROR);
     StartShutdown();
     return;
@@ -768,7 +768,7 @@ void CorruptParamsShutdown(void)
     LogPrintf("We detected corrupt Sapling params! Exiting...");
     uiInterface.ThreadSafeMessageBox(strprintf(
         _("Corrupt Sapling network parameters were detected! Something is very wrong.\n"
-            "Please join our Discord for help: https://myhush.org/discord/")),
+            "Please join our Telegram for help: https://hush.is/telegram_support")),
         "", CClientUIInterface::MSG_ERROR);
     StartShutdown();
     return;
