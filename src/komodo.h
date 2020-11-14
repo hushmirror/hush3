@@ -45,7 +45,7 @@ bool check_pprevnotarizedht();
 
 #include "komodo_structs.h"
 #include "komodo_globals.h"
-#include "komodo_utils.h"
+#include "hush_utils.h"
 #include "komodo_curve25519.h"
 
 #include "komodo_cJSON.c"

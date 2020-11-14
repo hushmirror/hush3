@@ -1241,7 +1241,7 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams);
 // You specify the BR, and the FR % gets added so 10% of 12.5 is 1.25
 // but to tell the AC params, I need to say "11% of 11.25" is 1.25
 // 11% ie. 1/9th cannot be exactly represented and so the FR has tiny amounts of error unless done manually
-// This must be kept in sync with hush_block_subsidy() in komoto_utils.h!
+// This must be kept in sync with hush_block_subsidy() in hush_utils.h!
 // Changing these functions are consensus changes!
 // Here Be Dragons! -- Duke Leto
 uint64_t hush_commission(int height)
