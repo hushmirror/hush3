@@ -4,7 +4,6 @@
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include "key.h"
-
 #include "chainparams.h"
 #include "key_io.h"
 #include "script/script.h"
@@ -12,12 +11,9 @@
 #include "util.h"
 #include "utilstrencodings.h"
 #include "test/test_bitcoin.h"
-
 #include "zcash/Address.hpp"
-
 #include <string>
 #include <vector>
-
 #include <boost/test/unit_test.hpp>
 
 using namespace std;

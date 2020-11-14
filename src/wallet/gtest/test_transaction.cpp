@@ -1,5 +1,7 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <gtest/gtest.h>
-
 #include "primitives/transaction.h"
 #include "zcash/Note.hpp"
 #include "zcash/Address.hpp"
@@ -8,6 +10,8 @@ extern ZCJoinSplit* params;
 extern int GenZero(int n);
 extern int GenMax(int n);
 
+//TODO: Sapling transaction
+/*
 TEST(Transaction, JSDescriptionRandomized) {
     // construct a merkle tree
     ZCIncrementalMerkleTree merkleTree;
@@ -88,3 +92,4 @@ TEST(Transaction, JSDescriptionRandomized) {
         EXPECT_EQ(expectedOutputMap, outputMap);
     }
 }
+*/

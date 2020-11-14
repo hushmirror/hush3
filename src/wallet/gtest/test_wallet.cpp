@@ -1,7 +1,9 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sodium.h>
-
 #include "base58.h"
 #include "chainparams.h"
 #include "key_io.h"
@@ -14,7 +16,6 @@
 #include "zcash/JoinSplit.hpp"
 #include "zcash/Note.hpp"
 #include "zcash/NoteEncryption.hpp"
-
 #include <boost/filesystem.hpp>
 
 using ::testing::Return;

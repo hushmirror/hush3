@@ -1,3 +1,4 @@
+// Copyright (c) 2019-2020 The Hush developers
 // Copyright 2014 BitPay, Inc.
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html

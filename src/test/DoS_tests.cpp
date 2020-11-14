@@ -1,12 +1,8 @@
+// Copyright (c) 2019-2020 The Hush developers
 // Copyright (c) 2011-2014 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
-//
 // Unit tests for denial-of-service detection/prevention code
-//
-
-
 
 #include "consensus/upgrades.h"
 #include "keystore.h"
@@ -16,11 +12,8 @@
 #include "script/sign.h"
 #include "serialize.h"
 #include "util.h"
-
 #include "test/test_bitcoin.h"
-
 #include <stdint.h>
-
 #include <boost/assign/list_of.hpp> // for 'map_list_of()'
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/foreach.hpp>

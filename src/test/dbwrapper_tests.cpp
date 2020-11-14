@@ -1,3 +1,4 @@
+// Copyright (c) 2019-2020 The Hush developers
 // Copyright (c) 2018 The Zcash developers
 // Copyright (c) 2012-2017 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying

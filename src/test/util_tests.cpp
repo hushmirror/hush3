@@ -1,9 +1,9 @@
+// Copyright (c) 2019-2020 The Hush developers
 // Copyright (c) 2011-2014 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include "util.h"
-
 #include "clientversion.h"
 #include "primitives/transaction.h"
 #include "random.h"
@@ -11,10 +11,8 @@
 #include "utilstrencodings.h"
 #include "utilmoneystr.h"
 #include "test/test_bitcoin.h"
-
 #include <stdint.h>
 #include <vector>
-
 #include <boost/test/unit_test.hpp>
 
 using namespace std;
