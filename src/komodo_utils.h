@@ -1790,16 +1790,16 @@ void komodo_args(char *argv0)
         {
             // We dont have any chain data yet, so use system clock to guess. 
             // I think on season change should reccomend notaries to use -notary to avoid needing this. 
-            int32_t kmd_season = getacseason(time(NULL));
+            int32_t hush_season = getacseason(time(NULL));
             for (i=0; i<64; i++)
             {
-                if ( strcmp(NOTARY_PUBKEY.c_str(),notaries_elected[kmd_season-1][i][1]) == 0 )
+                if ( strcmp(NOTARY_PUBKEY.c_str(),notaries_elected[hush_season-1][i][1]) == 0 )
                 {
                     IS_KOMODO_NOTARY = 1;
                     KOMODO_MININGTHREADS = 1;
                     mapArgs ["-genproclimit"] = itostr(KOMODO_MININGTHREADS);
                     IS_STAKED_NOTARY = -1;
-                    fprintf(stderr,"running as notary.%d %s\n",i,notaries_elected[kmd_season-1][i][0]);
+                    fprintf(stderr,"running as notary.%d %s\n",i,notaries_elected[hush_season-1][i][0]);
                     break;
                 }
             }
