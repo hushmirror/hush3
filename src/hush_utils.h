@@ -108,7 +108,9 @@ struct rmd160_vstate { uint64_t length; uint8_t buf[64]; uint32_t curlen, state[
 #define Sigma1(x)       (S(x, 6) ^ S(x, 11) ^ S(x, 25))
 #define Gamma0(x)       (S(x, 7) ^ S(x, 18) ^ R(x, 3))
 #define Gamma1(x)       (S(x, 17) ^ S(x, 19) ^ R(x, 10))
+#ifndef MIN
 #define MIN(x, y) ( ((x)<(y))?(x):(y) )
+#endif
 
 static inline int32_t sha256_vcompress(struct sha256_vstate * md,uint8_t *buf)
 {
