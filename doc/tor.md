@@ -128,7 +128,7 @@ a single Hush hidden server. Launch hushd as follows:
 
 	./hushd -onion=127.0.0.1:9050 -connect=fuckzookoie6wxgio.onion
 
-Now use komodo-cli to verify there is only a single peer connection.
+Now use hush-cli to verify there is only a single peer connection.
 
 	hush-cli getpeerinfo
 
