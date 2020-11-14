@@ -1,4 +1,7 @@
 #!/usr/bin/bash
+# Copyright (c) 2019-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 # This script makes the neccesary transactions to migrate
 # coin between 2 assetchains on the same -ac_cc id
