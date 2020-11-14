@@ -10,11 +10,16 @@ $(package)_config_env=AR="$($(package)_ar)" RANLIB="$($(package)_ranlib)" CC="$(
 $(package)_config_opts=--prefix=$(host_prefix)
 $(package)_config_opts+=--host=$(host)
 $(package)_config_opts+=--enable-static
+$(package)_config_opts+=--enable-debug
+$(package)_config_opts+=--enable-tls13
+#$(package)_config_opts+=--disable-tlsv12
+#$(package)_config_opts+=--disable-oldtls
 $(package)_config_opts+=--disable-shared
 $(package)_config_opts+=--disable-examples
 $(package)_config_opts+=--disable-crypttests
 $(package)_config_opts+=--enable-keygen
 $(package)_config_opts+=--enable-certgen
+$(package)_config_opts+=--enable-bigcache
 $(package)_config_opts+=--enable-enckeys
 $(package)_config_opts+=--enable-opensslall
 $(package)_config_opts+=--enable-opensslextra

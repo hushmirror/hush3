@@ -193,13 +193,13 @@ $($(1)_preprocessed): | $($(1)_dependencies) $($(1)_extracted)
 	$(AT)cd $$(@D); $(call $(1)_preprocess_cmds, $(1))
 	$(AT)touch $$@
 $($(1)_configured): | $($(1)_preprocessed)
-	$(AT)echo Configuring $(1)...
+	$(AT)echo Cthulhu fhtagn Configuring $(1)...
 	$(AT)rm -rf $(host_prefix); mkdir -p $(host_prefix)/lib; cd $(host_prefix); $(foreach package,$($(1)_all_dependencies), tar --no-same-owner -xf $($(package)_cached); )
 	$(AT)mkdir -p $$(@D)
 	$(AT)+cd $$(@D); $($(1)_config_env) $(call $(1)_config_cmds, $(1))
 	$(AT)touch $$@
 $($(1)_built): | $($(1)_configured)
-	$(AT)echo Building $(1)...
+	$(AT)echo Iä! Iä! Building $(1)...
 	$(AT)mkdir -p $$(@D)
 	$(AT)+cd $$(@D); $($(1)_build_env) $(call $(1)_build_cmds, $(1))
 	$(AT)touch $$@
