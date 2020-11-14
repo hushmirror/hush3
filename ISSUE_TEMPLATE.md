@@ -2,7 +2,7 @@
 
 This issue tracker is only for technical issues related to hushd
 
-General Hush questions and/or support requests and are best directed to [Discord](https://myhush.org/discord)
+General Hush questions and/or support requests and are best directed to [Telegram](https://hush.is/telegram_support)
 
 ### Describe the issue
 

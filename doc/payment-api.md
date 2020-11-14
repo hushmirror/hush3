@@ -2,16 +2,16 @@
 
 ## Overview
 
-Hush extends the Bitcoin Core API with new RPC calls to support private Hush payments.
+Hush extends the Bitcoin Core API with new RPC calls to support private Hush payments involving shielded addresses (zaddrs).
 
 Hush payments make use of two address formats:
 
 * taddr - an address for transparent funds (just like a Bitcoin address, value stored in UTXOs)
 * zaddr - an address for private funds (value stored in objects called notes)
 
-When transferring funds from one taddr to another taddr, you can use either the existing Bitcoin RPC calls or the new Hush RPC calls.
+As of Block 340000, taddrs cannot be recipients of transactions, they can only mine new coinbase funds, which must then be sent to a zaddr.
 
-When a transfer involves zaddrs, you must use the new Hush RPC calls.
+When a transfer involves zaddrs, you must use the new Hush RPC calls, such as `z_sendmany`.
 
 
 ## Compatibility with Bitcoin Core
@@ -111,7 +111,7 @@ z_listoperationids <br>| [state] | Return a list of operationids for all operati
 
 ## Asynchronous RPC call Error Codes
 
-Hush error codes are defined in https://github.com/zcash/zcash/blob/master/src/rpcprotocol.h
+Hush error codes are defined in https://git.hush.is/hush/hush3/src/branch/master/src/rpc/protocol.h
 
 ### z_sendmany error codes
 

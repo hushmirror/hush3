@@ -4,8 +4,8 @@
 
 ![Logo](doc/hush/hush.png "Logo")
 
-HUSH (originally Zdash) is a code fork of [ZCash](https://z.cash/) which has
-it's own genesis block. It is not a fork of another network.  Based on
+HUSH (originally Zdash) is a source code fork of [ZCash](https://z.cash/) and has
+it's own genesis block. It is not a chain fork of another coin.  Based on
 Bitcoin's code, it intends to offer a far higher standard of privacy through a
 sophisticated zero-knowledge proving scheme that preserves confidentiality of
 transaction metadata.
@@ -17,10 +17,12 @@ or more once the blockchain has reached a significant size.
 
 **HUSH is unfinished and highly experimental.** Use at your own risk!
 
-## Discord
+## Telegram
 
-Please feel free to join us on Discord at https://myhush.org/discord
-There are many channels, some you might enjoy are #general, #support and #mining.
+Please feel free to join us on Telegram :
+    * Main group: https://hush.is/telegram
+    * Support group: https://hush.is/telegram_support
+    * Mining group: https://hush.is/telegram_support
 
 ## Claiming Funds From Old Hush Wallets
 
@@ -43,7 +45,7 @@ with `t1` and now they begin with `R`.
 To see what an old HUSH v2 address looks like on the new chain, this online tool
 can be used: https://dexstats.info/addressconverter.php
 
-or this command line tool: https://github.com/MyHush/hush3/blob/duke/contrib/convert_address.py
+or this command line tool: https://git.hush.is/hush/hush3/src/master/contrib/convert_address.py
 
 
 ### Using an old wallet.dat
@@ -94,31 +96,10 @@ You can also transport funds one address at a time via private keys.
 Agama Desktop Wallet WIF-to-WIF Tool can convert between old HUSH and new HUSH3
 private keys.
 
-### Web Wallet Seed Phrase
-
-Nothing needs to be done, and if you use the Hush web wallet with a seed phrase,
-you can unlock your new funds on the new Hush mainnet with the same seedphrase.
-
-This web wallet is hosted on a best-effort basis to give newcomers an easy way
-to make addresses for mining and other uses. Please heed this advice to keep
-your funds safe:
-
- * DO NOT USE FOR LARGE AMOUNTS, use a full node or light wallet
- * ALWAYS ACCESS VIA https://
- * DO NOT USE FROM PUBLIC WIFI
- * DO NOT USE ON A COMPUTER OTHER PEOPLE USE
- * BACK UP YOUR SEED PHRASE (multiple paper copies)
-
-Even if you follow all those rules, due to web wallets relying on DNS and IP
-addresss, there are still potential attacks. You have been warned: https://wallet.myhush.org
-
-The source code for the Hush web wallet is here: https://github.com/MyHush/myhushwallet
-
-
 Installing
 ----------
 
-See [INSTALL.md](https://github.com/MyHush/hush3/blob/master/INSTALL.md).
+See [INSTALL.md](https://git.hush.is/hush/hush3/src/branch/master/INSTALL.md)
 
 
 License

@@ -77,7 +77,8 @@
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/thread.hpp>
 #include <chrono>
-#include <openssl/crypto.h>
+#include <wolfssl/options.h>
+#include <wolfssl/ssl.h>
 #include <thread>
 
 #if ENABLE_ZMQ
@@ -296,6 +297,7 @@ void Shutdown()
     //pzcashParams = NULL;
     globalVerifyHandle.reset();
     ECC_Stop();
+    CNode::NetCleanup();
     LogPrintf("%s: done\n", __func__);
 }
 
@@ -431,6 +433,8 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-torcontrol=<ip>:<port>", strprintf(_("Tor control port to use if onion listening enabled (default: %s)"), DEFAULT_TOR_CONTROL));
     strUsage += HelpMessageOpt("-torpassword=<pass>", _("Tor control port password (default: empty)"));
     strUsage += HelpMessageOpt("-tls=<option>", _("Specify TLS usage (default: 1 => enabled and preferred, yet compatible); other options are -tls=0 to disable TLS and -tls=only to enforce it"));
+    strUsage += HelpMessageOpt("-tlsfallbacknontls=<0 or 1>", _("If a TLS connection fails, the next connection attempt of the same peer (based on IP address) takes place without TLS (default: 1)"));
+    strUsage += HelpMessageOpt("-tlsvalidate=<0 or 1>", _("Connect to peers only with valid certificates (default: 0)"));
     strUsage += HelpMessageOpt("-tlskeypath=<path>", _("Full path to a private key"));
     strUsage += HelpMessageOpt("-tlskeypwd=<password>", _("Password for a private key encryption (default: not set, i.e. private key will be stored unencrypted)"));
     strUsage += HelpMessageOpt("-tlscertpath=<path>", _("Full path to a certificate"));
@@ -493,8 +497,7 @@ std::string HelpMessage(HelpMessageMode mode)
         strUsage += HelpMessageOpt("-stopafterblockimport", strprintf("Stop running after importing blocks from disk (default: %u)", 0));
         strUsage += HelpMessageOpt("-nuparams=hexBranchId:activationHeight", "Use given activation height for specified network upgrade (regtest-only)");
     }
-    string debugCategories = "addrman, alert, bench, coindb, db, deletetx, estimatefee, http, libevent, lock, mempool, net, partitioncheck, pow, proxy, prune, "
-                             "rand, reindex, rpc, selectcoins, tor, zmq, zrpc, zrpcunsafe (implies zrpc)"; // Don't translate these
+    string debugCategories = "addrman, alert, bench, coindb, db, deletetx, estimatefee, http, libevent, lock, mempool, net, tls, partitioncheck, pow, proxy, prune, rand, reindex, rpc, selectcoins, tor, zmq, zrpc, zrpcunsafe (implies zrpc)"; // Don't translate these
     strUsage += HelpMessageOpt("-debug=<category>", strprintf(_("Output debugging information (default: %u, supplying <category> is optional)"), 0) + ". " +
         _("If <category> is not supplied or if <category> = 1, output all debugging information.") + " " + _("<category> can be:") + " " + debugCategories + ".");
     strUsage += HelpMessageOpt("-experimentalfeatures", _("Enable use of experimental features"));
@@ -756,7 +759,7 @@ void NoParamsShutdown(void)
     LogPrintf("Could not find valid Sapling params anywhere! Exiting...");
     uiInterface.ThreadSafeMessageBox(strprintf(
         _("Cannot find the Sapling network parameters! Something is very wrong.\n"
-            "Please join our Discord for help: https://myhush.org/discord/")),
+            "Please join our Telegram for help: https://hush.is/telegram_support")),
         "", CClientUIInterface::MSG_ERROR);
     StartShutdown();
     return;
@@ -768,7 +771,7 @@ void CorruptParamsShutdown(void)
     LogPrintf("We detected corrupt Sapling params! Exiting...");
     uiInterface.ThreadSafeMessageBox(strprintf(
         _("Corrupt Sapling network parameters were detected! Something is very wrong.\n"
-            "Please join our Discord for help: https://myhush.org/discord/")),
+            "Please join our Telegram for help: https://hush.is/telegram_support")),
         "", CClientUIInterface::MSG_ERROR);
     StartShutdown();
     return;
@@ -1433,7 +1436,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     if (fPrintToDebugLog)
         OpenDebugLog();
-    LogPrintf("Using OpenSSL version %s\n", SSLeay_version(SSLEAY_VERSION));
+    LogPrintf("Using WolfSSL version %s\n", wolfSSL_lib_version());
 #ifdef ENABLE_WALLET
     LogPrintf("Using BerkeleyDB version %s\n", DbEnv::version(0, 0, 0));
 #endif
