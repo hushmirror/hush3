@@ -43,11 +43,13 @@ If you don't see your idea listed, and you think it can contribute to Hush, do o
 
 ## Style guide
 
-Don't write shitty code. Try to avoid emulating jl777 code style, which is like a rabbit donkey smoked bath salts with nothing to read but a K+R C book.
+Don't write shitty code. Do not emulate "jl777 code style" from Komodo, we consider that a bug, not a feature.
 
 ## Setting up your environment
 
 The Hush Core (hushd) is mainly written in C++ with specific modules written in C. Follow the [Install](https://github.com/MyHush/hush3/blob/master/INSTALL.md) instructions to build hushd from sources. For more informations about the Hush Platform and a full API documentation please visit the official [Hush Developer documentation](https://gilardh.github.io/dev-website/developers/)
+
+Other Hush software is written in Rust or Go. We avoid Javascript at all costs.
 
 ## Contribution review process
 
