@@ -15,7 +15,7 @@
 #ifndef OS_PORTABLEH
 #define OS_PORTABLEH
 
-// iguana_OS has functions that invoke system calls. Whenever possible stdio and similar functions are use and most functions are fully portable and in this file. For things that require OS specific, the call is routed to iguana_OS_portable_*  Usually, all but one OS can be handled with the same code, so iguana_OS_portable.c has most of this shared logic and an #ifdef iguana_OS_nonportable.c
+// dragon_OS has functions that invoke system calls. Whenever possible stdio and similar functions are use and most functions are fully portable and in this file. For things that require OS specific, the call is routed to dragon_OS_portable_*  Usually, all but one OS can be handled with the same code, so dragon_OS_portable.c has most of this shared logic and an #ifdef dragon_OS_nonportable.c
 
 #ifdef __APPLE__
 //#define LIQUIDITY_PROVIDER 1
@@ -279,19 +279,19 @@ void *queue_clone(queue_t *clone,queue_t *queue,int32_t size);
 int32_t queue_size(queue_t *queue);
 char *mbstr(char *str,double n);
 
-void iguana_memreset(struct OS_memspace *mem);
-void iguana_mempurge(struct OS_memspace *mem);
-void *iguana_meminit(struct OS_memspace *mem,char *name,void *ptr,int64_t totalsize,int32_t threadsafe);
-void *iguana_memalloc(struct OS_memspace *mem,long size,int32_t clearflag);
-int64_t iguana_memfree(struct OS_memspace *mem,void *ptr,int32_t size);
+void dragon_memreset(struct OS_memspace *mem);
+void dragon_mempurge(struct OS_memspace *mem);
+void *dragon_meminit(struct OS_memspace *mem,char *name,void *ptr,int64_t totalsize,int32_t threadsafe);
+void *dragon_memalloc(struct OS_memspace *mem,long size,int32_t clearflag);
+int64_t dragon_memfree(struct OS_memspace *mem,void *ptr,int32_t size);
 
 // generic functions
-bits256 iguana_merkle(char *symbol,bits256 *tree,int32_t txn_count);
+bits256 dragon_merkle(char *symbol,bits256 *tree,int32_t txn_count);
 bits256 bits256_calctxid(char *symbol,uint8_t *serialized,int32_t len);
 int32_t unhex(char c);
 void touppercase(char *str);
 uint32_t is_ipaddr(char *str);
-void iguana_bitmap(char *space,int32_t max,char *name);
+void dragon_bitmap(char *space,int32_t max,char *name);
 double _pairaved(double valA,double valB);
 int32_t unstringbits(char *buf,uint64_t bits);
 uint64_t stringbits(char *str);
@@ -383,26 +383,26 @@ void expand_ipbits(char *ipaddr,uint64_t ipbits);
 void escape_code(char *escaped,char *str);
 void SaM_PrepareIndices(void);
 
-// iguana_serdes.c
+// dragon_serdes.c
 #ifndef IGUANA_LOG2PACKETSIZE
 #define IGUANA_LOG2PACKETSIZE 22
 #endif
 #ifndef IGUANA_MAXPACKETSIZE
 #define IGUANA_MAXPACKETSIZE (1 << IGUANA_LOG2PACKETSIZE)
 #endif
-struct iguana_msghdr { uint8_t netmagic[4]; char command[12]; uint8_t serdatalen[4],hash[4]; } PACKED;
+struct dragon_msghdr { uint8_t netmagic[4]; char command[12]; uint8_t serdatalen[4],hash[4]; } PACKED;
 
-int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
-int32_t iguana_validatehdr(char *symbol,struct iguana_msghdr *H);
-int32_t iguana_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp);
-int32_t iguana_sethdr(struct iguana_msghdr *H,const uint8_t netmagic[4],char *command,uint8_t *data,int32_t datalen);
-uint8_t *iguana_varint16(int32_t rwflag,uint8_t *serialized,uint16_t *varint16p);
-uint8_t *iguana_varint32(int32_t rwflag,uint8_t *serialized,uint16_t *varint16p);
-uint8_t *iguana_varint64(int32_t rwflag,uint8_t *serialized,uint32_t *varint32p);
-int32_t iguana_rwvarint(int32_t rwflag,uint8_t *serialized,uint64_t *varint64p);
-int32_t iguana_rwvarint32(int32_t rwflag,uint8_t *serialized,uint32_t *int32p);
-int32_t iguana_rwvarstr(int32_t rwflag,uint8_t *serialized,int32_t maxlen,char *endianedp);
-int32_t iguana_rwmem(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
+int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
+int32_t dragon_validatehdr(char *symbol,struct dragon_msghdr *H);
+int32_t dragon_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *endianedp);
+int32_t dragon_sethdr(struct dragon_msghdr *H,const uint8_t netmagic[4],char *command,uint8_t *data,int32_t datalen);
+uint8_t *dragon_varint16(int32_t rwflag,uint8_t *serialized,uint16_t *varint16p);
+uint8_t *dragon_varint32(int32_t rwflag,uint8_t *serialized,uint16_t *varint16p);
+uint8_t *dragon_varint64(int32_t rwflag,uint8_t *serialized,uint32_t *varint32p);
+int32_t dragon_rwvarint(int32_t rwflag,uint8_t *serialized,uint64_t *varint64p);
+int32_t dragon_rwvarint32(int32_t rwflag,uint8_t *serialized,uint32_t *int32p);
+int32_t dragon_rwvarstr(int32_t rwflag,uint8_t *serialized,int32_t maxlen,char *endianedp);
+int32_t dragon_rwmem(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 #define bits256_nonz(a) (((a).ulongs[0] | (a).ulongs[1] | (a).ulongs[2] | (a).ulongs[3]) != 0)
 
 bits256 bits256_ave(bits256 a,bits256 b);

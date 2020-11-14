@@ -188,10 +188,10 @@ int32_t komodo_rwapproval(int32_t rwflag,uint8_t *opretbuf,struct pax_transactio
         pax->vout += ((uint32_t)opretbuf[len++] << 8);
         //printf(" txid v.%d\n",pax->vout);
     }
-    len += iguana_rwnum(rwflag,&opretbuf[len],sizeof(pax->komodoshis),&pax->komodoshis);
-    len += iguana_rwnum(rwflag,&opretbuf[len],sizeof(pax->fiatoshis),&pax->fiatoshis);
-    len += iguana_rwnum(rwflag,&opretbuf[len],sizeof(pax->height),&pax->height);
-    len += iguana_rwnum(rwflag,&opretbuf[len],sizeof(pax->otherheight),&pax->otherheight);
+    len += dragon_rwnum(rwflag,&opretbuf[len],sizeof(pax->komodoshis),&pax->komodoshis);
+    len += dragon_rwnum(rwflag,&opretbuf[len],sizeof(pax->fiatoshis),&pax->fiatoshis);
+    len += dragon_rwnum(rwflag,&opretbuf[len],sizeof(pax->height),&pax->height);
+    len += dragon_rwnum(rwflag,&opretbuf[len],sizeof(pax->otherheight),&pax->otherheight);
     if ( rwflag != 0 )
     {
         memcpy(&opretbuf[len],pax->rmd160,20), len += 20;
@@ -855,7 +855,7 @@ const char *komodo_opreturn(int32_t height,uint64_t value,uint8_t *opretbuf,int3
         tokomodo = 0;
         if ( opretlen == 38 ) // any KMD tx
         {
-            iguana_rwnum(0,&opretbuf[34],sizeof(kmdheight),&kmdheight);
+            dragon_rwnum(0,&opretbuf[34],sizeof(kmdheight),&kmdheight);
             memset(base,0,sizeof(base));
             PAX_pubkey(0,&opretbuf[1],&addrtype,rmd160,base,&shortflag,&fiatoshis);
             bitcoin_address(coinaddr,addrtype,rmd160,20);
@@ -998,7 +998,7 @@ const char *komodo_opreturn(int32_t height,uint64_t value,uint8_t *opretbuf,int3
             return(typestr);
         }
         tokomodo = 1;
-        iguana_rwnum(0,&opretbuf[34],sizeof(kmdheight),&kmdheight);
+        dragon_rwnum(0,&opretbuf[34],sizeof(kmdheight),&kmdheight);
         memset(base,0,sizeof(base));
         PAX_pubkey(0,&opretbuf[1],&addrtype,rmd160,base,&shortflag,&komodoshis);
         bitcoin_address(coinaddr,addrtype,rmd160,20);
@@ -1442,14 +1442,11 @@ void komodo_passport_iteration()
         lastinterest = komodo_chainactive_timestamp();
     }
     refsp = komodo_stateptr(symbol,dest);
-    if ( ASSETCHAINS_SYMBOL[0] == 0 || strcmp(ASSETCHAINS_SYMBOL,"KMDCC") == 0 )
+    if ( ASSETCHAINS_SYMBOL[0] == 0 || strcmp(ASSETCHAINS_SYMBOL,"JUSTLIES") == 0 )
     {
         refid = 33;
         limit = 10000000;
-        jumblr_iteration();
-    }
-    else
-    {
+    } else {
         limit = 10000000;
         refid = komodo_baseid(ASSETCHAINS_SYMBOL)+1; // illegal base -> baseid.-1 -> 0
         if ( refid == 0 )
@@ -1458,11 +1455,6 @@ void komodo_passport_iteration()
             return;
         }
     }
-    /*if ( KOMODO_PAX == 0 )
-    {
-        KOMODO_PASSPORT_INITDONE = 1;
-        return;
-    }*/
     starttime = (uint32_t)time(NULL);
     if ( callcounter++ < 1 )
         limit = 10000;

@@ -587,7 +587,7 @@ int32_t komodo_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_
 extern int32_t KOMODO_PAX;
 extern uint64_t KOMODO_INTERESTSUM,KOMODO_WALLETBALANCE;
 int32_t komodo_is_issuer();
-int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
+int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 int32_t komodo_isrealtime(int32_t *kmdheightp);
 int32_t pax_fiatstatus(uint64_t *available,uint64_t *deposited,uint64_t *issued,uint64_t *withdrawn,uint64_t *approved,uint64_t *redeemed,char *base);
 int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[IGUANA_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
@@ -703,10 +703,10 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
             ret.push_back(Pair("value",params[1].get_str()));
             ret.push_back(Pair("valuesize",valuesize));
         }
-        iguana_rwnum(1,&keyvalue[0],sizeof(keylen),&keylen);
-        iguana_rwnum(1,&keyvalue[2],sizeof(valuesize),&valuesize);
-        iguana_rwnum(1,&keyvalue[4],sizeof(height),&height);
-        iguana_rwnum(1,&keyvalue[8],sizeof(flags),&flags);
+        dragon_rwnum(1,&keyvalue[0],sizeof(keylen),&keylen);
+        dragon_rwnum(1,&keyvalue[2],sizeof(valuesize),&valuesize);
+        dragon_rwnum(1,&keyvalue[4],sizeof(height),&height);
+        dragon_rwnum(1,&keyvalue[8],sizeof(flags),&flags);
         memcpy(&keyvalue[12],key,keylen);
         if ( value != 0 )
             memcpy(&keyvalue[12 + keylen],value,valuesize);
@@ -780,7 +780,7 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
     uint8_t opretbuf[64]; int32_t opretlen; uint64_t fee = komodoshis / 1000;
     if ( fee < 10000 )
         fee = 10000;
-    iguana_rwnum(1,&pubkey37[33],sizeof(height),&height);
+    dragon_rwnum(1,&pubkey37[33],sizeof(height),&height);
     opretlen = komodo_opreturnscript(opretbuf,'D',pubkey37,37);
     SendMoney(address.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,komodoshis);
     return wtx.GetHash().GetHex();
@@ -815,7 +815,7 @@ UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
     uint8_t opretbuf[64]; int32_t opretlen; uint64_t fee = fiatoshis / 1000;
     if ( fee < 10000 )
         fee = 10000;
-    iguana_rwnum(1,&pubkey37[33],sizeof(kmdheight),&kmdheight);
+    dragon_rwnum(1,&pubkey37[33],sizeof(kmdheight),&kmdheight);
     opretlen = komodo_opreturnscript(opretbuf,'W',pubkey37,37);
     SendMoney(destaddress.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,fiatoshis);
     return wtx.GetHash().GetHex();
@@ -5196,7 +5196,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
             + strprintf("%d", MERGE_TO_ADDRESS_DEFAULT_TRANSPARENT_LIMIT) + ") Limit on the maximum number of UTXOs to merge.  Set to 0 to use node option -mempooltxinputlimit (before Overwinter), or as many as will fit in the transaction (after Overwinter).\n"
             "4. shielded_limit        (numeric, optional, default="
             + strprintf("%d Sapling Notes", MERGE_TO_ADDRESS_DEFAULT_SAPLING_LIMIT) + ") Limit on the maximum number of notes to merge.  Set to 0 to merge as many as will fit in the transaction.\n"
-            "5. maximum_utxo_size       (numeric, optional) eg, 0.0001 anything under 10000 satoshies will be merged, ignores 10,000 sat p2pk utxo that iguana uses, and merges coinbase utxo.\n"
+            "5. maximum_utxo_size       (numeric, optional) eg, 0.0001 anything under 10000 satoshies will be merged, ignores 10,000 sat p2pk utxo that dragon uses, and merges coinbase utxo.\n"
             "6. \"memo\"                (string, optional) Encoded as hex. When toaddress is a z-addr, this will be stored in the memo field of the new note.\n"
 
             "\nResult:\n"

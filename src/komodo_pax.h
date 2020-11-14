@@ -197,16 +197,16 @@ int32_t dpow_readprices(int32_t height,uint8_t *data,uint32_t *timestampp,double
     uint32_t kmdbtc,btcusd,cnyusd; int32_t i,n,nonz,len = 0;
     if ( data[0] == 'P' && data[5] == 35 )
         data++;
-    len += iguana_rwnum(0,&data[len],sizeof(uint32_t),(void *)timestampp);
-    len += iguana_rwnum(0,&data[len],sizeof(uint32_t),(void *)&n);
+    len += dragon_rwnum(0,&data[len],sizeof(uint32_t),(void *)timestampp);
+    len += dragon_rwnum(0,&data[len],sizeof(uint32_t),(void *)&n);
     if ( n != 35 )
     {
         printf("dpow_readprices illegal n.%d\n",n);
         return(-1);
     }
-    len += iguana_rwnum(0,&data[len],sizeof(uint32_t),(void *)&kmdbtc); // /= 1000
-    len += iguana_rwnum(0,&data[len],sizeof(uint32_t),(void *)&btcusd); // *= 1000
-    len += iguana_rwnum(0,&data[len],sizeof(uint32_t),(void *)&cnyusd);
+    len += dragon_rwnum(0,&data[len],sizeof(uint32_t),(void *)&kmdbtc); // /= 1000
+    len += dragon_rwnum(0,&data[len],sizeof(uint32_t),(void *)&btcusd); // *= 1000
+    len += dragon_rwnum(0,&data[len],sizeof(uint32_t),(void *)&cnyusd);
     *KMDBTCp = ((double)kmdbtc / (1000000000. * 1000.));
     *BTCUSDp = PAX_BTCUSD(height,btcusd);
     *CNYUSDp = ((double)cnyusd / 1000000000.);
@@ -216,7 +216,7 @@ int32_t dpow_readprices(int32_t height,uint8_t *data,uint32_t *timestampp,double
             nonz++;
         //else if ( nonz != 0 )
         //    printf("pvals[%d] is zero\n",i);
-        len += iguana_rwnum(0,&data[len],sizeof(uint32_t),(void *)&pvals[i]);
+        len += dragon_rwnum(0,&data[len],sizeof(uint32_t),(void *)&pvals[i]);
         //printf("%u ",pvals[i]);
     }
     /*if ( nonz < n-3 )
@@ -249,7 +249,7 @@ int32_t komodo_pax_opreturn(int32_t height,uint8_t *opret,int32_t maxsize)
         {
             if ( (retval= (int32_t)fread(data,1,fsize,fp)) == fsize )
             {
-                len = iguana_rwnum(0,data,sizeof(crc32),(void *)&crc32);
+                len = dragon_rwnum(0,data,sizeof(crc32),(void *)&crc32);
                 check = calc_crc32(0,data+sizeof(crc32),(int32_t)(fsize-sizeof(crc32)));
                 if ( check == crc32 )
                 {
@@ -301,7 +301,7 @@ int32_t PAX_pubkey(int32_t rwflag,uint8_t *pubkey33,uint8_t *addrtypep,uint8_t r
         memset(pubkey33,0,33);
         pubkey33[0] = 0x02 | (*shortflagp != 0);
         memcpy(&pubkey33[1],fiat,3);
-        iguana_rwnum(rwflag,&pubkey33[4],sizeof(*fiatoshisp),(void *)fiatoshisp);
+        dragon_rwnum(rwflag,&pubkey33[4],sizeof(*fiatoshisp),(void *)fiatoshisp);
         pubkey33[12] = *addrtypep;
         memcpy(&pubkey33[13],rmd160,20);
     }
@@ -310,7 +310,7 @@ int32_t PAX_pubkey(int32_t rwflag,uint8_t *pubkey33,uint8_t *addrtypep,uint8_t r
         *shortflagp = (pubkey33[0] == 0x03);
         memcpy(fiat,&pubkey33[1],3);
         fiat[3] = 0;
-        iguana_rwnum(rwflag,&pubkey33[4],sizeof(*fiatoshisp),(void *)fiatoshisp);
+        dragon_rwnum(rwflag,&pubkey33[4],sizeof(*fiatoshisp),(void *)fiatoshisp);
         if ( *shortflagp != 0 )
             *fiatoshisp = -(*fiatoshisp);
         *addrtypep = pubkey33[12];

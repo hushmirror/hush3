@@ -98,10 +98,10 @@ int32_t getera(int timestamp)
     return(0);
 }
 
-UniValue getiguanajson(const UniValue& params, bool fHelp, const CPubKey& mypk)
+UniValue getdragonjson(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     if (fHelp || params.size() != 0)
-      throw runtime_error("getiguanajson\nreturns json for iguana, for the current ERA.");
+      throw runtime_error("getdragonjson\nreturns json for dragon, for the current ERA.");
 
     UniValue json(UniValue::VOBJ);
     UniValue seeds(UniValue::VARR);
@@ -113,7 +113,7 @@ UniValue getiguanajson(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     // loop over seeds array and push back to json array for seeds
     for (int8_t i = 0; i < 8; i++) {
-        seeds.push_back(iguanaSeeds[i][0]);
+        seeds.push_back(dragonSeeds[i][0]);
     }
 
     // loop over era's notaries and push back each pair to the notary array
@@ -123,14 +123,14 @@ UniValue getiguanajson(const UniValue& params, bool fHelp, const CPubKey& mypk)
         notaries.push_back(notary);
     }
 
-    // get the min sigs .. this always rounds UP so min sigs in iguana is +1 min sigs in komodod, due to some rounding error.
+    // get the min sigs .. this always rounds UP so min sigs in dragon is +1 min sigs in komodod, due to some rounding error.
     int minsigs;
     if ( num_notaries_STAKED[era]/5 > overrideMinSigs )
         minsigs = (num_notaries_STAKED[era] / 5) + 1;
     else
         minsigs = overrideMinSigs;
 
-    json.push_back(Pair("port",iguanaPort));
+    json.push_back(Pair("port",dragonPort));
     json.push_back(Pair("BTCminsigs",BTCminsigs));
     json.push_back(Pair("minsigs",minsigs));
     json.push_back(Pair("seeds",seeds));
@@ -207,8 +207,8 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "  \"balance\": xxxxxxx,         (numeric) the total Hush balance of the wallet\n"
             "  \"blocks\": xxxxxx,           (numeric) the current number of blocks processed in the server\n"
             "  \"timeoffset\": xxxxx,        (numeric) the time offset (deprecated, always 0)\n"
-            "  \"connections\": xxxxx,       (numeric) the number of connections\n"
-            "  \"tls_connections\": xxxxx,   (numeric) the number of TLS connections\n"
+            "  \"connections\": xxxxx,       (numeric) the number of plaintext connections\n"
+            "  \"tls_connections\": xxxxx,   (numeric) the number of encrypted TLS (SSL) connections\n"
             "  \"proxy\": \"host:port\",     (string, optional) the proxy used by the server\n"
             "  \"difficulty\": xxxxxx,       (numeric) the current difficulty\n"
             "  \"testnet\": true|false,      (boolean) if the server is using testnet or not\n"
@@ -237,8 +237,11 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("version", CLIENT_VERSION));
     obj.push_back(Pair("protocolversion", PROTOCOL_VERSION));
-    obj.push_back(Pair("KMDversion", KOMODO_VERSION));
+    // this KMD version represents the last time we did a full merge, we only cherry-pick or take nothing
+    // in the post-KYC "era" of KMD
+    obj.push_back(Pair("KMDversion", KOMODO_VERSION)); // never change this again, it's set in stone. -- Duke
     obj.push_back(Pair("synced", KOMODO_INSYNC!=0));
+    // any height larger than this can be attacked!
     obj.push_back(Pair("notarized", notarized_height));
     obj.push_back(Pair("prevMoMheight", prevMoMheight));
     obj.push_back(Pair("notarizedhash", notarized_hash.ToString()));
@@ -474,64 +477,6 @@ UniValue coinsupply(const UniValue& params, bool fHelp, const CPubKey& mypk)
     } else {
         result.push_back(Pair("error", "invalid height"));
     }
-    return(result);
-}
-
-UniValue jumblr_deposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
-{
-    int32_t retval; UniValue result(UniValue::VOBJ);
-    if (fHelp || params.size() != 1)
-        throw runtime_error("jumblr_deposit \"depositaddress\"\n");
-    CBitcoinAddress address(params[0].get_str());
-    bool isValid = address.IsValid();
-    if ( isValid != 0 )
-    {
-        string addr = params[0].get_str();
-        if ( (retval= Jumblr_depositaddradd((char *)addr.c_str())) >= 0 )
-        {
-            result.push_back(Pair("result", retval));
-            JUMBLR_PAUSE = 0;
-        }
-        else result.push_back(Pair("error", retval));
-    } else result.push_back(Pair("error", "invalid address"));
-    return(result);
-}
-
-UniValue jumblr_secret(const UniValue& params, bool fHelp, const CPubKey& mypk)
-{
-    int32_t retval; UniValue result(UniValue::VOBJ);
-    if (fHelp || params.size() != 1)
-        throw runtime_error("jumblr_secret \"secretaddress\"\n");
-    CBitcoinAddress address(params[0].get_str());
-    bool isValid = address.IsValid();
-    if ( isValid != 0 )
-    {
-        string addr = params[0].get_str();
-        retval = Jumblr_secretaddradd((char *)addr.c_str());
-        result.push_back(Pair("result", "success"));
-        result.push_back(Pair("num", retval));
-        JUMBLR_PAUSE = 0;
-    } else result.push_back(Pair("error", "invalid address"));
-    return(result);
-}
-
-UniValue jumblr_pause(const UniValue& params, bool fHelp, const CPubKey& mypk)
-{
-    int32_t retval; UniValue result(UniValue::VOBJ);
-    if (fHelp )
-        throw runtime_error("jumblr_pause\n");
-    JUMBLR_PAUSE = 1;
-    result.push_back(Pair("result", "paused"));
-    return(result);
-}
-
-UniValue jumblr_resume(const UniValue& params, bool fHelp, const CPubKey& mypk)
-{
-    int32_t retval; UniValue result(UniValue::VOBJ);
-    if (fHelp )
-        throw runtime_error("jumblr_resume\n");
-    JUMBLR_PAUSE = 0;
-    result.push_back(Pair("result", "resumed"));
     return(result);
 }
 

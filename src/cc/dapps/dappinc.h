@@ -349,7 +349,7 @@ cJSON *get_komodocli(char *refcoin,char **retstrp,char *acname,char *method,char
         sprintf(cmdstr,"%s %s %s %s %s %s %s %s %s > %s\n",REFCOIN_CLI,method,arg0,arg1,arg2,arg3,arg4,arg5,arg6,fname);
         //printf("ref.(%s) REFCOIN_CLI (%s)\n",refcoin,cmdstr);
     }
-//fprintf(stderr,"system(%s)\n",cmdstr);
+    //fprintf(stderr,"system(%s)\n",cmdstr);
     system(cmdstr);
     *retstrp = 0;
     if ( (jsonstr= filestr(&fsize,fname)) != 0 )
@@ -364,12 +364,13 @@ cJSON *get_komodocli(char *refcoin,char **retstrp,char *acname,char *method,char
     return(retjson);
 }
 
-cJSON *subatomic_cli(char *clistr,char **retstrp,char *method,char *arg0,char *arg1,char *arg2,char *arg3,char *arg4,char *arg5,char *arg6)
+cJSON *hushdex_cli(char *clistr,char **retstrp,char *method,char *arg0,char *arg1,char *arg2,char *arg3,char *arg4,char *arg5,char *arg6)
 {
     long fsize; cJSON *retjson = 0; char cmdstr[32768],*jsonstr,fname[32768];
-    sprintf(fname,"/tmp/subatomic_%s_%d",method,(rand() >> 17) % 10000);
+    //TODO: fix this shitty insecure jl777 fucktwattery
+    sprintf(fname,"/tmp/hushdex_%s_%d",method,(rand() >> 17) % 10000);
     sprintf(cmdstr,"%s %s %s %s %s %s %s %s %s > %s\n",clistr,method,arg0,arg1,arg2,arg3,arg4,arg5,arg6,fname);
-//fprintf(stderr,"system(%s)\n",cmdstr);
+    //fprintf(stderr,"system(%s)\n",cmdstr);
     system(cmdstr);
     *retstrp = 0;
     if ( (jsonstr= filestr(&fsize,fname)) != 0 )

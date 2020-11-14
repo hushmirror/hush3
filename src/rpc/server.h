@@ -391,7 +391,7 @@ extern UniValue validateaddress(const UniValue& params, bool fHelp, const CPubKe
 extern UniValue txnotarizedconfirmed(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue decodeccopret(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue getiguanajson(const UniValue& params, bool fHelp, const CPubKey& mypk);
+extern UniValue getdragonjson(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getnotarysendmany(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue geterablockheights(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue setpubkey(const UniValue& params, bool fHelp, const CPubKey& mypk);
@@ -402,11 +402,6 @@ extern UniValue getnetworkinfo(const UniValue& params, bool fHelp, const CPubKey
 extern UniValue getdeprecationinfo(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue setmocktime(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue resendwallettransactions(const UniValue& params, bool fHelp, const CPubKey& mypk);
-
-extern UniValue jumblr_deposit(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue jumblr_secret(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue jumblr_pause(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue jumblr_resume(const UniValue& params, bool fHelp, const CPubKey& mypk);
 
 extern UniValue getrawtransaction(const UniValue& params, bool fHelp, const CPubKey& mypk); // in rcprawtransaction.cpp
 extern UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk);

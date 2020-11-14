@@ -727,7 +727,7 @@ void calc_rmd160_sha256(uint8_t rmd160[20],uint8_t *data,int32_t datalen)
     calc_rmd160(0,rmd160,hash.bytes,sizeof(hash));
 }
 
-int32_t iguana_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
+int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp)
 {
     int32_t i; uint64_t x;
     if ( rwflag == 0 )
@@ -767,7 +767,7 @@ uint32_t komodo_assetmagic(char *symbol,uint64_t supply,uint8_t *extraptr,int32_
     uint8_t buf[512]; uint32_t crc0=0; int32_t len = 0; bits256 hash;
     if ( strcmp(symbol,"KMD") == 0 )
         return(0x8de4eef9);
-    len = iguana_rwnum(1,&buf[len],sizeof(supply),(void *)&supply);
+    len = dragon_rwnum(1,&buf[len],sizeof(supply),(void *)&supply);
     strcpy((char *)&buf[len],symbol);
     len += strlen(symbol);
     if ( extraptr != 0 && extralen != 0 )
@@ -821,12 +821,12 @@ uint16_t komodo_calcport(char *name,uint64_t supply,uint64_t endsubsidy,uint64_t
         //printf("end.%llu reward.%llu halving.%llu decay.%llu perc.%llu\n",(long long)endsubsidy,(long long)reward,(long long)halving,(long long)decay,(long long)commission);
         extraptr = extrabuf;
         memcpy(extraptr,ASSETCHAINS_OVERRIDE_PUBKEY33,33), extralen = 33;
-        extralen += iguana_rwnum(1,&extraptr[extralen],sizeof(endsubsidy),(void *)&endsubsidy);
-        extralen += iguana_rwnum(1,&extraptr[extralen],sizeof(reward),(void *)&reward);
-        extralen += iguana_rwnum(1,&extraptr[extralen],sizeof(halving),(void *)&halving);
-        extralen += iguana_rwnum(1,&extraptr[extralen],sizeof(decay),(void *)&decay);
+        extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(endsubsidy),(void *)&endsubsidy);
+        extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(reward),(void *)&reward);
+        extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(halving),(void *)&halving);
+        extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(decay),(void *)&decay);
         val = commission | (((uint64_t)staked & 0xff) << 32) | (((uint64_t)cc & 0xffffff) << 40);
-        extralen += iguana_rwnum(1,&extraptr[extralen],sizeof(val),(void *)&val);
+        extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(val),(void *)&val);
     }
     return(komodo_port(name,supply,&ASSETCHAINS_MAGIC,extraptr,extralen));
 }

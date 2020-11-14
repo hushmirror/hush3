@@ -298,7 +298,7 @@ static const CRPCCommand vRPCCommands[] =
   //  --------------------- ------------------------  -----------------------  ----------
     /* Overall control/query calls */
     { "control",            "help",                   &help,                   true  },
-    { "control",            "getiguanajson",          &getiguanajson,          true  },
+    { "control",            "getdragonjson",          &getdragonjson,          true  },
     { "control",            "getnotarysendmany",      &getnotarysendmany,      true  },
     { "control",            "geterablockheights",     &geterablockheights,     true  },
     { "control",            "stop",                   &stop,                   true  },
@@ -594,15 +594,11 @@ static const CRPCCommand vRPCCommands[] =
     { "util",               "estimatefee",            &estimatefee,            true  },
     { "util",               "estimatepriority",       &estimatepriority,       true  },
     { "util",               "z_validateaddress",      &z_validateaddress,      true  }, /* uses wallet if enabled */
-    { "util",               "jumblr_deposit",       &jumblr_deposit,       true  },
-    { "util",               "jumblr_secret",        &jumblr_secret,       true  },
-    { "util",               "jumblr_pause",        &jumblr_pause,       true  },
-    { "util",               "jumblr_resume",        &jumblr_resume,       true  },
-
-    { "util",             "invalidateblock",        &invalidateblock,        true  },
-    { "util",             "reconsiderblock",        &reconsiderblock,        true  },
-    /* Not shown in help */
-    { "hidden",             "setmocktime",            &setmocktime,            true  },
+    { "util",               "invalidateblock",        &invalidateblock,        true  },
+    { "util",               "reconsiderblock",        &reconsiderblock,        true  },
+    /* Fuck not showing users all the options -- Duke */
+    /* setmocktime used to Not be shown in help */
+    { "util",             "setmocktime",            &setmocktime,            true  },
 
 
 #ifdef ENABLE_WALLET

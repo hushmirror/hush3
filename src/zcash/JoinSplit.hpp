@@ -11,7 +11,6 @@
 #include "Note.hpp"
 #include "IncrementalMerkleTree.hpp"
 #include "NoteEncryption.hpp"
-
 #include "uint256.h"
 #include "uint252.h"
 
@@ -27,19 +26,15 @@ static constexpr size_t GROTH_PROOF_SIZE = (
 typedef std::array<unsigned char, GROTH_PROOF_SIZE> GrothProof;
 typedef boost::variant<PHGRProof, GrothProof> SproutProof;
 
-class JSInput {
-};
+class JSInput { };
 
-class JSOutput {
-};
+class JSOutput { };
 
 template<size_t NumInputs, size_t NumOutputs>
-class JoinSplit {
-};
+class JoinSplit { };
 
 }
 
-typedef libzcash::JoinSplit<ZC_NUM_JS_INPUTS,
-                            ZC_NUM_JS_OUTPUTS> ZCJoinSplit;
+typedef libzcash::JoinSplit<ZC_NUM_JS_INPUTS, ZC_NUM_JS_OUTPUTS> ZCJoinSplit;
 
 #endif // ZC_JOINSPLIT_H_

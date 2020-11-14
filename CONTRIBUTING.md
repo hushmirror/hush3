@@ -43,7 +43,7 @@ If you don't see your idea listed, and you think it can contribute to Hush, do o
 
 ## Style guide
 
-Don't write shitty code.
+Don't write shitty code. Try to avoid emulating jl777 code style, which is like a rabbit donkey smoked bath salts with nothing to read but a K+R C book.
 
 ## Setting up your environment
 
