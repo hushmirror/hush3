@@ -1236,7 +1236,7 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams);
 // This function defines the Hush Founders Reward (AKA Dev Tax)
 // 10% of all block rewards go towards Hush core team
 // If you do not like this, you are encouraged to fork the chain
-// or start your own Hush Smart Chain: https://github.com/myhush/hush-smart-chains
+// or start your own Hush Smart Chain: https://git.hush.is/hush/hush-smart-chains
 // HUSH supply curve cannot be exactly represented via KMD AC CLI args, so we do it ourselves.
 // You specify the BR, and the FR % gets added so 10% of 12.5 is 1.25
 // but to tell the AC params, I need to say "11% of 11.25" is 1.25

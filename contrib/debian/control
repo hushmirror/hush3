@@ -2,13 +2,13 @@ Source: hush
 Section: utils
 Priority: optional
 Maintainer: Hush <myhushteam@gmail.com>
-Homepage: https://myhush.org
+Homepage: https://hush.is
 Build-Depends: autoconf, automake, bsdmainutils, build-essential,
  git, g++-multilib, libc6-dev, libtool,
  m4, ncurses-dev, pkg-config, python,
  unzip, wget, zlib1g-dev
-Vcs-Git: https://github.com/MyHush/hush3.git
-Vcs-Browser: https://github.com/MyHush/hush3
+Vcs-Git: https://git.hush.is/hush/hush3.git
+Vcs-Browser: https://git.hush.is/hush/hush3
 
 Package: hush
 Architecture: amd64

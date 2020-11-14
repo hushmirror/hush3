@@ -182,9 +182,8 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0x4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"));
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("node1", "dnsseed.myhush.org"));
-        vSeeds.push_back(CDNSSeedData("node2", "dnsseed2.myhush.org"));
-        vSeeds.push_back(CDNSSeedData("node3", "dnsseed.bleuzero.com"));
+        vSeeds.push_back(CDNSSeedData("node1", "dnsseed.hush.is"));
+        vSeeds.push_back(CDNSSeedData("node2", "dnsseed2.hush.is"));
         // TODO: set up bootstrapping for mainnet
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,60);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,85);

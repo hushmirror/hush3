@@ -980,7 +980,7 @@ std::string PrivacyInfo()
 {
     return "\n" +
            FormatParagraph(strprintf(_("In order to ensure you are adequately protecting your privacy when using Hush, please see <%s>."),
-                                     "https://myhush.org/security/")) + "\n";
+                                     "https://hush.is/security/")) + "\n";
 }
 
 std::string LicenseInfo()
@@ -991,7 +991,7 @@ std::string LicenseInfo()
            FormatParagraph(strprintf(_("Copyright (C) 2015-%i jl777 and SuperNET developers"), COPYRIGHT_YEAR)) + "\n" +
            FormatParagraph(strprintf(_("Copyright (C) 2018-%i Duke Leto and The Hush developers"), COPYRIGHT_YEAR)) + "\n" +
            "\n" +
-           FormatParagraph(_("This is experimental software!!!")) + "\n" +
+           FormatParagraph(_("This is experimental Free Software! Fuck Yeah!!")) + "\n" +
            "\n" +
            FormatParagraph(_("Distributed under the GPLv3 software license, see the accompanying file COPYING or <https://www.gnu.org/licenses/gpl-3.0.en.html>.")) + "\n" +
            "\n";
