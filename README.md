@@ -45,7 +45,7 @@ with `t1` and now they begin with `R`.
 To see what an old HUSH v2 address looks like on the new chain, this online tool
 can be used: https://dexstats.info/addressconverter.php
 
-or this command line tool: https://github.com/MyHush/hush3/blob/duke/contrib/convert_address.py
+or this command line tool: https://git.hush.is/hush/hush3/src/master/contrib/convert_address.py
 
 
 ### Using an old wallet.dat
@@ -99,7 +99,7 @@ private keys.
 Installing
 ----------
 
-See [INSTALL.md](https://github.com/MyHush/hush3/blob/master/INSTALL.md).
+See [INSTALL.md](https://git.hush.is/hush/hush3/src/branch/master/INSTALL.md)
 
 
 License
