@@ -1,5 +1,4 @@
-Expectations for DNS Seed operators
-====================================
+# Expectations for DNS Seed operators
 
 Hush attempts to minimize the level of trust in DNS seeds,
 but DNS seeds still pose a small amount of risk for the network.
@@ -43,12 +42,12 @@ related to the DNS seed operation.
 
 If these expectations cannot be satisfied the operator should discontinue
 providing services and contact the active Hush development team as well as
-creating an issue in the [Hush Github repository](https://github.com/MyHush/hush3).
+creating an issue in the [Hush Git repository](https://git.hush.is./hush/hush3).
 
 Behavior outside of these expectations may be reasonable in some
 situations but should be discussed in public in advance.
 
 See also
 ----------
-- [hush-seeder](https://github.com/MyHush/hush-seeder) is a reference
+- [hush-seeder](https://git.hush.is/hush/hush-seeder) is a reference
   implementation of a DNS seed.
