@@ -9,8 +9,7 @@ extern pthread_mutex_t staked_mutex;
 
 int8_t is_STAKED(const char *chain_name) 
 {
-    static int8_t STAKED=0;
-    return(STAKED);
+    return 0;
 };
 
 int32_t STAKED_era(int timestamp)
@@ -23,16 +22,8 @@ int8_t StakedNotaryID(std::string &notaryname, char *Raddress) {
 }
 
 int8_t numStakedNotaries(uint8_t pubkeys[64][33],int8_t era) {
-    int i; int8_t retval = 0;
-    return(retval);
+    return 0;
 }
 
 void UpdateNotaryAddrs(uint8_t pubkeys[64][33],int8_t numNotaries) {
 }
-
-CrosschainAuthority Choose_auth_STAKED(int32_t chosen_era) {
-  CrosschainAuthority auth;
-  auth.requiredSigs = (num_notaries_STAKED[chosen_era-1] / 5);
-  auth.size = num_notaries_STAKED[chosen_era-1];
-  return auth;
-};
