@@ -75,7 +75,7 @@ const std::string ADDR_TYPE_SAPLING = "sapling";
 const std::string ADDR_TYPE_AMNESIA = "amnesia";
 extern int32_t HUSH_INSYNC;
 uint32_t komodo_segid32(char *coinaddr);
-int32_t komodo_dpowconfs(int32_t height,int32_t numconfs);
+int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int32_t komodo_isnotaryvout(char *coinaddr,uint32_t tiptime); // from ac_private chains only
 CBlockIndex *komodo_getblockindex(uint256 hash);
 extern string randomSietchZaddr();
@@ -152,7 +152,7 @@ void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
         entry.push_back(Pair("generated", true));
     if (confirms > 0)
     {
-        entry.push_back(Pair("confirmations", komodo_dpowconfs((int32_t)komodo_blockheight(wtx.hashBlock),confirms)));
+        entry.push_back(Pair("confirmations", hush_dpowconfs((int32_t)komodo_blockheight(wtx.hashBlock),confirms)));
         entry.push_back(Pair("blockhash", wtx.hashBlock.GetHex()));
         entry.push_back(Pair("blockindex", wtx.nIndex));
         entry.push_back(Pair("blocktime", (uint64_t)komodo_blocktime(wtx.hashBlock)));
@@ -986,7 +986,7 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp, const CPubKey&
                 int nDepth    = wtx.GetDepthInMainChain();
                 if( nMinDepth > 1 ) {
                     int nHeight    = tx_height(wtx.GetHash());
-                    int dpowconfs  = komodo_dpowconfs(nHeight, nDepth);
+                    int dpowconfs  = hush_dpowconfs(nHeight, nDepth);
                     if (dpowconfs >= nMinDepth) {
                         nAmount   += txout.nValue; // komodo_interest?
                     }
@@ -1076,7 +1076,7 @@ CAmount GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMi
         int nDepth    = wtx.GetDepthInMainChain();
         if( nMinDepth > 1 ) {
             int nHeight    = tx_height(wtx.GetHash());
-            int dpowconfs  = komodo_dpowconfs(nHeight, nDepth);
+            int dpowconfs  = hush_dpowconfs(nHeight, nDepth);
             if (nReceived != 0 && dpowconfs >= nMinDepth) {
                 nBalance += nReceived;
             }
@@ -1260,7 +1260,7 @@ UniValue getbalance(const UniValue& params, bool fHelp, const CPubKey& mypk)
             int nDepth    = wtx.GetDepthInMainChain();
             if( nMinDepth > 1 ) {
                  int nHeight    = tx_height(wtx.GetHash());
-                 int dpowconfs  = komodo_dpowconfs(nHeight, nDepth);
+                 int dpowconfs  = hush_dpowconfs(nHeight, nDepth);
                  if (dpowconfs >= nMinDepth) {
                     BOOST_FOREACH(const COutputEntry& r, listReceived)
                         nBalance += r.amount;
@@ -1653,7 +1653,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
         int nDepth    = wtx.GetDepthInMainChain();
         if( nMinDepth > 1 ) {
             int nHeight   = tx_height(wtx.GetHash());
-            int dpowconfs = komodo_dpowconfs(nHeight, nDepth);
+            int dpowconfs = hush_dpowconfs(nHeight, nDepth);
             if (dpowconfs < nMinDepth)
                 continue;
         } else {
@@ -1720,7 +1720,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
             obj.push_back(Pair("account",       strAccount));
             obj.push_back(Pair("amount",        ValueFromAmount(nAmount)));
             obj.push_back(Pair("rawconfirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf)));
-            obj.push_back(Pair("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : komodo_dpowconfs(nHeight, nConf))));
+            obj.push_back(Pair("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : hush_dpowconfs(nHeight, nConf))));
             UniValue transactions(UniValue::VARR);
             if (it != mapTally.end())
             {
@@ -1747,7 +1747,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
             obj.push_back(Pair("account",       (*it).first));
             obj.push_back(Pair("amount",        ValueFromAmount(nAmount)));
             obj.push_back(Pair("rawconfirmations", (nConf == std::numeric_limits<int>::max() ? 0 : nConf)));
-            obj.push_back(Pair("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : komodo_dpowconfs(nHeight, nConf))));
+            obj.push_back(Pair("confirmations", (nConf == std::numeric_limits<int>::max() ? 0 : hush_dpowconfs(nHeight, nConf))));
             ret.push_back(obj);
         }
     }
@@ -2938,7 +2938,7 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
         int nDepth    = out.tx->GetDepthInMainChain();
         if( nMinDepth > 1 ) {
             int nHeight    = tx_height(out.tx->GetHash());
-            int dpowconfs  = komodo_dpowconfs(nHeight, nDepth);
+            int dpowconfs  = hush_dpowconfs(nHeight, nDepth);
             if (dpowconfs < nMinDepth || dpowconfs > nMaxDepth)
                 continue;
         } else {
@@ -2992,7 +2992,7 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
             txheight = (chainActive.LastTip()->GetHeight() - out.nDepth - 1);
         entry.push_back(Pair("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
         entry.push_back(Pair("rawconfirmations",out.nDepth));
-        entry.push_back(Pair("confirmations",komodo_dpowconfs(txheight,out.nDepth)));
+        entry.push_back(Pair("confirmations",hush_dpowconfs(txheight,out.nDepth)));
         entry.push_back(Pair("spendable", out.fSpendable));
         results.push_back(entry);
     }
@@ -3801,7 +3801,7 @@ UniValue z_listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
             UniValue obj(UniValue::VOBJ);
 
             int nHeight   = tx_height(entry.op.hash);
-            int dpowconfs = komodo_dpowconfs(nHeight, entry.confirmations);
+            int dpowconfs = hush_dpowconfs(nHeight, entry.confirmations);
 
             // Only return notarized results when minconf>1
             if (nMinDepth > 1 && dpowconfs == 1)
@@ -4025,7 +4025,7 @@ CAmount getBalanceTaddr(std::string transparentAddress, int minDepth=1, bool ign
         int nDepth    = out.tx->GetDepthInMainChain();
         if( minDepth > 1 ) {
             int nHeight    = tx_height(out.tx->GetHash());
-            int dpowconfs  = komodo_dpowconfs(nHeight, nDepth);
+            int dpowconfs  = hush_dpowconfs(nHeight, nDepth);
             if (dpowconfs < minDepth) {
                 continue;
             }
@@ -4132,7 +4132,7 @@ UniValue z_listreceivedbyaddress(const UniValue& params, bool fHelp, const CPubK
         for (SaplingNoteEntry & entry : saplingEntries) {
             UniValue obj(UniValue::VOBJ);
             int nHeight   = tx_height(entry.op.hash);
-            int dpowconfs = komodo_dpowconfs(nHeight, entry.confirmations);
+            int dpowconfs = hush_dpowconfs(nHeight, entry.confirmations);
             // Only return notarized results when minconf>1
             if (nMinDepth > 1 && dpowconfs == 1)
                 continue;

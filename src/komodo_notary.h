@@ -342,7 +342,7 @@ int32_t komodo_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *
     } else return(0);
 }
 
-int32_t komodo_dpowconfs(int32_t txheight,int32_t numconfs)
+int32_t hush_dpowconfs(int32_t txheight,int32_t numconfs)
 {
     static int32_t hadnotarization;
     char symbol[KOMODO_ASSETCHAIN_MAXLEN],dest[KOMODO_ASSETCHAIN_MAXLEN]; struct komodo_state *sp;

@@ -55,7 +55,7 @@ using namespace libzcash;
 
 extern char ASSETCHAINS_SYMBOL[65];
 
-int32_t komodo_dpowconfs(int32_t height,int32_t numconfs);
+int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int32_t komodo_blockheight(uint256 hash);
 int tx_height( const uint256 &hash );
 bool hush_hardfork_active(uint32_t time);
@@ -621,7 +621,7 @@ bool AsyncRPCOperation_sendmany::find_utxos(bool fAcceptCoinbase=false) {
 
         if( mindepth_ > 1 ) {
             int nHeight    = tx_height(out.tx->GetHash());
-            int dpowconfs  = komodo_dpowconfs(nHeight, out.nDepth);
+            int dpowconfs  = hush_dpowconfs(nHeight, out.nDepth);
             if (dpowconfs < mindepth_) {
                 continue;
             }

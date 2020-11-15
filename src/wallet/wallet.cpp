@@ -70,7 +70,7 @@ bool fPayAtLeastCustomFee = true;
 
 CBlockIndex *komodo_chainactive(int32_t height);
 extern std::string DONATION_PUBKEY;
-int32_t komodo_dpowconfs(int32_t height,int32_t numconfs);
+int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int tx_height( const uint256 &hash );
 bool fTxDeleteEnabled = false;
 bool fTxConflictDeleteEnabled = false;
@@ -4867,7 +4867,7 @@ void CWallet::GetFilteredNotes(
                 continue;
             }
             int nDepth     = wtx.GetDepthInMainChain();
-            int dpowconfs  = komodo_dpowconfs(nHeight,nDepth);
+            int dpowconfs  = hush_dpowconfs(nHeight,nDepth);
             if ( dpowconfs < minDepth || dpowconfs > maxDepth) {
                 continue;
             }

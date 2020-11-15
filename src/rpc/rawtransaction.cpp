@@ -57,7 +57,7 @@ int32_t komodo_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *
 using namespace std;
 
 extern char ASSETCHAINS_SYMBOL[];
-int32_t komodo_dpowconfs(int32_t height,int32_t numconfs);
+int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex)
 {
@@ -266,7 +266,7 @@ void TxToJSONExpanded(const CTransaction& tx, const uint256 hashBlock, UniValue&
 
         if (nConfirmations > 0) {
             entry.push_back(Pair("height", nHeight));
-            entry.push_back(Pair("confirmations", komodo_dpowconfs(nHeight,nConfirmations)));
+            entry.push_back(Pair("confirmations", hush_dpowconfs(nHeight,nConfirmations)));
             entry.push_back(Pair("rawconfirmations", nConfirmations));
             entry.push_back(Pair("time", nBlockTime));
             entry.push_back(Pair("blocktime", nBlockTime));
@@ -350,7 +350,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
             if (chainActive.Contains(pindex)) {
                 entry.push_back(Pair("height", pindex->GetHeight()));
                 entry.push_back(Pair("rawconfirmations", 1 + chainActive.Height() - pindex->GetHeight()));
-                entry.push_back(Pair("confirmations", komodo_dpowconfs(pindex->GetHeight(),1 + chainActive.Height() - pindex->GetHeight())));
+                entry.push_back(Pair("confirmations", hush_dpowconfs(pindex->GetHeight(),1 + chainActive.Height() - pindex->GetHeight())));
                 entry.push_back(Pair("time", pindex->GetBlockTime()));
                 entry.push_back(Pair("blocktime", pindex->GetBlockTime()));
             } else {

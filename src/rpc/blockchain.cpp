@@ -145,7 +145,7 @@ UniValue blockheaderToJSON(const CBlockIndex* blockindex)
     // Only report confirmations if the block is on the main chain
     if (chainActive.Contains(blockindex))
         confirmations = chainActive.Height() - blockindex->GetHeight() + 1;
-    result.push_back(Pair("confirmations", komodo_dpowconfs(blockindex->GetHeight(),confirmations)));
+    result.push_back(Pair("confirmations", hush_dpowconfs(blockindex->GetHeight(),confirmations)));
     result.push_back(Pair("rawconfirmations", confirmations));
     result.push_back(Pair("height", blockindex->GetHeight()));
     result.push_back(Pair("version", blockindex->nVersion));
@@ -178,7 +178,7 @@ UniValue blockToDeltasJSON(const CBlock& block, const CBlockIndex* blockindex)
     } else {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block is an orphan");
     }
-    result.push_back(Pair("confirmations", komodo_dpowconfs(blockindex->GetHeight(),confirmations)));
+    result.push_back(Pair("confirmations", hush_dpowconfs(blockindex->GetHeight(),confirmations)));
     result.push_back(Pair("rawconfirmations", confirmations));
     result.push_back(Pair("size", (int)::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION)));
     result.push_back(Pair("height", blockindex->GetHeight()));
@@ -299,7 +299,7 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     // Only report confirmations if the block is on the main chain
     if (chainActive.Contains(blockindex))
         confirmations = chainActive.Height() - blockindex->GetHeight() + 1;
-    result.push_back(Pair("confirmations", komodo_dpowconfs(blockindex->GetHeight(),confirmations)));
+    result.push_back(Pair("confirmations", hush_dpowconfs(blockindex->GetHeight(),confirmations)));
     result.push_back(Pair("rawconfirmations", confirmations));
     result.push_back(Pair("size", (int)::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION)));
     result.push_back(Pair("height", blockindex->GetHeight()));
@@ -1489,7 +1489,7 @@ UniValue gettxout(const UniValue& params, bool fHelp, const CPubKey& mypk)
         ret.push_back(Pair("confirmations", 0));
         ret.push_back(Pair("rawconfirmations", 0));
     } else {
-        ret.push_back(Pair("confirmations", komodo_dpowconfs(coins.nHeight,pindex->GetHeight() - coins.nHeight + 1)));
+        ret.push_back(Pair("confirmations", hush_dpowconfs(coins.nHeight,pindex->GetHeight() - coins.nHeight + 1)));
         ret.push_back(Pair("rawconfirmations", pindex->GetHeight() - coins.nHeight + 1));
     }
     ret.push_back(Pair("value", ValueFromAmount(coins.vout[n].nValue)));
