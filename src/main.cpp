@@ -114,11 +114,11 @@ bool fAlerts = DEFAULT_ALERTS;
 /* If the tip is older than this (in seconds), the node is considered to be in initial block download.
  */
 int64_t nMaxTipAge = DEFAULT_MAX_TIP_AGE;
-bool ishush3 = strncmp(ASSETCHAINS_SYMBOL, "HUSH3",5) == 0 ? true : false;
+bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 int32_t nFirstHalvingHeight = 340000;
 
 unsigned int expiryDelta = DEFAULT_TX_EXPIRY_DELTA;
-extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
+extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 #define ASSETCHAINS_MAX_ERAS 7
 extern uint64_t ASSETCHAINS_ENDSUBSIDY[ASSETCHAINS_MAX_ERAS+1], ASSETCHAINS_REWARD[ASSETCHAINS_MAX_ERAS+1], ASSETCHAINS_HALVING[ASSETCHAINS_MAX_ERAS+1];
 extern uint32_t ASSETCHAINS_MAGIC;
@@ -684,7 +684,7 @@ bool komodo_dailysnapshot(int32_t height)
         // we are on chain init, and need to scan all the way back to the correct height, other wise our node will have a diffrent snapshot to online nodes.
         // use the notarizationsDB to scan back from the consesnus height to get the offset we need.
         std::string symbol; Notarisation nota;
-        symbol.assign(ASSETCHAINS_SYMBOL);
+        symbol.assign(SMART_CHAIN_SYMBOL);
         if ( ScanNotarisationsDB(height-extraoffset, symbol, 100, nota) == 0 )
             undo_height = height-extraoffset-reorglimit; 
         else undo_height = nota.second.height;
@@ -1346,7 +1346,7 @@ bool CheckTransaction(uint32_t tiptime,const CTransaction& tx, CValidationState 
     if ( *(int32_t *)&array[0] == 0 )
         numbanned = komodo_bannedset(&indallvouts,array,(int32_t)(sizeof(array)/sizeof(*array)));
     n = tx.vin.size();
-    if ( ASSETCHAINS_SYMBOL[0] == 0 )
+    if ( SMART_CHAIN_SYMBOL[0] == 0 )
     {
         for (j=0; j<n; j++)
         {
@@ -1777,7 +1777,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
     }
 //fprintf(stderr,"addmempool 1\n");
     auto verifier = libzcash::ProofVerifier::Strict();
-    if ( ASSETCHAINS_SYMBOL[0] == 0 && komodo_validate_interest(tx,chainActive.LastTip()->GetHeight()+1,chainActive.LastTip()->GetMedianTimePast() + 777,0) < 0 )
+    if ( SMART_CHAIN_SYMBOL[0] == 0 && komodo_validate_interest(tx,chainActive.LastTip()->GetHeight()+1,chainActive.LastTip()->GetMedianTimePast() + 777,0) < 0 )
     {
         fprintf(stderr,"AcceptToMemoryPool komodo_validate_interest failure\n");
         return error("AcceptToMemoryPool: komodo_validate_interest failed");
@@ -2728,7 +2728,7 @@ namespace Consensus {
             // Check for negative or overflow input values
             nValueIn += coins->vout[prevout.n].nValue;
 #ifdef KOMODO_ENABLE_INTEREST
-            if ( ASSETCHAINS_SYMBOL[0] == 0 && nSpendHeight > 60000 )//chainActive.LastTip() != 0 && chainActive.LastTip()->GetHeight() >= 60000 )
+            if ( SMART_CHAIN_SYMBOL[0] == 0 && nSpendHeight > 60000 )//chainActive.LastTip() != 0 && chainActive.LastTip()->GetHeight() >= 60000 )
             {
                 if ( coins->vout[prevout.n].nValue >= 10*COIN )
                 {
@@ -2871,7 +2871,7 @@ bool ContextualCheckInputs(
 
  // If prev is coinbase, check that it's matured
  if (coins->IsCoinBase()) {
- if ( ASSETCHAINS_SYMBOL[0] == 0 )
+ if ( SMART_CHAIN_SYMBOL[0] == 0 )
  COINBASE_MATURITY = _COINBASE_MATURITY;
  if (nSpendHeight - coins->nHeight < COINBASE_MATURITY) {
  fprintf(stderr,"ContextualCheckInputs failure.1 i.%d of %d\n",i,(int32_t)tx.vin.size());
@@ -3331,7 +3331,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     //fprintf(stderr,"connectblock ht.%d\n",(int32_t)pindex->GetHeight());
     AssertLockHeld(cs_main);
 
-    bool ishush3 = strncmp(ASSETCHAINS_SYMBOL, "HUSH3",5) == 0 ? true : false;
+    bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 
     // At startup, HUSH3 doesn't know a block height yet and so we must wait until
     // connecting a block to set our private/blocktime flags, which are height-dependent
@@ -3681,14 +3681,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 fprintf(stderr,"checktoshis %.8f vs %.8f numvouts %d\n",dstr(checktoshis),dstr(block.vtx[0].vout[1].nValue),(int32_t)block.vtx[0].vout.size());
         }
     }
-    if (ASSETCHAINS_SYMBOL[0] != 0 && pindex->GetHeight() == 1 && block.vtx[0].GetValueOut() != blockReward)
+    if (SMART_CHAIN_SYMBOL[0] != 0 && pindex->GetHeight() == 1 && block.vtx[0].GetValueOut() != blockReward)
     {
         return state.DoS(100, error("ConnectBlock(): coinbase for block 1 pays wrong amount (actual=%d vs correct=%d)", block.vtx[0].GetValueOut(), blockReward),
                             REJECT_INVALID, "bad-cb-amount");
     }
     if ( block.vtx[0].GetValueOut() > blockReward+KOMODO_EXTRASATOSHI )
     {
-        if ( ASSETCHAINS_SYMBOL[0] != 0 || pindex->GetHeight() >= KOMODO_NOTARIES_HEIGHT1 || block.vtx[0].vout[0].nValue > blockReward )
+        if ( SMART_CHAIN_SYMBOL[0] != 0 || pindex->GetHeight() >= KOMODO_NOTARIES_HEIGHT1 || block.vtx[0].vout[0].nValue > blockReward )
         {
             //fprintf(stderr, "coinbase pays too much\n");
             //sleepflag = true;
@@ -3938,7 +3938,7 @@ void static UpdateTip(CBlockIndex *pindexNew) {
     mempool.AddTransactionsUpdated(1);
     KOMODO_NEWBLOCKS++;
     double progress;
-    if ( ASSETCHAINS_SYMBOL[0] == 0 ) {
+    if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         progress = Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), chainActive.LastTip());
     } else {
         int32_t longestchain = komodo_longestchain();
@@ -3975,7 +3975,7 @@ bool static DisconnectTip(CValidationState &state, bool fBare = false) {
     CBlock block;
     if (!ReadBlockFromDisk(block, pindexDelete,1))
         return AbortNode(state, "Failed to read block");
-    //if ( ASSETCHAINS_SYMBOL[0] != 0 || pindexDelete->GetHeight() > 1400000 )
+    //if ( SMART_CHAIN_SYMBOL[0] != 0 || pindexDelete->GetHeight() > 1400000 )
     {
         int32_t notarizedht,prevMoMheight; uint256 notarizedhash,txid;
         notarizedht = komodo_notarized_height(&prevMoMheight,&notarizedhash,&txid);
@@ -4090,7 +4090,7 @@ int32_t komodo_activate_sapling(CBlockIndex *pindex)
             if ( prevtime <= KOMODO_SAPLING_ACTIVATION && blocktime > KOMODO_SAPLING_ACTIVATION )
             {
                 activation = height + 60;
-                fprintf(stderr,"%s transition at %d (%d, %u) -> (%d, %u)\n",ASSETCHAINS_SYMBOL,height,prevht,prevtime,height,blocktime);
+                fprintf(stderr,"%s transition at %d (%d, %u) -> (%d, %u)\n",SMART_CHAIN_SYMBOL,height,prevht,prevtime,height,blocktime);
             }
             if ( prevtime < KOMODO_SAPLING_ACTIVATION-3600*24 )
                 break;
@@ -4102,7 +4102,7 @@ int32_t komodo_activate_sapling(CBlockIndex *pindex)
     if ( activation != 0 )
     {
         komodo_setactivation(activation);
-        fprintf(stderr,"%s sapling activation at %d\n",ASSETCHAINS_SYMBOL,activation);
+        fprintf(stderr,"%s sapling activation at %d\n",SMART_CHAIN_SYMBOL,activation);
         ASSETCHAINS_SAPLING = activation;
     }
     return activation;
@@ -4137,7 +4137,7 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *
         pblock = &block;
     }
     KOMODO_CONNECTING = (int32_t)pindexNew->GetHeight();
-    //fprintf(stderr,"%s connecting ht.%d maxsize.%d vs %d\n",ASSETCHAINS_SYMBOL,(int32_t)pindexNew->GetHeight(),MAX_BLOCK_SIZE(pindexNew->GetHeight()),(int32_t)::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
+    //fprintf(stderr,"%s connecting ht.%d maxsize.%d vs %d\n",SMART_CHAIN_SYMBOL,(int32_t)pindexNew->GetHeight(),MAX_BLOCK_SIZE(pindexNew->GetHeight()),(int32_t)::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
  
     // Apply the block atomically to the chain state.
     int64_t nTime2 = GetTimeMicros(); nTimeReadFromDisk += nTime2 - nTime1;
@@ -4205,9 +4205,9 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *
         HUSH_INSYNC = (int32_t)pindexNew->GetHeight();
     else HUSH_INSYNC = 0;
     //fprintf(stderr,"connect.%d insync.%d ASSETCHAINS_SAPLING.%d\n",(int32_t)pindexNew->GetHeight(),HUSH_INSYNC,ASSETCHAINS_SAPLING);
-    /*if ( HUSH_INSYNC != 0 ) //ASSETCHAINS_SYMBOL[0] == 0 &&
+    /*if ( HUSH_INSYNC != 0 ) //SMART_CHAIN_SYMBOL[0] == 0 &&
         komodo_broadcast(pblock,8);
-    else if ( ASSETCHAINS_SYMBOL[0] != 0 )
+    else if ( SMART_CHAIN_SYMBOL[0] != 0 )
         komodo_broadcast(pblock,4);*/
     if ( KOMODO_NSPV_FULLNODE )
     {
@@ -4397,7 +4397,7 @@ static bool ActivateBestChainStep(bool fSkipdpow, CValidationState &state, CBloc
                          pindexMostWork->phashBlock->GetHex(), pindexMostWork->GetHeight(), pindexMostWork->chainPower.chainWork.GetHex(),
                          pindexMostWork->chainPower.chainStake.GetHex()) + "\n" +
         "- " + strprintf(_("Fork point:  %s %s, height %d"),
-                         ASSETCHAINS_SYMBOL,pindexFork->phashBlock->GetHex(), pindexFork->GetHeight()) + "\n\n" +
+                         SMART_CHAIN_SYMBOL,pindexFork->phashBlock->GetHex(), pindexFork->GetHeight()) + "\n\n" +
         _("Please help, human!");
         LogPrintf("*** %s\nif you launch with -maxreorg=%d it might be able to resolve this automatically", msg,reorgLength+10);
         fprintf(stderr,"*** %s\nif you launch with -maxreorg=%d it might be able to resolve this automatically", msg.c_str(),reorgLength+10);
@@ -4426,7 +4426,7 @@ static bool ActivateBestChainStep(bool fSkipdpow, CValidationState &state, CBloc
             if ( !DisconnectTip(state) )
                 break;
         }
-        fprintf(stderr,"reached rewind.%d, best to do: ./komodo-cli -ac_name=%s stop\n",KOMODO_REWIND,ASSETCHAINS_SYMBOL);
+        fprintf(stderr,"reached rewind.%d, best to do: ./komodo-cli -ac_name=%s stop\n",KOMODO_REWIND,SMART_CHAIN_SYMBOL);
         sleep(20);
         fprintf(stderr,"resuming normal operations\n");
         KOMODO_REWIND = 0;
@@ -5191,7 +5191,7 @@ bool CheckBlock(int32_t *futureblockp,int32_t height,CBlockIndex *pindex,const C
     // because we receive the wrong transactions for it.
 
     // Size limits
-    //fprintf(stderr,"%s checkblock %d -> %d vs blocksize.%d\n",ASSETCHAINS_SYMBOL,height,MAX_BLOCK_SIZE(height),(int32_t)::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION));
+    //fprintf(stderr,"%s checkblock %d -> %d vs blocksize.%d\n",SMART_CHAIN_SYMBOL,height,MAX_BLOCK_SIZE(height),(int32_t)::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION));
     if (block.vtx.empty() || block.vtx.size() > MAX_BLOCK_SIZE(height) || ::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION) > MAX_BLOCK_SIZE(height))
         return state.DoS(100, error("CheckBlock: size limits failed"),
                          REJECT_INVALID, "bad-blk-length");
@@ -5331,7 +5331,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     int nHeight = pindexPrev->GetHeight()+1;
 
     // Check proof of work
-    if ( (ASSETCHAINS_SYMBOL[0] != 0 || nHeight < 235300 || nHeight > 236000) && block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
+    if ( (SMART_CHAIN_SYMBOL[0] != 0 || nHeight < 235300 || nHeight > 236000) && block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
     {
         cout << block.nBits << " block.nBits vs. calc " << GetNextWorkRequired(pindexPrev, &block, consensusParams) <<
                                " for block #" << nHeight << endl;
@@ -5819,7 +5819,7 @@ bool ProcessNewBlock(bool from_miner,int32_t height,CValidationState &state, CNo
         CheckBlockIndex();
         if (!ret && futureblock == 0)
         {
-            /*if ( ASSETCHAINS_SYMBOL[0] == 0 )
+            /*if ( SMART_CHAIN_SYMBOL[0] == 0 )
             {
                 //fprintf(stderr,"request headers from failed process block peer\n");
                 pfrom->PushMessage("getheaders", chainActive.GetLocator(chainActive.LastTip()), uint256());
@@ -6306,7 +6306,7 @@ bool static LoadBlockIndexDB()
     PruneBlockIndexCandidates();
 
     double progress;
-    if ( ASSETCHAINS_SYMBOL[0] == 0 ) {
+    if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         progress = Checkpoints::GuessVerificationProgress(chainparams.Checkpoints(), chainActive.LastTip());
     } else {
         int32_t longestchain = komodo_longestchain();
@@ -6611,7 +6611,7 @@ bool LoadBlockIndex()
         KOMODO_LOADINGBLOCKS = 0;
         return false;
     }
-    fprintf(stderr,"finished loading blocks %s\n",ASSETCHAINS_SYMBOL);
+    fprintf(stderr,"finished loading blocks %s\n",SMART_CHAIN_SYMBOL);
     return true;
 }
 

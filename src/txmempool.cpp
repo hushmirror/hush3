@@ -399,8 +399,8 @@ int64_t komodo_block_unlocktime(uint32_t nHeight);
 void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMemPoolHeight, int flags)
 {
     // Remove transactions spending a coinbase which are now immature
-    extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
-    if ( ASSETCHAINS_SYMBOL[0] == 0 )
+    extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
+    if ( SMART_CHAIN_SYMBOL[0] == 0 )
         COINBASE_MATURITY = _COINBASE_MATURITY;
     // Remove transactions spending a coinbase which are now immature and no-longer-final transactions
     LOCK(cs);
@@ -511,7 +511,7 @@ void CTxMemPool::removeConflicts(const CTransaction &tx, std::list<CTransaction>
 }
 
 int32_t komodo_validate_interest(const CTransaction &tx,int32_t txheight,uint32_t nTime,int32_t dispflag);
-extern char ASSETCHAINS_SYMBOL[];
+extern char SMART_CHAIN_SYMBOL[];
 
 std::vector<uint256> CTxMemPool::removeExpired(unsigned int nBlockHeight)
 {
@@ -524,7 +524,7 @@ std::vector<uint256> CTxMemPool::removeExpired(unsigned int nBlockHeight)
         const CTransaction& tx = it->GetTx();
         tipindex = chainActive.LastTip();
 
-        bool fInterestNotValidated = ASSETCHAINS_SYMBOL[0] == 0 && tipindex != 0 && komodo_validate_interest(tx,tipindex->GetHeight()+1,tipindex->GetMedianTimePast() + 777,0) < 0;
+        bool fInterestNotValidated = SMART_CHAIN_SYMBOL[0] == 0 && tipindex != 0 && komodo_validate_interest(tx,tipindex->GetHeight()+1,tipindex->GetMedianTimePast() + 777,0) < 0;
         if (IsExpiredTx(tx, nBlockHeight) || fInterestNotValidated)
         {
             if (fInterestNotValidated && tipindex != 0)

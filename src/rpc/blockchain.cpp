@@ -892,7 +892,7 @@ UniValue kvsearch(const UniValue& params, bool fHelp, const CPubKey& mypk)
     LOCK(cs_main);
     if ( (keylen= (int32_t)strlen(params[0].get_str().c_str())) > 0 )
     {
-        ret.push_back(Pair("coin",(char *)(ASSETCHAINS_SYMBOL[0] == 0 ? "KMD" : ASSETCHAINS_SYMBOL)));
+        ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL)));
         ret.push_back(Pair("currentheight", (int64_t)chainActive.LastTip()->GetHeight()));
         ret.push_back(Pair("key",params[0].get_str()));
         ret.push_back(Pair("keylen",keylen));
@@ -1596,7 +1596,7 @@ void NetworkUpgradeDescPushBack(
 
 UniValue getblockchaininfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    uint256 notarized_hash,notarized_desttxid; int32_t prevMoMheight,notarized_height,longestchain,kmdnotarized_height,txid_height;
+    uint256 notarized_hash,notarized_desttxid; int32_t prevMoMheight,notarized_height,longestchain,hushnotarized_height,txid_height;
     if (fHelp || params.size() != 0)
         throw runtime_error(
             "getblockchaininfo\n"
@@ -1648,7 +1648,7 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp, const CPubKey& my
 
     LOCK(cs_main);
     double progress;
-    if ( ASSETCHAINS_SYMBOL[0] == 0 ) {
+    if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         progress = Checkpoints::GuessVerificationProgress(Params().Checkpoints(), chainActive.LastTip());
     } else {
         int32_t longestchain = KOMODO_LONGESTCHAIN;//komodo_longestchain();

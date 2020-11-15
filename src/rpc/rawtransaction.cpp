@@ -56,7 +56,7 @@ int32_t komodo_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *
 
 using namespace std;
 
-extern char ASSETCHAINS_SYMBOL[];
+extern char SMART_CHAIN_SYMBOL[];
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex)
@@ -217,7 +217,7 @@ void TxToJSONExpanded(const CTransaction& tx, const uint256 hashBlock, UniValue&
         const CTxOut& txout = tx.vout[i];
         UniValue out(UniValue::VOBJ);
         out.push_back(Pair("value", ValueFromAmount(txout.nValue)));
-        if ( ASSETCHAINS_SYMBOL[0] == 0 && pindex != 0 && tx.nLockTime >= 500000000 && (tipindex= chainActive.LastTip()) != 0 )
+        if ( SMART_CHAIN_SYMBOL[0] == 0 && pindex != 0 && tx.nLockTime >= 500000000 && (tipindex= chainActive.LastTip()) != 0 )
         {
             int64_t interest; int32_t txheight; uint32_t locktime;
             interest = komodo_accrued_interest(&txheight,&locktime,tx.GetHash(),i,0,txout.nValue,(int32_t)tipindex->GetHeight());
@@ -316,7 +316,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
         const CTxOut& txout = tx.vout[i];
         UniValue out(UniValue::VOBJ);
         out.push_back(Pair("value", ValueFromAmount(txout.nValue)));
-        if ( KOMODO_NSPV_FULLNODE && ASSETCHAINS_SYMBOL[0] == 0 && tx.nLockTime >= 500000000 && (tipindex= chainActive.LastTip()) != 0 )
+        if ( KOMODO_NSPV_FULLNODE && SMART_CHAIN_SYMBOL[0] == 0 && tx.nLockTime >= 500000000 && (tipindex= chainActive.LastTip()) != 0 )
         {
             int64_t interest; int32_t txheight; uint32_t locktime;
             interest = komodo_accrued_interest(&txheight,&locktime,tx.GetHash(),i,0,txout.nValue,(int32_t)tipindex->GetHeight());

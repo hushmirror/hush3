@@ -577,7 +577,7 @@ int32_t NSPV_notarizationextract(int32_t verifyntz,int32_t *ntzheightp,uint256 *
     int32_t numsigs=0; uint8_t elected[64][33]; char *symbol; std::vector<uint8_t> opret; uint32_t nTime;
     if ( tx.vout.size() >= 2 )
     {
-        symbol = (ASSETCHAINS_SYMBOL[0] == 0) ? (char *)"KMD" : ASSETCHAINS_SYMBOL;
+        symbol = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"KMD" : SMART_CHAIN_SYMBOL;
         GetOpReturnData(tx.vout[1].scriptPubKey,opret);
         if ( opret.size() >= 32*2+4 )
         {

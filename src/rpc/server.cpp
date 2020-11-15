@@ -255,7 +255,7 @@ UniValue help(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return tableRPC.help(strCommand);
 }
 
-extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
+extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 
 #ifdef ENABLE_WALLET
 void GenerateBitcoins(bool b, CWallet *pw, int t);
@@ -282,10 +282,10 @@ UniValue stop(const UniValue& params, bool fHelp, const CPubKey& mypk)
     // Shutdown will take long enough that the response should get back
     StartShutdown();
 
-    if ((strncmp(ASSETCHAINS_SYMBOL, "HUSH3", 5) == 0) ) {
+    if ((strncmp(SMART_CHAIN_SYMBOL, "HUSH3", 5) == 0) ) {
         sprintf(buf,"Hush server stopping...");
 	} else {
-        sprintf(buf,"%s server stopping...",ASSETCHAINS_SYMBOL);
+        sprintf(buf,"%s server stopping...",SMART_CHAIN_SYMBOL);
 	}
     return buf;
 }
@@ -872,12 +872,12 @@ UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params
 
 std::string HelpExampleCli(const std::string& methodname, const std::string& args)
 {
-    if ( ASSETCHAINS_SYMBOL[0] == 0 ) {
+    if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         return "> komodo-cli " + methodname + " " + args + "\n";
-    } else if ((strncmp(ASSETCHAINS_SYMBOL, "HUSH3", 5) == 0) ) {
+    } else if ((strncmp(SMART_CHAIN_SYMBOL, "HUSH3", 5) == 0) ) {
         return "> hush-cli " + methodname + " " + args + "\n";
     } else {
-        return "> komodo-cli -ac_name=" + strprintf("%s", ASSETCHAINS_SYMBOL) + " " + methodname + " " + args + "\n";
+        return "> komodo-cli -ac_name=" + strprintf("%s", SMART_CHAIN_SYMBOL) + " " + methodname + " " + args + "\n";
     }
 }
 
@@ -889,8 +889,8 @@ std::string HelpExampleRpc(const std::string& methodname, const std::string& arg
 
 string experimentalDisabledHelpMsg(const string& rpc, const string& enableArg)
 {
-    string daemon = ASSETCHAINS_SYMBOL[0] == 0 ? "komodod" : "hushd";
-    string ticker = ASSETCHAINS_SYMBOL[0] == 0 ? "komodo" : ASSETCHAINS_SYMBOL;
+    string daemon = SMART_CHAIN_SYMBOL[0] == 0 ? "komodod" : "hushd";
+    string ticker = SMART_CHAIN_SYMBOL[0] == 0 ? "komodo" : SMART_CHAIN_SYMBOL;
 
     return "\nWARNING: " + rpc + " is disabled.\n"
         "To enable it, restart " + daemon + " with the -experimentalfeatures and\n"

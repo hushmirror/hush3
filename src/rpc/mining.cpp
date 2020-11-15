@@ -388,7 +388,7 @@ UniValue genminingCSV(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if (fHelp || params.size() != 0 )
         throw runtime_error("genminingCSV\n");
     LOCK(cs_main);
-    sprintf(fname,"%s_mining.csv",ASSETCHAINS_SYMBOL[0] == 0 ? "KMD" : ASSETCHAINS_SYMBOL);
+    sprintf(fname,"%s_mining.csv",SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL);
     if ( (fp= fopen(fname,"wb")) != 0 )
     {
         fprintf(fp,"height,nTime,nBits,bnTarget,bnTargetB,diff,solvetime\n");

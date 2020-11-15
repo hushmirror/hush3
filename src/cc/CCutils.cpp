@@ -682,7 +682,7 @@ bool komodo_txnotarizedconfirmed(uint256 txid)
     CTransaction tx;
     uint256 hashBlock;
     CBlockIndex *pindex;    
-    char symbol[KOMODO_ASSETCHAIN_MAXLEN],dest[KOMODO_ASSETCHAIN_MAXLEN]; struct komodo_state *sp;
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
 
     if ( KOMODO_NSPV_SUPERLITE )
     {

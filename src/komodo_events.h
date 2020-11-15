@@ -20,7 +20,7 @@
 struct komodo_event *komodo_eventadd(struct komodo_state *sp,int32_t height,char *symbol,uint8_t type,uint8_t *data,uint16_t datalen)
 {
     struct komodo_event *ep=0; uint16_t len = (uint16_t)(sizeof(*ep) + datalen);
-    if ( sp != 0 && ASSETCHAINS_SYMBOL[0] != 0 )
+    if ( sp != 0 && SMART_CHAIN_SYMBOL[0] != 0 )
     {
         portable_mutex_lock(&komodo_mutex);
         ep = (struct komodo_event *)calloc(1,len);
@@ -40,11 +40,11 @@ struct komodo_event *komodo_eventadd(struct komodo_state *sp,int32_t height,char
 void komodo_eventadd_notarized(struct komodo_state *sp,char *symbol,int32_t height,char *dest,uint256 notarized_hash,uint256 notarized_desttxid,int32_t notarizedheight,uint256 MoM,int32_t MoMdepth)
 {
     static uint32_t counter; int32_t verified=0; char *coin; struct komodo_event_notarized N;
-    coin = (ASSETCHAINS_SYMBOL[0] == 0) ? (char *)"KMD" : ASSETCHAINS_SYMBOL;
+    coin = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"KMD" : SMART_CHAIN_SYMBOL;
     if ( IS_HUSH_NOTARY != 0 && (verified= komodo_verifynotarization(symbol,dest,height,notarizedheight,notarized_hash,notarized_desttxid)) < 0 )
     {
         if ( counter++ < 100 )
-            printf("[%s] error validating notarization ht.%d notarized_height.%d, if on a pruned %s node this can be ignored\n",ASSETCHAINS_SYMBOL,height,notarizedheight,dest);
+            printf("[%s] error validating notarization ht.%d notarized_height.%d, if on a pruned %s node this can be ignored\n",SMART_CHAIN_SYMBOL,height,notarizedheight,dest);
     }
     else if ( strcmp(symbol,coin) == 0 )
     {
@@ -92,7 +92,7 @@ void komodo_eventadd_pricefeed(struct komodo_state *sp,char *symbol,int32_t heig
 void komodo_eventadd_opreturn(struct komodo_state *sp,char *symbol,int32_t height,uint256 txid,uint64_t value,uint16_t vout,uint8_t *buf,uint16_t opretlen)
 {
     struct komodo_event_opreturn O; uint8_t *opret;
-    if ( ASSETCHAINS_SYMBOL[0] != 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 )
     {
         opret = (uint8_t *)calloc(1,sizeof(O) + opretlen + 16);
         O.txid = txid;
@@ -132,7 +132,7 @@ void komodo_event_rewind(struct komodo_state *sp,char *symbol,int32_t height)
     struct komodo_event *ep;
     if ( sp != 0 )
     {
-        if ( ASSETCHAINS_SYMBOL[0] == 0 && height <= KOMODO_LASTMINED && prevKOMODO_LASTMINED != 0 )
+        if ( SMART_CHAIN_SYMBOL[0] == 0 && height <= KOMODO_LASTMINED && prevKOMODO_LASTMINED != 0 )
         {
             printf("undo KOMODO_LASTMINED %d <- %d\n",KOMODO_LASTMINED,prevKOMODO_LASTMINED);
             KOMODO_LASTMINED = prevKOMODO_LASTMINED;
@@ -144,7 +144,7 @@ void komodo_event_rewind(struct komodo_state *sp,char *symbol,int32_t height)
             {
                 if ( ep->height < height )
                     break;
-                //printf("[%s] undo %s event.%c ht.%d for rewind.%d\n",ASSETCHAINS_SYMBOL,symbol,ep->type,ep->height,height);
+                //printf("[%s] undo %s event.%c ht.%d for rewind.%d\n",SMART_CHAIN_SYMBOL,symbol,ep->type,ep->height,height);
                 komodo_event_undo(sp,ep);
                 sp->Komodo_numevents--;
             }

@@ -59,7 +59,7 @@
 using namespace std;
 using namespace libzcash;
 
-extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
+extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 extern std::string ASSETCHAINS_OVERRIDE_PUBKEY;
 const std::string ADDR_TYPE_SAPLING = "sapling";
 const std::string ADDR_TYPE_AMNESIA = "amnesia";
@@ -172,7 +172,7 @@ string AccountFromValue(const UniValue& value)
 
 char *komodo_chainname()
 {
-     return(ASSETCHAINS_SYMBOL[0] == 0 ? (char *)"KMD" : ASSETCHAINS_SYMBOL);
+     return(SMART_CHAIN_SYMBOL[0] == 0 ? (char *)"KMD" : SMART_CHAIN_SYMBOL);
 }
 
 void OS_randombytes(unsigned char *x,long xlen);
@@ -622,7 +622,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         );
     if (!EnsureWalletIsAvailable(fHelp))
         return 0;
-    if ( ASSETCHAINS_SYMBOL[0] == 0 )
+    if ( SMART_CHAIN_SYMBOL[0] == 0 )
         return(0);
     haveprivkey = 0;
     memset(&sig,0,sizeof(sig));
@@ -679,7 +679,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         //for (i=0; i<32; i++)
         //    printf("%02x",((uint8_t *)&sig)[i]);
         //printf(" sig for keylen.%d + valuesize.%d\n",keylen,refvaluesize);
-        ret.push_back(Pair("coin",(char *)(ASSETCHAINS_SYMBOL[0] == 0 ? "KMD" : ASSETCHAINS_SYMBOL)));
+        ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "KMD" : SMART_CHAIN_SYMBOL)));
         height = chainActive.LastTip()->GetHeight();
         if ( memcmp(&zeroes,&refpubkey,sizeof(refpubkey)) != 0 )
             ret.push_back(Pair("owner",refpubkey.GetHex()));
@@ -780,7 +780,7 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
 UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     CWalletTx wtx; std::string dest; int32_t kmdheight; uint64_t seed,komodoshis = 0; char destaddr[64]; uint8_t i,pubkey37[37]; bool fSubtractFeeFromAmount = false;
-    if ( ASSETCHAINS_SYMBOL[0] == 0 )
+    if ( SMART_CHAIN_SYMBOL[0] == 0 )
         return(0);
     if (!EnsureWalletIsAvailable(fHelp))
         return 0;
@@ -794,14 +794,14 @@ UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if (!address.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bitcoin address");
     int64_t fiatoshis = atof(params[1].get_str().c_str()) * COIN;
-    komodoshis = PAX_fiatdest(&seed,1,destaddr,pubkey37,(char *)params[0].get_str().c_str(),kmdheight,ASSETCHAINS_SYMBOL,fiatoshis);
+    komodoshis = PAX_fiatdest(&seed,1,destaddr,pubkey37,(char *)params[0].get_str().c_str(),kmdheight,SMART_CHAIN_SYMBOL,fiatoshis);
     dest.append(destaddr);
     CBitcoinAddress destaddress(CRYPTO777_KMDADDR);
     if (!destaddress.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
     for (i=0; i<33; i++)
         printf("%02x",pubkey37[i]);
-    printf(" kmdheight.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) komodoshis.%llu seed.%llx\n",kmdheight,(char *)params[0].get_str().c_str(),ASSETCHAINS_SYMBOL,(long long)fiatoshis,destaddr,(long long)komodoshis,(long long)seed);
+    printf(" kmdheight.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) komodoshis.%llu seed.%llx\n",kmdheight,(char *)params[0].get_str().c_str(),SMART_CHAIN_SYMBOL,(long long)fiatoshis,destaddr,(long long)komodoshis,(long long)seed);
     EnsureWalletIsUnlocked();
     uint8_t opretbuf[64]; int32_t opretlen; uint64_t fee = fiatoshis / 1000;
     if ( fee < 10000 )
@@ -2552,7 +2552,7 @@ UniValue encryptwallet(const UniValue& params, bool fHelp, const CPubKey& mypk)
         return NullUniValue;
 
     string enableArg = "developerencryptwallet";
-    int32_t flag = (komodo_acpublic(0) || ASSETCHAINS_SYMBOL[0] == 0);
+    int32_t flag = (komodo_acpublic(0) || SMART_CHAIN_SYMBOL[0] == 0);
     auto fEnableWalletEncryption = fExperimentalMode && GetBoolArg("-" + enableArg, flag);
 
     std::string strWalletEncryptionDisabledMsg = "";
@@ -2993,7 +2993,7 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
 uint64_t komodo_interestsum()
 {
 #ifdef ENABLE_WALLET
-    if ( ASSETCHAINS_SYMBOL[0] == 0 && GetBoolArg("-disablewallet", false) == 0 && KOMODO_NSPV_FULLNODE )
+    if ( SMART_CHAIN_SYMBOL[0] == 0 && GetBoolArg("-disablewallet", false) == 0 && KOMODO_NSPV_FULLNODE )
     {
         uint64_t interest,sum = 0; int32_t txheight; uint32_t locktime;
         vector<COutput> vecOutputs;

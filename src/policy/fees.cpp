@@ -68,13 +68,13 @@ void TxConfirmStats::ClearCurrent(unsigned int nBlockHeight)
 
 unsigned int TxConfirmStats::FindBucketIndex(double val)
 {
-    extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
+    extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
     auto it = bucketMap.lower_bound(val);
     if ( it != bucketMap.end() )
     {
         //static uint32_t counter;
         //if ( counter++ < 1 )
-        //    fprintf(stderr,"%s FindBucketIndex violation: from val %f\n",ASSETCHAINS_SYMBOL,val);
+        //    fprintf(stderr,"%s FindBucketIndex violation: from val %f\n",SMART_CHAIN_SYMBOL,val);
     }
     return it->second;
 }

@@ -811,7 +811,7 @@ char *bitcoin_address(char *coinaddr,uint8_t addrtype,uint8_t *pubkey_or_rmd160,
 
 int32_t komodo_is_issuer()
 {
-    if ( ASSETCHAINS_SYMBOL[0] != 0 && komodo_baseid(ASSETCHAINS_SYMBOL) >= 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 && komodo_baseid(SMART_CHAIN_SYMBOL) >= 0 )
         return(1);
     else return(0);
 }
@@ -1334,15 +1334,15 @@ void komodo_statefname(char *fname,char *symbol,char *str)
 {
     int32_t n,len;
     sprintf(fname,"%s",GetDataDir(false).string().c_str());
-    if ( (n= (int32_t)strlen(ASSETCHAINS_SYMBOL)) != 0 )
+    if ( (n= (int32_t)strlen(SMART_CHAIN_SYMBOL)) != 0 )
     {
         len = (int32_t)strlen(fname);
-        if ( strcmp(ASSETCHAINS_SYMBOL,&fname[len - n]) == 0 )
+        if ( strcmp(SMART_CHAIN_SYMBOL,&fname[len - n]) == 0 )
             fname[len - n] = 0;
         else
         {
             if ( strcmp(symbol,"REGTEST") != 0 )
-                printf("unexpected fname.(%s) vs %s [%s] n.%d len.%d (%s)\n",fname,symbol,ASSETCHAINS_SYMBOL,n,len,&fname[len - n]);
+                printf("unexpected fname.(%s) vs %s [%s] n.%d len.%d (%s)\n",fname,symbol,SMART_CHAIN_SYMBOL,n,len,&fname[len - n]);
             return;
         }
     }
@@ -1365,7 +1365,7 @@ void komodo_statefname(char *fname,char *symbol,char *str)
 #endif
     }
     strcat(fname,str);
-    //printf("test.(%s) -> [%s] statename.(%s) %s\n",test,ASSETCHAINS_SYMBOL,symbol,fname);
+    //printf("test.(%s) -> [%s] statename.(%s) %s\n",test,SMART_CHAIN_SYMBOL,symbol,fname);
 }
 
 void komodo_configfile(char *symbol,uint16_t rpcport)
@@ -1441,7 +1441,7 @@ void komodo_configfile(char *symbol,uint16_t rpcport)
 
 uint16_t komodo_userpass(char *userpass,char *symbol)
 {
-    FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[KOMODO_ASSETCHAIN_MAXLEN];
+    FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[HUSH_SMART_CHAIN_MAXLEN];
     userpass[0] = 0;
     if ( strcmp("KMD",symbol) == 0 )
     {
@@ -1457,7 +1457,7 @@ uint16_t komodo_userpass(char *userpass,char *symbol)
     {
         port = _komodo_userpass(username,password,fp);
         sprintf(userpass,"%s:%s",username,password);
-        if ( strcmp(symbol,ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp(symbol,SMART_CHAIN_SYMBOL) == 0 )
             strcpy(ASSETCHAINS_USERPASS,userpass);
         fclose(fp);
     }
@@ -1647,7 +1647,7 @@ uint64_t komodo_ac_block_subsidy(int nHeight)
     int64_t subsidyDifference;
     int32_t numhalvings = 0, curEra = 0, sign = 1;
     static uint64_t cached_subsidy; static int32_t cached_numhalvings; static int cached_era;
-    bool ishush3 = strncmp(ASSETCHAINS_SYMBOL, "HUSH3",5) == 0 ? true : false;
+    bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 
     // check for backwards compat, older chains with no explicit rewards had 0.0001 block reward
     if ( ASSETCHAINS_ENDSUBSIDY[0] == 0 && ASSETCHAINS_REWARD[0] == 0 ) {
@@ -1915,7 +1915,7 @@ void komodo_args(char *argv0)
         Split(GetArg("-ac_halving",""), sizeof(ASSETCHAINS_HALVING)/sizeof(*ASSETCHAINS_HALVING),  ASSETCHAINS_HALVING, 0);
         Split(GetArg("-ac_reward",""), sizeof(ASSETCHAINS_REWARD)/sizeof(*ASSETCHAINS_REWARD),  ASSETCHAINS_REWARD, 0);
 
-        bool ishush3 = strncmp(ASSETCHAINS_SYMBOL, "HUSH3",5) == 0 ? true : false;
+        bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 
         if(ishush3) {
             fprintf(stderr,"%s: Setting custom HUSH3 reward,halving,subsidy chain values...\n",__func__);
@@ -2301,14 +2301,14 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
         if ( strlen(addn.c_str()) > 0 )
             ASSETCHAINS_SEED = 1;
 
-        strncpy(ASSETCHAINS_SYMBOL,name.c_str(),sizeof(ASSETCHAINS_SYMBOL)-1);
+        strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
 
         MAX_MONEY = komodo_max_money();
 
-        if ( (baseid = komodo_baseid(ASSETCHAINS_SYMBOL)) >= 0 && baseid < 32 )
+        if ( (baseid = komodo_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
         {
             //komodo_maxallowed(baseid);
-            printf("baseid.%d MAX_MONEY.%s %.8f\n",baseid,ASSETCHAINS_SYMBOL,(double)MAX_MONEY/SATOSHIDEN);
+            printf("baseid.%d MAX_MONEY.%s %.8f\n",baseid,SMART_CHAIN_SYMBOL,(double)MAX_MONEY/SATOSHIDEN);
         }
 
         if ( ASSETCHAINS_CC >= KOMODO_FIRSTFUNGIBLEID && MAX_MONEY < 1000000LL*SATOSHIDEN )
@@ -2316,8 +2316,8 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
         if ( KOMODO_BIT63SET(MAX_MONEY) != 0 )
             MAX_MONEY = KOMODO_MAXNVALUE;
         fprintf(stderr,"MAX_MONEY %llu %.8f\n",(long long)MAX_MONEY,(double)MAX_MONEY/SATOSHIDEN);
-        //printf("baseid.%d MAX_MONEY.%s %.8f\n",baseid,ASSETCHAINS_SYMBOL,(double)MAX_MONEY/SATOSHIDEN);
-        uint16_t tmpport = komodo_port(ASSETCHAINS_SYMBOL,ASSETCHAINS_SUPPLY,&ASSETCHAINS_MAGIC,extraptr,extralen);
+        //printf("baseid.%d MAX_MONEY.%s %.8f\n",baseid,SMART_CHAIN_SYMBOL,(double)MAX_MONEY/SATOSHIDEN);
+        uint16_t tmpport = komodo_port(SMART_CHAIN_SYMBOL,ASSETCHAINS_SUPPLY,&ASSETCHAINS_MAGIC,extraptr,extralen);
         if ( GetArg("-port",0) != 0 )
         {
             ASSETCHAINS_P2PPORT = GetArg("-port",0);
@@ -2334,18 +2334,18 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
 #endif
         }
         //fprintf(stderr,"Got datadir.(%s)\n",dirname);
-        if ( ASSETCHAINS_SYMBOL[0] != 0 )
+        if ( SMART_CHAIN_SYMBOL[0] != 0 )
         {
             int32_t komodo_baseid(char *origbase);
             extern int COINBASE_MATURITY;
-            if ( strcmp(ASSETCHAINS_SYMBOL,"KMD") == 0 )
+            if ( strcmp(SMART_CHAIN_SYMBOL,"KMD") == 0 )
             {
                 fprintf(stderr,"cant have assetchain named KMD\n");
                 StartShutdown();
             }
-            if ( (port= komodo_userpass(ASSETCHAINS_USERPASS,ASSETCHAINS_SYMBOL)) != 0 )
+            if ( (port= komodo_userpass(ASSETCHAINS_USERPASS,SMART_CHAIN_SYMBOL)) != 0 )
                 ASSETCHAINS_RPCPORT = port;
-            else komodo_configfile(ASSETCHAINS_SYMBOL,ASSETCHAINS_P2PPORT + 1);
+            else komodo_configfile(SMART_CHAIN_SYMBOL,ASSETCHAINS_P2PPORT + 1);
 
             if (ASSETCHAINS_CBMATURITY != 0)
                 COINBASE_MATURITY = ASSETCHAINS_CBMATURITY;
@@ -2356,7 +2356,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
                 fprintf(stderr,"ac_cbmaturity must be >0, shutting down\n");
                 StartShutdown();
             }
-            //fprintf(stderr,"ASSETCHAINS_RPCPORT (%s) %u\n",ASSETCHAINS_SYMBOL,ASSETCHAINS_RPCPORT);
+            //fprintf(stderr,"ASSETCHAINS_RPCPORT (%s) %u\n",SMART_CHAIN_SYMBOL,ASSETCHAINS_RPCPORT);
         }
         if ( ASSETCHAINS_RPCPORT == 0 )
             ASSETCHAINS_RPCPORT = ASSETCHAINS_P2PPORT + 1;
@@ -2367,7 +2367,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
             sprintf(&magicstr[i<<1],"%02x",magic[i]);
         magicstr[8] = 0;
 #ifndef FROM_CLI
-        sprintf(fname,"%s_7776",ASSETCHAINS_SYMBOL);
+        sprintf(fname,"%s_7776",SMART_CHAIN_SYMBOL);
         if ( (fp= fopen(fname,"wb")) != 0 )
         {
             int8_t notarypay = 0;
@@ -2431,25 +2431,25 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
         }
     }
     int32_t dpowconfs = KOMODO_DPOWCONFS;
-    if ( ASSETCHAINS_SYMBOL[0] != 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 )
     {
         BITCOIND_RPCPORT = GetArg("-rpcport", ASSETCHAINS_RPCPORT);
-        //fprintf(stderr,"(%s) port.%u chain params initialized\n",ASSETCHAINS_SYMBOL,BITCOIND_RPCPORT);
+        //fprintf(stderr,"(%s) port.%u chain params initialized\n",SMART_CHAIN_SYMBOL,BITCOIND_RPCPORT);
 
         // Set cc enables for all existing ac_cc chains here. 
-        if ( strcmp("AXO",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("AXO",SMART_CHAIN_SYMBOL) == 0 )
         {
             // No CCs used on this chain yet.
             CCDISABLEALL;
         }
-        if ( strcmp("CCL",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("CCL",SMART_CHAIN_SYMBOL) == 0 )
         {
             // No CCs used on this chain yet. 
             CCDISABLEALL;
             CCENABLE(EVAL_TOKENS);
             CCENABLE(EVAL_HEIR);
         }
-        if ( strcmp("COQUI",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("COQUI",SMART_CHAIN_SYMBOL) == 0 )
         {
             CCDISABLEALL;
             CCENABLE(EVAL_DICE);
@@ -2458,40 +2458,40 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
             CCENABLE(EVAL_ASSETS);
             CCENABLE(EVAL_TOKENS);
         }
-        if ( strcmp("DION",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("DION",SMART_CHAIN_SYMBOL) == 0 )
         {
             // No CCs used on this chain yet. 
             CCDISABLEALL;
         }
         
-        if ( strcmp("EQL",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("EQL",SMART_CHAIN_SYMBOL) == 0 )
         {
             // No CCs used on this chain yet. 
             CCDISABLEALL;
         }
-        if ( strcmp("ILN",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("ILN",SMART_CHAIN_SYMBOL) == 0 )
         {
             // No CCs used on this chain yet. 
             CCDISABLEALL;
         }
-        if ( strcmp("OUR",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("OUR",SMART_CHAIN_SYMBOL) == 0 )
         {
             // No CCs used on this chain yet. 
             CCDISABLEALL;
         }
-        if ( strcmp("ZEXO",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("ZEXO",SMART_CHAIN_SYMBOL) == 0 )
         {
             // No CCs used on this chain yet. 
             CCDISABLEALL;
         }
-        if ( strcmp("SEC",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("SEC",SMART_CHAIN_SYMBOL) == 0 )
         {
             CCDISABLEALL;
             CCENABLE(EVAL_ASSETS);
             CCENABLE(EVAL_TOKENS);
             CCENABLE(EVAL_ORACLES);
         }
-        if ( strcmp("KMDICE",ASSETCHAINS_SYMBOL) == 0 )
+        if ( strcmp("KMDICE",SMART_CHAIN_SYMBOL) == 0 )
         {
             CCDISABLEALL;
             CCENABLE(EVAL_FAUCET);
@@ -2500,7 +2500,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
         }
     } else BITCOIND_RPCPORT = GetArg("-rpcport", BaseParams().RPCPort());
     KOMODO_DPOWCONFS = GetArg("-dpowconfs",dpowconfs);
-    if ( ASSETCHAINS_SYMBOL[0] == 0 || strcmp(ASSETCHAINS_SYMBOL,"SUPERNET") == 0 || strcmp(ASSETCHAINS_SYMBOL,"DEX") == 0 || strcmp(ASSETCHAINS_SYMBOL,"COQUI") == 0 || strcmp(ASSETCHAINS_SYMBOL,"PIRATE") == 0 || strcmp(ASSETCHAINS_SYMBOL,"KMDICE") == 0 )
+    if ( SMART_CHAIN_SYMBOL[0] == 0 || strcmp(SMART_CHAIN_SYMBOL,"SUPERNET") == 0 || strcmp(SMART_CHAIN_SYMBOL,"DEX") == 0 || strcmp(SMART_CHAIN_SYMBOL,"COQUI") == 0 || strcmp(SMART_CHAIN_SYMBOL,"PIRATE") == 0 || strcmp(SMART_CHAIN_SYMBOL,"KMDICE") == 0 )
         KOMODO_EXTRASATOSHI = 1;
 }
 
@@ -2531,7 +2531,7 @@ struct komodo_state *komodo_stateptrget(char *base)
 struct komodo_state *komodo_stateptr(char *symbol,char *dest)
 {
     int32_t baseid;
-    komodo_nameset(symbol,dest,ASSETCHAINS_SYMBOL);
+    komodo_nameset(symbol,dest,SMART_CHAIN_SYMBOL);
     return(komodo_stateptrget(symbol));
 }
 

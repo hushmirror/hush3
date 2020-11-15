@@ -564,7 +564,7 @@ void *chainparams_commandline()
     fprintf(stderr,"chainparams_commandline called\n");
     CChainParams::CCheckpointData checkpointData;
     //fprintf(stderr,">>>>>>>> port.%u\n",ASSETCHAINS_P2PPORT);
-    if ( ASSETCHAINS_SYMBOL[0] != 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 )
     {
         if ( ASSETCHAINS_BLOCKTIME != 60 )
         {
@@ -586,12 +586,12 @@ void *chainparams_commandline()
         pCurrentParams->pchMessageStart[1] = (ASSETCHAINS_MAGIC >> 8) & 0xff;
         pCurrentParams->pchMessageStart[2] = (ASSETCHAINS_MAGIC >> 16) & 0xff;
         pCurrentParams->pchMessageStart[3] = (ASSETCHAINS_MAGIC >> 24) & 0xff;
-        fprintf(stderr,">>>>>>>>>> %s: p2p.%u rpc.%u magic.%08x %u %u coins\n",ASSETCHAINS_SYMBOL,ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT,ASSETCHAINS_MAGIC,ASSETCHAINS_MAGIC,(uint32_t)ASSETCHAINS_SUPPLY);
+        fprintf(stderr,">>>>>>>>>> %s: p2p.%u rpc.%u magic.%08x %u %u coins\n",SMART_CHAIN_SYMBOL,ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT,ASSETCHAINS_MAGIC,ASSETCHAINS_MAGIC,(uint32_t)ASSETCHAINS_SUPPLY);
 
         pCurrentParams->consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nActivationHeight = ASSETCHAINS_SAPLING;
         pCurrentParams->consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = ASSETCHAINS_OVERWINTER;
 		// Generated at 1575831755 via hush3 contrib/checkpoints.pl by Duke Leto
-        if (strcmp(ASSETCHAINS_SYMBOL,"HUSH3") == 0) {
+        if (strcmp(SMART_CHAIN_SYMBOL,"HUSH3") == 0) {
                 // Generated at 1596199654 via hush3 contrib/checkpoints.pl by Duke Leto
                 checkpointData = //(Checkpoints::CCheckpointData)
                 {

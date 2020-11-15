@@ -2968,7 +2968,7 @@ bool sudoku_validate(struct CCcontract_info *cp,int32_t height,Eval *eval,const 
                                     strcpy(laststr,str);
                                     fprintf(stderr,"%s\n",str);
                                 }
-                                if ( strcmp(ASSETCHAINS_SYMBOL,"SUDOKU") != 0 || height > 2000 )
+                                if ( strcmp(SMART_CHAIN_SYMBOL,"SUDOKU") != 0 || height > 2000 )
                                     return eval->Invalid("mismatched sudoku value vs score");
                                 else return(true);
                             } else return(true);
@@ -3000,14 +3000,14 @@ bool sudoku_validate(struct CCcontract_info *cp,int32_t height,Eval *eval,const 
                                     {
                                         if ( dispflag != 0 )
                                             fprintf(stderr,"ht.%d errflag.%d %s\n",height,errflag,unsolved);
-                                        if ( (height != 1220 && height != 1383) || strcmp(ASSETCHAINS_SYMBOL,"SUDOKU") != 0  )
+                                        if ( (height != 1220 && height != 1383) || strcmp(SMART_CHAIN_SYMBOL,"SUDOKU") != 0  )
                                             return eval->Invalid("invalid timestamp vs unsolved");
                                     }
                                     if ( dupree_solver(0,&score,unsolved) != 1 )
                                     {
                                         if ( dispflag != 0 )
                                             fprintf(stderr,"non-unique sudoku at ht.%d\n",height);
-                                        if ( strcmp(ASSETCHAINS_SYMBOL,"SUDOKU") != 0 )
+                                        if ( strcmp(SMART_CHAIN_SYMBOL,"SUDOKU") != 0 )
                                             return eval->Invalid("invalid sudoku with multiple solutions");
                                     }
                                     if ( dispflag != 0 )
@@ -3034,7 +3034,7 @@ bool sudoku_validate(struct CCcontract_info *cp,int32_t height,Eval *eval,const 
                                     return(true);
                                 } else return eval->Invalid("invalid solution opret");
                             }
-                            else if ( strcmp(ASSETCHAINS_SYMBOL,"SUDOKU") == 0 && height == 236 )
+                            else if ( strcmp(SMART_CHAIN_SYMBOL,"SUDOKU") == 0 && height == 236 )
                                 return(true);
                             else return eval->Invalid("invalid solution vin");
                         }

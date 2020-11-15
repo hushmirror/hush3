@@ -381,7 +381,7 @@ char *komodo_issuemethod(char *userpass,char *method,char *params,uint16_t port)
     {
         sprintf(url,(char *)"http://127.0.0.1:%u",port);
         sprintf(postdata,"{\"method\":\"%s\",\"params\":%s}",method,params);
- //printf("[%s] (%s) postdata.(%s) params.(%s) USERPASS.(%s)\n",ASSETCHAINS_SYMBOL,url,postdata,params,KMDUSERPASS);
+ //printf("[%s] (%s) postdata.(%s) params.(%s) USERPASS.(%s)\n",SMART_CHAIN_SYMBOL,url,postdata,params,KMDUSERPASS);
         retstr2 = bitcoind_RPC(&retstr,(char *)"debug",url,userpass,method,params);
         //retstr = curl_post(&cHandle,url,USERPASS,postdata,0,0,0,0);
     }
@@ -454,7 +454,7 @@ int32_t komodo_verifynotarizedscript(int32_t height,uint8_t *script,int32_t len,
     printf(" notarized, ");
     for (i=0; i<32; i++)
         printf("%02x",((uint8_t *)&hash)[i]);
-    printf(" opreturn from [%s] ht.%d MISMATCHED\n",ASSETCHAINS_SYMBOL,height);
+    printf(" opreturn from [%s] ht.%d MISMATCHED\n",SMART_CHAIN_SYMBOL,height);
     return(-1);
 }
 
@@ -480,15 +480,15 @@ int32_t komodo_verifynotarization(char *symbol,char *dest,int32_t height,int32_t
      sprintf(&params[i*2 + 2],"%02x",((uint8_t *)&NOTARIZED_DESTTXID)[31-i]);
      strcat(params,"\", 1]");*/
     sprintf(params,"[\"%s\", 1]",NOTARIZED_DESTTXID.ToString().c_str());
-    if ( strcmp(symbol,ASSETCHAINS_SYMBOL[0]==0?(char *)"KMD":ASSETCHAINS_SYMBOL) != 0 )
+    if ( strcmp(symbol,SMART_CHAIN_SYMBOL[0]==0?(char *)"KMD":SMART_CHAIN_SYMBOL) != 0 )
         return(0);
-    if ( 0 && ASSETCHAINS_SYMBOL[0] != 0 )
-        printf("[%s] src.%s dest.%s params.[%s] ht.%d notarized.%d\n",ASSETCHAINS_SYMBOL,symbol,dest,params,height,NOTARIZED_HEIGHT);
+    if ( 0 && SMART_CHAIN_SYMBOL[0] != 0 )
+        printf("[%s] src.%s dest.%s params.[%s] ht.%d notarized.%d\n",SMART_CHAIN_SYMBOL,symbol,dest,params,height,NOTARIZED_HEIGHT);
     if ( strcmp(dest,"KMD") == 0 )
     {
         if ( KMDUSERPASS[0] != 0 )
         {
-            if ( ASSETCHAINS_SYMBOL[0] != 0 )
+            if ( SMART_CHAIN_SYMBOL[0] != 0 )
             {
                 jsonstr = komodo_issuemethod(KMDUSERPASS,(char *)"getrawtransaction",params,KMD_PORT);
                 //printf("userpass.(%s) got (%s)\n",KMDUSERPASS,jsonstr);
@@ -508,7 +508,7 @@ int32_t komodo_verifynotarization(char *symbol,char *dest,int32_t height,int32_t
     }
     else
     {
-        printf("[%s] verifynotarization error unexpected dest.(%s)\n",ASSETCHAINS_SYMBOL,dest);
+        printf("[%s] verifynotarization error unexpected dest.(%s)\n",SMART_CHAIN_SYMBOL,dest);
         return(-1);
     }
     if ( jsonstr != 0 )
@@ -518,7 +518,7 @@ int32_t komodo_verifynotarization(char *symbol,char *dest,int32_t height,int32_t
             if ( (txjson= jobj(json,(char *)"result")) != 0 && (vouts= jarray(&n,txjson,(char *)"vout")) > 0 )
             {
                 vout = jitem(vouts,n-1);
-                if ( 0 && ASSETCHAINS_SYMBOL[0] != 0 )
+                if ( 0 && SMART_CHAIN_SYMBOL[0] != 0 )
                     printf("vout.(%s)\n",jprint(vout,0));
                 if ( (skey= jobj(vout,(char *)"scriptPubKey")) != 0 )
                 {
@@ -598,7 +598,7 @@ uint64_t komodo_seed(int32_t height)
      memset(&zero,0,sizeof(zero));
      if ( height > 10 )
      height -= 10;
-     if ( ASSETCHAINS_SYMBOL[0] == 0 )
+     if ( SMART_CHAIN_SYMBOL[0] == 0 )
      hash = _komodo_getblockhash(height);
      if ( memcmp(&hash,&zero,sizeof(hash)) == 0 )
      hash = komodo_getblockhash(height);
@@ -724,14 +724,14 @@ int32_t komodo_isPoS(CBlock *pblock,int32_t height,bool fJustCheck)
 
 void komodo_disconnect(CBlockIndex *pindex,CBlock& block)
 {
-    char symbol[KOMODO_ASSETCHAIN_MAXLEN],dest[KOMODO_ASSETCHAIN_MAXLEN]; struct komodo_state *sp;
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
     //fprintf(stderr,"disconnect ht.%d\n",pindex->GetHeight());
     komodo_init(pindex->GetHeight());
     if ( (sp= komodo_stateptr(symbol,dest)) != 0 )
     {
         //sp->rewinding = pindex->GetHeight();
         //fprintf(stderr,"-%d ",pindex->GetHeight());
-    } else printf("komodo_disconnect: ht.%d cant get komodo_state.(%s)\n",pindex->GetHeight(),ASSETCHAINS_SYMBOL);
+    } else printf("komodo_disconnect: ht.%d cant get komodo_state.(%s)\n",pindex->GetHeight(),SMART_CHAIN_SYMBOL);
 }
 
 int32_t komodo_is_notarytx(const CTransaction& tx)
@@ -1123,18 +1123,18 @@ int32_t komodo_checkpoint(int32_t *notarized_heightp,int32_t nHeight,uint256 has
         {
             if ( nHeight < notarized_height )
             {
-                //fprintf(stderr,"[%s] nHeight.%d < NOTARIZED_HEIGHT.%d\n",ASSETCHAINS_SYMBOL,nHeight,notarized_height);
+                //fprintf(stderr,"[%s] nHeight.%d < NOTARIZED_HEIGHT.%d\n",SMART_CHAIN_SYMBOL,nHeight,notarized_height);
                 return(-1);
             }
             else if ( nHeight == notarized_height && memcmp(&hash,&notarized_hash,sizeof(hash)) != 0 )
             {
-                fprintf(stderr,"[%s] nHeight.%d == NOTARIZED_HEIGHT.%d, diff hash\n",ASSETCHAINS_SYMBOL,nHeight,notarized_height);
+                fprintf(stderr,"[%s] nHeight.%d == NOTARIZED_HEIGHT.%d, diff hash\n",SMART_CHAIN_SYMBOL,nHeight,notarized_height);
                 return(-1);
             }
-        } //else fprintf(stderr,"[%s] unexpected error notary_hash %s ht.%d at ht.%d\n",ASSETCHAINS_SYMBOL,notarized_hash.ToString().c_str(),notarized_height,notary->GetHeight());
+        } //else fprintf(stderr,"[%s] unexpected error notary_hash %s ht.%d at ht.%d\n",SMART_CHAIN_SYMBOL,notarized_hash.ToString().c_str(),notarized_height,notary->GetHeight());
     }
     //else if ( notarized_height > 0 && notarized_height != 73880 && notarized_height >= 170000 )
-    //    fprintf(stderr,"[%s] couldnt find notarized.(%s %d) ht.%d\n",ASSETCHAINS_SYMBOL,notarized_hash.ToString().c_str(),notarized_height,pindex->GetHeight());
+    //    fprintf(stderr,"[%s] couldnt find notarized.(%s %d) ht.%d\n",SMART_CHAIN_SYMBOL,notarized_hash.ToString().c_str(),notarized_height,pindex->GetHeight());
     return(0);
 }
 
@@ -1203,7 +1203,7 @@ int32_t komodo_isrealtime(int32_t *kmdheightp)
 int32_t komodo_validate_interest(const CTransaction &tx,int32_t txheight,uint32_t cmptime,int32_t dispflag)
 {
     dispflag = 1;
-    if ( KOMODO_REWIND == 0 && ASSETCHAINS_SYMBOL[0] == 0 && (int64_t)tx.nLockTime >= LOCKTIME_THRESHOLD ) //1473793441 )
+    if ( KOMODO_REWIND == 0 && SMART_CHAIN_SYMBOL[0] == 0 && (int64_t)tx.nLockTime >= LOCKTIME_THRESHOLD ) //1473793441 )
     {
         if ( txheight > 246748 )
         {
@@ -1354,7 +1354,7 @@ uint64_t komodo_commission(const CBlock *pblock,int32_t height)
     static bool didinit = false, ishush3 = false;
 
     if (!didinit) {
-        ishush3 = strncmp(ASSETCHAINS_SYMBOL, "HUSH3",5) == 0 ? true : false;
+        ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
         didinit = true;
         fprintf(stderr,"%s: didinit ishush3=%d\n", __func__, ishush3);
     }
@@ -2158,10 +2158,10 @@ int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
     if ( ASSETCHAINS_LWMAPOS != 0 && bhash > bnTarget )
     {
     }
-    if ( (ASSETCHAINS_SYMBOL[0] != 0 || height > 792000) && bhash > bnTarget )
+    if ( (SMART_CHAIN_SYMBOL[0] != 0 || height > 792000) && bhash > bnTarget )
     {
         failed = 1;
-        if ( height > 0 && ASSETCHAINS_SYMBOL[0] == 0 ) // for the fast case
+        if ( height > 0 && SMART_CHAIN_SYMBOL[0] == 0 ) // for the fast case
         {
             if ( (n= komodo_notaries(pubkeys,height,pblock->nTime)) > 0 )
             {
@@ -2173,7 +2173,7 @@ int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
                     }
             }
         }
-        else if ( possible == 0 || ASSETCHAINS_SYMBOL[0] != 0 )
+        else if ( possible == 0 || SMART_CHAIN_SYMBOL[0] != 0 )
         {
             if ( KOMODO_TEST_ASSETCHAIN_SKIP_POW )
                 return(0);
@@ -2296,7 +2296,7 @@ int32_t komodo_acpublic(uint32_t tiptime)
             if ( (pindex= chainActive.LastTip()) != 0 )
                 tiptime = pindex->nTime;
         }
-        if ( (ASSETCHAINS_SYMBOL[0] == 0 || strcmp(ASSETCHAINS_SYMBOL,"ZEX") == 0) && tiptime >= KOMODO_SAPLING_DEADLINE )
+        if ( (SMART_CHAIN_SYMBOL[0] == 0 || strcmp(SMART_CHAIN_SYMBOL,"ZEX") == 0) && tiptime >= KOMODO_SAPLING_DEADLINE )
             acpublic = 1;
     }
     return(acpublic);
@@ -2351,7 +2351,7 @@ int64_t komodo_newcoins(int64_t *zfundsp,int64_t *sproutfundsp,int32_t nHeight,C
     }
     *zfundsp = zfunds;
     *sproutfundsp = sproutfunds;
-    if ( ASSETCHAINS_SYMBOL[0] == 0 && (voutsum-vinsum) == 100003*SATOSHIDEN ) // 15 times
+    if ( SMART_CHAIN_SYMBOL[0] == 0 && (voutsum-vinsum) == 100003*SATOSHIDEN ) // 15 times
         return(3 * SATOSHIDEN);
     //if ( voutsum-vinsum+zfunds > 100000*SATOSHIDEN || voutsum-vinsum+zfunds < 0 )
     //.    fprintf(stderr,"ht.%d vins %.8f, vouts %.8f -> %.8f zfunds %.8f\n",nHeight,dstr(vinsum),dstr(voutsum),dstr(voutsum)-dstr(vinsum),dstr(zfunds));

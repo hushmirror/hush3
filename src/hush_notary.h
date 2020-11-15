@@ -90,15 +90,15 @@ int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestam
     int32_t i,htind,n; uint64_t mask = 0; struct knotary_entry *kp,*tmp;
     static uint8_t kmd_pubkeys[NUM_HUSH_SEASONS][64][33],didinit[NUM_HUSH_SEASONS];
     
-    if ( timestamp == 0 && ASSETCHAINS_SYMBOL[0] != 0 ) {
+    if ( timestamp == 0 && SMART_CHAIN_SYMBOL[0] != 0 ) {
         timestamp = komodo_heightstamp(height);
-    } else if ( ASSETCHAINS_SYMBOL[0] == 0 ) {
+    } else if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         timestamp = 0;
     }
 
     // Find the correct DPoW Notary pubkeys for this season
     int32_t hush_season = 0;
-    bool ishush3        = strncmp(ASSETCHAINS_SYMBOL, "HUSH3",5) == 0 ? true : false;
+    bool ishush3        = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
     hush_season         = ishush3 ? gethushseason(height) : getacseason(timestamp);
     if ( hush_season != 0 )
     {
@@ -130,8 +130,8 @@ int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestam
     }
     pthread_mutex_lock(&komodo_mutex);
     n = Pubkeys[htind].numnotaries;
-    if ( 0 && ASSETCHAINS_SYMBOL[0] != 0 )
-        fprintf(stderr,"%s height.%d t.%u genesis.%d\n",ASSETCHAINS_SYMBOL,height,timestamp,n);
+    if ( 0 && SMART_CHAIN_SYMBOL[0] != 0 )
+        fprintf(stderr,"%s height.%d t.%u genesis.%d\n",SMART_CHAIN_SYMBOL,height,timestamp,n);
     HASH_ITER(hh,Pubkeys[htind].Notaries,kp,tmp)
     {
         if ( kp->notaryid < n )
@@ -191,7 +191,7 @@ void komodo_notarysinit(int32_t origheight,uint8_t pubkeys[64][33],int32_t num)
         htind = (height / KOMODO_ELECTION_GAP);
         if ( htind >= KOMODO_MAXBLOCKS / KOMODO_ELECTION_GAP )
             htind = (KOMODO_MAXBLOCKS / KOMODO_ELECTION_GAP) - 1;
-        //printf("htind.%d activation %d from %d vs %d | hwmheight.%d %s\n",htind,height,origheight,(((origheight+KOMODO_ELECTION_GAP/2)/KOMODO_ELECTION_GAP)+1)*KOMODO_ELECTION_GAP,hwmheight,ASSETCHAINS_SYMBOL);
+        //printf("htind.%d activation %d from %d vs %d | hwmheight.%d %s\n",htind,height,origheight,(((origheight+KOMODO_ELECTION_GAP/2)/KOMODO_ELECTION_GAP)+1)*KOMODO_ELECTION_GAP,hwmheight,SMART_CHAIN_SYMBOL);
     } else htind = 0;
     pthread_mutex_lock(&komodo_mutex);
     for (k=0; k<num; k++)
@@ -233,7 +233,7 @@ int32_t komodo_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,
         printf("komodo_chosennotary ht.%d illegal\n",height);
         return(-1);
     }
-    if ( height >= KOMODO_NOTARIES_HARDCODED || ASSETCHAINS_SYMBOL[0] != 0 )
+    if ( height >= KOMODO_NOTARIES_HARDCODED || SMART_CHAIN_SYMBOL[0] != 0 )
     {
         if ( (*notaryidp= komodo_electednotary(&numnotaries,pubkey33,height,timestamp)) >= 0 && numnotaries != 0 )
         {
@@ -270,7 +270,7 @@ int32_t komodo_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,
 
 struct notarized_checkpoint *komodo_npptr_for_height(int32_t height, int *idx)
 {
-    char symbol[KOMODO_ASSETCHAIN_MAXLEN],dest[KOMODO_ASSETCHAIN_MAXLEN]; int32_t i; struct komodo_state *sp; struct notarized_checkpoint *np = 0;
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t i; struct komodo_state *sp; struct notarized_checkpoint *np = 0;
     if ( (sp= komodo_stateptr(symbol,dest)) != 0 )
     {
         for (i=sp->NUM_NPOINTS-1; i>=0; i--)
@@ -293,7 +293,7 @@ struct notarized_checkpoint *komodo_npptr(int32_t height)
 
 struct notarized_checkpoint *komodo_npptr_at(int idx)
 {
-    char symbol[KOMODO_ASSETCHAIN_MAXLEN],dest[KOMODO_ASSETCHAIN_MAXLEN]; struct komodo_state *sp;
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
     if ( (sp= komodo_stateptr(symbol,dest)) != 0 )
         if (idx < sp->NUM_NPOINTS)
             return &sp->NPOINTS[idx];
@@ -303,7 +303,7 @@ struct notarized_checkpoint *komodo_npptr_at(int idx)
 int32_t komodo_prevMoMheight()
 {
     static uint256 zero;
-    char symbol[KOMODO_ASSETCHAIN_MAXLEN],dest[KOMODO_ASSETCHAIN_MAXLEN]; int32_t i; struct komodo_state *sp; struct notarized_checkpoint *np = 0;
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t i; struct komodo_state *sp; struct notarized_checkpoint *np = 0;
     if ( (sp= komodo_stateptr(symbol,dest)) != 0 )
     {
         for (i=sp->NUM_NPOINTS-1; i>=0; i--)
@@ -318,7 +318,7 @@ int32_t komodo_prevMoMheight()
 
 int32_t komodo_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *txidp)
 {
-    char symbol[KOMODO_ASSETCHAIN_MAXLEN],dest[KOMODO_ASSETCHAIN_MAXLEN]; struct komodo_state *sp;
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
     *prevMoMheightp = 0;
     memset(hashp,0,sizeof(*hashp));
     memset(txidp,0,sizeof(*txidp));
@@ -345,7 +345,7 @@ int32_t komodo_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *
 int32_t hush_dpowconfs(int32_t txheight,int32_t numconfs)
 {
     static int32_t hadnotarization;
-    char symbol[KOMODO_ASSETCHAIN_MAXLEN],dest[KOMODO_ASSETCHAIN_MAXLEN]; struct komodo_state *sp;
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
     if ( KOMODO_DPOWCONFS != 0 && txheight > 0 && numconfs > 0 && (sp= komodo_stateptr(symbol,dest)) != 0 )
     {
         if ( sp->NOTARIZED_HEIGHT > 0 )
@@ -385,7 +385,7 @@ int32_t komodo_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,in
 
 int32_t komodo_notarizeddata(int32_t nHeight,uint256 *notarized_hashp,uint256 *notarized_desttxidp)
 {
-    struct notarized_checkpoint *np = 0; int32_t i=0,flag = 0; char symbol[KOMODO_ASSETCHAIN_MAXLEN],dest[KOMODO_ASSETCHAIN_MAXLEN]; struct komodo_state *sp;
+    struct notarized_checkpoint *np = 0; int32_t i=0,flag = 0; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
     if ( (sp= komodo_stateptr(symbol,dest)) != 0 )
     {
         if ( sp->NUM_NPOINTS > 0 )
@@ -426,7 +426,7 @@ int32_t komodo_notarizeddata(int32_t nHeight,uint256 *notarized_hashp,uint256 *n
         }
         if ( np != 0 )
         {
-            //char str[65],str2[65]; printf("[%s] notarized_ht.%d\n",ASSETCHAINS_SYMBOL,np->notarized_height);
+            //char str[65],str2[65]; printf("[%s] notarized_ht.%d\n",SMART_CHAIN_SYMBOL,np->notarized_height);
             if ( np->nHeight >= nHeight || (i < sp->NUM_NPOINTS && np[1].nHeight < nHeight) )
                 printf("warning: flag.%d i.%d np->ht %d [1].ht %d >= nHeight.%d\n",flag,i,np->nHeight,np[1].nHeight,nHeight);
             *notarized_hashp = np->notarized_hash;
@@ -447,8 +447,8 @@ void komodo_notarized_update(struct komodo_state *sp,int32_t nHeight,int32_t not
         fprintf(stderr,"komodo_notarized_update REJECT notarized_height %d > %d nHeight\n",notarized_height,nHeight);
         return;
     }
-    if ( 0 && ASSETCHAINS_SYMBOL[0] != 0 )
-        fprintf(stderr,"[%s] komodo_notarized_update nHeight.%d notarized_height.%d\n",ASSETCHAINS_SYMBOL,nHeight,notarized_height);
+    if ( 0 && SMART_CHAIN_SYMBOL[0] != 0 )
+        fprintf(stderr,"[%s] komodo_notarized_update nHeight.%d notarized_height.%d\n",SMART_CHAIN_SYMBOL,nHeight,notarized_height);
     portable_mutex_lock(&komodo_mutex);
     sp->NPOINTS = (struct notarized_checkpoint *)realloc(sp->NPOINTS,(sp->NUM_NPOINTS+1) * sizeof(*sp->NPOINTS));
     np = &sp->NPOINTS[sp->NUM_NPOINTS++];

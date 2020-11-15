@@ -29,8 +29,8 @@ extern char Gametxidstr[67];
 #define SMALLVAL 0.000000000000001
 #define SATOSHIDEN ((uint64_t)100000000L)
 #define dstr(x) ((double)(x) / SATOSHIDEN)
-#define KOMODO_ASSETCHAIN_MAXLEN 65
-char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN],IPADDRESS[100];
+#define HUSH_SMART_CHAIN_MAXLEN 65
+char ASSETCHAINS_SYMBOL[HUSH_SMART_CHAIN_MAXLEN],IPADDRESS[100];
 
 #ifndef _BITS256
 #define _BITS256
@@ -696,7 +696,7 @@ uint16_t _komodo_userpass(char *username, char *password, FILE *fp)
 
 uint16_t komodo_userpass(char *userpass,char *symbol)
 {
-    FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[KOMODO_ASSETCHAIN_MAXLEN];
+    FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[HUSH_SMART_CHAIN_MAXLEN];
     userpass[0] = 0;
     if ( strcmp("KMD",symbol) == 0 )
     {

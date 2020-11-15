@@ -55,8 +55,8 @@ void setupChain()
     // Init blockchain
     ClearDatadirCache();
     auto pathTemp = GetTempPath() / strprintf("test_komodo_%li_%i", GetTime(), GetRand(100000));
-    if (ASSETCHAINS_SYMBOL[0])
-        pathTemp = pathTemp / strprintf("_%s", ASSETCHAINS_SYMBOL);
+    if (SMART_CHAIN_SYMBOL[0])
+        pathTemp = pathTemp / strprintf("_%s", SMART_CHAIN_SYMBOL);
     boost::filesystem::create_directories(pathTemp);
     mapArgs["-datadir"] = pathTemp.string();
     pblocktree = new CBlockTreeDB(1 << 20, true);

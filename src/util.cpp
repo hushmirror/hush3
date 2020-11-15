@@ -487,15 +487,15 @@ void PrintExceptionContinue(const std::exception* pex, const char* pszThread)
     strMiscWarning = message;
 }
 
-extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
+extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 //int64_t MAX_MONEY = 200000000 * 100000000LL;
 
 boost::filesystem::path GetDefaultDataDir()
 {
     namespace fs = boost::filesystem;
-    char symbol[KOMODO_ASSETCHAIN_MAXLEN];
-    if ( ASSETCHAINS_SYMBOL[0] != 0 )
-        strcpy(symbol,ASSETCHAINS_SYMBOL);
+    char symbol[HUSH_SMART_CHAIN_MAXLEN];
+    if ( SMART_CHAIN_SYMBOL[0] != 0 )
+        strcpy(symbol,SMART_CHAIN_SYMBOL);
     else symbol[0] = 0;
     // Windows < Vista: C:\Documents and Settings\Username\Application Data\Komodo
     // Windows >= Vista: C:\Users\Username\AppData\Roaming\Komodo
@@ -652,8 +652,8 @@ void ClearDatadirCache()
 boost::filesystem::path GetConfigFile()
 {
     char confname[512];
-    if ( ASSETCHAINS_SYMBOL[0] != 0 )
-        sprintf(confname,"%s.conf",ASSETCHAINS_SYMBOL);
+    if ( SMART_CHAIN_SYMBOL[0] != 0 )
+        sprintf(confname,"%s.conf",SMART_CHAIN_SYMBOL);
     else
     {
 #ifdef __APPLE__

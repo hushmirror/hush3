@@ -672,7 +672,7 @@ bool Eval::ImportCoin(const std::vector<uint8_t> params, const CTransaction &imp
 
     LOGSTREAM("importcoin", CCLOG_DEBUG1, stream << "Validating import tx..., txid=" << importTx.GetHash().GetHex() << std::endl);
 
-    if (strcmp(ASSETCHAINS_SYMBOL, "CFEKDIMXY6") == 0 && chainActive.Height() <= 44693)
+    if (strcmp(SMART_CHAIN_SYMBOL, "CFEKDIMXY6") == 0 && chainActive.Height() <= 44693)
         return true;
 
     if (importTx.vout.size() < 2)

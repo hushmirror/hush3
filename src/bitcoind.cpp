@@ -56,8 +56,8 @@
 
 static bool fDaemon;
 #include "hush_defs.h"
-#define KOMODO_ASSETCHAIN_MAXLEN 65
-extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
+#define HUSH_SMART_CHAIN_MAXLEN 65
+extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 extern int32_t ASSETCHAINS_BLOCKTIME;
 extern uint64_t ASSETCHAINS_CBOPRET;
 void komodo_passport_iteration();
@@ -78,7 +78,7 @@ void WaitForShutdown(boost::thread_group* threadGroup)
     while (!fShutdown)
     {
         //fprintf(stderr,"call passport iteration\n");
-        if ( ASSETCHAINS_SYMBOL[0] == 0 )
+        if ( SMART_CHAIN_SYMBOL[0] == 0 )
         {
             if ( KOMODO_NSPV_FULLNODE )
                 komodo_passport_iteration();
@@ -172,7 +172,7 @@ bool AppInit(int argc, char* argv[])
         chainparams_commandline();
 
         fprintf(stderr,"call komodo_args.(%s) NOTARY_PUBKEY.(%s)\n",argv[0],NOTARY_PUBKEY.c_str());
-        printf("initialized %s at %u\n",ASSETCHAINS_SYMBOL,(uint32_t)time(NULL));
+        printf("initialized %s at %u\n",SMART_CHAIN_SYMBOL,(uint32_t)time(NULL));
         if (!boost::filesystem::is_directory(GetDataDir(false)))
         {
             fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", mapArgs["-datadir"].c_str());
@@ -225,7 +225,7 @@ bool AppInit(int argc, char* argv[])
         fDaemon = GetBoolArg("-daemon", false);
         if (fDaemon)
         {
-            fprintf(stdout, "Komodo %s server starting\n",ASSETCHAINS_SYMBOL);
+            fprintf(stdout, "Komodo %s server starting\n",SMART_CHAIN_SYMBOL);
 
             // Daemonize
             pid_t pid = fork();

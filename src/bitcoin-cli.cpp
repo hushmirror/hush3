@@ -33,7 +33,7 @@
 #include <event2/keyvalq_struct.h>
 #include "support/events.h"
 uint16_t BITCOIND_RPCPORT = 7771;
-char ASSETCHAINS_SYMBOL[65];
+char SMART_CHAIN_SYMBOL[65];
 
 #include <univalue.h>
 
@@ -99,7 +99,7 @@ static int AppInitRPC(int argc, char* argv[])
     std:string name;
     name = GetArg("-ac_name","");
     if ( !name.empty() )
-        strncpy(ASSETCHAINS_SYMBOL,name.c_str(),sizeof(ASSETCHAINS_SYMBOL)-1);
+        strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
 
     if (argc<2 || mapArgs.count("-?") || mapArgs.count("-h") || mapArgs.count("-help") || mapArgs.count("-version")) {
         std::string strUsage = _("Hush RPC client version") + " " + FormatFullVersion() + "\n" + PrivacyInfo();

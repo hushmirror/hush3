@@ -53,7 +53,7 @@
 
 using namespace libzcash;
 
-extern char ASSETCHAINS_SYMBOL[65];
+extern char SMART_CHAIN_SYMBOL[65];
 
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int32_t komodo_blockheight(uint256 hash);
@@ -333,7 +333,7 @@ bool AsyncRPCOperation_sendmany::main_impl() {
             }
             // for Komodo, set lock time to accure interest, for other chains, set
             // locktime to spend time locked coinbases
-            if (ASSETCHAINS_SYMBOL[0] == 0)
+            if (SMART_CHAIN_SYMBOL[0] == 0)
             {
                 if ( !hush_hardfork_active((uint32_t)chainActive.LastTip()->nTime) )
                     builder_.SetLockTime((uint32_t)time(NULL) - 60); // set lock time for Komodo interest
@@ -349,7 +349,7 @@ bool AsyncRPCOperation_sendmany::main_impl() {
                 CTxIn in(COutPoint(txid, vout));
                 rawTx.vin.push_back(in);
             }
-            if (ASSETCHAINS_SYMBOL[0] == 0)
+            if (SMART_CHAIN_SYMBOL[0] == 0)
             {
                 if ( !hush_hardfork_active((uint32_t)chainActive.LastTip()->nTime) )
                     rawTx.nLockTime = (uint32_t)time(NULL) - 60; // jl777

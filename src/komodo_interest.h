@@ -74,7 +74,7 @@ uint64_t komodo_earned_interest(int32_t height,int64_t paidinterest)
 
 uint64_t komodo_moneysupply(int32_t height)
 {
-    if ( height <= 1 || ASSETCHAINS_SYMBOL[0] == 0 )
+    if ( height <= 1 || SMART_CHAIN_SYMBOL[0] == 0 )
         return(0);
     else return(COIN * 100000000 + (height-1) * 3 + komodo_earned_interest(height,-1));
 }
@@ -107,7 +107,7 @@ uint64_t komodo_interest(int32_t txheight,uint64_t nValue,uint32_t nLockTime,uin
 {
     int32_t minutes,exception; uint64_t interestnew,numerator,denominator,interest = 0; uint32_t activation;
     activation = 1491350400;  // 1491350400 5th April
-    if ( ASSETCHAINS_SYMBOL[0] != 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 )
         return(0);
     if ( txheight >= KOMODO_ENDOFERA )
         return(0);

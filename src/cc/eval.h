@@ -154,7 +154,7 @@ public:
 };
 
 
-extern char ASSETCHAINS_SYMBOL[65];
+extern char SMART_CHAIN_SYMBOL[65];
 
 
 /*
@@ -221,7 +221,7 @@ public:
     template <typename Stream>
     bool DetectBackNotarisation(Stream& s, CSerActionUnserialize act)
     {
-        if (ASSETCHAINS_SYMBOL[0]) return 1;
+        if (SMART_CHAIN_SYMBOL[0]) return 1;
         if (s.size() >= 72) {
             if (strcmp("BTC", &s[68]) == 0) return 1;
             if (strcmp("KMD", &s[68]) == 0) return 1;

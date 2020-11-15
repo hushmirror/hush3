@@ -37,8 +37,8 @@ int32_t komodo_checkvout(int32_t vout,int32_t k,int32_t indallvouts);
 
 pthread_mutex_t komodo_mutex,staked_mutex;
 
-#define KOMODO_ELECTION_GAP 2000    //((ASSETCHAINS_SYMBOL[0] == 0) ? 2000 : 100)
-#define KOMODO_ASSETCHAIN_MAXLEN 65
+#define KOMODO_ELECTION_GAP 2000    //((SMART_CHAIN_SYMBOL[0] == 0) ? 2000 : 100)
+#define HUSH_SMART_CHAIN_MAXLEN 65
 
 struct pax_transaction *PAX;
 int32_t NUM_PRICES; uint32_t *PVALS;
@@ -61,7 +61,7 @@ std::vector<std::string> vWhiteListAddress;
 char NOTARYADDRS[64][64];
 char NOTARY_ADDRESSES[NUM_HUSH_SEASONS][64][64];
 
-char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN],ASSETCHAINS_USERPASS[4096];
+char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN],ASSETCHAINS_USERPASS[4096];
 uint16_t ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT,ASSETCHAINS_BEAMPORT,ASSETCHAINS_CODAPORT;
 uint32_t ASSETCHAIN_INIT,ASSETCHAINS_CC,KOMODO_STOPAT,KOMODO_DPOWCONFS = 1,STAKING_MIN_DIFF;
 uint32_t ASSETCHAINS_MAGIC = 2387029918;
@@ -142,7 +142,7 @@ uint64_t komodo_current_supply(uint32_t nHeight)
     uint64_t cur_money;
     int32_t baseid;
 
-    //if ( (baseid = komodo_baseid(ASSETCHAINS_SYMBOL)) >= 0 && baseid < 32 )
+    //if ( (baseid = komodo_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
     //    cur_money = ASSETCHAINS_GENESISTXVAL + ASSETCHAINS_SUPPLY + nHeight * ASSETCHAINS_REWARD[0] / SATOSHIDEN;
     //else
     {

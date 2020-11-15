@@ -637,7 +637,7 @@ uint64_t komodo_paxpriceB(uint64_t seed,int32_t height,char *base,char *rel,uint
 uint64_t komodo_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uint64_t basevolume)
 {
     int32_t i,nonz=0; int64_t diff; uint64_t price,seed,sum = 0;
-    if ( ASSETCHAINS_SYMBOL[0] == 0 && chainActive.LastTip() != 0 && height > chainActive.LastTip()->GetHeight() )
+    if ( SMART_CHAIN_SYMBOL[0] == 0 && chainActive.LastTip() != 0 && height > chainActive.LastTip()->GetHeight() )
     {
         if ( height < 100000000 )
         {
@@ -726,7 +726,7 @@ uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pu
     if ( (baseid= komodo_baseid(origbase)) < 0 || baseid == MAX_CURRENCIES )
     {
         if ( 0 && origbase[0] != 0 )
-            printf("[%s] PAX_fiatdest illegal base.(%s)\n",ASSETCHAINS_SYMBOL,origbase);
+            printf("[%s] PAX_fiatdest illegal base.(%s)\n",SMART_CHAIN_SYMBOL,origbase);
         return(0);
     }
     for (i=0; i<3; i++)
