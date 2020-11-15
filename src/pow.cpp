@@ -21,7 +21,6 @@
 
 #include "pow.h"
 #include "consensus/upgrades.h"
-
 #include "arith_uint256.h"
 #include "chain.h"
 #include "chainparams.h"
@@ -30,7 +29,6 @@
 #include "streams.h"
 #include "uint256.h"
 #include "util.h"
-
 #include "sodium.h"
 
 #ifdef ENABLE_RUST
@@ -778,8 +776,6 @@ CChainPower GetBlockProof(const CBlockIndex& block)
 
     if (fNegative || fOverflow || bnWorkTarget == 0)
         return CChainPower(0);
-
-    CBlockHeader header = block.GetBlockHeader();
 
     return CChainPower(0, bnStakeTarget, (~bnWorkTarget / (bnWorkTarget + 1)) + 1);
 }
