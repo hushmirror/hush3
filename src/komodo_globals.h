@@ -17,7 +17,7 @@
  *                                                                            *
  ******************************************************************************/
 
-#include "komodo_defs.h"
+#include "hush_defs.h"
 
 void komodo_prefetch(FILE *fp);
 uint32_t komodo_heightstamp(int32_t height);
@@ -59,7 +59,7 @@ int8_t ASSETCHAINS_ADAPTIVEPOW;
 std::vector<uint8_t> Mineropret;
 std::vector<std::string> vWhiteListAddress;
 char NOTARYADDRS[64][64];
-char NOTARY_ADDRESSES[NUM_KMD_SEASONS][64][64];
+char NOTARY_ADDRESSES[NUM_HUSH_SEASONS][64][64];
 
 char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN],ASSETCHAINS_USERPASS[4096];
 uint16_t ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT,ASSETCHAINS_BEAMPORT,ASSETCHAINS_CODAPORT;

@@ -41,7 +41,7 @@
 #include "wallet/wallet.h"
 #endif
 
-#include "komodo_defs.h"
+#include "hush_defs.h"
 
 #include <stdint.h>
 

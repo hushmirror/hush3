@@ -15,7 +15,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-#include "komodo_defs.h"
+#include "hush_defs.h"
 #include "key_io.h"
 #include "cc/CCinclude.h"
 #include <string.h>

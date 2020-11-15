@@ -14,7 +14,7 @@
  *                                                                            *
  ******************************************************************************/
 
-#include "komodo_defs.h"
+#include "hush_defs.h"
 #include "komodo_cJSON.h"
 
 #define KOMODO_MAINNET_START 178999
@@ -63,11 +63,11 @@ const char *Notaries_genesis[][2] =
 
 int32_t gethushseason(int32_t height)
 {
-    if ( height <= KMD_SEASON_HEIGHTS[0] )
+    if ( height <= HUSH_SEASON_HEIGHTS[0] )
         return(1);
-    for (int32_t i = 1; i < NUM_KMD_SEASONS; i++)
+    for (int32_t i = 1; i < NUM_HUSH_SEASONS; i++)
     {
-        if ( height <= KMD_SEASON_HEIGHTS[i] && height > KMD_SEASON_HEIGHTS[i-1] )
+        if ( height <= HUSH_SEASON_HEIGHTS[i] && height > HUSH_SEASON_HEIGHTS[i-1] )
             return(i+1);
     }
     return(0);
@@ -75,11 +75,11 @@ int32_t gethushseason(int32_t height)
 
 int32_t getacseason(uint32_t timestamp)
 {
-    if ( timestamp <= KMD_SEASON_TIMESTAMPS[0] )
+    if ( timestamp <= HUSH_SEASON_TIMESTAMPS[0] )
         return(1);
-    for (int32_t i = 1; i < NUM_KMD_SEASONS; i++)
+    for (int32_t i = 1; i < NUM_HUSH_SEASONS; i++)
     {
-        if ( timestamp <= KMD_SEASON_TIMESTAMPS[i] && timestamp > KMD_SEASON_TIMESTAMPS[i-1] )
+        if ( timestamp <= HUSH_SEASON_TIMESTAMPS[i] && timestamp > HUSH_SEASON_TIMESTAMPS[i-1] )
             return(i+1);
     }
     return(0);
@@ -88,7 +88,7 @@ int32_t getacseason(uint32_t timestamp)
 int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp)
 {
     int32_t i,htind,n; uint64_t mask = 0; struct knotary_entry *kp,*tmp;
-    static uint8_t kmd_pubkeys[NUM_KMD_SEASONS][64][33],didinit[NUM_KMD_SEASONS];
+    static uint8_t kmd_pubkeys[NUM_HUSH_SEASONS][64][33],didinit[NUM_HUSH_SEASONS];
     
     if ( timestamp == 0 && ASSETCHAINS_SYMBOL[0] != 0 ) {
         timestamp = komodo_heightstamp(height);

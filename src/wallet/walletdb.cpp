@@ -31,7 +31,7 @@
 #include "utiltime.h"
 #include "wallet/wallet.h"
 #include "zcash/Proof.hpp"
-#include "komodo_defs.h"
+#include "hush_defs.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>

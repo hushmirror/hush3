@@ -1,4 +1,6 @@
 // Copyright 2019-2020 The Hush Developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
@@ -20,7 +22,7 @@
 #include <curl/curl.h>
 #include <curl/easy.h>
 #include "consensus/params.h"
-#include "komodo_defs.h"
+#include "hush_defs.h"
 #include "script/standard.h"
 #include "cc/CCinclude.h"
 #include "sietch.h"

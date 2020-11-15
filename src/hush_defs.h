@@ -42,9 +42,10 @@
 // 3: 3rd season
     // 1751328000 = dummy timestamp, 1 July 2025!
     // 7113400 = 5x current KMD blockheight. 
-// to add seasons, change NUM_KMD_SEASONS, and add timestamp and height of activation to these arrays. 
+// to add seasons, change NUM_HUSH_SEASONS, and add timestamp and height of activation to these arrays. 
 
-#define NUM_KMD_SEASONS 6
+#define NUM_HUSH_SEASONS 7
+//TODO: some parts of the codebase assume 64 and do not use this constant
 #define NUM_HUSH_NOTARIES 64
 
 // $ ./contrib/block_time.pl 166250
@@ -56,15 +57,18 @@ const uint32_t nHushHardforkHeight  = 166250;
 // Hush Block 245555 will happen at roughly... now
 const uint32_t nHushHardforkHeight2 = 245055;
 
+// This height begins Hush DPoW from Hush notaries
+const uint32_t nHushHardforkHeight3 = 320000;
+
 // No coins/code are currently using timestamp activated fork
 const uint32_t nHushHardforkTimestamp  = 1580303652; // Jan 29nd 1pm GMT
 const uint32_t nHushHardforkTimestamp2 = 1594425600; // Jul 11th 12a GMT
 
-static const uint32_t KMD_SEASON_TIMESTAMPS[NUM_KMD_SEASONS] = {1525132800, 1563148800, nHushHardforkTimestamp, nHushHardforkTimestamp2, nHushHardforkTimestamp2*5, nHushHardforkTimestamp2*6};
-static const int32_t  KMD_SEASON_HEIGHTS[NUM_KMD_SEASONS]    = {1,2,nHushHardforkHeight, nHushHardforkHeight2, (int)340000, 5*nHushHardforkHeight2};
+static const uint32_t HUSH_SEASON_TIMESTAMPS[NUM_HUSH_SEASONS] = {1525132800, 1563148800, nHushHardforkTimestamp, nHushHardforkTimestamp2, nHushHardforkTimestamp2*5, nHushHardforkTimestamp2*6, nHushHardforkTimestamp2*7};
+static const int32_t  HUSH_SEASON_HEIGHTS[NUM_HUSH_SEASONS]    = {1,2,nHushHardforkHeight, nHushHardforkHeight2, (int)340000, nHushHardforkHeight3, nHushHardforkHeight3*5};
 
 // Era array of pubkeys. Add extra seasons to bottom as requried, after adding appropriate info above. 
-static const char *notaries_elected[NUM_KMD_SEASONS][NUM_HUSH_NOTARIES][2] =
+static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
 {
     {
         { "0_jl777_testA", "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828" },
@@ -198,6 +202,7 @@ static const char *notaries_elected[NUM_KMD_SEASONS][NUM_HUSH_NOTARIES][2] =
         {"webworker01_NA", "03bb7d005e052779b1586f071834c5facbb83470094cff5112f0072b64989f97d7" },
         {"xrobesx_NA", "03f0cc6d142d14a40937f12dbd99dbd9021328f45759e26f1877f2a838876709e1" },
     },
+
     {
         {"madmax_NA", "0237e0d3268cebfa235958808db1efc20cc43b31100813b1f3e15cc5aa647ad2c3" }, // 0
         {"alright_AR", "020566fe2fb3874258b2d3cf1809a5d650e0edc7ba746fa5eec72750c5188c9cc9" },
@@ -264,6 +269,7 @@ static const char *notaries_elected[NUM_KMD_SEASONS][NUM_HUSH_NOTARIES][2] =
         {"patchkez_SH", "03f45e9beb5c4cd46525db8195eb05c1db84ae7ef3603566b3d775770eba3b96ee" },
         {"decker_AR", "03ffdf1a116300a78729608d9930742cd349f11a9d64fcc336b8f18592dd9c91bc" }, // 63
     },
+
     {
         // Season 3.5 third party NN pubkeys from https://github.com/KomodoPlatform/dPoW/blob/master/dragon/3rd_party
         {"madmax_NA", "02ef81a360411adf71184ff04d0c5793fc41fd1d7155a28dd909f21f35f4883ac1" },
@@ -331,6 +337,7 @@ static const char *notaries_elected[NUM_KMD_SEASONS][NUM_HUSH_NOTARIES][2] =
         {"patchkez_SH", "03d7c187689bf829ca076a30bbf36d2e67bb74e16a3290d8a55df21d6cb15c80c1" },
         {"decker_AR", "02a85540db8d41c7e60bf0d33d1364b4151cad883dd032878ea4c037f67b769635" }
     },
+
     {
         // Season 4 https://github.com/KomodoPlatform/dPoW/blob/s4/dragon/3rd_party
         {"alien_AR", "024f20c096b085308e21893383f44b4faf1cdedea9ad53cc7d7e7fbfa0c30c1e71" },
@@ -397,6 +404,75 @@ static const char *notaries_elected[NUM_KMD_SEASONS][NUM_HUSH_NOTARIES][2] =
         {"tonyl_DEV", "0258b77d7dcfc6c2628b0b6b438951a6e74201fb2cd180a795e4c37fcf8e78a678" },
         {"webworker01_NA", "02de90c720c007229374772505a43917a84ed129d5fbcfa4949cc2e9b563351124" },
         {"zatjum_SH", "0241c5660ca540780be66603b1791127a1261d56abbcb7562c297eec8e4fc078fb" }
+   },
+   {
+        // Hush Delayed Proof of Work
+        // NOTE: Hush notaries are anon, where KMD notaries doxx themselves, lulz
+        // TODO: Fill in production pubkeys, these are placeholders
+        {"notary01", "024f20c096b085308e21893383f4404faf1cdedea9ad53cc7d7e7fbfa0c30c1e70" },
+        {"notary02", "022b85908191788f409506ebcf96a092f3274f352864c3ed566c5a16de63953230" },
+        {"notary03", "022f62b56ddfd07c9860921c701280ac39bb3ac8f6f083d1b59c8f4943be3de160" },
+        {"notary04", "03b6f9493658bdd102503585a08ae042b49d6a68fb69ac3626f9737cd7581abdf0" },
+        {"notary05", "037a20916d2e9ea575300ac9d729507c23a606b9a200c8e913d7c9832f912a1fa0" },
+        {"notary06", "028803e07bcc521fde264b7191a940f9b3612e8ee4e24a99bcd903f69762408390" },
+        {"notary07", "0311dde03c2dd654ce78323b718ed0ad73a464d1bde97820f3395f54788b5420d0" },
+        {"notary08", "030cd487e10fbf142e0e8d582e7020cb775f378569c3cb5acd0ff97b6b12203580" },
+        {"notary09", "030bf7bd7ad0515c33b5d5d9a91e0029baf801b9002f80495ae535ea1ceb2352c0" },
+        {"notary10", "026f4f66385daaf8313ef30ffe4980e7db497132682dca185a70763d93e1217d90" },
+        {"notary11", "03f4e69edcb4fa3b2095cb8cb1ca000f4ec4972eac5d8822397e5c8d87aa21a730" },
+        {"notary12", "023c7584b1006d4a62a4b4c9c1ede090a3789316547897d5ed49ff9385a32cb410" },
+        {"notary13", "025199bc04bcb8a17976d9fe8bc87063a6150c2727321aa59bf34a2b49f223a0c0" },
+        {"notary14", "02a85540db8d41c7e60bf0d33d1360b4151cad883dd032878ea4c037f67b269630" },
+        {"notary15", "02fca8ee50e49f480de275745618d07b0b3680b0bdcce7dcae7d2e0fd5c3245740" },
+        {"notary16", "027777775b89ff548c3be54fb0c9405437d87f38bfce83bdef113899881b219c90" },
+        {"notary17", "029912212d370ee0fb4d38eefd8bf0d8ab04e2c3b0354020789c29ddf2a32c72d0" },
+        {"notary18", "033c121d3f8d450174674a73f3b7f040b2717a7d51ea19ee597e2e8e8f9d2ed870" },
+        {"notary19", "03bfcbca83f11e622fa4eed9a1fa20dba377981ea3b22e3d0a4015f9a9322f9270" },
+        {"notary20", "03a5c083c78ba397970f20b544a01013e7ed36ca8a5ae26d5fe7bd38b92b2a0c90" },
+        {"notary21", "03639bc56d3fecf856f17759a441c0893668e7c2d460f3d216798a413cd6266bb0" },
+        {"notary22", "03e388bcc579ac2675f8fadfa921e0c186dcea8d2b43de1eed6caba23d5a262b70" },
+        {"notary23", "03a5cfda2b097c808834ccdd805820c811b519611feabdfe6b3644312e53267480" },
+        {"notary24", "02a654037d12cdd609f4fad48e15e054538e03f61fdae1a1b855f16ebaca26bd70" },
+        {"notary25", "0262da6aaa0b295b8e2f120035924058a4a630f899316dc13ee15ef03e9b2b2b20" },
+        {"notary26", "0242778789986d614f75bcf629081051b851a12ab1cc10c13995b27b90fe2b75a0" },
+        {"notary27", "03a416533cace0814455a1bb1cd7801ce825a543c6f62841432c4c8d887527ace0" },
+        {"notary28", "02b3908eda4078f0e9b6704451cdc04d418e899c0f515fa1338d7494da6f2a6470" },
+        {"notary29", "031d1584cf0eb4a2d314465e49e2607226b1615c371801318d6b4854c15626a580" },
+        {"notary30", "02f803e6f159824a181cc5d709f3d0e7ff65f19e1899920124aeb4e3d2d829f910" },
+        {"notary31", "027afddbcf690230dd8d435ec16a70fb0083e6b77030f761437f291dfc402579d0" },
+        {"notary32", "0397ec3a4ad84b3009566d260c89f0c4404e86e5d044964147c9371277e32f5990" },
+        {"notary33", "036d3afebe1eab09f4c38c3ee6a4609ad390f3df92787c11437a58c59a292408e0" },
+        {"notary34", "028690ca1e3afdf8a38b421f6a41f0ff407afc96d5a7a6a188330aae26c82086b0" },
+        {"notary35", "027a4ca7b11d3456ff558c08bb04403a89c7f383448461f10b6b3b07424a2be9a0" },
+        {"notary36", "0239e34ad22957bbf4c8df824401f037b2afe8d40f7a6451cd43e8f27dde2ab0d0" },
+        {"notary37", "03b21ff042bf1730b28bde43f44c004578b41996117ac7614b567c3773082e3be0" },
+        {"notary38", "036494e7c9467c8c7ff3bf29e841907fb0fa24241866569144ea422479ec2e6250" },
+        {"notary39", "03e67440141f53a08684c329ebc852b018e41f905da88e51aa4a6dc5aa4b224470" },
+        {"notary40", "026d5f29d09ff3f33e14db4811606249b2438c6bcf964871714f81d1f2d922acd0" },
+        {"notary41", "0392e4c9400e69f28c6b9e89d586da69d5a6af7702f10451aa6ebc1996f0296e10" },
+        {"notary42", "0310a249c6c2dcc29f2135715138a9ddb8e01c0eab701cb10b96d9cec6602bdc50" },
+        {"notary43", "0284c4d3cb97dd8a32d10fb32b1855ae18cf845dad542e318937ca0e998f254ec0" },
+        {"notary44", "03c53bd421de4a29ce68c8cc83f802e1181e77c08f8f16614490d61452ea2d0230" },
+        {"notary45", "028c08db6e7242681f50db6c234fe3d6e12fb1a915350311be26373bac0d257d40" },
+        {"notary46", "03c18431bb6bc95672f640f19998a196becd2851d5dcba4195fe8d85b7d72eab80" },
+        {"notary47", "0243958faf9ae4d43b598b859ddc595c170c4cf50f8e4511d660ae5bc72a2b8210" },
+        {"notary48", "03369187ce134bd7793ee34af7756fe1ab27202e09306491cdd5d8ad2c71297930" },
+        {"notary49", "03889a10f9df2caef57220628515693cf25316fe1b0693b1241419e75d0d2e66e0" },
+        {"notary50", "0240011b95cde819f298fe0f507b2260c9fecdab784924016d4d1e54c522203cb0" },
+        {"notary51", "02ad7ef25d2dd461e361120cd3efe7cbce5e9512c361e9115aac33dd303d258610" },
+        {"notary52", "02641c36ae6747b88150a463a1fe65cf7a9d1c00a64387c13f296f0b64e72c7d30" },
+        {"notary53", "0397b7584cb29717b721c0c587d4462477efc1f36a569211133c9d17b0cd2f2780" },
+        {"notary54", "03c6e047218f34644ccba67e317b9da5d28e68bbbb6b9971aef1281d2baf246490" },
+        {"notary55", "02285bf2f9e96068ecac14bc6f770e394927b4da9f5ba831eaa9468b5d47f203a0" },
+        {"notary56", "0213751a1c59d3489ca85b3d62a3d606dcef7f0428aa02111978ea16fb38a2fad0" },
+        {"notary57", "02e7722ebba9f8b5ebfb4e87d4fa58cc75aef677535b9cf1060c7d9471aacd9c90" },
+        {"notary58", "03958bd8d13fe6946b8d0d0fbbc3861c72542560d0276e81a4c6b5fe55bc758b80" },
+        {"notary59", "02276090e483db1a01a802456b10831b3b6e0a6ad3ece9b1a01f4aad0e480c8ed0" },
+        {"notary60", "02abf206bafc8048dbdc042b8eb6b1e356ea5dbe149eae3132b4811d4905e5cf00" },
+        {"notary61", "0229e499e3f2e065ced402ceb8aaf3d5ab8bd3793aa074315e9fa30772ce604900" },
+        {"notary62", "0258b77d7dcfc6c2628b0b6b438951a6e74201fb2cd180a195e4c37fcf8e78a670" },
+        {"notary63", "02de90c720c007229374772505a43917a84ed129d5fbcfa1949cc2e9b563351120" },
+        {"notary64", "0241c5660ca540780be66603b1791127a1261d56abbcb7512c297eec8e4fc078f0" }
    }
 };
 
@@ -452,7 +528,7 @@ extern std::string DONATION_PUBKEY;
 extern uint8_t ASSETCHAINS_PRIVATE;
 extern int32_t USE_EXTERNAL_PUBKEY;
 extern char NOTARYADDRS[64][64];
-extern char NOTARY_ADDRESSES[NUM_KMD_SEASONS][64][64];
+extern char NOTARY_ADDRESSES[NUM_HUSH_SEASONS][64][64];
 extern int32_t KOMODO_TESTNODE, KOMODO_SNAPSHOT_INTERVAL;
 extern int32_t ASSETCHAINS_EARLYTXIDCONTRACT;
 extern int32_t ASSETCHAINS_STAKED_SPLIT_PERCENTAGE;

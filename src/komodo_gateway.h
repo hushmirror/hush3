@@ -15,7 +15,7 @@
  ******************************************************************************/
 
 // paxdeposit equivalent in reverse makes opreturn and KMD does the same in reverse
-#include "komodo_defs.h"
+#include "hush_defs.h"
 
 /*#include "secp256k1/include/secp256k1.h"
 #include "secp256k1/include/secp256k1_schnorrsig.h"

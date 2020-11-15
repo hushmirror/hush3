@@ -13,7 +13,7 @@
  *                                                                            *
  ******************************************************************************/
 
-#include "komodo_defs.h"
+#include "hush_defs.h"
 
 #include "uthash.h"
 #include "utlist.h"

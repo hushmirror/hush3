@@ -13,7 +13,7 @@
  *                                                                            *
  ******************************************************************************/
 
-#include "komodo_defs.h"
+#include "hush_defs.h"
 
 #define USD 0
 #define EUR 1

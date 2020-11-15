@@ -91,7 +91,7 @@ static CBlock CreateGenesisBlock(uint32_t nTime, const uint256& nNonce, const st
  * + Contains no strange transactions
  */
 void *chainparams_commandline();
-#include "komodo_defs.h"
+#include "hush_defs.h"
 int32_t ASSETCHAINS_BLOCKTIME = 60;
 uint64_t ASSETCHAINS_NK[2];
 

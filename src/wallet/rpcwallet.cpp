@@ -52,7 +52,7 @@
 #include <utf8.h>
 #include <univalue.h>
 #include <numeric>
-#include "komodo_defs.h"
+#include "hush_defs.h"
 #include <string.h>
 #include "rpchushwallet.h"
 
@@ -566,7 +566,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return wtx.GetHash().GetHex();
 }
 
-#include "komodo_defs.h"
+#include "hush_defs.h"
 
 #define KOMODO_KVPROTECTED 1
 #define KOMODO_KVBINARY 2

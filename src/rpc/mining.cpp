@@ -49,7 +49,7 @@
 
 using namespace std;
 
-#include "komodo_defs.h"
+#include "hush_defs.h"
 
 extern int32_t ASSETCHAINS_FOUNDERS;
 uint64_t komodo_commission(const CBlock *pblock,int32_t height);

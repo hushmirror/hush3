@@ -40,7 +40,7 @@
 #endif
 #include <unistd.h>
 
-#include "komodo_defs.h"
+#include "hush_defs.h"
 int64_t komodo_block_unlocktime(uint32_t nHeight);
 
 void AtomicTimer::start()

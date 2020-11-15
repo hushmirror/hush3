@@ -133,7 +133,7 @@ void UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, 
         pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, consensusParams);
     }
 }
-#include "komodo_defs.h"
+#include "hush_defs.h"
 #include "cc/CCinclude.h"
 
 extern CCriticalSection cs_metrics;

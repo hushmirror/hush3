@@ -89,7 +89,7 @@
 
 using namespace std;
 
-#include "komodo_defs.h"
+#include "hush_defs.h"
 extern void ThreadSendAlert();
 extern bool komodo_dailysnapshot(int32_t height);
 extern int32_t KOMODO_LOADINGBLOCKS;
