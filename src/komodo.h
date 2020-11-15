@@ -18,13 +18,11 @@
 #define H_KOMODO_H
 #include "komodo_defs.h"
 
-
 #ifdef _WIN32
 #define printf(...)
 #endif
 
-// Todo:
-// verify: reorgs
+// Todo: verify: reorgs
 
 #define KOMODO_ASSETCHAINS_WAITNOTARIZE
 #define KOMODO_PAXMAX (10000 * COIN)
@@ -47,12 +45,11 @@ bool check_pprevnotarizedht();
 #include "komodo_globals.h"
 #include "hush_utils.h"
 #include "komodo_curve25519.h"
-
 #include "komodo_cJSON.c"
 #include "komodo_bitcoind.h"
 #include "komodo_interest.h"
 #include "komodo_pax.h"
-#include "komodo_notary.h"
+#include "hush_notary.h"
 
 int32_t komodo_parsestatefile(struct komodo_state *sp,FILE *fp,char *symbol,char *dest);
 #include "komodo_kv.h"
