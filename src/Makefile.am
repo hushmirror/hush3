@@ -1,4 +1,6 @@
 # Copyright 2019-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 DIST_SUBDIRS = secp256k1 univalue cryptoconditions
 
@@ -251,7 +253,7 @@ obj/build.h: FORCE
 	$(abs_top_srcdir)
 libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
-# server: zcashd
+# server: hushd
 libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
@@ -398,7 +400,7 @@ crypto_libbitcoin_crypto_a_SOURCES += \
 	${EQUIHASH_TROMP_SOURCES}
 endif
 
-# common: shared between zcashd and non-server tools
+# common: shared between hushd and non-server tools
 libbitcoin_common_a_CPPFLAGS = -fPIC $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_common_a_CXXFLAGS = -fPIC $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
@@ -607,7 +609,7 @@ komodo_tx_LDADD = \
 
 komodo_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 
-# zcash protocol primitives #
+# Zcash Protocol Primitives
 libzcash_a_SOURCES = \
 	zcash/IncrementalMerkleTree.cpp \
 	zcash/NoteEncryption.cpp \
@@ -712,7 +714,7 @@ endif
 	$(AM_V_GEN) $(PROTOC) --cpp_out=$(@D) --proto_path=$(abspath $(<D) $<)
 
 if ENABLE_TESTS
-include Makefile.ktest.include
+include Makefile.test-hush.include
 #include Makefile.test.include
 #include Makefile.gtest.include
 endif

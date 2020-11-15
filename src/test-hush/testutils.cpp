@@ -4,7 +4,6 @@
 #include <cryptoconditions.h>
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
-
 #include "core_io.h"
 #include "key.h"
 #include "main.h"
@@ -21,7 +20,6 @@
 #include "primitives/transaction.h"
 #include "script/cc.h"
 #include "script/interpreter.h"
-
 #include "testutils.h"
 
 

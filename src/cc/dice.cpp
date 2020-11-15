@@ -99,7 +99,7 @@ What is needed is for the dealer node to track the entropy tx that was already b
 
 #define MAX_ENTROPYUSED 8192
 #define DICE_MINUTXOS 15000
-extern int32_t KOMODO_INSYNC;
+extern int32_t HUSH_INSYNC;
 
 pthread_mutex_t DICE_MUTEX,DICEREVEALED_MUTEX;
 
@@ -329,7 +329,7 @@ void *dicefinish(void *_ptr)
     dicepk = GetUnspendable(cp,0);
     GetCCaddress(cp,CCaddr,GetUnspendable(cp,0));
     fprintf(stderr,"start dicefinish thread %s CCaddr.%s\n",coinaddr,CCaddr);
-    if ( (newht= KOMODO_INSYNC) == 0 )
+    if ( (newht= HUSH_INSYNC) == 0 )
         sleep(7);
     sleep(3);
     while ( 1 )
@@ -489,7 +489,7 @@ void *dicefinish(void *_ptr)
                 free(utxos);
             }
         }
-        if ( (newht= KOMODO_INSYNC) == 0 || newht == lastheight )
+        if ( (newht= HUSH_INSYNC) == 0 || newht == lastheight )
             sleep(3);
         else usleep(500000);
     }
@@ -936,7 +936,7 @@ bool DiceValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &tx, 
                     if ( (iswin= DiceIsWinner(entropy,entropyvout,txid,tx,vinTx,hash,sbits,minbet,maxbet,maxodds,timeoutblocks,fundingtxid)) != 0 )
                     {
                         // will only happen for fundingPubKey
-                        if ( KOMODO_INSYNC != 0 && KOMODO_DEALERNODE != 0 )
+                        if ( HUSH_INSYNC != 0 && KOMODO_DEALERNODE != 0 )
                             DiceQueue(iswin,sbits,fundingtxid,txid,tx,entropyvout);
                     }
                     else
@@ -1669,7 +1669,7 @@ void *dealer0_loop(void *_arg)
     entropytxs = (CTransaction *)calloc(sizeof(*entropytxs),DICE_MINUTXOS);
     while ( 1 )
     {
-        while ( KOMODO_INSYNC == 0 || (height= KOMODO_INSYNC) == lastht )
+        while ( HUSH_INSYNC == 0 || (height= HUSH_INSYNC) == lastht )
         {
             sleep(3);
         }

@@ -73,7 +73,7 @@ extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
 extern std::string ASSETCHAINS_OVERRIDE_PUBKEY;
 const std::string ADDR_TYPE_SAPLING = "sapling";
 const std::string ADDR_TYPE_AMNESIA = "amnesia";
-extern int32_t KOMODO_INSYNC;
+extern int32_t HUSH_INSYNC;
 uint32_t komodo_segid32(char *coinaddr);
 int32_t komodo_dpowconfs(int32_t height,int32_t numconfs);
 int32_t komodo_isnotaryvout(char *coinaddr,uint32_t tiptime); // from ac_private chains only
@@ -4640,7 +4640,7 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    THROW_IF_SYNCING(KOMODO_INSYNC);
+    THROW_IF_SYNCING(HUSH_INSYNC);
 
     // Check that the from address is valid.
     auto fromaddress = params[0].get_str();
@@ -4962,7 +4962,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    THROW_IF_SYNCING(KOMODO_INSYNC);
+    THROW_IF_SYNCING(HUSH_INSYNC);
 
     // Validate the from address
     auto fromaddress = params[0].get_str();
@@ -5218,7 +5218,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    THROW_IF_SYNCING(KOMODO_INSYNC);
+    THROW_IF_SYNCING(HUSH_INSYNC);
 
     bool useAnyUTXO = false;
     bool useAnySapling = false;

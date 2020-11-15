@@ -6,16 +6,16 @@ TESTS += hush-test
 bin_PROGRAMS += hush-test
 
 # tool for generating our public parameters
-hush_test_SOURCES = \
-	test-hush/main.cpp \
-	test-hush/testutils.cpp \
-	test-hush/test_cryptoconditions.cpp \
-	test-hush/test_coinimport.cpp \
-	test-hush/test_eval_bet.cpp \
-	test-hush/test_eval_notarisation.cpp \
-	test-hush/test_parse_notarisation.cpp \
-	test-hush/test_addrman.cpp \
-	test-hush/test_netbase_tests.cpp
+hush_test_SOURCES = test-hush/main.cpp
+# devs can enable this shit, it just slows down default compiles
+#	test-hush/testutils.cpp \
+#	test-hush/test_cryptoconditions.cpp \
+#	test-hush/test_coinimport.cpp \
+#	test-hush/test_eval_bet.cpp \
+#	test-hush/test_eval_notarisation.cpp \
+#	test-hush/test_parse_notarisation.cpp \
+#	test-hush/test_addrman.cpp \
+#	test-hush/test_netbase_tests.cpp
 
 hush_test_CPPFLAGS = $(hushd_CPPFLAGS)
 

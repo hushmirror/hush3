@@ -50,7 +50,7 @@
 
 using namespace std;
 
-extern int32_t KOMODO_INSYNC;
+extern int32_t HUSH_INSYNC;
 extern bool fZindex;
 extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex);
@@ -1658,7 +1658,7 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp, const CPubKey& my
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("chain",                 Params().NetworkIDString()));
     obj.push_back(Pair("blocks",                (int)chainActive.Height()));
-    obj.push_back(Pair("synced",                KOMODO_INSYNC!=0));
+    obj.push_back(Pair("synced",                HUSH_INSYNC!=0));
     obj.push_back(Pair("longestchain",        KOMODO_LONGESTCHAIN));
     obj.push_back(Pair("notarized", notarized_height));
     obj.push_back(Pair("headers",               pindexBestHeader ? pindexBestHeader->GetHeight() : -1));
@@ -1887,7 +1887,7 @@ inline CBlockIndex* LookupBlockIndex(const uint256& hash)
 
 UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    THROW_IF_SYNCING(KOMODO_INSYNC);
+    THROW_IF_SYNCING(HUSH_INSYNC);
 
     if (fHelp || params.size() > 2)
         throw runtime_error(
