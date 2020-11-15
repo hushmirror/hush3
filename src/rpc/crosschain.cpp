@@ -1,3 +1,6 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -34,12 +37,9 @@
 #include "script/script_error.h"
 #include "script/sign.h"
 #include "script/standard.h"
-#include "notaries_staked.h"
-
 #include "key_io.h"
 #include "cc/CCImportGateway.h"
 #include "cc/CCtokens.h"
-
 #include <stdint.h>
 #include <univalue.h>
 #include <regex>
@@ -301,9 +301,6 @@ UniValue migrate_createburntransaction(const UniValue& params, bool fHelp, const
     if( params.size() == 4 )
         tokenid = Parseuint256(params[3].get_str().c_str());
         
-    if ( tokenid != zeroid && strcmp("LABS", targetSymbol.c_str()))
-        throw JSONRPCError(RPC_TYPE_ERROR, "There is no tokens support on LABS.");
-
     CPubKey myPubKey = Mypubkey();
     struct CCcontract_info *cpTokens, C;
     cpTokens = CCinit(&C, EVAL_TOKENS);
@@ -1143,11 +1140,9 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
     GetBlockNotarisations(blockHash, nibs);
     UniValue out(UniValue::VOBJ);
     //out.push_back(make_pair("blocktime",(int)));
-    UniValue labs(UniValue::VARR);
-    UniValue kmd(UniValue::VARR);
-    int8_t numNN = 0, numSN = 0; uint8_t notarypubkeys[64][33] = {0}; uint8_t LABSpubkeys[64][33] = {0};
+    UniValue hush(UniValue::VARR);
+    int8_t numNN = 0; uint8_t notarypubkeys[64][33] = {0};
     numNN = komodo_notaries(notarypubkeys, height, chainActive[height]->nTime);
-    numSN = numStakedNotaries(LABSpubkeys,STAKED_era(chainActive[height]->nTime));
 
     BOOST_FOREACH(const Notarisation& n, nibs)
     {
@@ -1155,33 +1150,21 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
         uint256 hash; CTransaction tx;
         if ( myGetTransaction(n.first,tx,hash) )
         {
-            if ( is_STAKED(n.second.symbol) != 0 )
-            {
-                if ( !GetNotarisationNotaries(LABSpubkeys, numSN, tx.vin, NotarisationNotaries) )
-                    continue;
-            }
-            else 
-            {
-                if ( !GetNotarisationNotaries(notarypubkeys, numNN, tx.vin, NotarisationNotaries) )
-                    continue;
-            }
+            if ( !GetNotarisationNotaries(notarypubkeys, numNN, tx.vin, NotarisationNotaries) )
+                continue;
         }
         item.push_back(make_pair("txid", n.first.GetHex()));
         item.push_back(make_pair("chain", n.second.symbol));
         item.push_back(make_pair("height", (int)n.second.height));
         item.push_back(make_pair("blockhash", n.second.blockHash.GetHex()));
-        //item.push_back(make_pair("KMD_height", height)); // for when timstamp input is used.
+        //item.push_back(make_pair("HUSH_height", height)); // for when timstamp input is used.
         
         for ( auto notary : NotarisationNotaries )
             notaryarr.push_back(notary);
         item.push_back(make_pair("notaries",notaryarr));
-        if ( is_STAKED(n.second.symbol) != 0 )
-            labs.push_back(item);
-        else 
-            kmd.push_back(item);
+        hush.push_back(item);
     }
-    out.push_back(make_pair("KMD", kmd));
-    out.push_back(make_pair("LABS", labs));
+    out.push_back(make_pair("HUSH", hush));
     return out;
 }
 

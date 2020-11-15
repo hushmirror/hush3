@@ -180,7 +180,6 @@ BITCOIN_CORE_H = \
   mruset.h \
   net.h \
   netbase.h \
-  notaries_staked.h \
   noui.h \
   policy/fees.h \
   pow.h \
@@ -302,7 +301,6 @@ libbitcoin_server_a_SOURCES = \
   metrics.h \
   miner.cpp \
   net.cpp \
-  notaries_staked.cpp \
   noui.cpp \
   notarisationdb.cpp \
   policy/fees.cpp \

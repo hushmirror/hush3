@@ -55,8 +55,6 @@
 
 #include "sodium.h"
 
-#include "notaries_staked.h"
-
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #ifdef ENABLE_MINING
@@ -628,7 +626,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
         else txNew.nLockTime = std::max((int64_t)(pindexPrev->nTime+1), GetTime());
 
 
-        if ( ASSETCHAINS_SYMBOL[0] == 0 && IS_KOMODO_NOTARY != 0 && My_notaryid >= 0 )
+        if ( ASSETCHAINS_SYMBOL[0] == 0 && IS_HUSH_NOTARY != 0 && My_notaryid >= 0 )
             txNew.vout[0].nValue += 5000;
         pblock->vtx[0] = txNew;
 
@@ -731,7 +729,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
         }
         pblock->nSolution.clear();
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
-        if ( ASSETCHAINS_SYMBOL[0] == 0 && IS_KOMODO_NOTARY != 0 && My_notaryid >= 0 )
+        if ( ASSETCHAINS_SYMBOL[0] == 0 && IS_HUSH_NOTARY != 0 && My_notaryid >= 0 )
         {
             uint32_t r; CScript opret; void **ptr=0;
 
@@ -770,7 +768,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                 return(0);
             }
         }
-        else if ( ASSETCHAINS_CC == 0 && pindexPrev != 0 && ASSETCHAINS_STAKED == 0 && (ASSETCHAINS_SYMBOL[0] != 0 || IS_KOMODO_NOTARY == 0 || My_notaryid < 0) )
+        else if ( ASSETCHAINS_CC == 0 && pindexPrev != 0 && ASSETCHAINS_STAKED == 0 && (ASSETCHAINS_SYMBOL[0] != 0 || IS_HUSH_NOTARY == 0 || My_notaryid < 0) )
         {
             CValidationState state;
             //fprintf(stderr,"check validity\n");
@@ -988,7 +986,7 @@ static bool ProcessBlockFound(CBlock* pblock)
 
 #ifdef ENABLE_WALLET
     // Remove key from key pool
-    if ( IS_KOMODO_NOTARY == 0 )
+    if ( IS_HUSH_NOTARY == 0 )
     {
         if (GetArg("-mineraddress", "").empty()) {
             // Remove key from key pool
@@ -1112,7 +1110,7 @@ void static BitcoinMiner()
     unsigned int n = chainparams.EquihashN();
     unsigned int k = chainparams.EquihashK();
     uint8_t *script; uint64_t total; int32_t i,j,gpucount=KOMODO_MAXGPUCOUNT,notaryid = -1;
-    while ( (ASSETCHAIN_INIT == 0 || KOMODO_INITDONE == 0) )
+    while ( (ASSETCHAIN_INIT == 0 || HUSH_INITDONE == 0) )
     {
         sleep(1);
         if ( komodo_baseid(ASSETCHAINS_SYMBOL) < 0 )
@@ -1260,7 +1258,7 @@ void static BitcoinMiner()
                         if ( i == 33 )
                             externalflag = 1;
                         else externalflag = 0;
-                        if ( IS_KOMODO_NOTARY != 0 )
+                        if ( IS_HUSH_NOTARY != 0 )
                         {
                             for (i=1; i<66; i++)
                                 if ( memcmp(pubkeys[i],pubkeys[0],33) == 0 )
@@ -1368,7 +1366,7 @@ void static BitcoinMiner()
                           //  MilliSleep(30);
                         return false;
                     }
-                    if ( IS_KOMODO_NOTARY != 0 && B.nTime > GetTime() )
+                    if ( IS_HUSH_NOTARY != 0 && B.nTime > GetTime() )
                     {
                         //fprintf(stderr,"need to wait %d seconds to submit block\n",(int32_t)(B.nTime - GetTime()));
                         while ( GetTime() < B.nTime-2 )
@@ -1383,7 +1381,7 @@ void static BitcoinMiner()
                     }
                     if ( ASSETCHAINS_STAKED == 0 )
                     {
-                        if ( IS_KOMODO_NOTARY != 0 )
+                        if ( IS_HUSH_NOTARY != 0 )
                         {
                             int32_t r;
                             if ( (r= ((Mining_height + NOTARY_PUBKEY33[16]) % 64) / 8) > 0 )

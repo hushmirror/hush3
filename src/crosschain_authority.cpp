@@ -1,18 +1,13 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include "cc/eval.h"
 #include "crosschain.h"
 #include "notarisationdb.h"
 
-
 int GetSymbolAuthority(const char* symbol)
 {
-    if (strncmp(symbol, "TXSCL", 5) == 0)
-        return CROSSCHAIN_TXSCL;
-    if (is_STAKED(symbol) != 0) {
-        //printf("RETURNED CROSSCHAIN STAKED AS TRUE\n");
-        return CROSSCHAIN_STAKED;
-    }
-    //printf("RETURNED CROSSCHAIN KOMODO AS TRUE\n");
-    return CROSSCHAIN_KOMODO;
+    return CROSSCHAIN_HUSH;
 }
 
 
@@ -55,16 +50,3 @@ bool CheckTxAuthority(const CTransaction &tx, CrosschainAuthority auth)
 
     return true;
 }
-
-
-/*
-const CrosschainAuthority auth_STAKED = [&](){
-    CrosschainAuthority auth;
-    auth.requiredSigs = (num_notaries_STAKED / 5);
-    auth.size = num_notaries_STAKED;
-    for (int n=0; n<auth.size; n++)
-        for (size_t i=0; i<33; i++)
-            sscanf(notaries_STAKED[n][1]+(i*2), "%2hhx", auth.notaries[n]+i);
-    return auth;
-}();
-*/

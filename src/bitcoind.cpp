@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2013 The Bitcoin Core developers
-// Copyright (c) 2019      The Hush developers
+// Copyright (c) 2019-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -28,11 +28,9 @@
 #include "util.h"
 #include "httpserver.h"
 #include "httprpc.h"
-
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
-
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -72,22 +70,6 @@ void WaitForShutdown(boost::thread_group* threadGroup)
 {
     int32_t i,height; CBlockIndex *pindex; bool fShutdown = ShutdownRequested(); const uint256 zeroid;
     // Tell the main threads to shutdown.
-	/*
-    if (komodo_currentheight()>KOMODO_EARLYTXID_HEIGHT && KOMODO_EARLYTXID!=zeroid && ((height=tx_height(KOMODO_EARLYTXID))==0 || height>KOMODO_EARLYTXID_HEIGHT))
-    {
-        fprintf(stderr,"%s: error: earlytx must be before block height %d or tx does not exist\n",__FUNCTION__, KOMODO_EARLYTXID_HEIGHT);
-	    fprintf(stderr,"%s: earlytxid=%s, tx_height=%d, komodo_currentheight=%d\n", __FUNCTION__, KOMODO_EARLYTXID.GetHex().c_str(), tx_height(KOMODO_EARLYTXID), komodo_currentheight() );
-        StartShutdown();
-    }
-	*/
-    /*if ( ASSETCHAINS_STAKED == 0 && ASSETCHAINS_ADAPTIVEPOW == 0 && (pindex= komodo_chainactive(1)) != 0 )
-    {
-        if ( pindex->nTime > ADAPTIVEPOW_CHANGETO_DEFAULTON )
-        {
-            ASSETCHAINS_ADAPTIVEPOW = 1;
-            fprintf(stderr,"default activate adaptivepow\n");
-        } else fprintf(stderr,"height1 time %u vs %u\n",pindex->nTime,ADAPTIVEPOW_CHANGETO_DEFAULTON);
-    } //else fprintf(stderr,"cant find height 1\n");*/
 
     if ( ASSETCHAINS_CBOPRET != 0 ) {
         komodo_pricesinit();
@@ -135,7 +117,7 @@ void WaitForShutdown(boost::thread_group* threadGroup)
 //
 // Start
 //
-extern int32_t IS_KOMODO_NOTARY,USE_EXTERNAL_PUBKEY;
+extern int32_t IS_HUSH_NOTARY,USE_EXTERNAL_PUBKEY;
 extern uint32_t ASSETCHAIN_INIT;
 extern std::string NOTARY_PUBKEY;
 int32_t komodo_is_issuer();

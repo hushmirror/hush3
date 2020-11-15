@@ -621,7 +621,7 @@ uint32_t komodo_txtime(CScript &opret,uint64_t *valuep,uint256 hash, int32_t n, 
     CTxDestination address; CTransaction tx; uint256 hashBlock; int32_t numvouts;
     *valuep = 0;
     if (!GetTransaction(hash, tx,
-#ifndef KOMODO_ZCASH
+#ifndef HUSH_ZCASH
                         Params().GetConsensus(),
 #endif
                         hashBlock, true))
@@ -652,7 +652,7 @@ uint32_t komodo_txtime2(uint64_t *valuep,uint256 hash,int32_t n,char *destaddr)
     CTxDestination address; CBlockIndex *pindex; CTransaction tx; uint256 hashBlock; uint32_t txtime = 0;
     *valuep = 0;
     if (!GetTransaction(hash, tx,
-#ifndef KOMODO_ZCASH
+#ifndef HUSH_ZCASH
                         Params().GetConsensus(),
 #endif
                         hashBlock, true))

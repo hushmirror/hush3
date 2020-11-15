@@ -1,3 +1,6 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -50,8 +53,6 @@ Details.
 /// so it can lookup directly all transactions to any address. 
 /// This is a key performance boosting thing as if it wasnt there, trying to get all the utxo for an address not in the wallet is quite time consuming.
 ///
-/// More information about Antara framework:
-/// https://developers.komodoplatform.com/basic-docs/start-here/about-komodo-platform/product-introductions.html#smart-chains-antara
 
 #include <cc/eval.h>
 #include <script/cc.h>

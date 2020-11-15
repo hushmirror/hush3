@@ -1,4 +1,6 @@
 // Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -1768,8 +1770,7 @@ void komodo_args(char *argv0)
     std::string name,addn,hexstr,symbol; char *dirname,fname[512],arg0str[64],magicstr[9]; uint8_t magic[4],extrabuf[32756],disablebits[32],*extraptr=0;
     FILE *fp; uint64_t val; uint16_t port; int32_t i,nonz=0,baseid,len,n,extralen = 0; uint64_t ccenables[256], ccEnablesHeight[512] = {0}; CTransaction earlytx; uint256 hashBlock;
 
-    IS_KOMODO_NOTARY = GetBoolArg("-notary", false);
-    IS_STAKED_NOTARY = GetArg("-stakednotary", -1);
+    IS_HUSH_NOTARY = GetBoolArg("-notary", false);
     KOMODO_NSPV = GetArg("-nSPV",0);
     memset(ccenables,0,sizeof(ccenables));
     memset(disablebits,0,sizeof(disablebits));
@@ -1788,7 +1789,7 @@ void komodo_args(char *argv0)
     {
         decode_hex(NOTARY_PUBKEY33,33,(char *)NOTARY_PUBKEY.c_str());
         USE_EXTERNAL_PUBKEY = 1;
-        if ( IS_KOMODO_NOTARY == 0 )
+        if ( IS_HUSH_NOTARY == 0 )
         {
             // We dont have any chain data yet, so use system clock to guess. 
             // I think on season change should reccomend notaries to use -notary to avoid needing this. 
@@ -1797,20 +1798,16 @@ void komodo_args(char *argv0)
             {
                 if ( strcmp(NOTARY_PUBKEY.c_str(),notaries_elected[hush_season-1][i][1]) == 0 )
                 {
-                    IS_KOMODO_NOTARY = 1;
+                    IS_HUSH_NOTARY = 1;
                     KOMODO_MININGTHREADS = 1;
                     mapArgs ["-genproclimit"] = itostr(KOMODO_MININGTHREADS);
-                    IS_STAKED_NOTARY = -1;
                     fprintf(stderr,"running as notary.%d %s\n",i,notaries_elected[hush_season-1][i][0]);
                     break;
                 }
             }
         }
     }
-    if ( IS_STAKED_NOTARY != -1 && IS_KOMODO_NOTARY == true ) {
-        fprintf(stderr, "Cannot be STAKED and KMD notary at the same time!\n");
-        StartShutdown();
-    }
+
 	name = GetArg("-ac_name","");
     if ( argv0 != 0 )
     {
@@ -2352,7 +2349,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
 
             if (ASSETCHAINS_CBMATURITY != 0)
                 COINBASE_MATURITY = ASSETCHAINS_CBMATURITY;
-            else if (ASSETCHAINS_LASTERA == 0 || is_STAKED(ASSETCHAINS_SYMBOL) != 0)
+            else if (ASSETCHAINS_LASTERA == 0)
                 COINBASE_MATURITY = 1;
             if (COINBASE_MATURITY < 1)
             {
@@ -2429,7 +2426,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
                 fclose(fp);
                 //printf("KOMODO.(%s) -> userpass.(%s)\n",fname,KMDUSERPASS);
             } //else printf("couldnt open.(%s)\n",fname);
-            if ( IS_KOMODO_NOTARY == 0 )
+            if ( IS_HUSH_NOTARY == 0 )
                 break;
         }
     }

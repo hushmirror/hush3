@@ -1,3 +1,6 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -15,12 +18,9 @@
 
 #ifndef CROSSCHAIN_H
 #define CROSSCHAIN_H
-
 #include "cc/eval.h"
 
-const int CROSSCHAIN_KOMODO = 1;
-const int CROSSCHAIN_TXSCL = 2;
-const int CROSSCHAIN_STAKED = 3;
+const int CROSSCHAIN_HUSH = 1;
 
 typedef struct CrosschainAuthority {
     uint8_t notaries[64][33];
@@ -34,7 +34,7 @@ bool CheckTxAuthority(const CTransaction &tx, CrosschainAuthority auth);
 /* On assetchain */
 TxProof GetAssetchainProof(uint256 hash,CTransaction burnTx);
 
-/* On KMD */
+/* On HUSH */
 uint256 CalculateProofRoot(const char* symbol, uint32_t targetCCid, int kmdHeight,
         std::vector<uint256> &moms, uint256 &destNotarisationTxid);
 TxProof GetCrossChainProof(const uint256 txid, const char* targetSymbol, uint32_t targetCCid,

@@ -39,34 +39,24 @@
 #include "script/interpreter.h"
 #include "zcash/zip32.h"
 #include "zcash/Note.hpp"
-#include "notaries_staked.h"
-
 #include "utiltime.h"
 #include "asyncrpcoperation.h"
 #include "asyncrpcqueue.h"
 #include "wallet/asyncrpcoperation_mergetoaddress.h"
 #include "wallet/asyncrpcoperation_sendmany.h"
 #include "wallet/asyncrpcoperation_shieldcoinbase.h"
-
 #include "consensus/upgrades.h"
-
 #include "sodium.h"
-
 #include <stdint.h>
-
 #include <boost/assign/list_of.hpp>
 #include <utf8.h>
-
 #include <univalue.h>
-
 #include <numeric>
-
 #include "komodo_defs.h"
 #include <string.h>
 #include "rpchushwallet.h"
 
 using namespace std;
-
 using namespace libzcash;
 
 extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
@@ -88,6 +78,7 @@ extern string newSietchZaddr();
 int64_t nWalletUnlockTime;
 static CCriticalSection cs_nWalletUnlockTime;
 std::string CCerror;
+char *uint256_str(char *dest,uint256 txid);
 
 // Private method:
 UniValue z_getoperationstatus_IMPL(const UniValue&, bool);
@@ -4424,7 +4415,7 @@ UniValue z_viewtransaction(const UniValue& params, bool fHelp, const CPubKey& my
         entry.push_back(Pair("anchor", uint256_str(str,spend.anchor)));
         entry.push_back(Pair("commitment", uint256_str(str,spend.cv)));
         entry.push_back(Pair("rk", uint256_str(str,spend.rk)));
-		//TODO: how to get list of wtinesses and height?
+		//TODO: how to get list of witnesses and height?
         //entry.push_back(Pair("witnessHeight", op.witnessHeight));
         entry.push_back(Pair("spendAuthSig", HexStr(spend.spendAuthSig.begin(), spend.spendAuthSig.end())));
         entry.push_back(Pair("zkproof", HexStr(spend.zkproof.begin(), spend.zkproof.end())));

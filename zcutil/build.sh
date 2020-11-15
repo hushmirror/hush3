@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (c) 2019 The Hush developers
+# Copyright (c) 2019-2020 The Hush developers
 # Released under the GPLv3
 
 set -eu -o pipefail

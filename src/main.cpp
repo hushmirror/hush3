@@ -21,7 +21,6 @@
 
 #include "main.h"
 #include "sodium.h"
-
 #include "addrman.h"
 #include "alert.h"
 #include "arith_uint256.h"
@@ -639,8 +638,8 @@ CBlockTreeDB *pblocktree = NULL;
 
 // Komodo globals
 
-#define KOMODO_ZCASH
-#include "komodo.h"
+#define HUSH_ZCASH
+#include "hush.h"
 
 UniValue komodo_snapshot(int top)
 {
@@ -1384,7 +1383,7 @@ int32_t komodo_isnotaryvout(char *coinaddr,uint32_t tiptime) // from ac_private 
     }
     if ( strcmp(coinaddr,CRYPTO777_KMDADDR) == 0 )
         return(1);
-    for (int32_t i = 0; i < NUM_KMD_NOTARIES; i++) 
+    for (int32_t i = 0; i < NUM_HUSH_NOTARIES; i++) 
     {
         if ( strcmp(coinaddr,NOTARY_ADDRESSES[season-1][i]) == 0 )
         {
@@ -3697,7 +3696,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                              error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
                                    block.vtx[0].GetValueOut(), blockReward),
                              REJECT_INVALID, "bad-cb-amount");
-        } else if ( IS_KOMODO_NOTARY != 0 )
+        } else if ( IS_HUSH_NOTARY != 0 )
             fprintf(stderr,"allow nHeight.%d coinbase %.8f vs %.8f interest %.8f\n",(int32_t)pindex->GetHeight(),dstr(block.vtx[0].GetValueOut()),dstr(blockReward),dstr(sum));
     }
     if (!control.Wait())
@@ -7799,7 +7798,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             }
             pfrom->PushMessage("headers", vHeaders);
         }
-        /*else if ( IS_KOMODO_NOTARY != 0 )
+        /*else if ( IS_HUSH_NOTARY != 0 )
         {
             static uint32_t counter;
             if ( counter++ < 3 )

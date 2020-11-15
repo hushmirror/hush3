@@ -1,3 +1,6 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -535,8 +538,6 @@ bool CheckMigration(Eval *eval, const CTransaction &importTx, const CTransaction
 
     uint256 tokenid = zeroid;
     if (vimportOpret.begin()[0] == EVAL_TOKENS) { // for tokens (new opret with tokens)
-        if ( is_STAKED(ASSETCHAINS_SYMBOL) == 1 )
-            return eval->Invalid("no-tokens-migrate-on-LABS");
         struct CCcontract_info *cpTokens, CCtokens_info;
         std::vector<std::pair<uint8_t, vscript_t>>  oprets;
         uint8_t evalCodeInOpret;

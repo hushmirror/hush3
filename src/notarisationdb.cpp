@@ -1,16 +1,15 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include "dbwrapper.h"
 #include "notarisationdb.h"
 #include "uint256.h"
 #include "cc/eval.h"
 #include "crosschain.h"
 #include "main.h"
-#include "notaries_staked.h"
-
 #include <boost/foreach.hpp>
 
-
 NotarisationDB *pnotarisations;
-
 
 NotarisationDB::NotarisationDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "notarisations", nCacheSize, fMemory, fWipe, false, 64) { }
 
@@ -19,7 +18,6 @@ NotarisationsInBlock ScanBlockNotarisations(const CBlock &block, int nHeight)
 {
     EvalRef eval;
     NotarisationsInBlock vNotarisations;
-    CrosschainAuthority auth_STAKED;
     int timestamp = block.nTime;
 
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
@@ -34,12 +32,10 @@ NotarisationsInBlock ScanBlockNotarisations(const CBlock &block, int nHeight)
         //printf("Checked notarisation data for %s \n",data.symbol);
         int authority = GetSymbolAuthority(data.symbol);
 
-        if (authority == CROSSCHAIN_KOMODO) {
+        if (authority == CROSSCHAIN_HUSH) {
             if (!eval->CheckNotaryInputs(tx, nHeight, block.nTime))
                 continue;
             //printf("Authorised notarisation data for %s \n",data.symbol);
-        } else if (authority == CROSSCHAIN_STAKED) {
-		    continue;
         }
 
         if (parsed) {

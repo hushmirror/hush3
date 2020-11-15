@@ -3633,7 +3633,6 @@ bool CWallet::CreateTransaction(const vector<CRecipient>& vecSend, CWalletTx& wt
     int nextBlockHeight = chainActive.Height() + 1;
     CMutableTransaction txNew = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextBlockHeight);
     
-    //if ((uint32_t)chainActive.LastTip()->nTime < ASSETCHAINS_STAKED_HF_TIMESTAMP)
     if ( !hush_hardfork_active((uint32_t)chainActive.LastTip()->nTime) )
         txNew.nLockTime = (uint32_t)chainActive.LastTip()->nTime + 1; // set to a time close to now
     else

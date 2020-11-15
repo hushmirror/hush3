@@ -104,18 +104,18 @@ int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestam
     {
         if ( didinit[hush_season-1] == 0 )
         {
-            for (i=0; i<NUM_KMD_NOTARIES; i++)
+            for (i=0; i<NUM_HUSH_NOTARIES; i++)
                 decode_hex(kmd_pubkeys[hush_season-1][i],33,(char *)notaries_elected[hush_season-1][i][1]);
             if ( ASSETCHAINS_PRIVATE != 0 )
             {
                 // we need to populate the address array for the notary exemptions.
-                for (i = 0; i<NUM_KMD_NOTARIES; i++)
+                for (i = 0; i<NUM_HUSH_NOTARIES; i++)
                     pubkey2addr((char *)NOTARY_ADDRESSES[hush_season-1][i],(uint8_t *)kmd_pubkeys[hush_season-1][i]);
             }
             didinit[hush_season-1] = 1;
         }
-        memcpy(pubkeys,kmd_pubkeys[hush_season-1],NUM_KMD_NOTARIES * 33);
-        return(NUM_KMD_NOTARIES);
+        memcpy(pubkeys,kmd_pubkeys[hush_season-1],NUM_HUSH_NOTARIES * 33);
+        return(NUM_HUSH_NOTARIES);
     }
 
     //TODO: delete staked chain junk

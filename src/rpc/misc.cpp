@@ -29,7 +29,6 @@
 #include "timedata.h"
 #include "txmempool.h"
 #include "util.h"
-#include "notaries_staked.h"
 #include "cc/eval.h"
 #include "cc/CCinclude.h"
 #ifdef ENABLE_WALLET
@@ -38,11 +37,8 @@
 #endif
 
 #include <stdint.h>
-
 #include <boost/assign/list_of.hpp>
-
 #include <univalue.h>
-
 #include "zcash/Address.hpp"
 
 using namespace std;
@@ -70,15 +66,16 @@ bool komodo_txnotarizedconfirmed(uint256 txid);
 uint32_t komodo_chainactive_timestamp();
 int32_t komodo_whoami(char *pubkeystr,int32_t height,uint32_t timestamp);
 extern uint64_t KOMODO_INTERESTSUM,KOMODO_WALLETBALANCE;
-extern int32_t KOMODO_LASTMINED,JUMBLR_PAUSE,KOMODO_LONGESTCHAIN,IS_STAKED_NOTARY,IS_KOMODO_NOTARY,STAKED_ERA,HUSH_INSYNC;
+extern int32_t KOMODO_LASTMINED,JUMBLR_PAUSE,KOMODO_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
 extern char ASSETCHAINS_SYMBOL[KOMODO_ASSETCHAIN_MAXLEN];
 uint32_t komodo_segid32(char *coinaddr);
 int64_t komodo_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
 int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *kmdnotarized_heightp);
-int8_t StakedNotaryID(std::string &notaryname, char *Raddress);
 uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount);
 int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 
+// This is the last version of KMD upstream that was merged in
+// We only cherry-pick since then
 #define KOMODO_VERSION "0.5.0"
 extern uint16_t ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT;
 extern uint32_t ASSETCHAINS_CC;
@@ -88,13 +85,10 @@ extern int32_t ASSETCHAINS_SAPLING;
 extern uint64_t ASSETCHAINS_ENDSUBSIDY[],ASSETCHAINS_REWARD[],ASSETCHAINS_HALVING[],ASSETCHAINS_DECAY[],ASSETCHAINS_NOTARY_PAY[];
 extern std::string NOTARY_PUBKEY,NOTARY_ADDRESS; extern uint8_t NOTARY_PUBKEY33[];
 
+//TODO: use non-staked eras
+// Currently HUSH only uses block heights to define eras
 int32_t getera(int timestamp)
 {
-    for (int32_t i = 0; i < NUM_STAKED_ERAS; i++) {
-        if ( timestamp <= STAKED_NOTARIES_TIMESTAMP[i] ) {
-            return(i);
-        }
-    }
     return(0);
 }
 
@@ -113,23 +107,21 @@ UniValue getdragonjson(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     // loop over seeds array and push back to json array for seeds
     for (int8_t i = 0; i < 8; i++) {
-        seeds.push_back(dragonSeeds[i][0]);
+        //seeds.push_back(dragonSeeds[i][0]);
     }
 
-    // loop over era's notaries and push back each pair to the notary array
-    for (int8_t i = 0; i < num_notaries_STAKED[era]; i++) {
+    // get all current notaries
+    for (int8_t i = 0; i < NUM_HUSH_NOTARIES; i++) {
         UniValue notary(UniValue::VOBJ);
-        notary.push_back(Pair(notaries_STAKED[era][i][0],notaries_STAKED[era][i][1]));
+        notary.push_back(notaries_elected[era][i][0]);
         notaries.push_back(notary);
     }
 
-    // get the min sigs .. this always rounds UP so min sigs in dragon is +1 min sigs in komodod, due to some rounding error.
-    int minsigs;
-    if ( num_notaries_STAKED[era]/5 > overrideMinSigs )
-        minsigs = (num_notaries_STAKED[era] / 5) + 1;
-    else
-        minsigs = overrideMinSigs;
+    // TODO: should be a config param
+    int minsigs = 13;
+    int BTCminsigs = 13;
 
+    int dragonPort = 5555;
     json.push_back(Pair("port",dragonPort));
     json.push_back(Pair("BTCminsigs",BTCminsigs));
     json.push_back(Pair("minsigs",minsigs));
@@ -153,13 +145,14 @@ UniValue getnotarysendmany(const UniValue& params, bool fHelp, const CPubKey& my
         amount = params[0].get_int();
     }
 
+    //TODO: this is broke
     int era = getera(time(NULL));
 
     UniValue ret(UniValue::VOBJ);
-    for (int i = 0; i<num_notaries_STAKED[era]; i++)
+    for (int i = 0; i<NUM_HUSH_NOTARIES; i++)
     {
         char Raddress[18]; uint8_t pubkey33[33];
-        decode_hex(pubkey33,33,(char *)notaries_STAKED[era][i][1]);
+        decode_hex(pubkey33,33,(char *)notaries_elected[era][i][1]);
         pubkey2addr((char *)Raddress,(uint8_t *)pubkey33);
         ret.push_back(Pair(Raddress,amount));
     }
@@ -237,7 +230,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("version", CLIENT_VERSION));
     obj.push_back(Pair("protocolversion", PROTOCOL_VERSION));
-    // this KMD version represents the last time we did a full merge, we only cherry-pick or take nothing
+    // this KMD version represents the last time we did a full merge, we no longer merge
     // in the post-KYC "era" of KMD
     obj.push_back(Pair("KMDversion", KOMODO_VERSION)); // never change this again, it's set in stone. -- Duke
     obj.push_back(Pair("synced", HUSH_INSYNC!=0));
@@ -299,10 +292,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     obj.push_back(Pair("errors",        GetWarnings("statusbar")));
      if ( NOTARY_PUBKEY33[0] != 0 ) {
         char pubkeystr[65]; int32_t notaryid; std::string notaryname;
-        if ( (notaryid= StakedNotaryID(notaryname, (char *)NOTARY_ADDRESS.c_str())) != -1 ) {
-            obj.push_back(Pair("notaryid",        notaryid));
-            obj.push_back(Pair("notaryname",      notaryname));
-        } else if( (notaryid= komodo_whoami(pubkeystr,(int32_t)chainActive.LastTip()->GetHeight(),komodo_chainactive_timestamp())) >= 0 )  {
+        if( (notaryid= komodo_whoami(pubkeystr,(int32_t)chainActive.LastTip()->GetHeight(),komodo_chainactive_timestamp())) >= 0 )  {
             obj.push_back(Pair("notaryid",        notaryid));
             if ( KOMODO_LASTMINED != 0 )
                 obj.push_back(Pair("lastmined", KOMODO_LASTMINED));
@@ -311,7 +301,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     }
     if ( ASSETCHAINS_CC != 0 )
         obj.push_back(Pair("CCid",        (int)ASSETCHAINS_CC));
-    obj.push_back(Pair("name",        ASSETCHAINS_SYMBOL[0] == 0 ? "KMD" : ASSETCHAINS_SYMBOL));
+    obj.push_back(Pair("name",        ASSETCHAINS_SYMBOL[0] == 0 ? "HUSH" : ASSETCHAINS_SYMBOL));
 
     obj.push_back(Pair("p2pport",        ASSETCHAINS_P2PPORT));
     obj.push_back(Pair("rpcport",        ASSETCHAINS_RPCPORT));
@@ -333,14 +323,12 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
                     acDecay = std::to_string(ASSETCHAINS_DECAY[i]);
                     acEndSubsidy = std::to_string(ASSETCHAINS_ENDSUBSIDY[i]);
                     acNotaryPay = std::to_string(ASSETCHAINS_NOTARY_PAY[i]);
-                }
-                else
-                {
-                    acReward += "," + std::to_string(ASSETCHAINS_REWARD[i]);
-                    acHalving += "," + std::to_string(ASSETCHAINS_HALVING[i]);
-                    acDecay += "," + std::to_string(ASSETCHAINS_DECAY[i]);
+                } else {
+                    acReward     += "," + std::to_string(ASSETCHAINS_REWARD[i]);
+                    acHalving    += "," + std::to_string(ASSETCHAINS_HALVING[i]);
+                    acDecay      += "," + std::to_string(ASSETCHAINS_DECAY[i]);
                     acEndSubsidy += "," + std::to_string(ASSETCHAINS_ENDSUBSIDY[i]);
-                    acNotaryPay += "," + std::to_string(ASSETCHAINS_NOTARY_PAY[i]);
+                    acNotaryPay  += "," + std::to_string(ASSETCHAINS_NOTARY_PAY[i]);
                 }
             }
             if (ASSETCHAINS_LASTERA > 0)

@@ -1,3 +1,6 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,7 +20,6 @@
 #define CC_EVAL_H
 
 #include <cryptoconditions.h>
-
 #include "cc/utils.h"
 #include "chain.h"
 #include "streams.h"
@@ -36,7 +38,6 @@
  * there should be a code identifying it. For example,
  * a possible code is EVAL_BITCOIN_SCRIPT, where the entire binary
  * after the code is interpreted as a bitcoin script.
- * Verus EVAL_STAKEGUARD is 0x01
  */
 #define FOREACH_EVAL(EVAL)             \
         EVAL(EVAL_IMPORTPAYOUT, 0xe1)  \

@@ -1,4 +1,6 @@
 // Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -366,7 +368,7 @@ void komodo_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotar
     }
     if ( (sp= komodo_stateptr(symbol,dest)) == 0 )
     {
-        KOMODO_INITDONE = (uint32_t)time(NULL);
+        HUSH_INITDONE = (uint32_t)time(NULL);
         printf("[%s] no komodo_stateptr\n",ASSETCHAINS_SYMBOL);
         return;
     }
@@ -385,7 +387,7 @@ void komodo_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotar
                     ;
             }
         } else fp = fopen(fname,"wb+");
-        KOMODO_INITDONE = (uint32_t)time(NULL);
+        HUSH_INITDONE = (uint32_t)time(NULL);
     }
     if ( height <= 0 )
     {
@@ -544,7 +546,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
         return(-1);
     if ( scriptlen == 35 && scriptbuf[0] == 33 && scriptbuf[34] == 0xac )
     {
-        if ( i == 0 && j == 0 && memcmp(NOTARY_PUBKEY33,scriptbuf+1,33) == 0 && IS_KOMODO_NOTARY != 0 )
+        if ( i == 0 && j == 0 && memcmp(NOTARY_PUBKEY33,scriptbuf+1,33) == 0 && IS_HUSH_NOTARY != 0 )
         {
             printf("%s KOMODO_LASTMINED.%d -> %d\n",ASSETCHAINS_SYMBOL,KOMODO_LASTMINED,height);
             prevKOMODO_LASTMINED = KOMODO_LASTMINED;
@@ -805,10 +807,7 @@ int32_t komodo_notarycmp(uint8_t *scriptPubKey,int32_t scriptlen,uint8_t pubkeys
     return(-1);
 }
 
-// int32_t (!!!)
-/*
-    read blackjok3rtt comments in main.cpp 
-*/
+// Connect a Hush Block
 int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
 {
     static int32_t hwmheight;
@@ -824,7 +823,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
     }
     memset(&zero,0,sizeof(zero));
     komodo_init(pindex->GetHeight());
-    KOMODO_INITDONE = (uint32_t)time(NULL);
+    HUSH_INITDONE = (uint32_t)time(NULL);
     if ( (sp= komodo_stateptr(symbol,dest)) == 0 )
     {
         fprintf(stderr,"unexpected null komodostateptr.[%s]\n",ASSETCHAINS_SYMBOL);
@@ -858,10 +857,6 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
         txn_count = block.vtx.size();
         for (i=0; i<txn_count; i++)
         {
-            if ( (is_STAKED(ASSETCHAINS_SYMBOL) != 0 && staked_era == 0) || (is_STAKED(ASSETCHAINS_SYMBOL) == 255) ) {
-                // in era gap or chain banned, no point checking any invlaid notarisations.
-                break;
-            }
             // Notary pay chains need notarisation in position 1, ignore the rest on validation. Check notarisation is 1 on check.
             if ( !fJustCheck && i > 1 && ASSETCHAINS_NOTARY_PAY[0] != 0 )
                 break;
@@ -922,7 +917,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                 sp->NOTARIZED_HASH     = block.GetHash();
                 sp->NOTARIZED_DESTTXID = txhash;
             }
-            if ( IS_KOMODO_NOTARY != 0 && ASSETCHAINS_SYMBOL[0] == 0 )
+            if ( IS_HUSH_NOTARY != 0 && ASSETCHAINS_SYMBOL[0] == 0 )
                 printf("(tx.%d: ",i);
             for (j=0; j<numvouts; j++)
             {
@@ -940,7 +935,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                         }
                     }
                 }*/
-                if ( IS_KOMODO_NOTARY != 0 && ASSETCHAINS_SYMBOL[0] == 0 )
+                if ( IS_HUSH_NOTARY != 0 && ASSETCHAINS_SYMBOL[0] == 0 )
                     printf("%.8f ",dstr(block.vtx[i].vout[j].nValue));
                 len = block.vtx[i].vout[j].scriptPubKey.size();
                 
@@ -961,7 +956,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                     }
                 }
             }
-            if ( IS_KOMODO_NOTARY != 0 && ASSETCHAINS_SYMBOL[0] == 0 )
+            if ( IS_HUSH_NOTARY != 0 && ASSETCHAINS_SYMBOL[0] == 0 )
                 printf(") ");
             if ( 0 && ASSETCHAINS_SYMBOL[0] == 0 )
                 printf("[%s] ht.%d txi.%d signedmask.%llx numvins.%d numvouts.%d notarized.%d special.%d isratification.%d\n",ASSETCHAINS_SYMBOL,height,i,(long long)signedmask,numvins,numvouts,notarized,specialtx,isratification);
@@ -1003,14 +998,14 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                 }
             }
         }
-        if ( !fJustCheck && IS_KOMODO_NOTARY != 0 && ASSETCHAINS_SYMBOL[0] == 0 )
+        if ( !fJustCheck && IS_HUSH_NOTARY != 0 && ASSETCHAINS_SYMBOL[0] == 0 )
             printf("%s ht.%d\n",ASSETCHAINS_SYMBOL[0] == 0 ? "KMD" : ASSETCHAINS_SYMBOL,height);
         if ( !fJustCheck && pindex->GetHeight() == hwmheight )
             komodo_stateupdate(height,0,0,0,zero,0,0,0,0,height,(uint32_t)pindex->nTime,0,0,0,0,zero,0);
     } 
     else 
         { fprintf(stderr,"hush_connectblock: unexpected null pindex\n"); return(0); }
-    //KOMODO_INITDONE = (uint32_t)time(NULL);
+    //HUSH_INITDONE = (uint32_t)time(NULL);
     //fprintf(stderr,"%s end connect.%d\n",ASSETCHAINS_SYMBOL,pindex->GetHeight());
     if (fJustCheck)
     {

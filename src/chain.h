@@ -29,13 +29,10 @@ class CChainPower;
 #include "pow.h"
 #include "tinyformat.h"
 #include "uint256.h"
-extern int8_t is_STAKED(const char *chain_name);
-extern bool fZindex;
-
 #include <vector>
-
 #include <boost/foreach.hpp>
 
+extern bool fZindex;
 static const int SPROUT_VALUE_VERSION = 1001400;
 static const int SAPLING_VALUE_VERSION = 1010100;
 extern int32_t ASSETCHAINS_LWMAPOS;
