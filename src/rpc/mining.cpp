@@ -665,9 +665,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp, const CPubKey& myp
             TestBlockValidity(state, block, pindexPrev, false, true);
             return BIP22ValidationResult(state);
         }
-    }
-    else
-    {
+    } else {
         strMode = "template";
     }
 
@@ -676,9 +674,13 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp, const CPubKey& myp
         LOCK(cs_vNodes);
         fvNodesEmpty = vNodes.empty();
     }
-    if (Params().MiningRequiresPeers() && (IsNotInSync() || fvNodesEmpty))
-    {
-        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Cannot get a block template while no peers are connected or chain not in sync!");
+
+    if (Params().MiningRequiresPeers() && fvNodesEmpty) {
+        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Hush has no peers yet!");
+    }
+
+    if (IsInitialBlockDownload()) {
+        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Hush is downloading blocks...");
     }
 
     static unsigned int nTransactionsUpdatedLast;
