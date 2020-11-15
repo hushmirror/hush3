@@ -3385,7 +3385,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     {
         // do a full block scan to get notarisation position and to enforce a valid notarization is in position 1.
         // if notarisation in the block, must be position 1 and the coinbase must pay notaries.
-        int32_t notarisationTx = komodo_connectblock(true,pindex,*(CBlock *)&block);  
+        int32_t notarisationTx = hush_connectblock(true,pindex,*(CBlock *)&block);
         // -1 means that the valid notarization isnt in position 1 or there are too many notarizations in this block.
         if ( notarisationTx == -1 )
             return state.DoS(100, error("ConnectBlock(): Notarization is not in TX position 1 or block contains more than 1 notarization! Invalid Block!"),
@@ -3797,7 +3797,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     LogPrint("bench", "    - Callbacks: %.2fms [%.2fs]\n", 0.001 * (nTime4 - nTime3), nTimeCallbacks * 0.000001);
 
     //FlushStateToDisk();
-    komodo_connectblock(false,pindex,*(CBlock *)&block);  // dPoW state update.
+    hush_connectblock(false,pindex,*(CBlock *)&block);  // dPoW state update.
     if ( ASSETCHAINS_NOTARY_PAY[0] != 0 )
     {
       // Update the notary pay with the latest payment.

@@ -40,7 +40,7 @@ uint256 NOTARIZED_HASH,NOTARIZED_DESTTXID;
 
 int32_t gettxout_scriptPubKey(uint8_t *scriptPubkey,int32_t maxsize,uint256 txid,int32_t n);
 void komodo_event_rewind(struct komodo_state *sp,char *symbol,int32_t height);
-int32_t komodo_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block);
+int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block);
 bool check_pprevnotarizedht();
 
 #include "komodo_structs.h"
@@ -812,7 +812,7 @@ int32_t komodo_notarycmp(uint8_t *scriptPubKey,int32_t scriptlen,uint8_t pubkeys
 /*
     read blackjok3rtt comments in main.cpp 
 */
-int32_t komodo_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
+int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
 {
     static int32_t hwmheight;
     int32_t staked_era; static int32_t lastStakedEra;
@@ -822,7 +822,7 @@ int32_t komodo_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
     int32_t i,j,k,numnotaries,notarized,scriptlen,isratification,nid,numvalid,specialtx,notarizedheight,notaryid,len,numvouts,numvins,height,txn_count;
     if ( pindex == 0 )
     {
-        fprintf(stderr,"komodo_connectblock null pindex\n");
+        fprintf(stderr,"hush_connectblock null pindex\n");
         return(0);
     }
     memset(&zero,0,sizeof(zero));
@@ -1012,7 +1012,7 @@ int32_t komodo_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
             komodo_stateupdate(height,0,0,0,zero,0,0,0,0,height,(uint32_t)pindex->nTime,0,0,0,0,zero,0);
     } 
     else 
-        { fprintf(stderr,"komodo_connectblock: unexpected null pindex\n"); return(0); }
+        { fprintf(stderr,"hush_connectblock: unexpected null pindex\n"); return(0); }
     //KOMODO_INITDONE = (uint32_t)time(NULL);
     //fprintf(stderr,"%s end connect.%d\n",ASSETCHAINS_SYMBOL,pindex->GetHeight());
     if (fJustCheck)
@@ -1024,13 +1024,14 @@ int32_t komodo_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
         if ( notarisations.size() > 1 || (notarisations.size() == 1 && notarisations[0] != 1) )
             return(-1);
         
-        fprintf(stderr,"komodo_connectblock: unxexpected behaviour when fJustCheck == true, report blackjok3rtt plz ! \n");
+        fprintf(stderr,"hush_connectblock: unxexpected behaviour when fJustCheck == true, report bug plz ! \n");
         /* this needed by gcc-8, it counts here that control reaches end of non-void function without this.
            by default, we count that if control reached here -> the valid notarization isnt in position 1 or there are too many notarizations in this block.
         */
         return(-1); 
+    } else {
+        return(0);
     }
-    else return(0);
 }
 
 #endif
