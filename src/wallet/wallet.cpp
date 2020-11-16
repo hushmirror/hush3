@@ -21,7 +21,6 @@
 
 #include "wallet/wallet.h"
 #include "asyncrpcqueue.h"
-
 #include "checkpoints.h"
 #include "coincontrol.h"
 #include "consensus/upgrades.h"
@@ -42,9 +41,7 @@
 #include "wallet/asyncrpcoperation_saplingconsolidation.h"
 #include "zcash/zip32.h"
 #include "cc/CCinclude.h"
-
 #include <assert.h>
-
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
@@ -1088,7 +1085,7 @@ void CWallet::BuildWitnessCache(const CBlockIndex* pindex, bool witnessOnly)
   while (pblockindex) {
 
     if (pblockindex->GetHeight() % 100 == 0 && pblockindex->GetHeight() < height - 5) {
-      LogPrintf("Building Witnesses for block %i %.4f complete\n", pblockindex->GetHeight(), pblockindex->GetHeight() / double(height));
+      LogPrintf("Building Witnesses for block %i %.4f complete, %d remaining\n", pblockindex->GetHeight(), pblockindex->GetHeight() / double(height), height - pblockindex->GetHeight() );
     }
 
     SaplingMerkleTree saplingTree;
