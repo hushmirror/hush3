@@ -44,6 +44,7 @@
     // 7113400 = 5x current KMD blockheight. 
 // to add seasons, change NUM_HUSH_SEASONS, and add timestamp and height of activation to these arrays. 
 
+// Always define one more season than is actually needed, which has a block activation in the far future
 #define NUM_HUSH_SEASONS 7
 //TODO: some parts of the codebase assume 64 and do not use this constant
 #define NUM_HUSH_NOTARIES 64
@@ -58,7 +59,7 @@ const uint32_t nHushHardforkHeight  = 166250;
 const uint32_t nHushHardforkHeight2 = 245055;
 
 // This height begins Hush DPoW from Hush notaries
-const uint32_t nHushHardforkHeight3 = 320000;
+const uint32_t nHushHardforkHeight3 = 340420;
 
 // No coins/code are currently using timestamp activated fork
 const uint32_t nHushHardforkTimestamp  = 1580303652; // Jan 29nd 1pm GMT
@@ -71,6 +72,7 @@ static const int32_t  HUSH_SEASON_HEIGHTS[NUM_HUSH_SEASONS]    = {1,2,nHushHardf
 static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
 {
     {
+        // season 1
         { "0_jl777_testA", "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828" },
         { "0_jl777_testB", "02ebfc784a4ba768aad88d44d1045d240d47b26e248cafaf1c5169a42d7a61d344" },
         { "0_kolo_testA", "0287aa4b73988ba26cf6565d815786caf0d2c4af704d7883d163ee89cd9977edec" },
@@ -137,6 +139,7 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
         { "xxspot2_XX", "03d85b221ea72ebcd25373e7961f4983d12add66a92f899deaf07bab1d8b6f5573" }
     },
     {
+        // season 2
         {"0dev1_jl777", "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828" },
         {"0dev2_kolo", "030f34af4b908fb8eb2099accb56b8d157d49f6cfb691baa80fdd34f385efed961" },
         {"0dev3_kolo", "025af9d2b2a05338478159e9ac84543968fd18c45fd9307866b56f33898653b014" },
@@ -204,6 +207,7 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
     },
 
     {
+        // season 3
         {"madmax_NA", "0237e0d3268cebfa235958808db1efc20cc43b31100813b1f3e15cc5aa647ad2c3" }, // 0
         {"alright_AR", "020566fe2fb3874258b2d3cf1809a5d650e0edc7ba746fa5eec72750c5188c9cc9" },
         {"strob_NA", "0206f7a2e972d9dfef1c424c731503a0a27de1ba7a15a91a362dc7ec0d0fb47685" },
@@ -271,7 +275,7 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
     },
 
     {
-        // Season 3.5 third party NN pubkeys from https://github.com/KomodoPlatform/dPoW/blob/master/dragon/3rd_party
+        // Season 4 third party NN pubkeys from https://github.com/KomodoPlatform/dPoW/blob/master/dragon/3rd_party
         {"madmax_NA", "02ef81a360411adf71184ff04d0c5793fc41fd1d7155a28dd909f21f35f4883ac1" },
         {"alright_AR", "036a6bca1c2a8166f79fa8a979662892742346cc972b432f8e61950a358d705517" },
         {"strob_NA", "02049202f3872877e81035549f6f3a0f868d0ad1c9b0e0d2b48b1f30324255d26d" },
@@ -339,7 +343,7 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
     },
 
     {
-        // Season 4 https://github.com/KomodoPlatform/dPoW/blob/s4/dragon/3rd_party
+        // Season 5 (fuck season 3.5) https://github.com/KomodoPlatform/dPoW/blob/s4/dragon/3rd_party
         {"alien_AR", "024f20c096b085308e21893383f44b4faf1cdedea9ad53cc7d7e7fbfa0c30c1e71" },
         {"alien_EU", "022b85908191788f409506ebcf96a892f3274f352864c3ed566c5a16de63953236" },
         {"alien_NA", "022f62b56ddfd07c9860921c701285ac39bb3ac8f6f083d1b59c8f4943be3de162" },
@@ -406,7 +410,7 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
         {"zatjum_SH", "0241c5660ca540780be66603b1791127a1261d56abbcb7562c297eec8e4fc078fb" }
    },
    {
-        // Hush Delayed Proof of Work
+        // Hush Delayed Proof of Work, Season 6 In The Great History Of DPoW
         // NOTE: Hush notaries are anon, where KMD notaries doxx themselves, lulz
         // TODO: Fill in production pubkeys, these are placeholders
         {"notary01", "024f20c096b085308e21893383f4404faf1cdedea9ad53cc7d7e7fbfa0c30c1e70" },
