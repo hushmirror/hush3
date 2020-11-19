@@ -22,7 +22,7 @@ or more once the blockchain has reached a significant size.
 Please feel free to join us on Telegram :
     * Main group: https://hush.is/telegram
     * Support group: https://hush.is/telegram_support
-    * Mining group: https://hush.is/telegram_support
+    * Mining group: https://hush.is/telegram_mining
 
 ## Claiming Funds From Old Hush Wallets
 
@@ -45,7 +45,7 @@ with `t1` and now they begin with `R`.
 To see what an old HUSH v2 address looks like on the new chain, this online tool
 can be used: https://dexstats.info/addressconverter.php
 
-or this command line tool: https://github.com/MyHush/hush3/blob/duke/contrib/convert_address.py
+or this command line tool: https://git.hush.is/hush/hush3/src/duke/contrib/convert_address.py
 
 
 ### Using an old wallet.dat
@@ -120,7 +120,7 @@ The source code for the Hush web wallet is here: https://github.com/MyHush/myhus
 Installing
 ----------
 
-See [INSTALL.md](https://github.com/MyHush/hush3/blob/master/INSTALL.md).
+See [INSTALL.md](https://git.hush.is/hush/hush3/src/master/INSTALL.md).
 
 
 License
