@@ -60,7 +60,7 @@ static bool fDaemon;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 extern int32_t ASSETCHAINS_BLOCKTIME;
 extern uint64_t ASSETCHAINS_CBOPRET;
-void komodo_passport_iteration();
+void hush_passport_iteration();
 uint64_t komodo_interestsum();
 int32_t komodo_longestchain();
 void komodo_cbopretupdate(int32_t forceflag);
@@ -81,7 +81,7 @@ void WaitForShutdown(boost::thread_group* threadGroup)
         if ( SMART_CHAIN_SYMBOL[0] == 0 )
         {
             if ( KOMODO_NSPV_FULLNODE )
-                komodo_passport_iteration();
+                hush_passport_iteration();
             for (i=0; i<10; i++)
             {
                 fShutdown = ShutdownRequested();
@@ -121,7 +121,7 @@ extern int32_t IS_HUSH_NOTARY,USE_EXTERNAL_PUBKEY;
 extern uint32_t ASSETCHAIN_INIT;
 extern std::string NOTARY_PUBKEY;
 int32_t komodo_is_issuer();
-void komodo_passport_iteration();
+void hush_passport_iteration();
 
 bool AppInit(int argc, char* argv[])
 {
