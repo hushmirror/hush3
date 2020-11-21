@@ -17,7 +17,7 @@
 // build hushdex and put in path: git pull; gcc cc/dapps/hushdex.c -lm -o hushdex; cp hushdex /usr/bin
 // alice sends relcoin and gets basecoin
 
-#define DEXP2P_CHAIN ((char *)"ZEX")
+#define DEXP2P_CHAIN ((char *)"TODO")
 #define DEXP2P_PUBKEYS ((char *)"hushdex")
 #include "dappinc.h"
 
