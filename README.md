@@ -22,7 +22,7 @@ or more once the blockchain has reached a significant size.
 Please feel free to join us on Telegram :
     * Main group: https://hush.is/telegram
     * Support group: https://hush.is/telegram_support
-    * Mining group: https://hush.is/telegram_support
+    * Mining group: https://hush.is/telegram_mining
 
 ## Claiming Funds From Old Hush Wallets
 
@@ -96,13 +96,10 @@ You can also transport funds one address at a time via private keys.
 Agama Desktop Wallet WIF-to-WIF Tool can convert between old HUSH and new HUSH3
 private keys.
 
-Installing
-----------
+# Installing
 
 See [INSTALL.md](https://git.hush.is/hush/hush3/src/branch/master/INSTALL.md)
 
-
-License
--------
+# License
 
 For license information see the file [COPYING](COPYING).
