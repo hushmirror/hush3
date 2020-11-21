@@ -36,7 +36,7 @@ sudo apt-get install build-essential pkg-config libc6-dev m4 g++-multilib \
       autoconf libtool ncurses-dev unzip git python zlib1g-dev wget \
       bsdmainutils automake curl unzip nano libsodium-dev
 # pull
-git clone https://github.com/MyHush/hush3.git
+git clone https://git.hush.is/hush/hush3
 cd hush3
 # Build
 ./build.sh -j$(nproc)
@@ -61,7 +61,7 @@ Downloading Git source repo, building and running Hush:
 
 ```sh
 # pull
-git clone https://github.com/MyHush/hush3.git
+git clone https://git.hush.is/hush/hush3
 cd hush
 # Build
 ./build-win.sh -j$(nproc)
