@@ -163,3 +163,7 @@ cryptoconditions signTreeSecp256k1 '{
     }
 }
 ```
+
+# License
+
+GPLv3
