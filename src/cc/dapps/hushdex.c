@@ -152,9 +152,10 @@ char *hushdex_checkname(char *tmpstr,struct msginfo *mp,int32_t baserel,char *co
 
 int32_t hushdex_zonly(struct coininfo *coin)
 {
-    if ( strcmp(coin->coin,"PIRATE") == 0 )
+    if ( strcmp(coin->coin,"HUSH3") == 0 )
         return(1);
-    else return(coin->iszaddr);
+
+    return 0;
 }
 
 // //////////////////////////////// the four key functions needed to support a new item for hushdexs
@@ -229,24 +230,8 @@ int64_t hushdex_getbalance(struct coininfo *coin)
             retval = SATOSHIDEN;
         }
         return(retval);
-    }
-    else if ( hushdex_zonly(coin) != 0 )
+    } else if ( hushdex_zonly(coin) != 0 ) {
         return(z_getbalance(coinstr,acname,DPOW_recvZaddr));
-    else
-    {
-        if ( coin->istoken != 0 )
-        {
-            if ( get_getbalance(coinstr,acname) < SUBATOMIC_TXFEE )
-            {
-                fprintf(stderr,"not enough balance to send token\n");
-                return(0);
-            }
-            //fprintf(stderr,"token balance %s\n",coin->tokenid);
-            return(get_tokenbalance(coinstr,acname,coin->tokenid) * SATOSHIDEN);
-        }
-        else if ( coin->isexternal == 0 )
-            return(get_getbalance(coinstr,acname));
-        else return(_hushdex_getbalance(coin));
     }
 }
 
