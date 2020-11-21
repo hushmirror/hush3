@@ -199,7 +199,7 @@ bool AppInit(int argc, char* argv[])
                 GetConfigFile().string().c_str(),
                 "contrib/debian/examples/HUSH3.conf",
                 "/usr/share/doc/hush/examples/HUSH3.conf",
-                "https://github.com/MyHush/hush3/blob/master/contrib/debian/examples/HUSH3.conf");
+                "https://git.hush.is/hush/hush3/src/branch/master/contrib/debian/examples/HUSH3.conf");
             return false;
         } catch (const std::exception& e) {
             fprintf(stderr,"Error reading configuration file: %s\n", e.what());
