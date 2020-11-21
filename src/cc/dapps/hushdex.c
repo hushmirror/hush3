@@ -17,7 +17,7 @@
 // build hushdex and put in path: git pull; gcc cc/dapps/hushdex.c -lm -o hushdex; cp hushdex /usr/bin
 // alice sends relcoin and gets basecoin
 
-#define DEXP2P_CHAIN ((char *)"TODO")
+#define DEXP2P_CHAIN ((char *)"HUSHDEX")
 #define DEXP2P_PUBKEYS ((char *)"hushdex")
 #include "dappinc.h"
 
@@ -153,6 +153,9 @@ char *hushdex_checkname(char *tmpstr,struct msginfo *mp,int32_t baserel,char *co
 int32_t hushdex_zonly(struct coininfo *coin)
 {
     if ( strcmp(coin->coin,"HUSH3") == 0 )
+        return(1);
+
+    if ( strcmp(coin->coin,"HUSHFILE") == 0 )
         return(1);
 
     return 0;
