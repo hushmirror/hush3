@@ -27,7 +27,7 @@
 #include "consensus/validation.h"
 #include "primitives/transaction.h"
 
-#define KOMODO_FIRSTFUNGIBLEID 100
+#define HUSH_FIRSTFUNGIBLEID 100
 
 /*
  * Eval codes

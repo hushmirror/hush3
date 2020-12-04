@@ -2311,7 +2311,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
             printf("baseid.%d MAX_MONEY.%s %.8f\n",baseid,SMART_CHAIN_SYMBOL,(double)MAX_MONEY/SATOSHIDEN);
         }
 
-        if ( ASSETCHAINS_CC >= KOMODO_FIRSTFUNGIBLEID && MAX_MONEY < 1000000LL*SATOSHIDEN )
+        if ( ASSETCHAINS_CC >= HUSH_FIRSTFUNGIBLEID && MAX_MONEY < 1000000LL*SATOSHIDEN )
             MAX_MONEY = 1000000LL*SATOSHIDEN;
         if ( KOMODO_BIT63SET(MAX_MONEY) != 0 )
             MAX_MONEY = KOMODO_MAXNVALUE;

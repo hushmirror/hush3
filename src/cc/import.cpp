@@ -705,7 +705,7 @@ bool Eval::ImportCoin(const std::vector<uint8_t> params, const CTransaction &imp
     // Check burntx shows correct outputs hash
     if (payoutsHash != SerializeHash(payouts))
         return Invalid("wrong-payouts");
-    if (targetCcid < KOMODO_FIRSTFUNGIBLEID)
+    if (targetCcid < HUSH_FIRSTFUNGIBLEID)
         return Invalid("chain-not-fungible");
 
     if ( targetCcid != 0xffffffff )
