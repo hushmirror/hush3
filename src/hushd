@@ -32,10 +32,14 @@ END=128,340000,5422111
 SUPPLY=6178674
 FOUNDERS=1
 CLIENTNAME=GoldenSandtrout
-NODE1=188.165.212.101 # EU
-NODE2=64.120.113.130  # AR
-NODE3=209.58.144.205  # NA
-NODE4=94.130.35.94    # EU
+NODE1=node1.hush.is
+NODE2=node2.hush.is
+NODE3=node3.hush.is
+NODE4=node4.hush.is
+NODE5=node5.hush.is
+NODE6=node6.hush.is
+NODE7=node7.hush.is
+NODE8=node8.hush.is
 CCLIB=hush3
 
 # CryptoConditions/Custom Consensus params
@@ -63,6 +67,8 @@ else
     fi
 fi
 
+# jl777 disgraced his village and so Duke The Elder journeys on
+# with the True Cypherpunks
 $KMD -ac_name=$NAME           \
      -ac_sapling=$SAPLING     \
      -ac_reward=$REWARD       \
