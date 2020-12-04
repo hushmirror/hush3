@@ -13,10 +13,11 @@ NAME=HUSH3
 
 CLI=${KOMODOCLI:-./komodo-cli}
 if [ -f $CLI ]; then
-   $CLI -ac_name=$NAME "$@"
+    $CLI -ac_name=$NAME "$@"
 else
-	# We prefix our binary when installed
-	# system wide on Debain system, to prevent clashes
-	CLI=hush-komodo-cli
+    # We prefix our binary when installed
+    # system wide on Debain systems, to prevent clashes,
+    # because we are classy like that. Fuck jl777, The KYC Traitor.
+    CLI=hush-komodo-cli
     $CLI -ac_name=$NAME "$@"
 fi
