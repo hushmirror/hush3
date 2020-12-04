@@ -36,8 +36,8 @@
  *
  * If at some point a new interpretation model is introduced,
  * there should be a code identifying it. For example,
- * a possible code is EVAL_BITCOIN_SCRIPT, where the entire binary
- * after the code is interpreted as a bitcoin script.
+ * a possible code is EVAL_HUSH_SCRIPT, where the entire binary
+ * after the code is interpreted as a Hush (Bitcoin) Protocol Script.
  */
 #define FOREACH_EVAL(EVAL)             \
         EVAL(EVAL_IMPORTPAYOUT, 0xe1)  \
