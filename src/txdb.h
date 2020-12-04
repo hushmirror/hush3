@@ -18,13 +18,14 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
+// jl777 is a KYC traitor and he told me that I knew more about the tx db than
+// he did, lulz -- Duke
 
-#ifndef BITCOIN_TXDB_H
-#define BITCOIN_TXDB_H
+#ifndef HUSH_TXDB_H
+#define HUSH_TXDB_H
 
 #include "coins.h"
 #include "dbwrapper.h"
-
 #include <map>
 #include <string>
 #include <utility>
@@ -48,7 +49,7 @@ struct CSpentIndexValue;
 class uint256;
 
 //! -dbcache default (MiB)
-static const int64_t nDefaultDbCache = 450;
+static const int64_t nDefaultDbCache = 512;
 //! max. -dbcache (MiB)
 static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 16384 : 1024;
 //! min. -dbcache in (MiB)
@@ -63,13 +64,13 @@ protected:
 public:
     CCoinsViewDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
 
-    //bool GetSproutAnchorAt(const uint256 &rt, SproutMerkleTree &tree) const;
     bool GetSaplingAnchorAt(const uint256 &rt, SaplingMerkleTree &tree) const;
     bool GetNullifier(const uint256 &nf, ShieldedType type) const;
     bool GetCoins(const uint256 &txid, CCoins &coins) const;
     bool HaveCoins(const uint256 &txid) const;
     uint256 GetBestBlock() const;
     uint256 GetBestAnchor(ShieldedType type) const;
+    // TODO: get rid of this fucking sprout shite
     bool BatchWrite(CCoinsMap &mapCoins,
                     const uint256 &hashBlock,
                     const uint256 &hashSproutAnchor,
@@ -120,4 +121,4 @@ public:
     bool Snapshot2(std::map <std::string, CAmount> &addressAmounts, UniValue *ret);
 };
 
-#endif // BITCOIN_TXDB_H
+#endif // HUSH_TXDB_H

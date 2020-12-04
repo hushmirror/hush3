@@ -19,14 +19,12 @@
  ******************************************************************************/
 
 #include "coins.h"
-
 #include "memusage.h"
 #include "random.h"
 #include "version.h"
 #include "policy/fees.h"
 #include "hush_defs.h"
 #include "importcoin.h"
-
 #include <assert.h>
 
 /**
@@ -112,9 +110,7 @@ CCoinsViewCache::~CCoinsViewCache()
 
 size_t CCoinsViewCache::DynamicMemoryUsage() const {
     return memusage::DynamicUsage(cacheCoins) +
-           memusage::DynamicUsage(cacheSproutAnchors) +
            memusage::DynamicUsage(cacheSaplingAnchors) +
-           memusage::DynamicUsage(cacheSproutNullifiers) +
            memusage::DynamicUsage(cacheSaplingNullifiers) +
            cachedCoinsUsage;
 }
@@ -162,10 +158,9 @@ bool CCoinsViewCache::GetSaplingAnchorAt(const uint256 &rt, SaplingMerkleTree &t
 
 bool CCoinsViewCache::GetNullifier(const uint256 &nullifier, ShieldedType type) const {
     CNullifiersMap* cacheToUse;
+    // SAPLING is the only current supported type but we may
+    // have more in The Future
     switch (type) {
-        case SPROUT:
-            cacheToUse = &cacheSproutNullifiers;
-            break;
         case SAPLING:
             cacheToUse = &cacheSaplingNullifiers;
             break;
@@ -219,6 +214,7 @@ void CCoinsViewCache::AbstractPushAnchor(
     }
 }
 
+//TODO: delete
 template<> void CCoinsViewCache::PushAnchor(const SproutMerkleTree &tree)
 {
     AbstractPushAnchor<SproutMerkleTree, CAnchorsSproutMap, CAnchorsSproutMap::iterator, CAnchorsSproutCacheEntry>(
@@ -290,14 +286,6 @@ void CCoinsViewCache::AbstractPopAnchor(
 
 void CCoinsViewCache::PopAnchor(const uint256 &newrt, ShieldedType type) {
     switch (type) {
-        case SPROUT:
-            AbstractPopAnchor<SproutMerkleTree, CAnchorsSproutMap, CAnchorsSproutCacheEntry>(
-                newrt,
-                SPROUT,
-                cacheSproutAnchors,
-                hashSproutAnchor
-            );
-            break;
         case SAPLING:
             AbstractPopAnchor<SaplingMerkleTree, CAnchorsSaplingMap, CAnchorsSaplingCacheEntry>(
                 newrt,
@@ -388,11 +376,6 @@ uint256 CCoinsViewCache::GetBestBlock() const {
 
 uint256 CCoinsViewCache::GetBestAnchor(ShieldedType type) const {
     switch (type) {
-        case SPROUT:
-            if (hashSproutAnchor.IsNull())
-                hashSproutAnchor = base->GetBestAnchor(type);
-            return hashSproutAnchor;
-            break;
         case SAPLING:
             if (hashSaplingAnchor.IsNull())
                 hashSaplingAnchor = base->GetBestAnchor(type);
@@ -508,24 +491,20 @@ bool CCoinsViewCache::BatchWrite(CCoinsMap &mapCoins,
         mapCoins.erase(itOld);
     }
 
-    //::BatchWriteAnchors<CAnchorsSproutMap, CAnchorsSproutMap::iterator, CAnchorsSproutCacheEntry>(mapSproutAnchors, cacheSproutAnchors, cachedCoinsUsage);
     ::BatchWriteAnchors<CAnchorsSaplingMap, CAnchorsSaplingMap::iterator, CAnchorsSaplingCacheEntry>(mapSaplingAnchors, cacheSaplingAnchors, cachedCoinsUsage);
 
-    //::BatchWriteNullifiers(mapSproutNullifiers, cacheSproutNullifiers);
     ::BatchWriteNullifiers(mapSaplingNullifiers, cacheSaplingNullifiers);
 
-    hashSproutAnchor = hashSproutAnchorIn;
+    hashSproutAnchor  = hashSproutAnchorIn;
     hashSaplingAnchor = hashSaplingAnchorIn;
-    hashBlock = hashBlockIn;
+    hashBlock         = hashBlockIn;
     return true;
 }
 
 bool CCoinsViewCache::Flush() {
     bool fOk = base->BatchWrite(cacheCoins, hashBlock, hashSproutAnchor, hashSaplingAnchor, cacheSproutAnchors, cacheSaplingAnchors, cacheSproutNullifiers, cacheSaplingNullifiers);
     cacheCoins.clear();
-    //cacheSproutAnchors.clear();
     cacheSaplingAnchors.clear();
-    //cacheSproutNullifiers.clear();
     cacheSaplingNullifiers.clear();
     cachedCoinsUsage = 0;
     return fOk;

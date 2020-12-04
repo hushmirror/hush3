@@ -19,11 +19,10 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_TXMEMPOOL_H
-#define BITCOIN_TXMEMPOOL_H
+#ifndef HUSH_TXMEMPOOL_H
+#define HUSH_TXMEMPOOL_H
 
 #include <list>
-
 #include "addressindex.h"
 #include "spentindex.h"
 #include "amount.h"
@@ -153,6 +152,7 @@ private:
     uint64_t nRecentlyAddedSequence = 0;
     uint64_t nNotifiedSequence = 0;
 
+    //TODO: remove, requires refactoring
     std::map<uint256, const CTransaction*> mapSproutNullifiers;
     std::map<uint256, const CTransaction*> mapSaplingNullifiers;
 
@@ -298,4 +298,4 @@ public:
     bool HaveCoins(const uint256 &txid) const;
 };
 
-#endif // BITCOIN_TXMEMPOOL_H
+#endif // HUSH_TXMEMPOOL_H
