@@ -303,7 +303,7 @@ int32_t komodo_paxcmp(char *symbol,int32_t kmdheight,uint64_t value,uint64_t che
 uint64_t komodo_paxtotal()
 {
     struct pax_transaction *pax,*pax2,*tmp,*tmp2; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN],*str; int32_t i,ht; int64_t checktoshis; uint64_t seed,total = 0; struct komodo_state *basesp;
-    if ( KOMODO_PASSPORT_INITDONE == 0 ) //KOMODO_PAX == 0 ||
+    if ( HUSH_PASSPORT_INITDONE == 0 ) //KOMODO_PAX == 0 ||
         return(0);
     if ( komodo_isrealtime(&ht) == 0 )
         return(0);
@@ -428,7 +428,7 @@ static int _paxorder(const void *a,const void *b)
 int32_t komodo_pending_withdraws(char *opretstr) // todo: enforce deterministic order
 {
     struct pax_transaction *pax,*pax2,*tmp,*paxes[64]; uint8_t opretbuf[16384*4]; int32_t i,n,ht,len=0; uint64_t total = 0;
-    if ( KOMODO_PAX == 0 || KOMODO_PASSPORT_INITDONE == 0 )
+    if ( KOMODO_PAX == 0 || HUSH_PASSPORT_INITDONE == 0 )
         return(0);
     if ( komodo_isrealtime(&ht) == 0 || SMART_CHAIN_SYMBOL[0] != 0 )
         return(0);
@@ -477,7 +477,7 @@ int32_t komodo_pending_withdraws(char *opretstr) // todo: enforce deterministic 
 int32_t komodo_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t tokomodo)
 {
     struct pax_transaction *pax,*tmp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; uint8_t *script,opcode,opret[16384*4],data[16384*4]; int32_t i,baseid,ht,len=0,opretlen=0,numvouts=1; struct komodo_state *sp; uint64_t available,deposited,issued,withdrawn,approved,redeemed,mask,sum = 0;
-    if ( KOMODO_PASSPORT_INITDONE == 0 )//KOMODO_PAX == 0 ||
+    if ( HUSH_PASSPORT_INITDONE == 0 )//KOMODO_PAX == 0 ||
         return(0);
     struct komodo_state *kmdsp = komodo_stateptrget((char *)"KMD");
     sp = komodo_stateptr(symbol,dest);
@@ -1451,7 +1451,7 @@ void hush_passport_iteration()
         refid = komodo_baseid(SMART_CHAIN_SYMBOL)+1; // illegal base -> baseid.-1 -> 0
         if ( refid == 0 )
         {
-            KOMODO_PASSPORT_INITDONE = 1;
+            HUSH_PASSPORT_INITDONE = 1;
             return;
         }
     }
@@ -1561,9 +1561,9 @@ void hush_passport_iteration()
     }
     //komodo_paxtotal(); // calls komodo_isrealtime(), which calls komodo_longestchain()
     refsp->RTmask |= RTmask;
-    if ( expired == 0 && KOMODO_PASSPORT_INITDONE == 0 )
+    if ( expired == 0 && HUSH_PASSPORT_INITDONE == 0 )
     {
-        KOMODO_PASSPORT_INITDONE = 1;
+        HUSH_PASSPORT_INITDONE = 1;
         printf("READY for %s RPC calls at %u! done PASSPORT %s refid.%d\n",SMART_CHAIN_SYMBOL,(uint32_t)time(NULL),SMART_CHAIN_SYMBOL,refid);
     }
 }
