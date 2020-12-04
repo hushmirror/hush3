@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_WALLET_WALLET_H
-#define BITCOIN_WALLET_WALLET_H
+#ifndef HUSH_WALLET_WALLET_H
+#define HUSH_WALLET_WALLET_H
 
 #include "amount.h"
 #include "asyncrpcoperation.h"
@@ -1499,4 +1499,4 @@ public:
 
 #define RETURN_IF_ERROR(CCerror) if ( CCerror != "" ) { ERR_RESULT(CCerror); return(result); }
 
-#endif // BITCOIN_WALLET_WALLET_H
+#endif // HUSH_WALLET_WALLET_H

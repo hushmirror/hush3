@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_WALLET_RPCHUSHWALLET_H
-#define BITCOIN_WALLET_RPCHUSHWALLET_H
+#ifndef HUSH_WALLET_RPCHUSHWALLET_H
+#define HUSH_WALLET_RPCHUSHWALLET_H
 
 struct balancestruct {
   CAmount confirmed;
@@ -19,4 +19,4 @@ void zsTxSendsToJSON(const CWalletTx& wtx, UniValue& sends, CAmount& totalSends,
 void zsWalletTxJSON(const CWalletTx& wtx, UniValue& ret, const std::string strAddress, bool fBool, const int returnType);
 
 
-#endif //BITCOIN_WALLET_RPCWALLET_H
+#endif //HUSH_WALLET_RPCWALLET_H

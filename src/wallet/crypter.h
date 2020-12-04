@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_WALLET_CRYPTER_H
-#define BITCOIN_WALLET_CRYPTER_H
+#ifndef HUSH_WALLET_CRYPTER_H
+#define HUSH_WALLET_CRYPTER_H
 
 #include "keystore.h"
 #include "serialize.h"
@@ -256,4 +256,4 @@ public:
     boost::signals2::signal<void (CCryptoKeyStore* wallet)> NotifyStatusChanged;
 };
 
-#endif // BITCOIN_WALLET_CRYPTER_H
+#endif // HUSH_WALLET_CRYPTER_H
