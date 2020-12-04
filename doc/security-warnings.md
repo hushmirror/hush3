@@ -3,27 +3,25 @@
 ## Security Audits
 
 Hush has not been subjected to a formal third-party security review! But the
-Zcash source code has. For security
-announcements, audit results and other general security information, see
-https://z.cash/support/security.html
+some of the Zcash and Komodo source code it is based on has.
 
-Hush does our best to integrate fixes and recommendations from Zcash audits
+Hush does our best to integrate fixes and recommendations from upstream audits
 to our own code, such as audits on ZecWallet that apply to SilentDragon.
-Hush also reports many new bugs and issues to upstream Zcash and many other
-Zcash Protocol coins.
+Hush used to report many new bugs and CVEs to upstream Zcash and Komodo but
+those relations have broken down.
 
 Additionally, Hush itself finds many CVE's and things-that-should-be-CVE's
 in Zcash internals. Since Zcash community treats Hush people so poorly, we
 keep these bugs and fixes to ourselves. If you want to know some of them,
-let us know and bring your wallet.
-
+let us know and bring your wallet. Public information available at
+<a href="https://attackingzcash.com">attackingzcash.com</a>
 
 ## Wallet Encryption
 
 Wallet encryption is disabled, for several reasons:
 
 - Encrypted wallets are unable to correctly detect shielded spends (due to the
-  nature of unlinkability of JoinSplits) and can incorrectly show larger
+  nature of unlinkability of ShieldedSpends) and can incorrectly show larger
   available shielded balances until the next time the wallet is unlocked. This
   problem was not limited to failing to recognize the spend; it was possible for
   the shown balance to increase by the amount of change from a spend, without
