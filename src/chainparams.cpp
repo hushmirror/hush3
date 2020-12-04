@@ -3,7 +3,6 @@
 // Copyright (c) 2019-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -22,14 +21,10 @@
 #include "key_io.h"
 #include "main.h"
 #include "crypto/equihash.h"
-
 #include "util.h"
 #include "utilstrencodings.h"
-
 #include <assert.h>
-
 #include <boost/assign/list_of.hpp>
-
 #include "chainparamsseeds.h"
 
 static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesisOutputScript, uint32_t nTime, const uint256& nNonce, const std::vector<unsigned char>& nSolution, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
@@ -182,9 +177,12 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0x4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"));
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("node1", "dnsseed.hush.is"));
-        vSeeds.push_back(CDNSSeedData("node2", "dnsseed2.hush.is"));
-        // TODO: set up bootstrapping for mainnet
+        // Hush Official DNS Seeds
+        vSeeds.push_back(CDNSSeedData("node1", "seed1.hush.is"));
+        vSeeds.push_back(CDNSSeedData("node2", "seed2.hush.is"));
+        // Community run DNS Seeds
+        vSeeds.push_back(CDNSSeedData("node3", "dns.leto.net"));
+
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,60);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,85);
         base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,188);
@@ -197,6 +195,7 @@ public:
         // guarantees the first two characters, when base58 encoded, are "SK"
         base58Prefixes[ZCSPENDING_KEY] = {171,54};
 
+        // guarantees the first two characters, when base58 encoded, are "zs"
         bech32HRPs[SAPLING_PAYMENT_ADDRESS]      = "zs";
         bech32HRPs[SAPLING_FULL_VIEWING_KEY]     = "zviews";
         bech32HRPs[SAPLING_INCOMING_VIEWING_KEY] = "zivks";
