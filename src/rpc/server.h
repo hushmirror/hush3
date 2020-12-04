@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_RPCSERVER_H
-#define BITCOIN_RPCSERVER_H
+#ifndef HUSH_RPCSERVER_H
+#define HUSH_RPCSERVER_H
 
 #include "amount.h"
 #include "rpc/protocol.h"
@@ -527,4 +527,4 @@ extern UniValue pricesrefillfund(const UniValue& params, bool fHelp, const CPubK
 
 
 
-#endif // BITCOIN_RPCSERVER_H
+#endif // HUSH_RPCSERVER_H

@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_RPCPROTOCOL_H
-#define BITCOIN_RPCPROTOCOL_H
+#ifndef HUSH_RPCPROTOCOL_H
+#define HUSH_RPCPROTOCOL_H
 
 #include <list>
 #include <map>
@@ -105,4 +105,4 @@ bool GetAuthCookie(std::string *cookie_out);
 /** Delete RPC authentication cookie from disk */
 void DeleteAuthCookie();
 
-#endif // BITCOIN_RPCPROTOCOL_H
+#endif // HUSH_RPCPROTOCOL_H

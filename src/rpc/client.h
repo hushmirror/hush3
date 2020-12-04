@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_RPCCLIENT_H
-#define BITCOIN_RPCCLIENT_H
+#ifndef HUSH_RPCCLIENT_H
+#define HUSH_RPCCLIENT_H
 
 #include <univalue.h>
 
@@ -29,4 +29,4 @@ UniValue RPCConvertValues(const std::string& strMethod, const std::vector<std::s
  */
 UniValue ParseNonRFCJSONValue(const std::string& strVal);
 
-#endif // BITCOIN_RPCCLIENT_H
+#endif // HUSH_RPCCLIENT_H
