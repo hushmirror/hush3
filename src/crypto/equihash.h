@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_EQUIHASH_H
-#define BITCOIN_EQUIHASH_H
+#ifndef HUSH_EQUIHASH_H
+#define HUSH_EQUIHASH_H
 
 #include "crypto/sha256.h"
 #include "utilstrencodings.h"
@@ -311,4 +311,4 @@ inline bool EhOptimisedSolveUncancellable(unsigned int n, unsigned int k, const 
         throw std::invalid_argument("Unsupported Equihash parameters"); \
     }
 
-#endif // BITCOIN_EQUIHASH_H
+#endif // HUSH_EQUIHASH_H

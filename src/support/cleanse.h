@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_SUPPORT_CLEANSE_H
-#define BITCOIN_SUPPORT_CLEANSE_H
+#ifndef HUSH_SUPPORT_CLEANSE_H
+#define HUSH_SUPPORT_CLEANSE_H
 
 #include <stdlib.h>
 
@@ -12,4 +12,4 @@
  * operation will not be optimized out by the compiler. */
 void memory_cleanse(void *ptr, size_t len);
 
-#endif // BITCOIN_SUPPORT_CLEANSE_H
+#endif // HUSH_SUPPORT_CLEANSE_H

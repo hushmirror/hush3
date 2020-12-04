@@ -2,8 +2,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_CRYPTO_HMAC_SHA256_H
-#define BITCOIN_CRYPTO_HMAC_SHA256_H
+#ifndef HUSH_CRYPTO_HMAC_SHA256_H
+#define HUSH_CRYPTO_HMAC_SHA256_H
 
 #include "crypto/sha256.h"
 
@@ -29,4 +29,4 @@ public:
     void Finalize(unsigned char hash[OUTPUT_SIZE]);
 };
 
-#endif // BITCOIN_CRYPTO_HMAC_SHA256_H
+#endif // HUSH_CRYPTO_HMAC_SHA256_H

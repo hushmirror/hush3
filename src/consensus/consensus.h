@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_CONSENSUS_CONSENSUS_H
-#define BITCOIN_CONSENSUS_CONSENSUS_H
+#ifndef HUSH_CONSENSUS_CONSENSUS_H
+#define HUSH_CONSENSUS_CONSENSUS_H
 
 /** The minimum allowed block version (network rule) */
 static const int32_t MIN_BLOCK_VERSION = 4;
@@ -54,4 +54,4 @@ enum {
 /** Used as the flags parameter to CheckFinalTx() in non-consensus code */
 static const unsigned int STANDARD_LOCKTIME_VERIFY_FLAGS = LOCKTIME_MEDIAN_TIME_PAST;
 
-#endif // BITCOIN_CONSENSUS_CONSENSUS_H
+#endif // HUSH_CONSENSUS_CONSENSUS_H

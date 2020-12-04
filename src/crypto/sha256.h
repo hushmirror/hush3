@@ -2,8 +2,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_CRYPTO_SHA256_H
-#define BITCOIN_CRYPTO_SHA256_H
+#ifndef HUSH_CRYPTO_SHA256_H
+#define HUSH_CRYPTO_SHA256_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -34,4 +34,4 @@ public:
  */
 std::string SHA256AutoDetect();
 
-#endif // BITCOIN_CRYPTO_SHA256_H
+#endif // HUSH_CRYPTO_SHA256_H

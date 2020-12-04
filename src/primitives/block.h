@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_PRIMITIVES_BLOCK_H
-#define BITCOIN_PRIMITIVES_BLOCK_H
+#ifndef HUSH_PRIMITIVES_BLOCK_H
+#define HUSH_PRIMITIVES_BLOCK_H
 
 #include "primitives/transaction.h"
 //#include "primitives/nonce.h"
@@ -279,4 +279,4 @@ struct CBlockLocator
     }
 };
 
-#endif // BITCOIN_PRIMITIVES_BLOCK_H
+#endif // HUSH_PRIMITIVES_BLOCK_H

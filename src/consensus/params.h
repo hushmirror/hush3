@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_CONSENSUS_PARAMS_H
-#define BITCOIN_CONSENSUS_PARAMS_H
+#ifndef HUSH_CONSENSUS_PARAMS_H
+#define HUSH_CONSENSUS_PARAMS_H
 
 #include "uint256.h"
 
@@ -137,4 +137,4 @@ struct Params {
 };
 } // namespace Consensus
 
-#endif // BITCOIN_CONSENSUS_PARAMS_H
+#endif // HUSH_CONSENSUS_PARAMS_H

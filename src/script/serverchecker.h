@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_SCRIPT_SERVERCHECKER_H
-#define BITCOIN_SCRIPT_SERVERCHECKER_H
+#ifndef HUSH_SCRIPT_SERVERCHECKER_H
+#define HUSH_SCRIPT_SERVERCHECKER_H
 
 #include "script/interpreter.h"
 
@@ -40,4 +40,4 @@ public:
     int CheckEvalCondition(const CC *cond) const;
 };
 
-#endif // BITCOIN_SCRIPT_SERVERCHECKER_H
+#endif // HUSH_SCRIPT_SERVERCHECKER_H

@@ -2,8 +2,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_SUPPORT_EVENTS_H
-#define BITCOIN_SUPPORT_EVENTS_H
+#ifndef HUSH_SUPPORT_EVENTS_H
+#define HUSH_SUPPORT_EVENTS_H
 
 #include <ios>
 #include <memory>
@@ -53,4 +53,4 @@ raii_evhttp_connection obtain_evhttp_connection_base(struct event_base* base, st
     return result;
 }
 
-#endif // BITCOIN_SUPPORT_EVENTS_H
+#endif // HUSH_SUPPORT_EVENTS_H

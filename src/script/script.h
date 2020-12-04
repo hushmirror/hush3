@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_SCRIPT_SCRIPT_H
-#define BITCOIN_SCRIPT_SCRIPT_H
+#ifndef HUSH_SCRIPT_SCRIPT_H
+#define HUSH_SCRIPT_SCRIPT_H
 
 #include "crypto/common.h"
 #include "prevector.h"
@@ -631,4 +631,4 @@ public:
     }
 };
 
-#endif // BITCOIN_SCRIPT_SCRIPT_H
+#endif // HUSH_SCRIPT_SCRIPT_H

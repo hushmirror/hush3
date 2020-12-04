@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_PRIMITIVES_TRANSACTION_H
-#define BITCOIN_PRIMITIVES_TRANSACTION_H
+#ifndef HUSH_PRIMITIVES_TRANSACTION_H
+#define HUSH_PRIMITIVES_TRANSACTION_H
 
 #include "amount.h"
 #include "random.h"
@@ -826,4 +826,4 @@ struct CMutableTransaction
     uint256 GetHash() const;
 };
 
-#endif // BITCOIN_PRIMITIVES_TRANSACTION_H
+#endif // HUSH_PRIMITIVES_TRANSACTION_H

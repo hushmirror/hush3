@@ -2,8 +2,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_COMPAT_BYTESWAP_H
-#define BITCOIN_COMPAT_BYTESWAP_H
+#ifndef HUSH_COMPAT_BYTESWAP_H
+#define HUSH_COMPAT_BYTESWAP_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
@@ -44,4 +44,4 @@ inline uint64_t bswap_64(uint64_t x)
 }
 #endif // HAVE_DECL_BSWAP64
 
-#endif // BITCOIN_COMPAT_BYTESWAP_H
+#endif // HUSH_COMPAT_BYTESWAP_H

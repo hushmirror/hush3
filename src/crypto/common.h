@@ -4,8 +4,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_CRYPTO_COMMON_H
-#define BITCOIN_CRYPTO_COMMON_H
+#ifndef HUSH_CRYPTO_COMMON_H
+#define HUSH_CRYPTO_COMMON_H
 
 #if defined(HAVE_CONFIG_H)
 #include "bitcoin-config.h"
@@ -145,4 +145,4 @@ int inline init_and_check_sodium()
 
     return 0;
 }
-#endif // BITCOIN_CRYPTO_COMMON_H
+#endif // HUSH_CRYPTO_COMMON_H
