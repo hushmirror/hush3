@@ -550,7 +550,7 @@ void hush_changeblocktime()
     fprintf(stderr,"HUSH blocktime changing to %d seconds\n",ASSETCHAINS_BLOCKTIME);
 }
 
-void komodo_setactivation(int32_t height)
+void hush_setactivation(int32_t height)
 {
     pCurrentParams->consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nActivationHeight = height;
     pCurrentParams->consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = height;

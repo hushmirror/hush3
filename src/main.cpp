@@ -83,7 +83,7 @@ int32_t KOMODO_NEWBLOCKS;
 int32_t komodo_block2pubkey33(uint8_t *pubkey33,CBlock *block);
 //void komodo_broadcast(CBlock *pblock,int32_t limit);
 bool Getscriptaddress(char *destaddr,const CScript &scriptPubKey);
-void komodo_setactivation(int32_t height);
+void hush_setactivation(int32_t height);
 void hush_changeblocktime();
 void komodo_pricesupdate(int32_t height,CBlock *pblock);
 
@@ -4101,7 +4101,7 @@ int32_t komodo_activate_sapling(CBlockIndex *pindex)
     }
     if ( activation != 0 )
     {
-        komodo_setactivation(activation);
+        hush_setactivation(activation);
         fprintf(stderr,"%s sapling activation at %d\n",SMART_CHAIN_SYMBOL,activation);
         ASSETCHAINS_SAPLING = activation;
     }
