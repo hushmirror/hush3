@@ -44,7 +44,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block);
 bool check_pprevnotarizedht();
 
 #include "komodo_structs.h"
-#include "komodo_globals.h"
+#include "hush_globals.h"
 #include "hush_utils.h"
 #include "komodo_curve25519.h"
 #include "komodo_cJSON.c"

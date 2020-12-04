@@ -43,7 +43,7 @@ using namespace std;
 #include "uint256.h"
 #include "arith_uint256.h"
 #include "komodo_structs.h"
-#include "komodo_globals.h"
+#include "hush_globals.h"
 #include "hush_defs.h"
 
 #include "komodo_interest.h"
