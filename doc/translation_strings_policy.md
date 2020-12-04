@@ -1,12 +1,8 @@
-*** Warning: This document has not been updated for Hush and may be inaccurate. ***
+# Translation Strings Policy
 
-Translation Strings Policy
-===========================
+This document provides guidelines for internationalization of hushd full node software.
 
-This document provides guidelines for internationalization of the Bitcoin Core software.
-
-How to translate?
-------------------
+## How to translate?
 
 To mark a message as translatable
 
@@ -14,8 +10,7 @@ To mark a message as translatable
 
 No internationalization is used for e.g. developer scripts outside `src`.
 
-Strings to be translated
--------------------------
+## Strings to be translated
 
 On a high level, these strings are to be translated:
 
@@ -36,8 +31,7 @@ Make sure that default values do not end up in the string, but use string format
 
 Do not translate messages that are only shown to developers, such as those that only appear when `--help-debug` is used.
 
-General recommendations
-------------------------
+## General recommendations
 
 ### Avoid unnecessary translation strings
 
