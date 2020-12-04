@@ -17,8 +17,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_HTTPRPC_H
-#define BITCOIN_HTTPRPC_H
+#ifndef HUSH_HTTPRPC_H
+#define HUSH_HTTPRPC_H
 
 #include <string>
 #include <map>

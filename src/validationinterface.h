@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_VALIDATIONINTERFACE_H
-#define BITCOIN_VALIDATIONINTERFACE_H
+#ifndef HUSH_VALIDATIONINTERFACE_H
+#define HUSH_VALIDATIONINTERFACE_H
 
 #include <boost/signals2/signal.hpp>
 
@@ -80,4 +80,4 @@ CMainSignals& GetMainSignals();
 
 void ThreadNotifyWallets(CBlockIndex *pindexLastTip);
 
-#endif // BITCOIN_VALIDATIONINTERFACE_H
+#endif // HUSH_VALIDATIONINTERFACE_H

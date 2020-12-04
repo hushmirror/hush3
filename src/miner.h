@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_MINER_H
-#define BITCOIN_MINER_H
+#ifndef HUSH_MINER_H
+#define HUSH_MINER_H
 
 #include "primitives/block.h"
 
@@ -66,4 +66,4 @@ void GenerateBitcoins(bool fGenerate, int nThreads);
 
 void UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev);
 
-#endif // BITCOIN_MINER_H
+#endif // HUSH_MINER_H

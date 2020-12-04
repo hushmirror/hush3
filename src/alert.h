@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_ALERT_H
-#define BITCOIN_ALERT_H
+#ifndef HUSH_ALERT_H
+#define HUSH_ALERT_H
 
 #include "serialize.h"
 #include "sync.h"
@@ -125,4 +125,4 @@ public:
     static CAlert getAlertByHash(const uint256 &hash);
 };
 
-#endif // BITCOIN_ALERT_H
+#endif // HUSH_ALERT_H

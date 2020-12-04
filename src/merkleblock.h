@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_MERKLEBLOCK_H
-#define BITCOIN_MERKLEBLOCK_H
+#ifndef HUSH_MERKLEBLOCK_H
+#define HUSH_MERKLEBLOCK_H
 
 #include "serialize.h"
 #include "uint256.h"
@@ -168,4 +168,4 @@ public:
     }
 };
 
-#endif // BITCOIN_MERKLEBLOCK_H
+#endif // HUSH_MERKLEBLOCK_H

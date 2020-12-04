@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_CHAINPARAMS_H
-#define BITCOIN_CHAINPARAMS_H
+#ifndef HUSH_CHAINPARAMS_H
+#define HUSH_CHAINPARAMS_H
 
 #include "chainparamsbase.h"
 #include "consensus/params.h"
@@ -182,4 +182,4 @@ bool SelectParamsFromCommandLine();
  */
 void UpdateNetworkUpgradeParameters(Consensus::UpgradeIndex idx, int nActivationHeight);
 
-#endif // BITCOIN_CHAINPARAMS_H
+#endif // HUSH_CHAINPARAMS_H

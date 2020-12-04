@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_THREADSAFETY_H
-#define BITCOIN_THREADSAFETY_H
+#ifndef HUSH_THREADSAFETY_H
+#define HUSH_THREADSAFETY_H
 
 #ifdef __clang__
 // TL;DR Add GUARDED_BY(mutex) to member variables. The others are
@@ -52,4 +52,4 @@
 #define NO_THREAD_SAFETY_ANALYSIS
 #endif // __GNUC__
 
-#endif // BITCOIN_THREADSAFETY_H
+#endif // HUSH_THREADSAFETY_H

@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_MAIN_H
-#define BITCOIN_MAIN_H
+#ifndef HUSH_MAIN_H
+#define HUSH_MAIN_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
@@ -953,4 +953,4 @@ std::pair<std::map<CBlockIndex*, std::list<CTransaction>>, uint64_t> DrainRecent
 void SetChainNotifiedSequence(uint64_t recentlyConflictedSequence);
 bool ChainIsFullyNotified();
 
-#endif // BITCOIN_MAIN_H
+#endif // HUSH_MAIN_H

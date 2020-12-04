@@ -17,8 +17,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_CHAINPARAMSBASE_H
-#define BITCOIN_CHAINPARAMSBASE_H
+#ifndef HUSH_CHAINPARAMSBASE_H
+#define HUSH_CHAINPARAMSBASE_H
 
 #include <string>
 #include <vector>
@@ -75,4 +75,4 @@ bool SelectBaseParamsFromCommandLine();
  */
 bool AreBaseParamsConfigured();
 
-#endif // BITCOIN_CHAINPARAMSBASE_H
+#endif // HUSH_CHAINPARAMSBASE_H

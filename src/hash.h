@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_HASH_H
-#define BITCOIN_HASH_H
+#ifndef HUSH_HASH_H
+#define HUSH_HASH_H
 
 #include "crypto/ripemd160.h"
 #include "crypto/sha256.h"
@@ -234,4 +234,4 @@ unsigned int MurmurHash3(unsigned int nHashSeed, const std::vector<unsigned char
 
 void BIP32Hash(const ChainCode &chainCode, unsigned int nChild, unsigned char header, const unsigned char data[32], unsigned char output[64]);
 
-#endif // BITCOIN_HASH_H
+#endif // HUSH_HASH_H

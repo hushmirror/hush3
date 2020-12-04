@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_AMOUNT_H
-#define BITCOIN_AMOUNT_H
+#ifndef HUSH_AMOUNT_H
+#define HUSH_AMOUNT_H
 
 #include "serialize.h"
 
@@ -79,4 +79,4 @@ public:
     }
 };
 
-#endif //  BITCOIN_AMOUNT_H
+#endif //  HUSH_AMOUNT_H

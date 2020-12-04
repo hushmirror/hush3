@@ -23,8 +23,8 @@
  * Server/client environment: argument handling, config file parsing,
  * logging, thread wrappers
  */
-#ifndef BITCOIN_UTIL_H
-#define BITCOIN_UTIL_H
+#ifndef HUSH_UTIL_H
+#define HUSH_UTIL_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
@@ -295,4 +295,4 @@ void SplitStr(const std::string& strVal, std::vector<std::string> &outVals);
 #define HUSH_SMART_CHAIN_MAXLEN 65
 
 
-#endif // BITCOIN_UTIL_H
+#endif // HUSH_UTIL_H

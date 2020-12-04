@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_CHAIN_H
-#define BITCOIN_CHAIN_H
+#ifndef HUSH_CHAIN_H
+#define HUSH_CHAIN_H
 
 class CChainPower;
 
@@ -777,4 +777,4 @@ public:
     const CBlockIndex *FindFork(const CBlockIndex *pindex) const;
 };
 
-#endif // BITCOIN_CHAIN_H
+#endif // HUSH_CHAIN_H

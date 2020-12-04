@@ -20,8 +20,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_KEY_H
-#define BITCOIN_KEY_H
+#ifndef HUSH_KEY_H
+#define HUSH_KEY_H
 
 #include "pubkey.h"
 #include "serialize.h"
@@ -220,4 +220,4 @@ void ECC_Stop(void);
 /** Check that required EC support is available at runtime. */
 bool ECC_InitSanityCheck(void);
 
-#endif // BITCOIN_KEY_H
+#endif // HUSH_KEY_H

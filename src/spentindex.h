@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_SPENTINDEX_H
-#define BITCOIN_SPENTINDEX_H
+#ifndef HUSH_SPENTINDEX_H
+#define HUSH_SPENTINDEX_H
 
 #include "uint256.h"
 #include "amount.h"
@@ -95,4 +95,4 @@ struct CSpentIndexKeyCompare
     }
 };
 
-#endif // BITCOIN_SPENTINDEX_H
+#endif // HUSH_SPENTINDEX_H

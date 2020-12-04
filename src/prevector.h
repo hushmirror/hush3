@@ -1,5 +1,5 @@
-#ifndef _BITCOIN_PREVECTOR_H_
-#define _BITCOIN_PREVECTOR_H_
+#ifndef _HUSH_PREVECTOR_H_
+#define _HUSH_PREVECTOR_H_
 
 #include <util.h>
 

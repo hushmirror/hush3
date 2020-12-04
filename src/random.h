@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_RANDOM_H
-#define BITCOIN_RANDOM_H
+#ifndef HUSH_RANDOM_H
+#define HUSH_RANDOM_H
 
 #include "uint256.h"
 
@@ -86,4 +86,4 @@ static inline uint32_t insecure_rand(void)
     return (insecure_rand_Rw << 16) + insecure_rand_Rz;
 }
 
-#endif // BITCOIN_RANDOM_H
+#endif // HUSH_RANDOM_H

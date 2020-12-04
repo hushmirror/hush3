@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_CHECKPOINTS_H
-#define BITCOIN_CHECKPOINTS_H
+#ifndef HUSH_CHECKPOINTS_H
+#define HUSH_CHECKPOINTS_H
 
 #include "uint256.h"
 #include "chainparams.h"
@@ -57,4 +57,4 @@ double GuessVerificationProgress(const CChainParams::CCheckpointData& data, CBlo
 
 } //namespace Checkpoints
 
-#endif // BITCOIN_CHECKPOINTS_H
+#endif // HUSH_CHECKPOINTS_H

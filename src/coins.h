@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_COINS_H
-#define BITCOIN_COINS_H
+#ifndef HUSH_COINS_H
+#define HUSH_COINS_H
 
 #define KOMODO_ENABLE_INTEREST //enabling this is a hardfork, activate with new RR method
 
@@ -604,4 +604,4 @@ private:
     );
 };
 
-#endif // BITCOIN_COINS_H
+#endif // HUSH_COINS_H

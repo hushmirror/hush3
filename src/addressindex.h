@@ -4,8 +4,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_ADDRESSINDEX_H
-#define BITCOIN_ADDRESSINDEX_H
+#ifndef HUSH_ADDRESSINDEX_H
+#define HUSH_ADDRESSINDEX_H
 
 #include "uint256.h"
 #include "amount.h"
@@ -80,4 +80,4 @@ struct CMempoolAddressDeltaKeyCompare
     }
 };
 
-#endif // BITCOIN_ADDRESSINDEX_H
+#endif // HUSH_ADDRESSINDEX_H

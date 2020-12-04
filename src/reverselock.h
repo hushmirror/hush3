@@ -17,8 +17,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_REVERSELOCK_H
-#define BITCOIN_REVERSELOCK_H
+#ifndef HUSH_REVERSELOCK_H
+#define HUSH_REVERSELOCK_H
 
 /**
  * An RAII-style reverse lock. Unlocks on construction and locks on destruction.
@@ -46,4 +46,4 @@ private:
     Lock templock;
 };
 
-#endif // BITCOIN_REVERSELOCK_H
+#endif // HUSH_REVERSELOCK_H

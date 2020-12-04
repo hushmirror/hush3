@@ -17,8 +17,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_BLOOM_H
-#define BITCOIN_BLOOM_H
+#ifndef HUSH_BLOOM_H
+#define HUSH_BLOOM_H
 
 #include "serialize.h"
 
@@ -150,4 +150,4 @@ private:
 };
 
 
-#endif // BITCOIN_BLOOM_H
+#endif // HUSH_BLOOM_H

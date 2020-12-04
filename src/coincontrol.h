@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_COINCONTROL_H
-#define BITCOIN_COINCONTROL_H
+#ifndef HUSH_COINCONTROL_H
+#define HUSH_COINCONTROL_H
 
 #include "primitives/transaction.h"
 
@@ -78,4 +78,4 @@ private:
     std::set<COutPoint> setSelected;
 };
 
-#endif // BITCOIN_COINCONTROL_H
+#endif // HUSH_COINCONTROL_H

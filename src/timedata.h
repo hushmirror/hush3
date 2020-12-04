@@ -4,8 +4,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_TIMEDATA_H
-#define BITCOIN_TIMEDATA_H
+#ifndef HUSH_TIMEDATA_H
+#define HUSH_TIMEDATA_H
 
 #include <set>
 #include <stdint.h>
@@ -36,4 +36,4 @@ public:
 
 extern CTimeWarning timeWarning;
 
-#endif // BITCOIN_TIMEDATA_H
+#endif // HUSH_TIMEDATA_H

@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_KEYSTORE_H
-#define BITCOIN_KEYSTORE_H
+#ifndef HUSH_KEYSTORE_H
+#define HUSH_KEYSTORE_H
 
 #include "key.h"
 #include "pubkey.h"
@@ -245,4 +245,4 @@ typedef std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char> > > Crypt
 //! Sapling 
 typedef std::map<libzcash::SaplingExtendedFullViewingKey, std::vector<unsigned char> > CryptedSaplingSpendingKeyMap;
 
-#endif // BITCOIN_KEYSTORE_H
+#endif // HUSH_KEYSTORE_H

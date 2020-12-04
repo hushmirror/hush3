@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_UNDO_H
-#define BITCOIN_UNDO_H
+#ifndef HUSH_UNDO_H
+#define HUSH_UNDO_H
 
 #include "compressor.h" 
 #include "primitives/transaction.h"
@@ -78,4 +78,4 @@ public:
     }
 };
 
-#endif // BITCOIN_UNDO_H
+#endif // HUSH_UNDO_H

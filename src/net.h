@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_NET_H
-#define BITCOIN_NET_H
+#ifndef HUSH_NET_H
+#define HUSH_NET_H
 
 #include "bloom.h"
 #include "compat.h"
@@ -720,4 +720,4 @@ public:
     bool Read(CAddrMan& addr);
 };
 
-#endif // BITCOIN_NET_H
+#endif // HUSH_NET_H

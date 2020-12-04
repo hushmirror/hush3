@@ -17,8 +17,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_MRUSET_H
-#define BITCOIN_MRUSET_H
+#ifndef HUSH_MRUSET_H
+#define HUSH_MRUSET_H
 
 #include <set>
 #include <vector>
@@ -77,4 +77,4 @@ public:
     size_type max_size() const { return nMaxSize; }
 };
 
-#endif // BITCOIN_MRUSET_H
+#endif // HUSH_MRUSET_H

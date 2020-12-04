@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_COMPAT_H
-#define BITCOIN_COMPAT_H
+#ifndef HUSH_COMPAT_H
+#define HUSH_COMPAT_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
@@ -116,4 +116,4 @@ bool static inline IsSelectableSocket(SOCKET s) {
 #endif
 }
 
-#endif // BITCOIN_COMPAT_H
+#endif // HUSH_COMPAT_H

@@ -17,8 +17,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_NETBASE_H
-#define BITCOIN_NETBASE_H
+#ifndef HUSH_NETBASE_H
+#define HUSH_NETBASE_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
@@ -240,4 +240,4 @@ struct timeval MillisToTimeval(int64_t nTimeout);
 
 bool SanityCheckASMap(const std::vector<bool>& asmap);
 
-#endif // BITCOIN_NETBASE_H
+#endif // HUSH_NETBASE_H

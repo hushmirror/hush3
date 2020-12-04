@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_ADDRMAN_H
-#define BITCOIN_ADDRMAN_H
+#ifndef HUSH_ADDRMAN_H
+#define HUSH_ADDRMAN_H
 
 #include "netbase.h"
 #include "protocol.h"
@@ -645,4 +645,4 @@ public:
 
 };
 
-#endif // BITCOIN_ADDRMAN_H
+#endif // HUSH_ADDRMAN_H

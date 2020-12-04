@@ -14,8 +14,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_ALERTKEYS_H
-#define BITCOIN_ALERTKEYS_H
+#ifndef HUSH_ALERTKEYS_H
+#define HUSH_ALERTKEYS_H
 
 // REMINDER: DO NOT COMMIT YOUR PRIVATE KEYS TO THE GIT REPOSITORY, lulz
 

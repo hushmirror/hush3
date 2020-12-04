@@ -5,8 +5,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_KEYIO_H
-#define BITCOIN_KEYIO_H
+#ifndef HUSH_KEYIO_H
+#define HUSH_KEYIO_H
 
 #include <chainparams.h>
 #include <key.h>
@@ -42,4 +42,4 @@ libzcash::ViewingKey DecodeViewingKey(const std::string& str);
 std::string EncodeSpendingKey(const libzcash::SpendingKey& zkey);
 libzcash::SpendingKey DecodeSpendingKey(const std::string& str);
 
-#endif // BITCOIN_KEYIO_H
+#endif // HUSH_KEYIO_H

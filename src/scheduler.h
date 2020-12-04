@@ -17,8 +17,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_SCHEDULER_H
-#define BITCOIN_SCHEDULER_H
+#ifndef HUSH_SCHEDULER_H
+#define HUSH_SCHEDULER_H
 
 //
 // NOTE:

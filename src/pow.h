@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_POW_H
-#define BITCOIN_POW_H
+#ifndef HUSH_POW_H
+#define HUSH_POW_H
 
 #include "chain.h"
 #include "consensus/params.h"
@@ -47,4 +47,4 @@ CChainPower GetBlockProof(const CBlockIndex& block);
 /** Return the time it would take to redo the work difference between from and to, assuming the current hashrate corresponds to the difficulty at tip, in seconds. */
 int64_t GetBlockProofEquivalentTime(const CBlockIndex& to, const CBlockIndex& from, const CBlockIndex& tip, const Consensus::Params&);
 
-#endif // BITCOIN_POW_H
+#endif // HUSH_POW_H

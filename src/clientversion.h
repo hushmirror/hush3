@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_CLIENTVERSION_H
-#define BITCOIN_CLIENTVERSION_H
+#ifndef HUSH_CLIENTVERSION_H
+#define HUSH_CLIENTVERSION_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
@@ -86,4 +86,4 @@ std::string FormatSubVersion(const std::string& name, int nClientVersion, const 
 
 #endif // WINDRES_PREPROC
 
-#endif // BITCOIN_CLIENTVERSION_H
+#endif // HUSH_CLIENTVERSION_H
