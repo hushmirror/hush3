@@ -286,6 +286,14 @@ void CCoinsViewCache::AbstractPopAnchor(
 
 void CCoinsViewCache::PopAnchor(const uint256 &newrt, ShieldedType type) {
     switch (type) {
+        case SPROUT:
+            AbstractPopAnchor<SproutMerkleTree, CAnchorsSproutMap, CAnchorsSproutCacheEntry>(
+                newrt,
+                SPROUT,
+                cacheSproutAnchors,
+                hashSproutAnchor
+            );
+            break;
         case SAPLING:
             AbstractPopAnchor<SaplingMerkleTree, CAnchorsSaplingMap, CAnchorsSaplingCacheEntry>(
                 newrt,
@@ -373,9 +381,13 @@ uint256 CCoinsViewCache::GetBestBlock() const {
     return hashBlock;
 }
 
-
 uint256 CCoinsViewCache::GetBestAnchor(ShieldedType type) const {
     switch (type) {
+        case SPROUT:
+            if (hashSproutAnchor.IsNull())
+                hashSproutAnchor = base->GetBestAnchor(type);
+            return hashSproutAnchor;
+            break;
         case SAPLING:
             if (hashSaplingAnchor.IsNull())
                 hashSaplingAnchor = base->GetBestAnchor(type);
