@@ -1,3 +1,4 @@
+// Copyright (c) 2019-2020 The Hush developers
 // Copyright (c) 2016 Jack Grigg
 // Copyright (c) 2016 The Zcash developers
 // Distributed under the GPLv3 software license, see the accompanying
@@ -8,10 +9,8 @@
 
 #include "crypto/sha256.h"
 #include "utilstrencodings.h"
-
 #include "sodium.h"
-#include "komodo_nk.h"
-
+#include "hush_nk.h"
 #include <cstring>
 #include <exception>
 #include <functional>
