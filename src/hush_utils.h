@@ -1779,12 +1779,16 @@ void hush_args(char *argv0)
     {
         KOMODO_MININGTHREADS = GetArg("-genproclimit",-1);
     }
-    if ( (KOMODO_EXCHANGEWALLET= GetBoolArg("-exchange", false)) != 0 )
-        fprintf(stderr,"KOMODO_EXCHANGEWALLET mode active\n");
-    DONATION_PUBKEY = GetArg("-donation", "");
-    NOTARY_PUBKEY = GetArg("-pubkey", "");
+    if ( (GetBoolArg("-exchange", false)) != 0 ) {
+        printf("The KMD-only feature -exchange is not supported by HUSH!\n");
+        printf("jl777 uses this \"feature\" to steal from his own users!\n");
+        printf("Learn more at https://duke.hush.is :)\n");
+        StartShutdown();
+    }
+    DONATION_PUBKEY   = GetArg("-donation", "");
+    NOTARY_PUBKEY     = GetArg("-pubkey", "");
     KOMODO_DEALERNODE = GetArg("-dealer",0);
-    KOMODO_TESTNODE = GetArg("-testnode",0);
+    KOMODO_TESTNODE   = GetArg("-testnode",0);
     if ( strlen(NOTARY_PUBKEY.c_str()) == 66 )
     {
         decode_hex(NOTARY_PUBKEY33,33,(char *)NOTARY_PUBKEY.c_str());

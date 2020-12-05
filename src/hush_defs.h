@@ -527,7 +527,6 @@ extern uint8_t ASSETCHAINS_CCDISABLES[256];
 
 extern int32_t USE_EXTERNAL_PUBKEY;
 extern std::string NOTARY_PUBKEY,NOTARY_ADDRESS;
-extern int32_t KOMODO_EXCHANGEWALLET;
 extern std::string DONATION_PUBKEY;
 extern uint8_t ASSETCHAINS_PRIVATE;
 extern int32_t USE_EXTERNAL_PUBKEY;
