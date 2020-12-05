@@ -1777,7 +1777,7 @@ void hush_args(char *argv0)
     memset(ccEnablesHeight,0,sizeof(ccEnablesHeight));
     if ( GetBoolArg("-gen", false) != 0 )
     {
-        KOMODO_MININGTHREADS = GetArg("-genproclimit",-1);
+        HUSH_MININGTHREADS = GetArg("-genproclimit",-1);
     }
     if ( (GetBoolArg("-exchange", false)) != 0 ) {
         printf("The KMD-only feature -exchange is not supported by HUSH!\n");
@@ -1803,8 +1803,8 @@ void hush_args(char *argv0)
                 if ( strcmp(NOTARY_PUBKEY.c_str(),notaries_elected[hush_season-1][i][1]) == 0 )
                 {
                     IS_HUSH_NOTARY = 1;
-                    KOMODO_MININGTHREADS = 1;
-                    mapArgs ["-genproclimit"] = itostr(KOMODO_MININGTHREADS);
+                    HUSH_MININGTHREADS = 1;
+                    mapArgs ["-genproclimit"] = itostr(HUSH_MININGTHREADS);
                     fprintf(stderr,"running as notary.%d %s\n",i,notaries_elected[hush_season-1][i][0]);
                     break;
                 }

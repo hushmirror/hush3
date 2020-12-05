@@ -185,7 +185,7 @@ UniValue getgenerate(const UniValue& params, bool fHelp, const CPubKey& mypk)
     LOCK(cs_main);
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("generate",         GetBoolArg("-gen", false) && GetBoolArg("-genproclimit", -1) != 0 ));
-    obj.push_back(Pair("numthreads",       (int64_t)KOMODO_MININGTHREADS));
+    obj.push_back(Pair("numthreads",       (int64_t)HUSH_MININGTHREADS));
     return obj;
 }
 
@@ -363,11 +363,11 @@ UniValue setgenerate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         //    fGenerate = false;
     }
 
-    KOMODO_MININGTHREADS = (int32_t)nGenProcLimit;
-	fprintf(stderr,"%s:KOMODO_MININGTHREADS=%d\n", __FUNCTION__, KOMODO_MININGTHREADS);
+    HUSH_MININGTHREADS = (int32_t)nGenProcLimit;
+	fprintf(stderr,"%s:HUSH_MININGTHREADS=%d\n", __FUNCTION__, HUSH_MININGTHREADS);
 
     mapArgs["-gen"]           = (fGenerate ? "1" : "0");
-    mapArgs ["-genproclimit"] = itostr(KOMODO_MININGTHREADS);
+    mapArgs ["-genproclimit"] = itostr(HUSH_MININGTHREADS);
 
 #ifdef ENABLE_WALLET
     GenerateBitcoins(fGenerate, pwalletMain, nGenProcLimit);
@@ -476,7 +476,7 @@ UniValue getmininginfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     obj.push_back(Pair("chain",            Params().NetworkIDString()));
 #ifdef ENABLE_MINING
     obj.push_back(Pair("generate",         GetBoolArg("-gen", false) && GetBoolArg("-genproclimit", -1) != 0 ));
-    obj.push_back(Pair("numthreads",       (int64_t)KOMODO_MININGTHREADS));
+    obj.push_back(Pair("numthreads",       (int64_t)HUSH_MININGTHREADS));
 #endif
     return obj;
 }
