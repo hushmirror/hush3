@@ -118,33 +118,6 @@ int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestam
         return(NUM_HUSH_NOTARIES);
     }
 
-    //TODO: delete staked chain junk
-    /*
-    htind = height / KOMODO_ELECTION_GAP;
-    if ( htind >= KOMODO_MAXBLOCKS / KOMODO_ELECTION_GAP )
-        htind = (KOMODO_MAXBLOCKS / KOMODO_ELECTION_GAP) - 1;
-    if ( Pubkeys == 0 )
-    {
-        komodo_init(height);
-        //printf("Pubkeys.%p htind.%d vs max.%d\n",Pubkeys,htind,KOMODO_MAXBLOCKS / KOMODO_ELECTION_GAP);
-    }
-    pthread_mutex_lock(&komodo_mutex);
-    n = Pubkeys[htind].numnotaries;
-    if ( 0 && SMART_CHAIN_SYMBOL[0] != 0 )
-        fprintf(stderr,"%s height.%d t.%u genesis.%d\n",SMART_CHAIN_SYMBOL,height,timestamp,n);
-    HASH_ITER(hh,Pubkeys[htind].Notaries,kp,tmp)
-    {
-        if ( kp->notaryid < n )
-        {
-            mask |= (1LL << kp->notaryid);
-            memcpy(pubkeys[kp->notaryid],kp->pubkey,33);
-        } else printf("illegal notaryid.%d vs n.%d\n",kp->notaryid,n);
-    }
-    pthread_mutex_unlock(&komodo_mutex);
-    if ( (n < 64 && mask == ((1LL << n)-1)) || (n == 64 && mask == 0xffffffffffffffffLL) )
-        return(n);
-    printf("error retrieving notaries ht.%d got mask.%llx for n.%d\n",height,(long long)mask,n);
-    */
     return(-1);
 }
 
