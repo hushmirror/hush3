@@ -13,13 +13,11 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #ifndef KOMODO_DEFS_H
 #define KOMODO_DEFS_H
 #include "arith_uint256.h"
 #include "chain.h"
 #include "hush_nk.h"
-
 #define KOMODO_EARLYTXID_HEIGHT 100
 //#define ADAPTIVEPOW_CHANGETO_DEFAULTON 1572480000
 #define ASSETCHAINS_MINHEIGHT 128
@@ -36,17 +34,10 @@
 #define KOMODO_SAPLING_DEADLINE 1550188800 // Feb 15th, 2019
 #define _COINBASE_MATURITY 100
 
-// KMD Notary Seasons 
-// 1: May 1st 2018 1530921600
-// 2: July 15th 2019 1563148800 -> estimated height 1444000
-// 3: 3rd season
-    // 1751328000 = dummy timestamp, 1 July 2025!
-    // 7113400 = 5x current KMD blockheight. 
-// to add seasons, change NUM_HUSH_SEASONS, and add timestamp and height of activation to these arrays. 
-
+// Notary Seasons: To add seasons, change NUM_HUSH_SEASONS, and add timestamp and height of activation to these arrays. 
 // Always define one more season than is actually needed, which has a block activation in the far future
-#define NUM_HUSH_SEASONS 7
 //TODO: some parts of the codebase assume 64 and do not use this constant
+#define NUM_HUSH_SEASONS 7
 #define NUM_HUSH_NOTARIES 64
 
 // $ ./contrib/block_time.pl 166250
@@ -73,9 +64,9 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
 {
     {
         // season 1
-        { "0_jl777_testA", "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828" },
-        { "0_jl777_testB", "02ebfc784a4ba768aad88d44d1045d240d47b26e248cafaf1c5169a42d7a61d344" },
-        { "0_kolo_testA", "0287aa4b73988ba26cf6565d815786caf0d2c4af704d7883d163ee89cd9977edec" },
+        { "fuck_jl777_testA", "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828" },
+        { "fuck_jl777_testB", "02ebfc784a4ba768aad88d44d1045d240d47b26e248cafaf1c5169a42d7a61d344" },
+        { "fuck_kolo_testA", "0287aa4b73988ba26cf6565d815786caf0d2c4af704d7883d163ee89cd9977edec" },
         { "artik_AR", "029acf1dcd9f5ff9c455f8bb717d4ae0c703e089d16cf8424619c491dff5994c90" },
         { "artik_EU", "03f54b2c24f82632e3cdebe4568ba0acf487a80f8a89779173cdb78f74514847ce" },
         { "artik_NA", "0224e31f93eff0cc30eaf0b2389fbc591085c0e122c4d11862c1729d090106c842" },
@@ -138,12 +129,13 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
         { "xxspot1_XX", "02ef445a392fcaf3ad4176a5da7f43580e8056594e003eba6559a713711a27f955" },
         { "xxspot2_XX", "03d85b221ea72ebcd25373e7961f4983d12add66a92f899deaf07bab1d8b6f5573" }
     },
+
     {
         // season 2
-        {"0dev1_jl777", "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828" },
-        {"0dev2_kolo", "030f34af4b908fb8eb2099accb56b8d157d49f6cfb691baa80fdd34f385efed961" },
-        {"0dev3_kolo", "025af9d2b2a05338478159e9ac84543968fd18c45fd9307866b56f33898653b014" },
-        {"0dev4_decker", "028eea44a09674dda00d88ffd199a09c9b75ba9782382cc8f1e97c0fd565fe5707" },
+        {"fuck_dev1_jl777", "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828" },
+        {"fuck_dev2_kolo", "030f34af4b908fb8eb2099accb56b8d157d49f6cfb691baa80fdd34f385efed961" },
+        {"fuck_dev3_kolo", "025af9d2b2a05338478159e9ac84543968fd18c45fd9307866b56f33898653b014" },
+        {"fuck_dev4_decker", "028eea44a09674dda00d88ffd199a09c9b75ba9782382cc8f1e97c0fd565fe5707" },
         {"a-team_SH", "03b59ad322b17cb94080dc8e6dc10a0a865de6d47c16fb5b1a0b5f77f9507f3cce" },
         {"artik_AR", "029acf1dcd9f5ff9c455f8bb717d4ae0c703e089d16cf8424619c491dff5994c90" },
         {"artik_EU", "03f54b2c24f82632e3cdebe4568ba0acf487a80f8a89779173cdb78f74514847ce" },
