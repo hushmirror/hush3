@@ -2,7 +2,6 @@
 // Copyright (c) 2018 The Zcash developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -38,22 +37,22 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
     {
         /*.nBranchId =*/ 0,
         /*.strName =*/ "Sprout",
-        /*.strInfo =*/ "The Zcash network at launch",
+        /*.strInfo =*/ "The Zcash network at launch. Hush is the first Zcash Protocol coin in the world that contains no Sprout history in it's blockchain!",
     },
     {
         /*.nBranchId =*/ 0x74736554,
         /*.strName =*/ "Test dummy",
-        /*.strInfo =*/ "Test dummy info",
+        /*.strInfo =*/ "Zcash Company Profits From Surveillance",
     },
     {
         /*.nBranchId =*/ 0x5ba81b19,
         /*.strName =*/ "Overwinter",
-        /*.strInfo =*/ "See https://z.cash/upgrade/overwinter.html for details.",
+        /*.strInfo =*/ "See https://hush.is for details.",
     },
     {
         /*.nBranchId =*/ 0x76b809bb,
         /*.strName =*/ "Sapling",
-        /*.strInfo =*/ "See https://z.cash/upgrade/sapling.html for details.",
+        /*.strInfo =*/ "See https://hush.is for details.",
     }
 };
 
