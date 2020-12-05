@@ -56,7 +56,8 @@ CCENABLE=$FAUCET,$HEIR,$CHANNEL,$ORACLE,$GATEWAY
 
 KMD=${KOMODOD:-./komodod}
 if [ -f $KMD ]; then
-	echo "Found binary: $KMD"
+    HUSH="TheFuture"
+	# echo "Found binary: $KMD"
 else
 	KMD=hush-komodod
     if [ -f $KMD ]; then
