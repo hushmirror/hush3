@@ -1,5 +1,10 @@
+#!/bin/bash
+# Copyright (c) 2019-2020 Hush developers
+# Released under the GPLv3
+
+echo "Purging $1"
+
 rm -rf ~/.komodo/$1/chainstate
 rm -rf ~/.komodo/$1/database
 rm -rf ~/.komodo/$1/blocks
 rm -rf ~/.komodo/$1/komodostate
-
