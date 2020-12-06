@@ -378,11 +378,11 @@ void komodo_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotar
         komodo_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"komodostate");
         if ( (fp= fopen(fname,"rb+")) != 0 )
         {
-            if ( (retval= komodo_faststateinit(sp,fname,symbol,dest)) > 0 )
+            if ( (retval= hush_faststateinit(sp,fname,symbol,dest)) > 0 )
                 fseek(fp,0,SEEK_END);
             else
             {
-                fprintf(stderr,"komodo_faststateinit retval.%d\n",retval);
+                fprintf(stderr,"hush_faststateinit retval.%d\n",retval);
                 while ( komodo_parsestatefile(sp,fp,symbol,dest) >= 0 )
                     ;
             }

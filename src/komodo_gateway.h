@@ -1357,7 +1357,7 @@ long komodo_indfile_update(FILE *indfp,uint32_t *prevpos100p,long lastfpos,long 
     return(newfpos);
 }
 
-int32_t komodo_faststateinit(struct komodo_state *sp,char *fname,char *symbol,char *dest)
+int32_t hush_faststateinit(struct komodo_state *sp,char *fname,char *symbol,char *dest)
 {
     FILE *indfp; char indfname[1024]; uint8_t *filedata; long validated=-1,datalen,fpos,lastfpos; uint32_t tmp,prevpos100,indcounter,starttime; int32_t func,finished = 0;
     starttime = (uint32_t)time(NULL);
@@ -1414,7 +1414,7 @@ int32_t komodo_faststateinit(struct komodo_state *sp,char *fname,char *symbol,ch
                     finished = 1;
                 }
             }
-        } else printf("komodo_faststateinit unexpected case\n");
+        } else printf("hush_faststateinit unexpected case\n");
         free(filedata);
         return(finished == 1);
     }
