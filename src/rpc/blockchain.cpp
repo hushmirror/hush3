@@ -1651,7 +1651,7 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp, const CPubKey& my
     if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         progress = Checkpoints::GuessVerificationProgress(Params().Checkpoints(), chainActive.LastTip());
     } else {
-        int32_t longestchain = HUSH_LONGESTCHAIN;//komodo_longestchain();
+        int32_t longestchain = HUSH_LONGESTCHAIN;//hush_longestchain();
 	    progress = (longestchain > 0 ) ? (double) chainActive.Height() / longestchain : 1.0;
     }
     notarized_height = komodo_notarized_height(&prevMoMheight,&notarized_hash,&notarized_desttxid);

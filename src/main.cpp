@@ -3941,7 +3941,7 @@ void static UpdateTip(CBlockIndex *pindexNew) {
     if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         progress = Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), chainActive.LastTip());
     } else {
-        int32_t longestchain = komodo_longestchain();
+        int32_t longestchain = hush_longestchain();
         progress = (longestchain > 0 ) ? (double) chainActive.Height() / longestchain : 1.0;
     }
 
@@ -5611,7 +5611,7 @@ bool AcceptBlock(int32_t *futureblockp,CBlock& block, CValidationState& state, C
             {
                 CValidationState tmpstate; CBlockIndex *tmpindex; int32_t ht,longest;
                 ht = (int32_t)pindex->GetHeight();
-                longest = komodo_longestchain();
+                longest = hush_longestchain();
                 if ( (longest == 0 || ht < longest-6) && (tmpindex=komodo_chainactive(ht)) != 0 )
                 {
                     fprintf(stderr,"reconsider height.%d, longest.%d\n",(int32_t)ht,longest);
@@ -5824,7 +5824,7 @@ bool ProcessNewBlock(bool from_miner,int32_t height,CValidationState &state, CNo
                 //fprintf(stderr,"request headers from failed process block peer\n");
                 pfrom->PushMessage("getheaders", chainActive.GetLocator(chainActive.LastTip()), uint256());
             }*/
-            komodo_longestchain();
+            hush_longestchain();
             return error("%s: AcceptBlock FAILED", __func__);
         }
         //else fprintf(stderr,"added block %s %p\n",pindex->GetBlockHash().ToString().c_str(),pindex->pprev);
@@ -6309,8 +6309,8 @@ bool static LoadBlockIndexDB()
     if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         progress = Checkpoints::GuessVerificationProgress(chainparams.Checkpoints(), chainActive.LastTip());
     } else {
-        int32_t longestchain = komodo_longestchain();
-        // TODO: komodo_longestchain does not have the data it needs at the time LoadBlockIndexDB
+        int32_t longestchain = hush_longestchain();
+        // TODO: hush_longestchain does not have the data it needs at the time LoadBlockIndexDB
         // runs, which makes it return 0, so we guess 50% for now
         progress = (longestchain > 0 ) ? (double) chainActive.Height() / longestchain : 0.5;
     }

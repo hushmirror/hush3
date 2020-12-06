@@ -1186,7 +1186,7 @@ int32_t komodo_nextheight()
     CBlockIndex *pindex; int32_t ht;
     if ( (pindex= chainActive.LastTip()) != 0 && (ht= pindex->GetHeight()) > 0 )
         return(ht+1);
-    else return(komodo_longestchain() + 1);
+    else return(hush_longestchain() + 1);
 }
 
 int32_t komodo_isrealtime(int32_t *kmdheightp)
@@ -1195,7 +1195,7 @@ int32_t komodo_isrealtime(int32_t *kmdheightp)
     if ( (sp= komodo_stateptrget((char *)"KMD")) != 0 )
         *kmdheightp = sp->CURRENT_HEIGHT;
     else *kmdheightp = 0;
-    if ( (pindex= chainActive.LastTip()) != 0 && pindex->GetHeight() >= (int32_t)komodo_longestchain() )
+    if ( (pindex= chainActive.LastTip()) != 0 && pindex->GetHeight() >= (int32_t)hush_longestchain() )
         return(1);
     else return(0);
 }

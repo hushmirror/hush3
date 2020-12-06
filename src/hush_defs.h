@@ -546,7 +546,7 @@ int32_t komodo_minerids(uint8_t *minerids,int32_t height,int32_t width);
 int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[IGUANA_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
 
 uint32_t komodo_blocktime(uint256 hash);
-int32_t komodo_longestchain();
+int32_t hush_longestchain();
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int8_t komodo_segid(int32_t nocache,int32_t height);
 int32_t komodo_heightpricebits(uint64_t *seedp,uint32_t *heightbits,int32_t nHeight);

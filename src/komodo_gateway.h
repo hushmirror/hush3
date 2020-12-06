@@ -1438,7 +1438,7 @@ void hush_passport_iteration()
     {
         if ( SMART_CHAIN_SYMBOL[0] == 0 )
             komodo_interestsum();
-        //komodo_longestchain();
+        //hush_longestchain();
         lastinterest = komodo_chainactive_timestamp();
     }
     refsp = komodo_stateptr(symbol,dest);
@@ -1542,7 +1542,7 @@ void hush_passport_iteration()
             if ( (fp= fopen(fname,"wb")) != 0 )
             {
                 buf[0] = (uint32_t)chainActive.LastTip()->GetHeight();
-                buf[1] = (uint32_t)komodo_longestchain();
+                buf[1] = (uint32_t)hush_longestchain();
                 if ( buf[0] != 0 && buf[0] == buf[1] )
                 {
                     buf[2] = (uint32_t)time(NULL);
@@ -1559,7 +1559,7 @@ void hush_passport_iteration()
         if ( sp != 0 && isrealtime == 0 )
             refsp->RTbufs[0][2] = 0;
     }
-    //komodo_paxtotal(); // calls komodo_isrealtime(), which calls komodo_longestchain()
+    //komodo_paxtotal(); // calls komodo_isrealtime(), which calls hush_longestchain()
     refsp->RTmask |= RTmask;
     if ( expired == 0 && HUSH_PASSPORT_INITDONE == 0 )
     {

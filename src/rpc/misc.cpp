@@ -55,7 +55,7 @@ using namespace std;
  **/
 
 uint64_t komodo_interestsum();
-int32_t komodo_longestchain();
+int32_t hush_longestchain();
 int32_t komodo_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *txidp);
 bool komodo_txnotarizedconfirmed(uint256 txid);
 uint32_t komodo_chainactive_timestamp();

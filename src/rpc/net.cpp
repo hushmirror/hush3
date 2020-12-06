@@ -178,7 +178,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 }
 
 int32_t HUSH_LONGESTCHAIN;
-int32_t komodo_longestchain()
+int32_t hush_longestchain()
 {
     static int32_t depth;
     int32_t ht,n=0,num=0,maxheight=0,height = 0;
@@ -194,7 +194,7 @@ int32_t komodo_longestchain()
         }
         BOOST_FOREACH(const CNodeStats& stats, vstats)
         {
-            //fprintf(stderr,"komodo_longestchain iter.%d\n",n);
+            //fprintf(stderr,"hush_longestchain iter.%d\n",n);
             CNodeStateStats statestats;
             bool fStateStats = GetNodeStateStats(stats.nodeid,statestats);
             if ( statestats.nSyncHeight < 0 )
