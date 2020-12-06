@@ -177,7 +177,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return ret;
 }
 
-int32_t KOMODO_LONGESTCHAIN;
+int32_t HUSH_LONGESTCHAIN;
 int32_t komodo_longestchain()
 {
     static int32_t depth;
@@ -216,14 +216,14 @@ int32_t komodo_longestchain()
         depth--;
         if ( num > (n >> 1) )
         {
-            if ( 0 && height != KOMODO_LONGESTCHAIN )
-                fprintf(stderr,"set %s KOMODO_LONGESTCHAIN <- %d\n",SMART_CHAIN_SYMBOL,height);
-            KOMODO_LONGESTCHAIN = height;
+            if ( 0 && height != HUSH_LONGESTCHAIN )
+                fprintf(stderr,"set %s HUSH_LONGESTCHAIN <- %d\n",SMART_CHAIN_SYMBOL,height);
+            HUSH_LONGESTCHAIN = height;
             return(height);
         }
-        KOMODO_LONGESTCHAIN = 0;
+        HUSH_LONGESTCHAIN = 0;
     }
-    return(KOMODO_LONGESTCHAIN);
+    return(HUSH_LONGESTCHAIN);
 }
 
 UniValue addnode(const UniValue& params, bool fHelp, const CPubKey& mypk)

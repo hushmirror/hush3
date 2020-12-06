@@ -61,7 +61,7 @@ bool komodo_txnotarizedconfirmed(uint256 txid);
 uint32_t komodo_chainactive_timestamp();
 int32_t komodo_whoami(char *pubkeystr,int32_t height,uint32_t timestamp);
 extern uint64_t KOMODO_INTERESTSUM,KOMODO_WALLETBALANCE;
-extern int32_t KOMODO_LASTMINED,JUMBLR_PAUSE,KOMODO_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
+extern int32_t KOMODO_LASTMINED,JUMBLR_PAUSE,HUSH_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 uint32_t komodo_segid32(char *coinaddr);
 int64_t komodo_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
@@ -261,7 +261,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 #endif
         //fprintf(stderr,"after wallet %u\n",(uint32_t)time(NULL));
         obj.push_back(Pair("blocks",        (int)chainActive.Height()));
-        if ( (longestchain= KOMODO_LONGESTCHAIN) != 0 && chainActive.Height() > longestchain )
+        if ( (longestchain= HUSH_LONGESTCHAIN) != 0 && chainActive.Height() > longestchain )
             longestchain = chainActive.Height();
         //fprintf(stderr,"after longestchain %u\n",(uint32_t)time(NULL));
         obj.push_back(Pair("longestchain",        longestchain));

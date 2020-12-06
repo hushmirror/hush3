@@ -1651,7 +1651,7 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp, const CPubKey& my
     if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         progress = Checkpoints::GuessVerificationProgress(Params().Checkpoints(), chainActive.LastTip());
     } else {
-        int32_t longestchain = KOMODO_LONGESTCHAIN;//komodo_longestchain();
+        int32_t longestchain = HUSH_LONGESTCHAIN;//komodo_longestchain();
 	    progress = (longestchain > 0 ) ? (double) chainActive.Height() / longestchain : 1.0;
     }
     notarized_height = komodo_notarized_height(&prevMoMheight,&notarized_hash,&notarized_desttxid);
@@ -1659,7 +1659,7 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp, const CPubKey& my
     obj.push_back(Pair("chain",                 Params().NetworkIDString()));
     obj.push_back(Pair("blocks",                (int)chainActive.Height()));
     obj.push_back(Pair("synced",                HUSH_INSYNC!=0));
-    obj.push_back(Pair("longestchain",        KOMODO_LONGESTCHAIN));
+    obj.push_back(Pair("longestchain",        HUSH_LONGESTCHAIN));
     obj.push_back(Pair("notarized", notarized_height));
     obj.push_back(Pair("headers",               pindexBestHeader ? pindexBestHeader->GetHeight() : -1));
     obj.push_back(Pair("bestblockhash",         chainActive.LastTip()->GetBlockHash().GetHex()));
