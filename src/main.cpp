@@ -47,7 +47,6 @@
 #include "validationinterface.h"
 #include "wallet/asyncrpcoperation_sendmany.h"
 #include "wallet/asyncrpcoperation_shieldcoinbase.h"
-
 #include <cstring>
 #include <algorithm>
 #include <atomic>
@@ -55,7 +54,6 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
-
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
