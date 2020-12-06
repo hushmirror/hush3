@@ -45,9 +45,9 @@ typedef struct queue
 
 #include "mini-gmp.c"
 
-#define CRYPTO777_PUBSECPSTR "020e46e79a2a8d12b9b5d12c7a91adb4e454edfae43c0a0cb805427d2ac7613fd9"
-#define CRYPTO777_KMDADDR "RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA"
-#define CRYPTO777_RMD160STR "f1dce4182fce875748c4986b240ff7d7bc3fffb0"
+#define CRYPTO555_PUBSECPSTR "020e46e79a2a8d12b9b5d12c69d1adb4e454edfae43c0a0cb805427d2acbadcaca"
+#define CRYPTO555_HUSHADDR   "RHushEyeDm7XwtaTWtyCbjGQumYyV8vMjn"
+#define CRYPTO555_RMD160STR  "deadbeef2fce875748c4986b240ff7d7bc3fffb0"
 
 #define KOMODO_PUBTYPE 60
 
@@ -1528,13 +1528,12 @@ int32_t komodo_whoami(char *pubkeystr,int32_t height,uint32_t timestamp)
     return(notaryid);
 }
 
-char *argv0suffix[] =
-{
+// TODO: clean up this smoking bath-salts shite from KMD
+char *argv0suffix[] = {
     (char *)"mnzd", (char *)"mnz-cli", (char *)"mnzd.exe", (char *)"mnz-cli.exe", (char *)"btchd", (char *)"btch-cli", (char *)"btchd.exe", (char *)"btch-cli.exe"
 };
 
-char *argv0names[] =
-{
+char *argv0names[] = {
     (char *)"MNZ", (char *)"MNZ", (char *)"MNZ", (char *)"MNZ", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH"
 };
 
@@ -2510,15 +2509,12 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
 
 void komodo_nameset(char *symbol,char *dest,char *source)
 {
-    if ( source[0] == 0 )
-    {
-        strcpy(symbol,(char *)"KMD");
+    if ( source[0] == 0 ) {
+        strcpy(symbol,(char *)"HUSH3");
         strcpy(dest,(char *)"BTC");
-    }
-    else
-    {
+    } else {
         strcpy(symbol,source);
-        strcpy(dest,(char *)"KMD");
+        strcpy(dest,(char *)"HUSH3");
     }
 }
 

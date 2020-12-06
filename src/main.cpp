@@ -1381,7 +1381,7 @@ int32_t komodo_isnotaryvout(char *coinaddr,uint32_t tiptime) // from ac_private 
         uint8_t pubkeys[64][33];
         komodo_notaries(pubkeys,0,tiptime);
     }
-    if ( strcmp(coinaddr,CRYPTO777_KMDADDR) == 0 )
+    if ( strcmp(coinaddr,CRYPTO555_HUSHADDR) == 0 )
         return(1);
     for (int32_t i = 0; i < NUM_HUSH_NOTARIES; i++) 
     {

@@ -3,7 +3,6 @@
 // Copyright (c) 2019-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "amount.h"
 #include "consensus/upgrades.h"
 #include "core_io.h"
@@ -574,7 +572,6 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 #define IGUANA_MAXSCRIPTSIZE 10001
 uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pubkey37[37],char *coinaddr,int32_t height,char *base,int64_t fiatoshis);
 int32_t komodo_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen);
-#define CRYPTO777_KMDADDR "RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA"
 extern int32_t KOMODO_PAX;
 extern uint64_t KOMODO_INTERESTSUM,KOMODO_WALLETBALANCE;
 int32_t komodo_is_issuer();
@@ -722,9 +719,9 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         EnsureWalletIsUnlocked();
         fee = komodo_kvfee(flags,opretlen,keylen);
         ret.push_back(Pair("fee",(double)fee/COIN));
-        CBitcoinAddress destaddress(CRYPTO777_KMDADDR);
+        CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
         if (!destaddress.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid destination address!");
         SendMoney(destaddress.Get(),10000,false,wtx,opretbuf,opretlen,fee);
         ret.push_back(Pair("txid",wtx.GetHash().GetHex()));
     } else ret.push_back(Pair("error",(char *)"null key"));
@@ -760,7 +757,7 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
     }
     komodoshis = PAX_fiatdest(&seed,0,destaddr,pubkey37,(char *)params[0].get_str().c_str(),height,(char *)base.c_str(),fiatoshis);
     dest.append(destaddr);
-    CBitcoinAddress destaddress(CRYPTO777_KMDADDR);
+    CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
     if (!destaddress.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
     for (i=0; i<33; i++)
@@ -796,7 +793,7 @@ UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
     int64_t fiatoshis = atof(params[1].get_str().c_str()) * COIN;
     komodoshis = PAX_fiatdest(&seed,1,destaddr,pubkey37,(char *)params[0].get_str().c_str(),kmdheight,SMART_CHAIN_SYMBOL,fiatoshis);
     dest.append(destaddr);
-    CBitcoinAddress destaddress(CRYPTO777_KMDADDR);
+    CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
     if (!destaddress.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
     for (i=0; i<33; i++)
@@ -5623,7 +5620,7 @@ int32_t komodo_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *
         txNew.vin[0].prevout.hash = utxotxid; //revtxid;
         txNew.vin[0].prevout.n = utxovout;
         txNew.vout[0].nValue = utxovalue - txfee;
-        txNew.vout[0].scriptPubKey = CScript() << ParseHex(CRYPTO777_PUBSECPSTR) << OP_CHECKSIG;
+        txNew.vout[0].scriptPubKey = CScript() << ParseHex(CRYPTO555_PUBSECPSTR) << OP_CHECKSIG;
         if ( pTr != 0 )
         {
             void **p = (void**)pTr;

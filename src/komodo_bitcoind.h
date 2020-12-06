@@ -736,15 +736,15 @@ void komodo_disconnect(CBlockIndex *pindex,CBlock& block)
 
 int32_t komodo_is_notarytx(const CTransaction& tx)
 {
-    uint8_t *ptr; static uint8_t crypto777[33];
+    uint8_t *ptr; static uint8_t crypto555[33];
     if ( tx.vout.size() > 0 )
     {
         ptr = (uint8_t *)&tx.vout[0].scriptPubKey[0];
         if ( ptr != 0 )
         {
-            if ( crypto777[0] == 0 )
-                decode_hex(crypto777,33,(char *)CRYPTO777_PUBSECPSTR);
-            if ( memcmp(ptr+1,crypto777,33) == 0 )
+            if ( crypto555[0] == 0 )
+                decode_hex(crypto555,33,(char *)CRYPTO555_PUBSECPSTR);
+            if ( memcmp(ptr+1,crypto555,33) == 0 )
             {
                 //printf("found notarytx\n");
                 return(1);

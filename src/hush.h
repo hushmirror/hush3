@@ -541,7 +541,7 @@ int32_t komodo_validate_chain(uint256 srchash,int32_t notarized_height)
 int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryid,uint8_t *scriptbuf,int32_t scriptlen,int32_t height,uint256 txhash,int32_t i,int32_t j,uint64_t *voutmaskp,int32_t *specialtxp,int32_t *notarizedheightp,uint64_t value,int32_t notarized,uint64_t signedmask,uint32_t timestamp)
 {
     static uint256 zero; static FILE *signedfp;
-    int32_t opretlen,nid,offset,k,MoMdepth,matched,len = 0; uint256 MoM,srchash,desttxid; uint8_t crypto777[33]; struct komodo_state *sp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN];
+    int32_t opretlen,nid,offset,k,MoMdepth,matched,len = 0; uint256 MoM,srchash,desttxid; uint8_t crypto555[33]; struct komodo_state *sp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN];
     if ( (sp= komodo_stateptr(symbol,dest)) == 0 )
         return(-1);
     if ( scriptlen == 35 && scriptbuf[0] == 33 && scriptbuf[34] == 0xac )
@@ -552,14 +552,14 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
             prevKOMODO_LASTMINED = KOMODO_LASTMINED;
             KOMODO_LASTMINED = height;
         }
-        decode_hex(crypto777,33,(char *)CRYPTO777_PUBSECPSTR);
+        decode_hex(crypto555,33,(char *)CRYPTO555_PUBSECPSTR);
         /*for (k=0; k<33; k++)
-            printf("%02x",crypto777[k]);
-        printf(" crypto777 ");
+            printf("%02x",crypto555[k]);
+        printf(" crypto555 ");
         for (k=0; k<scriptlen; k++)
             printf("%02x",scriptbuf[k]);
-        printf(" <- script ht.%d i.%d j.%d cmp.%d\n",height,i,j,memcmp(crypto777,scriptbuf+1,33));*/
-        if ( memcmp(crypto777,scriptbuf+1,33) == 0 )
+        printf(" <- script ht.%d i.%d j.%d cmp.%d\n",height,i,j,memcmp(crypto555,scriptbuf+1,33));*/
+        if ( memcmp(crypto555,scriptbuf+1,33) == 0 )
         {
             *specialtxp = 1;
             //printf(">>>>>>>> ");
