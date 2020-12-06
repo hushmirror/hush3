@@ -1539,7 +1539,7 @@ char *argv0names[] = {
 
 
 // Large total supplies lead to numerical errors, beware!
-uint64_t komodo_max_money()
+uint64_t hush_max_money()
 {
     return komodo_current_supply(10000000);
 }
@@ -2306,7 +2306,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
 
         strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
 
-        MAX_MONEY = komodo_max_money();
+        MAX_MONEY = hush_max_money();
 
         if ( (baseid = komodo_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
         {
