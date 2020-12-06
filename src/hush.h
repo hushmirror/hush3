@@ -43,7 +43,7 @@ void komodo_event_rewind(struct komodo_state *sp,char *symbol,int32_t height);
 int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block);
 bool check_pprevnotarizedht();
 
-#include "komodo_structs.h"
+#include "hush_structs.h"
 #include "hush_globals.h"
 #include "hush_utils.h"
 #include "komodo_curve25519.h"

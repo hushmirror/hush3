@@ -18,7 +18,7 @@
  */
 
 #include "CCinclude.h"
-#include "komodo_structs.h"
+#include "hush_structs.h"
 #include "key_io.h"
 
 #ifdef TESTMODE           

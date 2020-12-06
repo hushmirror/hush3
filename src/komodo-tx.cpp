@@ -42,7 +42,7 @@ using namespace std;
 
 #include "uint256.h"
 #include "arith_uint256.h"
-#include "komodo_structs.h"
+#include "hush_structs.h"
 #include "hush_globals.h"
 #include "hush_defs.h"
 
