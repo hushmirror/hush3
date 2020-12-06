@@ -1530,11 +1530,11 @@ int32_t komodo_whoami(char *pubkeystr,int32_t height,uint32_t timestamp)
 
 // TODO: clean up this smoking bath-salts shite from KMD
 char *argv0suffix[] = {
-    (char *)"mnzd", (char *)"mnz-cli", (char *)"mnzd.exe", (char *)"mnz-cli.exe", (char *)"btchd", (char *)"btch-cli", (char *)"btchd.exe", (char *)"btch-cli.exe"
+    (char *)"fuckjl777d", (char *)"fuckjl777-cli", (char *)"fuckjl777d.exe", (char *)"fuckjl777-cli.exe", (char *)"btchd", (char *)"btch-cli", (char *)"btchd.exe", (char *)"btch-cli.exe"
 };
 
 char *argv0names[] = {
-    (char *)"MNZ", (char *)"MNZ", (char *)"MNZ", (char *)"MNZ", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH"
+    (char *)"FUCKJL777", (char *)"FUCKJL777", (char *)"FUCKJL777", (char *)"FUCKJL777", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH"
 };
 
 
