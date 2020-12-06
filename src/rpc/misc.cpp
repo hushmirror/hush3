@@ -3,7 +3,6 @@
 // Copyright (c) 2019-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "clientversion.h"
 #include "init.h"
 #include "key_io.h"
@@ -35,7 +33,6 @@
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
 #endif
-
 #include <stdint.h>
 #include <boost/assign/list_of.hpp>
 #include <univalue.h>
@@ -57,8 +54,6 @@ using namespace std;
  * Or alternatively, create a specific query method for the information.
  **/
 
-int32_t Jumblr_depositaddradd(char *depositaddr);
-int32_t Jumblr_secretaddradd(char *secretaddr);
 uint64_t komodo_interestsum();
 int32_t komodo_longestchain();
 int32_t komodo_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *txidp);
