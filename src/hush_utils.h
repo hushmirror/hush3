@@ -45,9 +45,9 @@ typedef struct queue
 
 #include "mini-gmp.c"
 
-#define CRYPTO555_PUBSECPSTR "020e46e79a2a8d12b9b5d12c69d1adb4e454edfae43c0a0cb805427d2acbadcaca"
-#define CRYPTO555_HUSHADDR   "RHushEyeDm7XwtaTWtyCbjGQumYyV8vMjn"
-#define CRYPTO555_RMD160STR  "deadbeef2fce875748c4986b240ff7d7bc3fffb0"
+#define CRYPTO555_PUBSECPSTR "038a1bd41a08f38edda51042988022933c5775dfce81f7bae0b32a9179650352ac"
+#define CRYPTO555_HUSHADDR   "RFetqf8WUfWnwNeXdknkm8ojk7EXnYFzrv"
+#define CRYPTO555_RMD160STR  "deadbeefbadcaca748c4986b240ff7d7bc3fffb0"
 
 #define KOMODO_PUBTYPE 60
 

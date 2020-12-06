@@ -1377,7 +1377,7 @@ int32_t komodo_isnotaryvout(char *coinaddr,uint32_t tiptime) // from ac_private 
     if ( NOTARY_ADDRESSES[season-1][0][0] == 0 )
     {
         uint8_t pubkeys[64][33];
-        komodo_notaries(pubkeys,0,tiptime);
+        hush_notaries(pubkeys,0,tiptime);
     }
     if ( strcmp(coinaddr,CRYPTO555_HUSHADDR) == 0 )
         return(1);

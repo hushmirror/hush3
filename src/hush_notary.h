@@ -22,44 +22,42 @@
 
 const char *Notaries_genesis[][2] =
 {
-    { "jl777_testA", "03b7621b44118017a16043f19b30cc8a4cfe068ac4e42417bae16ba460c80f3828" },
-    { "jl777_testB", "02ebfc784a4ba768aad88d44d1045d240d47b26e248cafaf1c5169a42d7a61d344" },
-    { "pondsea_SH", "02209073bc0943451498de57f802650311b1f12aa6deffcd893da198a544c04f36" },
-    { "crackers_EU", "0340c66cf2c41c41efb420af57867baa765e8468c12aa996bfd816e1e07e410728" },
-    { "pondsea_EU", "0225aa6f6f19e543180b31153d9e6d55d41bc7ec2ba191fd29f19a2f973544e29d" },
-    { "locomb_EU", "025c6d26649b9d397e63323d96db42a9d3caad82e1d6076970efe5056c00c0779b" },
-    { "fullmoon_AE", "0204a908350b8142698fdb6fabefc97fe0e04f537adc7522ba7a1e8f3bec003d4a" },
-    { "movecrypto_EU", "021ab53bc6cf2c46b8a5456759f9d608966eff87384c2b52c0ac4cc8dd51e9cc42" },
-    { "badass_EU", "0209d48554768dd8dada988b98aca23405057ac4b5b46838a9378b95c3e79b9b9e" },
-    { "crackers_NA", "029e1c01131974f4cd3f564cc0c00eb87a0f9721043fbc1ca60f9bd0a1f73f64a1" },
-    { "proto_EU", "03681ffdf17c8f4f0008cefb7fa0779c5e888339cdf932f0974483787a4d6747c1" }, // 10
-    { "jeezy_EU", "023cb3e593fb85c5659688528e9a4f1c4c7f19206edc7e517d20f794ba686fd6d6" },
-    { "farl4web_EU", "035caa40684ace968677dca3f09098aa02b70e533da32390a7654c626e0cf908e1" },
-    { "nxtswe_EU", "032fb104e5eaa704a38a52c126af8f67e870d70f82977e5b2f093d5c1c21ae5899" },
-    { "traderbill_EU", "03196e8de3e2e5d872f31d79d6a859c8704a2198baf0af9c7b21e29656a7eb455f" },
-    { "vanbreuk_EU", "024f3cad7601d2399c131fd070e797d9cd8533868685ddbe515daa53c2e26004c3" }, // 15
-    { "titomane_EU", "03517fcac101fed480ae4f2caf775560065957930d8c1facc83e30077e45bdd199" },
-    { "supernet_AE", "029d93ef78197dc93892d2a30e5a54865f41e0ca3ab7eb8e3dcbc59c8756b6e355" },
-    { "supernet_EU", "02061c6278b91fd4ac5cab4401100ffa3b2d5a277e8f71db23401cc071b3665546" },
-    { "supernet_NA", "033c073366152b6b01535e15dd966a3a8039169584d06e27d92a69889b720d44e1" },
-    { "yassin_EU", "033fb7231bb66484081952890d9a03f91164fb27d392d9152ec41336b71b15fbd0" }, // 20
-    { "durerus_EU", "02bcbd287670bdca2c31e5d50130adb5dea1b53198f18abeec7211825f47485d57" },
-    { "badass_SH", "026b49dd3923b78a592c1b475f208e23698d3f085c4c3b4906a59faf659fd9530b" },
-    { "badass_NA", "02afa1a9f948e1634a29dc718d218e9d150c531cfa852843a1643a02184a63c1a7" },
-    { "pondsea_NA", "031bcfdbb62268e2ff8dfffeb9ddff7fe95fca46778c77eebff9c3829dfa1bb411" },
-    { "rnr_EU", "0287aa4b73988ba26cf6565d815786caf0d2c4af704d7883d163ee89cd9977edec" },
-    { "crackers_SH", "02313d72f9a16055737e14cfc528dcd5d0ef094cfce23d0348fe974b6b1a32e5f0" },
-    { "grewal_SH", "03212a73f5d38a675ee3cdc6e82542a96c38c3d1c79d25a1ed2e42fcf6a8be4e68" },
-    { "polycryptoblock_NA", "02708dcda7c45fb54b78469673c2587bfdd126e381654819c4c23df0e00b679622" },
-    { "titomane_NA", "0387046d9745414fb58a0fa3599078af5073e10347e4657ef7259a99cb4f10ad47" },
-    { "titomane_AE", "03cda6ca5c2d02db201488a54a548dbfc10533bdc275d5ea11928e8d6ab33c2185" },
-    { "kolo_EU", "03f5c08dadffa0ffcafb8dd7ffc38c22887bd02702a6c9ac3440deddcf2837692b" },
-    { "artik_NA", "0224e31f93eff0cc30eaf0b2389fbc591085c0e122c4d11862c1729d090106c842" },
-    { "eclips_EU", "0339369c1f5a2028d44be7be6f8ec3b907fdec814f87d2dead97cab4edb71a42e9" },
-    { "titomane_SH", "035f49d7a308dd9a209e894321f010d21b7793461b0c89d6d9231a3fe5f68d9960" },
+        {"RFetqf8WUfWnwNeXdknkm8ojk7EXnYFzrv", "038a1bd41a08f38edda51042988022933c5775dfce81f7bae0b32a9179650352ac"},
+        {"RV7YSVW89WC9jBDtFG4ubtopDRove4Tfvc", "03c9d35488be73fe4f2dbb1dc011468482d71bac32249f8cce6480bcc574415d19"},
+        {"RBPFE9oXceZBWTn3Vhne4FUKE9vxGEXUKX", "028a8bb6ded2692b39a69ec2d3c9836ff221815909d5cd65257374aeb66394a002"},
+        {"RM3cvUcafPhjyypZLEginQjdhjLnSgJHte", "03a36180014115b47b97c1c8776a269bba66047b1ce2c7eb1a3d4e995a6dfff0df"},
+        {"RFFX1VaTmZYPBLCzFj7w3iJQArV9ZdaWcW", "02190865f3ca3678d322c96e49a3ddf8ad394a4c8cd97d4bb3376cf547d0d83c66"},
+        {"RDwZsLpH1QiAbJwUEY8ajXwTzu3PaWhx7n", "023ea0babb34e1ff9f4db8131ee84ad8991b954038a1e6ef9afc2a1b3fa13bbcb9"},
+        {"RCUvfnmt16ZMvLTmLGGAztcAE8fBjfbP6u", "0379a5ba9fb6b463ffcdc0b1f3ecf45a5b737275354f9c2598492f20660f6f7dfd"},
+        {"RBLu9adNVMVf6jzLLbAenWovcwq8nU6gYd", "022cd69381231d69d6d3b9638762df849bc7bbab71cbb8383eec29ca677f1afa30"},
+        {"RWfv6wd2fwgecnJxC1Ykpf1SJefGh2Wc6i", "03da8a8f57d88afb61f712a8cd35462b65ce2b2575db8f9ee33a725dcd12c44755"},
+        {"RWiK4xooG3dPdvaovu6JvR3DWoYD4tfRjx", "02ffe66af4d71345fe6984b5002ad69206e1817566a70d9ac406a679be6a3335a0"},
+        {"RYLNiJiRnEGeMxx1Q2xLoFujshRNkBa2x4", "028ef6501004569c1170ce2d7ec7ecfe5739001130ad1b39129f8b88cd3d610257"},
+        {"RTw36Ksy5Wk1Xv3B53T79zoRd6XDsE9MS6", "02d7cf4ece00895ca857fcdd0a4c2fc9c949a518d2750396f77d9f031c08a94364"},
+        {"RTPkUBriQzZy67WmFhEs6aQzJn5HBB3ntb", "03319ca1eae5888c45115d160ac07c4f2abd1720926aa579d535c4b46c807bb7f7"},
+        {"RBmZzttvDnMaEv47cWXs8SgdC993djB68r", "034302c4e1ff72a5f5391f259f7a46e646c7845aa2c9de9fb0c0a4c4802aad79d6"},
+        {"RGocb2jLCa2E9kVHDUsijrVGTDP82ngGYZ", "024440a18a16e38b836b3ad9bb54ab0b5ba83b04edebb58c62c09b2de29e9fc703"},
+        {"RVqwCjPQ6AJ6r9WeGzQvAT4eGXDScprLkW", "028a94e53ad8ed9e78f0f8a87cf3bc4754784222ad7ddf2d3dc5fafec2f6891cde"},
+        {"RB2Xc8eLrATRWVsxrZKHHx3hyJz1vugMt9", "02eca07a9b5810fe929a87f90e5f02e29a06479d39cd3a888abfa1793e1565155a"},
+        {"RKm7WUuFfqCTiUBkbxBsdh54nT6ivXpDPX", "03e3f634671005c8ffb7fe883fcf9e08f6f5486df057f215d761741d91c88de898"},
+        {"RLbHTvFQoz946W3o3gXTrjxxADeUsWWW16", "02e6bb6dcecf5e3abfe239dec55842a92f096eeac7f0ff7621c3e8948e5e789b27"},
+        {"RD75njr2RLGC5PqjHbWwuL7ndTqZiUfYxs", "0250d9996c25a34cb1b4e86303a297fc5c49c65615eb31a57fb17d1e1b376e71be"},
+        {"RT1VTzZYZLWUsPWFJ2oypEqB1MXMfq8b5Y", "02d1797941b7df42a98f59ede0f22294e7c02754232a8b1de9512ededaf3f82880"},
+        {"RKeXriTVXioHeKpFTjC8Cjohd6DHGUcKqt", "0341e62f0cdffc4ba3e0efb793c0fcaaad1b611db7021b844f643d5c25847733d2"},
+        {"RQYrDEgZPKMFAgTHNkWFeMHEmpkXe8j28T", "02b8719cd8484755990158cbdf7b9d990d4a5c3741cabe204e51ed04be5bd50133"},
+        {"RE85TACcn8CEn26itAxQV9afxV9mVg17vm", "0367f569d3dc304e699196fe9b798671fe3f12df7851a0a474879b0dbf8bc508d1"},
+        {"RPYWQJXto1aeCGe8T6g9Wo4tAL4xE82LJ8", "02cf1e245dfb44e418fd550abb825a600e1753d46a51995970e70c98be539da33e"},
+        {"RSVHRS5wqEw7bxfuE9k6xJGbARcy5guisp", "03ab8ac83d689ce76b5d29a54c3b34d0a6cb37d64313ff4467c744787475969a23"},
+        {"REAQwBaJFo6DyBkwfW7rTTDbUtkdmATcQ8", "025e80f0075514cc5940de85c0c559efa99a3688faf6cccb8c1d1f38b96ca91e71"},
+        {"RF1gz8QBw5uFScGasqVxoUjQwJCD9zHJwC", "031cdae4b545e5049ccee8e0cb792e25795b56e08b5e64b1d972c9b94e9bfd4ed0"},
+        {"RTnLGoWzpsyoGSViGH8GyYcYhSveSEmnPV", "03cf3403a9d1cefa83e07b73e618a7f991d140a8283a02df3ce7c00223f27f43d0"},
+        {"RArURqxp6qfF7fqv38tCYr6p4zBtLtqf4x", "026bc4c91c2c35fabe88fea6470d6cda98977a97c251656adf25b81653c00c3800"},
+        {"RN8GCryShNFvBWtcNEWrQJ5A9AWb3JJoXt", "02afa94f6574cd0fe4f5dc83b09a2112457862421ce96bdc75c1cf25ef5b1f8c4b"},
+        {"RQSC2eBckcFPWzq9UtofePC31wgDySfJtw", "035d570768d844c8150a3bd966a2e13aa99316f4ab3e80370c4d16fb02f95d0974"},
+        {"RC4uQsfH6jXpgnTFuFiDwAFo58gHLNkWo7", "02402b0ab7001fd4bcb4fa0d8d7006a6c521b1c76e85aad7b374ecd6c5d564c237"},
+        {"RREcuaUWSkNzTNPBbFLbXKTKiC4fd5t47J", "03d5bf8b43c44ba064e897da47dd36dba537bebf013d28247ce7a088496dd9b66d"},
+        {"REFyC5e7kmse3PUapDuXHL2xmtYEGttYYL", "035f56fd01dd21725928bbd878b795dccafecc03b978dc83748e9194dcbfebfb79"},
 };
-
-#define CRYPTO555_PUBSECPSTR "020e46e79a2a8d12b9b5d12c7a91adb4e454edfae43c0a0cb805427d2acbadcaca"
 
 int32_t gethushseason(int32_t height)
 {
@@ -85,7 +83,7 @@ int32_t getacseason(uint32_t timestamp)
     return(0);
 }
 
-int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp)
+int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp)
 {
     int32_t i,htind,n; uint64_t mask = 0; struct knotary_entry *kp,*tmp;
     static uint8_t kmd_pubkeys[NUM_HUSH_SEASONS][64][33],didinit[NUM_HUSH_SEASONS];
@@ -124,7 +122,7 @@ int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestam
 int32_t komodo_electednotary(int32_t *numnotariesp,uint8_t *pubkey33,int32_t height,uint32_t timestamp)
 {
     int32_t i,n; uint8_t pubkeys[64][33];
-    n = komodo_notaries(pubkeys,height,timestamp);
+    n = hush_notaries(pubkeys,height,timestamp);
     *numnotariesp = n;
     for (i=0; i<n; i++)
     {

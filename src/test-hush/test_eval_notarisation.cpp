@@ -18,7 +18,7 @@
 #include "testutils.h"
 
 
-extern int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
+extern int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 
 
 namespace TestEvalNotarisation {
@@ -66,7 +66,7 @@ namespace TestEvalNotarisation {
     template<typename Modifier>
         void SetupEval(EvalMock &eval, CMutableTransaction &notary, Modifier modify)
         {
-            eval.nNotaries = komodo_notaries(eval.notaries, 780060, 1522946781);
+            eval.nNotaries = hush_notaries(eval.notaries, 780060, 1522946781);
 
             // make fake notary inputs
             notary.vin.resize(11);

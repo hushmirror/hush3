@@ -13,13 +13,12 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-#ifndef KOMODO_DEFS_H
-#define KOMODO_DEFS_H
+#ifndef HUSH_DEFS_H
+#define HUSH_DEFS_H
 #include "arith_uint256.h"
 #include "chain.h"
 #include "hush_nk.h"
 #define KOMODO_EARLYTXID_HEIGHT 100
-//#define ADAPTIVEPOW_CHANGETO_DEFAULTON 1572480000
 #define ASSETCHAINS_MINHEIGHT 128
 #define ASSETCHAINS_MAX_ERAS 7
 #define KOMODO_ELECTION_GAP 2000
@@ -28,9 +27,9 @@
 #define KOMODO_LIMITED_NETWORKSIZE 4
 #define IGUANA_MAXSCRIPTSIZE 10001
 #define KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
-#define CRYPTO555_PUBSECPSTR "020e46e79a2a8d12b9b5d12c69d1adb4e454edfae43c0a0cb805427d2acbadcaca"
-#define CRYPTO555_HUSHADDR   "RHushEyeDm7XwtaTWtyCbjGQumYyV8vMjn"
-#define CRYPTO555_RMD160STR  "deadbeef2fce875748c4986b240ff7d7bc3fffb0"
+#define CRYPTO555_PUBSECPSTR "038a1bd41a08f38edda51042988022933c5775dfce81f7bae0b32a9179650352ac"
+#define CRYPTO555_HUSHADDR   "RFetqf8WUfWnwNeXdknkm8ojk7EXnYFzrv"
+#define CRYPTO555_RMD160STR  "deadbeefbadcaca748c4986b240ff7d7bc3fffb0"
 #define HUSH_FIRSTFUNGIBLEID 100
 #define KOMODO_SAPLING_ACTIVATION 1544832000 // Dec 15th, 2018
 #define KOMODO_SAPLING_DEADLINE 1550188800 // Feb 15th, 2019
@@ -407,70 +406,70 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
    {
         // Hush Delayed Proof of Work, Season 6 In The Great History Of DPoW
         // NOTE: Hush notaries are proudly anon, where KMD notaries doxx themselves, derpz and lulz
-        {"RHush8GC36rip8uY4fyDU79NxbhKNtqghk","0311e75bdbb9215eb040eb01f932097b2dde8632570b314087883dcd4344b27a8f"},
-        {"RHushPhhtqMDgdHe16NXuZfzQVAyKYzPZB","0387c4fbc3df18437820f1ecb3ce072c41b9ee3db45bb5df5bd4c9504ff769a0e3"},
-        {"RHush7Ua35bjt7RobikaG2rXp8oSu27uuE","033af93c56093489b836f309b1f1709ede0d34dcc01e676ba04c41492d45c2a82d"},
-        {"RHushXfsrvBTd1UKE5b86GpW7kPy6x8kMc","02735b7707a601677a201115d222ea96cca019e2537989202c930b5eabc1b7d0d1"},
-        {"RHushGKVM7V66vxaVMVKZa5zfU31jHnvvJ","02b64255d2ed8e72efb8606a5f3edd991706d6fa405e2edb2366ccc0d04411a971"},
-        {"RHushhj9ZqSxbsoKmbdQCs31udPj7R84L1","0219fd04e4d10a9a3a3bdd8463d817e27af21f9ee8fd9c96ab168f4075c7f8ab04"},
-        {"RHushHSVgpiFKTzKeYX1WeEVSFvaRJntfG","031f342fb96cfbe54881ad4feb5d6d4ffa431671a88f55ccd5c97710a40492858c"},
-        {"RHushhgnoYHyo1FAPd95pnSZ41ku9pbsTa","03c6c9f035edaa08b1361d4a36650506c33f9224dcca3e5e670e79cd6cacf4272a"},
-        {"RHushzyxZZWRTbeoL2kBTwpKRPQnCSydY2","02ed6ae515061943197e4666966107c60419d0f76051c6eff56f4aa325b4a4d909"},
-        {"RHushTgVyVCR2nfHSnFpnQdYpAJkuhh32A","03651c4e20684ba32afd45a51b78120b1d88a165a56a465b480e08a27877b25511"},
-        {"RHushfUUfe2mEvzooNJPVd46ajGR5mVk8u","02196af172bb155312575b55f7e9beec21fa861aa7ab424eafa8555e5c90cbf959"},
-        {"RHushycRhdDqFMmU2CsHsPNdsFy2gYxmLw","03686768588bd270934f38c9c747703bd13923a271781d53d73e35d516a8d95e06"},
-        {"RHusheqVQ3qFtSVbQz751H4EiNaP47bKPf","033d099e4bf7d6250adab6d1519aecd0c234b465de6c3c3569864b87acc160926d"},
-        {"RHushiEq7kXBBCAWz1E44i2aw1SAt6cMku","025260889f16fdb809f415a457a92c5afcd1b0f30101a2eca495c6fcc333684fd5"},
-        {"RHushVTxFKFfySmNqpHtFBg7s3whm3Zk4q","035ed8e13cd4861a76336f2f78aab5af350d363b4f7ce784b1ab24697b951ef352"},
-        {"RHushzssPeRpshz2Qgezx33QafbeeW67Wa","02a257c40452cc405e4b53f54224d2a76c7a74477f32b0e50e7349b9d4a7d8eb73"},
-        {"RHush9Mz58wqRMYwQmQ2uehTphpwyjNPF8","022dd50c6325d5739c49c1158b3d0c4300db5e05bbb180674bbe37563695bb7c4c"},
-        {"RHushLVwBCVsj5wQfL3Vqn5dtCUNzYACqR","03d7f02d5bf50eeb66b24932e2aa1ee68536184d8e904a9f08a19f1e63247bd370"},
-        {"RHushnwstemVMdgejh5tmb51GFCgfrW5Wn","03d7071297ce99b58ee5c16c91a682a67b98423df19c83016e30c3b566ee7d5013"},
-        {"RHushah3awaNJnms5fDzHQJde1QeoWhjnV","02279ff0ca33d8a6570e643cc8dc8feb48d5bd51a6bb8fe36b98fb30b01ce31ff8"},
-        {"RHushjrJUjLzE4am73D1aNkjH5S6hHWmWc","027ab4c14966b13955616c4a17de8a497088b3ceff076077aeb02504d73314b928"},
-        {"RHushptDtbjDvdeeyDZUvps6wFoPECxwEd","0209f18cc2f708ccc6c6d0ef380440dec0f6052dc3904f14dfa9303e7feb583128"},
-        {"RHushQH3qtbFHZ5qCjWYbPfWCa8tV8WVDR","035108e4d8415aa4dcffb076e3e7f681645be7ae9860b552147f46a26fa4995fe7"},
-        {"RHushw4ztWqhZycAJHzz2kaUwDQNr1CFUn","02d852b7ac1a0f8407cf6e17bd5729ad471ec8ff9b1010ea43b2dd11ab1f1fcc0f"},
-        {"RHushz1vQti15q7Cc1CwUvA2ctPnNVZQQj","03651736c7f6f19991ab047687fe1a832d97fdec946d185b0e475625692ad3eb2a"},
-        {"RHush3FwGHgmcSDUB6pLNfhser8qbwyCrS","0344bfb5e40f33f033869f0259e1baefdb297e4a266b87424af72fa09cf7f32e0e"},
-        {"RHushNnHbhKgtMbGM3dWnJ4Wa8FZvDL2es","03cceb1d4ce28edd255805b9e2cfad215c29e8aed068ae5ec76183e2b5b413d48c"},
-        {"RHush2dcugTQ8vGHMdFVwD9ULkFWzbsZ5W","02b762e56f508cb14127fe725017772b575925881911fd8fc374529b5e509ab7d3"},
-        {"RHushJ1ydfCUcAvNUsikkct9ZoW7nFqrmK","03b36c60c7fc1c81cc989e45847ad2faff93398a95ec6b8138b38f8078d5652e73"},
-        {"RHushdyAmvxV8Em5Gud33wDDQN74sKNUSK","02e096a7b57f6d5ac6d731b39dc9a656ea920d60c8db6f1d4f433985cb4756fb3e"},
-        {"RHushPdks3JJphcYrxukGtJDdx9spMwWS1","02ff62a40b44d34f7f96c303903bf76fca5a60693cb085ea1ce72e4bb29f572b95"},
-        {"RHushDUQxu68DZstxx3yj8jFV9G3iKn2dC","0227ac6e3b61069570b3f1c519492620929406120a0e77b71a8ead0f1f5a084a98"},
-        {"RHushU3jFwas7B7mJz5A9dSTUzBq9ifmD9","02cef39af8bb49fd5b920f75f28ea75de8202e3ad87a07e9a86fae2e78c54fe1be"},
-        {"RHushVBhtjBroSZU3NwS2JHPsaL6XpHMWc","02861aefc110ff5d8eb8783c068ee421872ad37d49830a5b14d7b19c01668a6e12"},
-        {"RHushxBYs561RAtoJbPPptzrS4LDg2yzkx","03e1235ad6da52d1ba97d5e5dbb0dad35aa0453ef92fc8c368abe8fce102cdc2e9"},
-        {"RHush6Cb9H11o77QkTwjj8HkUgHVySkYKN","03d22020cad60b83344414bdad05853c192c545d71539f463c974605eb0d118334"},
-        {"RHush19GGZa3yzPPdcyEYFGpJZepe2UoC5","03dbc620a20d4f9c9f066ec6773fbdd49e0062ff242fc1134d59e6058b4ef6627c"},
-        {"RHushcDcHdfLEuGPf9NfF8RyfuR9y7pfG9","02a55a7cb6f6784afd44bac0033c754e238683e7f9b4ce6ea3da5ed70aeeb297ab"},
-        {"RHushUwawFZ3hx4YYjiKrDw3EsEV5BguDw","03485a646f2c9d52a5dfc35d3db16b609f29bdc7c6ea3a3fbb9930f7cd8026722b"},
-        {"RHushRy6RUcozhxoySbxVmuWD2fnmA7Lnu","02aca0c996cdd7d180c788bca7a574af2e8824514849f087ec3784aaf82b4e09c1"},
-        {"RHushp5dFxnudvYmTMVvhHCpv7wAeg9yme","039603fcb707cf7a150bb3c8dcff70efb3652e28c5cb9f275a2723d6e7769b35e6"},
-        {"RHushYC8WX1DZZFSyEnKwWfYkaPbp3NYV2","033464b6800aa374ddda0499eeb17440a14c6f01b16e1ca8533721f565615b5652"},
-        {"RHushLmLU8qCQ2suwJCmLUGDP8UHeKakQ1","03f729b004fa78ad47d8a9948a9cec9c183251c60d19b722132825e91979ea1718"},
-        {"RHushf3WM6J2YkWW6jrzfysRJaL7ixvA4S","02d1f4327470ac0548d7e1c806793c555d28d53cbad2458f5e206bdd05238eb357"},
-        {"RHushe75FywZGhRZGuK16LBtStkQGH8Ft9","0204e1cb1cbdb494a4cd7d29447acad55748fe9a4bcf35db5ed9eb793ca88545cc"},
-        {"RHush8wqe1SkcweBBPqusQ5uakjEUKvxk1","0256120d1d2556284b6256d463d245fb0b6853d48b56c249c4092b9903043db4a6"},
-        {"RHushKidwwcrGGe6i75x8eP652kVSSZMvm","036e24c5212aaf795485b827f67af8d2b04558a6663815f62611830d9d0dce114c"},
-        {"RHushGV6GSMQePaLL7xcgWed6atye48cT1","02a298865ccbb575a770b68ece73962ddf5bcaeedc7b8bccab33e2ffda33ab0773"},
-        {"RHush2P6tQr1MSXsm8VUFzRhJUbPswkdpg","02db2b276a9cabdf93579492b20ff507b118f7406e70b10550fd53836431e83e2a"},
-        {"RHusheDCeKe5y3npBbHWbpCktTLbW1wVSG","0281d9e0ed1a854967e54d48aaa9276343e9b76c5efdc1d044ff5009641324fbc4"},
-        {"RHushxF6budLeauye6gYvNcmhriU3xdaef","0354a23100ae28c9b0265c555a6fa7354216aeb28fed6519f335c2c4e405432554"},
-        {"RHushEFSwwkmCUuJBHyi8GVeyToN3c9MBb","026ef72515d057d4dd3698ae3e5c5ccaccb71dfde4b6830949883ab8e0907f6715"},
-        {"RHushaW7hadHXYY5TqYpnNJhHrAET72nLe","0228391f4e557ece7c5f0d7145cd278ff78048dde393c3685f18fd7c1602481db7"},
-        {"RHushJbS2wBabhYyH8KDiyVkcg7haKvKYW","0255428e8b42cb23b85bbd4d22fd329cc30fc6c5e85fa8f3daf3109453e44cacd6"},
-        {"RHushXxE9Mhp7PdJ92SqcJUQbfvrM5ERtx","02bc2a7a7682d6b0ddc745229aff8defc26f26649c9138a82e598ff97887924713"},
-        {"RHush1En19qX2RygkcEg8tSZ1tog8kRFiZ","02d26b12982c4516faf3ccd2be162f21659f0022c88a89de905f9c18d833c7c371"},
-        {"RHushXP2DHksHNQe6W572Yzv4awwCdW3xd","038587a8e96f487afed148ca93328b766928c4968b25c6b27e292af0d56715df98"},
-        {"RHushUq1jpKdiWmHmnF7KQKEFY1HL3jxJi","03e9c491270b08613d1ec7c69b779e99f2c8c18475dd22f0cb2f35792822cd5335"},
-        {"RHushDE7wimzRmQ1vGyQAb4tHfY17tSNBG","02ac63417f3ca77b5040db2c8e7029a115cd01ef3482d30bbaffcbc6bcb737fd43"},
-        {"RHushSjWrj9NCs4CVoJPYL9aaUfunqLVPH","023b16bf42f558117d4277ec4814da82a58e2be744c5ce65022eb1c14d75f2c64d"},
-        {"RHushqCoG4swiBnPZfASZxPezxWQQm5b4y","02a2ab4315f2845989c007443e740ccbc8dc8272f98680d97228a0bc5ab8780146"},
-        {"RHushGnyatVjV3P6XV3AFEKtvpJKjZBwEy","0229d0fe5e080de8d9ff6d6c81d58db6d091de33854cb81dfb687caedd2ea08907"},
-        {"RHushzUshnwkZoh2WmH7SLy1XqB9EYa7in","02409c2b52f7dda4a940f989e1582087925407da1ce63ff4a1a6914f1774effa09"},
-        {"RHushaSfRLrsnxE4z8s3FVmSkyhaf2FCy8","03c8d684550004b16c061fc34331d106f9e54323e75824ddefe386a552018e4857"}
+        {"RFetqf8WUfWnwNeXdknkm8ojk7EXnYFzrv", "038a1bd41a08f38edda51042988022933c5775dfce81f7bae0b32a9179650352ac"},
+        {"RV7YSVW89WC9jBDtFG4ubtopDRove4Tfvc", "03c9d35488be73fe4f2dbb1dc011468482d71bac32249f8cce6480bcc574415d19"},
+        {"RBPFE9oXceZBWTn3Vhne4FUKE9vxGEXUKX", "028a8bb6ded2692b39a69ec2d3c9836ff221815909d5cd65257374aeb66394a002"},
+        {"RM3cvUcafPhjyypZLEginQjdhjLnSgJHte", "03a36180014115b47b97c1c8776a269bba66047b1ce2c7eb1a3d4e995a6dfff0df"},
+        {"RFFX1VaTmZYPBLCzFj7w3iJQArV9ZdaWcW", "02190865f3ca3678d322c96e49a3ddf8ad394a4c8cd97d4bb3376cf547d0d83c66"},
+        {"RDwZsLpH1QiAbJwUEY8ajXwTzu3PaWhx7n", "023ea0babb34e1ff9f4db8131ee84ad8991b954038a1e6ef9afc2a1b3fa13bbcb9"},
+        {"RCUvfnmt16ZMvLTmLGGAztcAE8fBjfbP6u", "0379a5ba9fb6b463ffcdc0b1f3ecf45a5b737275354f9c2598492f20660f6f7dfd"},
+        {"RBLu9adNVMVf6jzLLbAenWovcwq8nU6gYd", "022cd69381231d69d6d3b9638762df849bc7bbab71cbb8383eec29ca677f1afa30"},
+        {"RWfv6wd2fwgecnJxC1Ykpf1SJefGh2Wc6i", "03da8a8f57d88afb61f712a8cd35462b65ce2b2575db8f9ee33a725dcd12c44755"},
+        {"RWiK4xooG3dPdvaovu6JvR3DWoYD4tfRjx", "02ffe66af4d71345fe6984b5002ad69206e1817566a70d9ac406a679be6a3335a0"},
+        {"RYLNiJiRnEGeMxx1Q2xLoFujshRNkBa2x4", "028ef6501004569c1170ce2d7ec7ecfe5739001130ad1b39129f8b88cd3d610257"},
+        {"RTw36Ksy5Wk1Xv3B53T79zoRd6XDsE9MS6", "02d7cf4ece00895ca857fcdd0a4c2fc9c949a518d2750396f77d9f031c08a94364"},
+        {"RTPkUBriQzZy67WmFhEs6aQzJn5HBB3ntb", "03319ca1eae5888c45115d160ac07c4f2abd1720926aa579d535c4b46c807bb7f7"},
+        {"RBmZzttvDnMaEv47cWXs8SgdC993djB68r", "034302c4e1ff72a5f5391f259f7a46e646c7845aa2c9de9fb0c0a4c4802aad79d6"},
+        {"RGocb2jLCa2E9kVHDUsijrVGTDP82ngGYZ", "024440a18a16e38b836b3ad9bb54ab0b5ba83b04edebb58c62c09b2de29e9fc703"},
+        {"RVqwCjPQ6AJ6r9WeGzQvAT4eGXDScprLkW", "028a94e53ad8ed9e78f0f8a87cf3bc4754784222ad7ddf2d3dc5fafec2f6891cde"},
+        {"RB2Xc8eLrATRWVsxrZKHHx3hyJz1vugMt9", "02eca07a9b5810fe929a87f90e5f02e29a06479d39cd3a888abfa1793e1565155a"},
+        {"RKm7WUuFfqCTiUBkbxBsdh54nT6ivXpDPX", "03e3f634671005c8ffb7fe883fcf9e08f6f5486df057f215d761741d91c88de898"},
+        {"RLbHTvFQoz946W3o3gXTrjxxADeUsWWW16", "02e6bb6dcecf5e3abfe239dec55842a92f096eeac7f0ff7621c3e8948e5e789b27"},
+        {"RD75njr2RLGC5PqjHbWwuL7ndTqZiUfYxs", "0250d9996c25a34cb1b4e86303a297fc5c49c65615eb31a57fb17d1e1b376e71be"},
+        {"RT1VTzZYZLWUsPWFJ2oypEqB1MXMfq8b5Y", "02d1797941b7df42a98f59ede0f22294e7c02754232a8b1de9512ededaf3f82880"},
+        {"RKeXriTVXioHeKpFTjC8Cjohd6DHGUcKqt", "0341e62f0cdffc4ba3e0efb793c0fcaaad1b611db7021b844f643d5c25847733d2"},
+        {"RQYrDEgZPKMFAgTHNkWFeMHEmpkXe8j28T", "02b8719cd8484755990158cbdf7b9d990d4a5c3741cabe204e51ed04be5bd50133"},
+        {"RE85TACcn8CEn26itAxQV9afxV9mVg17vm", "0367f569d3dc304e699196fe9b798671fe3f12df7851a0a474879b0dbf8bc508d1"},
+        {"RPYWQJXto1aeCGe8T6g9Wo4tAL4xE82LJ8", "02cf1e245dfb44e418fd550abb825a600e1753d46a51995970e70c98be539da33e"},
+        {"RSVHRS5wqEw7bxfuE9k6xJGbARcy5guisp", "03ab8ac83d689ce76b5d29a54c3b34d0a6cb37d64313ff4467c744787475969a23"},
+        {"REAQwBaJFo6DyBkwfW7rTTDbUtkdmATcQ8", "025e80f0075514cc5940de85c0c559efa99a3688faf6cccb8c1d1f38b96ca91e71"},
+        {"RF1gz8QBw5uFScGasqVxoUjQwJCD9zHJwC", "031cdae4b545e5049ccee8e0cb792e25795b56e08b5e64b1d972c9b94e9bfd4ed0"},
+        {"RTnLGoWzpsyoGSViGH8GyYcYhSveSEmnPV", "03cf3403a9d1cefa83e07b73e618a7f991d140a8283a02df3ce7c00223f27f43d0"},
+        {"RArURqxp6qfF7fqv38tCYr6p4zBtLtqf4x", "026bc4c91c2c35fabe88fea6470d6cda98977a97c251656adf25b81653c00c3800"},
+        {"RN8GCryShNFvBWtcNEWrQJ5A9AWb3JJoXt", "02afa94f6574cd0fe4f5dc83b09a2112457862421ce96bdc75c1cf25ef5b1f8c4b"},
+        {"RQSC2eBckcFPWzq9UtofePC31wgDySfJtw", "035d570768d844c8150a3bd966a2e13aa99316f4ab3e80370c4d16fb02f95d0974"},
+        {"RC4uQsfH6jXpgnTFuFiDwAFo58gHLNkWo7", "02402b0ab7001fd4bcb4fa0d8d7006a6c521b1c76e85aad7b374ecd6c5d564c237"},
+        {"RREcuaUWSkNzTNPBbFLbXKTKiC4fd5t47J", "03d5bf8b43c44ba064e897da47dd36dba537bebf013d28247ce7a088496dd9b66d"},
+        {"REFyC5e7kmse3PUapDuXHL2xmtYEGttYYL", "035f56fd01dd21725928bbd878b795dccafecc03b978dc83748e9194dcbfebfb79"},
+        {"RH1BLwZosLp2hv9msdZGdSu93K8GrMWw7D", "0224ab22ece88f624f80a8535b8d5194646ad6be749070ec188a22c5e29fdd7098"},
+        {"RNkhugMQVbqDysSayHu2eAhTQpXzKWqZ3m", "02caab4c83c8cc245a7aeb6d25504363555d1b0874aef0f9f8116b4ddb61f24799"},
+        {"RKiyhLELDJATA7ZCUcutkP1WCEHnAgZRZ8", "028c01859a700ed3941a5786cf2043992e17a45c6689ac4bf608ad3f19e6d0e832"},
+        {"RLKARvLNo6Abkh5qh5NVn2HJmYfj8ELa6A", "0300a33629da90b9d3c0519d796f4b1278355bb8c46e4caee04b1305e2ab2ff3f2"},
+        {"RACX21FKLenyyEf8SYK3LmjsDzkDthwUbR", "0205d73c6a3e969eff29e5f424c861d22544245e09eaafc3fefe021cad052b7c0b"},
+        {"RETb7pEDauKBEuTBuXDhKS3ksd2p8x9KYa", "025c1f7596fd0b7286e6ebd1b3c275a14a13aa4d134db4677769324969b7b7e3a5"},
+        {"RJrAo78TL6zUmiHXbBv8oRhfGKxGnPnxUu", "02d40a76fbab96a78898b7579626be6dfe360c63b91030e513f849f212d57c1af6"},
+        {"RL8g6ANxhZBPHHHWgApaiSQ2BSP9qKwuwf", "020236a5748ea49da891276bcb85dc03487cb9f3d0c2b2cdb35227b6a624f86797"},
+        {"RY3vwBjuuTCiYL5am9HmwbdCjffWd9f4CE", "032f61fd08957d9b88dabc077d8732bef6c30d0234c14e02f3a741116834f591dc"},
+        {"RQW4LsSzjCPtNw1HGamSaCoiirvsrZmDY5", "02e29451f9baf0186a655396726a22a20617a3e54ea895590f6066abc993f83d32"},
+        {"RJtjorxqhazz39UpFdhDW8MiW4E3jhXDNk", "03795b7a650db872c22f13a9c88ad5c1ad3cb07a349f1f29e9789efd27e151164b"},
+        {"RSi8AiCCtS3doFupdpdfuorAhkrCS6mLMu", "037a62ff6b7eb2ba1e170b5c42e7788817ded6a3a7ed841321c01cc107aa647d42"},
+        {"RMjMXC8m9PgAaMMvwqgLCyCrv47pp6F6XY", "033bdf151c01bc733e614f9d4f204ca44396bf56984df6643205d349a35f7b265d"},
+        {"RYB3ZMgHt4h7YL8TUzpqaSDw22ABksAPGC", "021266e045f95322fceddae02877dca9721792bef8f2be28cacd7c36290cd813a7"},
+        {"RGwy64PXswUKpiepfzgaRW98v3gsuqPtow", "03008783c34c2622e7167f0a5201846133e530e89dfe1a8fbcf4c29b33051c4565"},
+        {"RKJRPLaQV4AkWF6EfUUzFwawTGU4RQZgcS", "03c20a9fd21de76a20ffc87e384be735dfabb7f34a2d881ca9714830fb1bbe6bdb"},
+        {"RQ4SPvBKTEKyV6y31iSihtfMxi3KeyAJgV", "033c5a23c75d946c15c15fac1e6d78e08c2b656549a158627cfb6bc44bb7b3a560"},
+        {"RTvRBC1pCQpPKrS27Q4hUCVKVpa5tSTsFS", "02c25672fae388a0613d0127fcfe38ef37f5f354ecfdea0fb734528e354319bd9d"},
+        {"RKxWu9HpCg7m3UeUGw2Xs1SpFiR96fSCQj", "02ec760d09b369b82b34d864af5a468d8a7dc5609b06bce455d045d1059c4b0f71"},
+        {"RBAaUWAD8jwVLL7ueb7ciAQewqgheKxwdk", "0274ec3abcca214cdf7f1a565f5f3d3fa910e62e751a1ab0de148ea14ba72d6ba7"},
+        {"RT853SBEGt4EWrKbpSujya69DG1jSNYjob", "02e80260ca44b8539159e6af678cf5ed0bc596753e4985f66418d6417085b4104e"},
+        {"RKjEuhVByPwJcZ9wuBgfELiCVnBrc4F8i4", "0357c38f5d5eb1662a54b980c9243ddd8b2100d4b2b9f8175246938ef76e100678"},
+        {"RT6wVuFFPU5tY6C7Buup1GLV3SE5mpYEha", "02571085ead1aca86b9e90fa9a23d99a194c862524b0c714102888be5bf122dc7d"},
+        {"RSTgcpV82AivrvWJpd4LR2KwWirwbwXE3Y", "021a0ee4611ca4d8a2e209cc43b95036deb0a9d1cc31fc9f87d50233a44f05ec1a"},
+        {"RCiaXRzo4AAG3zmPL3Hx63NsRWv5UGiNuM", "02f4876be65c54613e47f7fac67f1453e8d8fde5e19fa53f278a1083a08b258ab3"},
+        {"RCGgLWrTTaqBhUsS1BqrmFpJZAdNJMzscv", "02893d2db5329b15a33aa7edfbf323c85cabbdc25caa6cf6186fac6052ae6d96a0"},
+        {"RAJWHL6MzGFKg7KB2sZ87KPQUSvxy3VrEW", "0389971362b002ab5dfa1b5f9c4f88e68249511a3935242ba1e0d31c1c88a36d70"},
+        {"RU592tQnbH8gt6xd5Uu23nEw3SucDNkXmK", "02b8b6a2266fe57b25f2d4b1da93a07d27930154e78f9d137bc7509cf1ae8e3d49"},
+        {"RLGCLRzaEmruPC9UmVt5qRHEhXwHip1e6d", "02a2fd96b4459411ad2b09597ba59cf52b282c56330da7c0cc6d2a5c0323a18f1e"}
    }
 };
 
@@ -543,7 +542,7 @@ int32_t gethushseason(int32_t height);
 #define PRICES_MAXDATAPOINTS 8
 uint64_t komodo_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uint64_t basevolume);
 int32_t komodo_paxprices(int32_t *heights,uint64_t *prices,int32_t max,char *base,char *rel);
-int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
+int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 char *bitcoin_address(char *coinaddr,uint8_t addrtype,uint8_t *pubkey_or_rmd160,int32_t len);
 int32_t komodo_minerids(uint8_t *minerids,int32_t height,int32_t width);
 int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[IGUANA_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);

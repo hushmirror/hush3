@@ -27,7 +27,7 @@
 #include "cc/CCinclude.h"
 #include "sietch.h"
 
-int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
+int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 int32_t komodo_electednotary(int32_t *numnotariesp,uint8_t *pubkey33,int32_t height,uint32_t timestamp);
 int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryid,uint8_t *scriptbuf,int32_t scriptlen,int32_t height,uint256 txhash,int32_t i,int32_t j,uint64_t *voutmaskp,int32_t *specialtxp,int32_t *notarizedheightp,uint64_t value,int32_t notarized,uint64_t signedmask,uint32_t timestamp);
 bool EnsureWalletIsAvailable(bool avoidException);
@@ -885,7 +885,7 @@ uint32_t komodo_heightstamp(int32_t height)
             //    pindex->didinit = (KOMODO_LOADINGBLOCKS == 0);
         } // else fprintf(stderr,"error loading block at %d/%d",pindex->GetHeight(),height);
     }
-    if ( pindex->didinit != 0 && pindex->GetHeight() >= 0 && (num= komodo_notaries(pubkeys,(int32_t)pindex->GetHeight(),(uint32_t)pindex->nTime)) > 0 )
+    if ( pindex->didinit != 0 && pindex->GetHeight() >= 0 && (num= hush_notaries(pubkeys,(int32_t)pindex->GetHeight(),(uint32_t)pindex->nTime)) > 0 )
     {
         for (i=0; i<num; i++)
         {
@@ -932,7 +932,7 @@ void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height)
         if ( pindex->didinit != 0 )
             return(pindex->notaryid);
         timestamp = pindex->GetBlockTime();
-        if ( (num= komodo_notaries(pubkeys,height,timestamp)) > 0 )
+        if ( (num= hush_notaries(pubkeys,height,timestamp)) > 0 )
         {
             for (i=0; i<num; i++)
                 if ( memcmp(pubkeys[i],pubkey33,33) == 0 )
@@ -948,7 +948,7 @@ int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blo
     // after the season HF block ALL new notaries instantly become elegible. 
     int32_t i,j,n,duplicate; CBlock block; CBlockIndex *pindex; uint8_t notarypubs33[64][33];
     memset(mids,-1,sizeof(*mids)*66);
-    n = komodo_notaries(notarypubs33,height,0);
+    n = hush_notaries(notarypubs33,height,0);
     for (i=duplicate=0; i<66; i++)
     {
         if ( (pindex= komodo_chainactive(height-i)) != 0 )
@@ -979,7 +979,7 @@ int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blo
 int32_t komodo_minerids(uint8_t *minerids,int32_t height,int32_t width)
 {
     int32_t i,j,nonz,numnotaries; CBlock block; CBlockIndex *pindex; uint8_t notarypubs33[64][33],pubkey33[33];
-    numnotaries = komodo_notaries(notarypubs33,height,0);
+    numnotaries = hush_notaries(notarypubs33,height,0);
     for (i=nonz=0; i<width; i++)
     {
         if ( height-i <= 0 )
@@ -1843,7 +1843,7 @@ uint64_t komodo_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &Notar
     // fetch notary pubkey array.
     uint64_t total = 0, AmountToPay = 0;
     int8_t numSN = 0; uint8_t notarypubkeys[64][33] = {0};
-    numSN = komodo_notaries(notarypubkeys, height, timestamp);
+    numSN = hush_notaries(notarypubkeys, height, timestamp);
 
     // No point going further, no notaries can be paid.
     if ( notarypubkeys[0][0] == 0 )
@@ -1910,7 +1910,7 @@ uint64_t komodo_checknotarypay(CBlock *pblock,int32_t height)
     std::vector<int8_t> NotarisationNotaries; uint8_t *script; int32_t scriptlen;
     uint64_t timestamp = pblock->nTime;
     int8_t numSN = 0; uint8_t notarypubkeys[64][33] = {0};
-    numSN = komodo_notaries(notarypubkeys, height, timestamp);
+    numSN = hush_notaries(notarypubkeys, height, timestamp);
     if ( !GetNotarisationNotaries(notarypubkeys, numSN, pblock->vtx[1].vin, NotarisationNotaries) )
         return(0);
     
@@ -2163,7 +2163,7 @@ int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
         failed = 1;
         if ( height > 0 && SMART_CHAIN_SYMBOL[0] == 0 ) // for the fast case
         {
-            if ( (n= komodo_notaries(pubkeys,height,pblock->nTime)) > 0 )
+            if ( (n= hush_notaries(pubkeys,height,pblock->nTime)) > 0 )
             {
                 for (i=0; i<n; i++)
                     if ( memcmp(pubkey33,pubkeys[i],33) == 0 )
@@ -2271,7 +2271,7 @@ int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
             }
             // Check min sigs.
             int8_t numSN = 0; uint8_t notarypubkeys[64][33] = {0};
-            numSN = komodo_notaries(notarypubkeys, height, pblock->nTime);
+            numSN = hush_notaries(notarypubkeys, height, pblock->nTime);
             if ( pblock->vtx[1].vin.size() < numSN/5 )
             {
                 fprintf(stderr, "ht.%i does not meet minsigs.%i sigs.%lld\n",height,numSN/5,(long long)pblock->vtx[1].vin.size());

@@ -937,7 +937,7 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( (n= komodo_minerids(minerids,height,(int32_t)(sizeof(minerids)/sizeof(*minerids)))) > 0 )
     {
         memset(tally,0,sizeof(tally));
-        numnotaries = komodo_notaries(pubkeys,height,timestamp);
+        numnotaries = hush_notaries(pubkeys,height,timestamp);
         if ( numnotaries > 0 )
         {
             for (i=0; i<n; i++)
@@ -998,7 +998,7 @@ UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
         if ( pblockindex != 0 )
             timestamp = pblockindex->GetBlockTime();
     }
-    if ( (n= komodo_notaries(pubkeys,height,timestamp)) > 0 )
+    if ( (n= hush_notaries(pubkeys,height,timestamp)) > 0 )
     {
         for (i=0; i<n; i++)
         {

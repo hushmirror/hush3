@@ -584,7 +584,7 @@ int32_t NSPV_notarizationextract(int32_t verifyntz,int32_t *ntzheightp,uint256 *
             //sleep(1); // needed to avoid no pnodes error
             *desttxidp = NSPV_opretextract(ntzheightp,blockhashp,symbol,opret,tx.GetHash());
             nTime = NSPV_blocktime(*ntzheightp);
-            komodo_notaries(elected,*ntzheightp,nTime);
+            hush_notaries(elected,*ntzheightp,nTime);
             if ( verifyntz != 0 && (numsigs= NSPV_fastnotariescount(tx,elected,nTime)) < 12 )
             {
                 fprintf(stderr,"numsigs.%d error\n",numsigs);

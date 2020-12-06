@@ -67,7 +67,7 @@ uint32_t komodo_segid32(char *coinaddr);
 int64_t komodo_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
 int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_heightp);
 uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount);
-int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
+int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 
 // This is the last version of upstream that was merged in
 // We only cherry-pick since then
@@ -1201,7 +1201,7 @@ UniValue getnotarypayinfo(const UniValue& params, bool fHelp, const CPubKey& myp
     // pubkey 020000000000000000000000000000000
     balance = checkburnaddress(received, TotalNotaryPay, height, "REDVp3ox1pbcWYCzySadfHhk8UU3HM4k5x");
     
-    notarycount = komodo_notaries(notarypubkeys, height, chainActive[height]->GetBlockTime());
+    notarycount = hush_notaries(notarypubkeys, height, chainActive[height]->GetBlockTime());
     NotaryPay = komodo_notarypayamount(height, notarycount)*notarycount;
     bool spent = (received != balance);
     if ( !spent )
