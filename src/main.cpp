@@ -1770,14 +1770,8 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
             return false;
         }
     }
-//fprintf(stderr,"addmempool 1\n");
     auto verifier = libzcash::ProofVerifier::Strict();
-    if ( SMART_CHAIN_SYMBOL[0] == 0 && komodo_validate_interest(tx,chainActive.LastTip()->GetHeight()+1,chainActive.LastTip()->GetMedianTimePast() + 777,0) < 0 )
-    {
-        fprintf(stderr,"AcceptToMemoryPool komodo_validate_interest failure\n");
-        return error("AcceptToMemoryPool: komodo_validate_interest failed");
-    }
-    
+
     if (!CheckTransaction(tiptime,tx, state, verifier, 0, 0))
     {
         return error("AcceptToMemoryPool: CheckTransaction failed");
@@ -1814,7 +1808,6 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
         //fprintf(stderr,"AcceptToMemoryPool reject non-final\n");
         return state.DoS(0, false, REJECT_NONSTANDARD, "non-final");
     }
-//fprintf(stderr,"addmempool 3\n");
     // is it already in the memory pool?
     uint256 hash = tx.GetHash();
     if (pool.exists(hash))
@@ -1835,21 +1828,14 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
                 return false;
             }
         }
-        BOOST_FOREACH(const JSDescription &joinsplit, tx.vjoinsplit) {
-            BOOST_FOREACH(const uint256 &nf, joinsplit.nullifiers) {
-                if (pool.nullifierExists(nf, SPROUT)) {
-                    fprintf(stderr,"pool.mapNullifiers.count\n");
-                    return false;
-                }
-            }
-        }
+
         for (const SpendDescription &spendDescription : tx.vShieldedSpend) {
             if (pool.nullifierExists(spendDescription.nullifier, SAPLING)) {
                 return false;
             }
         }
     }
-//fprintf(stderr,"addmempool 4\n");
+
     {
         CCoinsView dummy;
         CCoinsViewCache view(&dummy);
@@ -1861,50 +1847,41 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
             view.SetBackend(viewMemPool);
 
             // do we already have it?
-            if (view.HaveCoins(hash))
-            {
+            if (view.HaveCoins(hash)) {
                 //fprintf(stderr,"view.HaveCoins(hash) error\n");
                 return state.Invalid(false, REJECT_DUPLICATE, "already have coins");
             }
 
-            if (tx.IsCoinImport() || tx.IsPegsImport())
-            {
+            if (tx.IsCoinImport() || tx.IsPegsImport()) {
                 // Inverse of normal case; if input exists, it's been spent
                 if (ExistsImportTombstone(tx, view))
                     return state.Invalid(false, REJECT_DUPLICATE, "import tombstone exists");
-            }
-            else
-            {
+            } else {
                 // do all inputs exist?
                 // Note that this does not check for the presence of actual outputs (see the next check for that),
                 // and only helps with filling in pfMissingInputs (to determine missing vs spent).
                 BOOST_FOREACH(const CTxIn txin, tx.vin)
                 {
-                    if (!view.HaveCoins(txin.prevout.hash))
-                    {
+                    if (!view.HaveCoins(txin.prevout.hash)) {
                         if (pfMissingInputs)
                             *pfMissingInputs = true;
                         //fprintf(stderr,"missing inputs\n");
                         return false; 
-                        /*
-                            https://github.com/zcash/zcash/blob/master/src/main.cpp#L1490
-                            state.DoS(0, error("AcceptToMemoryPool: tx inputs not found"),REJECT_INVALID, "bad-txns-inputs-missing");
-                        */
+                            // https://github.com/zcash/zcash/blob/master/src/main.cpp#L1490
+                            // state.DoS(0, error("AcceptToMemoryPool: tx inputs not found"),REJECT_INVALID, "bad-txns-inputs-missing");
                     }
                 }
                 // are the actual inputs available?
-                if (!view.HaveInputs(tx))
-                {
-                    //fprintf(stderr,"accept failure.1\n");
+                if (!view.HaveInputs(tx)) {
+                    //fprintf(stderr,"accept failure. inputs-spent\n");
                     return state.Invalid(error("AcceptToMemoryPool: inputs already spent"),REJECT_DUPLICATE, "bad-txns-inputs-spent");
                 }
             }
             
-            // are the joinsplit's requirements met?
-            if (!view.HaveShieldedRequirements(tx))
-            {
-                //fprintf(stderr,"accept failure.2\n");
-                return state.Invalid(error("AcceptToMemoryPool: shielded requirements not met"),REJECT_DUPLICATE, "bad-txns-joinsplit-requirements-not-met");
+            // are the zaddr requirements met?
+            if (!view.HaveShieldedRequirements(tx)) {
+                //fprintf(stderr,"accept failure. ztx reqs not met\n");
+                return state.Invalid(error("AcceptToMemoryPool: shielded requirements not met"),REJECT_DUPLICATE, "bad-txns-shielded-requirements-not-met");
             }
             
             // Bring the best block into scope
@@ -1951,7 +1928,6 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
                 }
             }
         }
-//fprintf(stderr,"addmempool 5\n");
         // Grab the branch ID we expect this transaction to commit to. We don't
         // yet know if it does, but if the entry gets added to the mempool, then
         // it has passed ContextualCheckInputs and therefore this is correct.
@@ -1960,14 +1936,13 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
         CTxMemPoolEntry entry(tx, nFees, GetTime(), dPriority, chainActive.Height(), mempool.HasNoInputsOf(tx), fSpendsCoinbase, consensusBranchId);
         unsigned int nSize = entry.GetTxSize();
         
-        // Accept a tx if it contains joinsplits and has at least the default fee specified by z_sendmany.
-        if (tx.vjoinsplit.size() > 0 && nFees >= ASYNC_RPC_OPERATION_DEFAULT_MINERS_FEE) {
-            // In future we will we have more accurate and dynamic computation of fees for tx with joinsplits.
+        // Accept a tx if it contains zspends and has at least the default fee specified by z_sendmany.
+        if (tx.vShieldedSpend.size() > 0 && nFees >= ASYNC_RPC_OPERATION_DEFAULT_MINERS_FEE) {
+            // In future we will we have more accurate and dynamic computation of fees, derpz
         } else {
-            // Don't accept it if it can't get into a block
+            // Don't accept it if it can't get into a block, yallz
             CAmount txMinFee = GetMinRelayFee(tx, nSize, true);
-            if (fLimitFree && nFees < txMinFee)
-            {
+            if (fLimitFree && nFees < txMinFee) {
                 //fprintf(stderr,"accept failure.5\n");
                 return state.DoS(0, error("AcceptToMemoryPool: not enough fees %s, %d < %d",hash.ToString(), nFees, txMinFee),REJECT_INSUFFICIENTFEE, "insufficient fee");
             }
@@ -2039,7 +2014,6 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
             flag = 1;
             KOMODO_CONNECTING = (1<<30) + (int32_t)chainActive.LastTip()->GetHeight() + 1;
         }
-//fprintf(stderr,"addmempool 7\n");
 
         if (!ContextualCheckInputs(tx, state, view, true, MANDATORY_SCRIPT_VERIFY_FLAGS, true, txdata, Params().GetConsensus(), consensusBranchId))
         {
@@ -2306,25 +2280,7 @@ bool GetTransaction(const uint256 &hash, CTransaction &txOut, uint256 &hashBlock
     return false;
 }
 
-/*char *komodo_getspendscript(uint256 hash,int32_t n)
- {
- CTransaction tx; uint256 hashBlock;
- if ( !GetTransaction(hash,tx,hashBlock,true) )
- {
- printf("null GetTransaction\n");
- return(0);
- }
- if ( n >= 0 && n < tx.vout.size() )
- return((char *)tx.vout[n].scriptPubKey.ToString().c_str());
- else printf("getspendscript illegal n.%d\n",n);
- return(0);
- }*/
-
-
-//////////////////////////////////////////////////////////////////////////////
-//
 // CBlock and CBlockIndex
-//
 
 bool WriteBlockToDisk(const CBlock& block, CDiskBlockPos& pos, const CMessageHeader::MessageStartChars& messageStart)
 {
@@ -2530,7 +2486,7 @@ void CheckForkWarningConditionsOnNewFork(CBlockIndex* pindexNewForkTip)
 {
     AssertLockHeld(cs_main);
     // If we are on a fork that is sufficiently large, set a warning flag
-    CBlockIndex* pfork = pindexNewForkTip;
+    CBlockIndex* pfork   = pindexNewForkTip;
     CBlockIndex* plonger = chainActive.LastTip();
     while (pfork && pfork != plonger)
     {
@@ -2841,45 +2797,6 @@ bool ContextualCheckInputs(
 
     return true;
 }
-
-
-/*bool ContextualCheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsViewCache &inputs, bool fScriptChecks, unsigned int flags, bool cacheStore, const Consensus::Params& consensusParams, std::vector<CScriptCheck> *pvChecks)
- {
- if (!NonContextualCheckInputs(tx, state, inputs, fScriptChecks, flags, cacheStore, consensusParams, pvChecks)) {
- fprintf(stderr,"ContextualCheckInputs failure.0\n");
- return false;
- }
-
- if (!tx.IsCoinBase())
- {
- // While checking, GetBestBlock() refers to the parent block.
- // This is also true for mempool checks.
- CBlockIndex *pindexPrev = mapBlockIndex.find(inputs.GetBestBlock())->second;
- int nSpendHeight = pindexPrev->GetHeight() + 1;
- for (unsigned int i = 0; i < tx.vin.size(); i++)
- {
- const COutPoint &prevout = tx.vin[i].prevout;
- const CCoins *coins = inputs.AccessCoins(prevout.hash);
- // Assertion is okay because NonContextualCheckInputs ensures the inputs
- // are available.
- assert(coins);
-
- // If prev is coinbase, check that it's matured
- if (coins->IsCoinBase()) {
- if ( SMART_CHAIN_SYMBOL[0] == 0 )
- COINBASE_MATURITY = _COINBASE_MATURITY;
- if (nSpendHeight - coins->nHeight < COINBASE_MATURITY) {
- fprintf(stderr,"ContextualCheckInputs failure.1 i.%d of %d\n",i,(int32_t)tx.vin.size());
-
- return state.Invalid(
- error("CheckInputs(): tried to spend coinbase at depth %d", nSpendHeight - coins->nHeight),REJECT_INVALID, "bad-txns-premature-spend-of-coinbase");
- }
- }
- }
- }
-
- return true;
- }*/
 
 namespace {
 
