@@ -568,7 +568,7 @@ void *chainparams_commandline()
         if ( ASSETCHAINS_BLOCKTIME != 60 )
         {
             pCurrentParams->consensus.nMaxFutureBlockTime = 7 * ASSETCHAINS_BLOCKTIME; // 7 blocks
-            pCurrentParams->consensus.nPowTargetSpacing = ASSETCHAINS_BLOCKTIME;
+            pCurrentParams->consensus.nPowTargetSpacing   = ASSETCHAINS_BLOCKTIME;
         }
         pCurrentParams->SetDefaultPort(ASSETCHAINS_P2PPORT);
         if ( ASSETCHAINS_NK[0] != 0 && ASSETCHAINS_NK[1] != 0 )
@@ -577,7 +577,7 @@ void *chainparams_commandline()
             pCurrentParams->SetNValue(ASSETCHAINS_NK[0]);
             pCurrentParams->SetKValue(ASSETCHAINS_NK[1]);
         }
-        if ( KOMODO_TESTNODE != 0 )
+        if ( HUSH_TESTNODE != 0 )
             pCurrentParams->SetMiningRequiresPeers(false);
         if ( ASSETCHAINS_RPCPORT == 0 )
             ASSETCHAINS_RPCPORT = ASSETCHAINS_P2PPORT + 1;

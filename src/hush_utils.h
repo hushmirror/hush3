@@ -1787,7 +1787,7 @@ void hush_args(char *argv0)
     DONATION_PUBKEY   = GetArg("-donation", "");
     NOTARY_PUBKEY     = GetArg("-pubkey", "");
     KOMODO_DEALERNODE = GetArg("-dealer",0);
-    KOMODO_TESTNODE   = GetArg("-testnode",0);
+    HUSH_TESTNODE   = GetArg("-testnode",0);
     if ( strlen(NOTARY_PUBKEY.c_str()) == 66 )
     {
         decode_hex(NOTARY_PUBKEY33,33,(char *)NOTARY_PUBKEY.c_str());
