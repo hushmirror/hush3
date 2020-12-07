@@ -1,5 +1,6 @@
+# Copyright (c) 2019-2020 Hush developers
 FROM ubuntu:16.04
-MAINTAINER Mihail Fedorov <kolo@komodoplatform.com>
+MAINTAINER Duke Leto <duke@leto.net>
 
 RUN apt-get -y update && \
     apt-get -y upgrade && \
@@ -17,13 +18,14 @@ WORKDIR /hush
 RUN cd /hush && \
     ./autogen.sh && \
     ./configure --with-incompatible-bdb --with-gui || true && \
-    ./zcutil/build.sh -j$(nproc)
-
-# Unknown stuff goes here
+    ./build.sh -j$(nproc)
 
 RUN ln -sf /hush/src/komodod /usr/bin/komodod && \
     ln -sf /hush/src/hushd /usr/bin/hushd && \
+    ln -sf /hush/src/hush-tx /usr/bin/hush-tx && \
+    ln -sf /hush/src/wallet-utility /usr/bin/hush-wallet-utility && \
+    ln -sf /hush/src/hush-smart-chain /usr/bin/hush-smart-chain && \
     ln -sf /hush/zcutil/docker-entrypoint.sh /usr/bin/entrypoint && \
-    ln -sf /hush/zcutil/docker-komodo-cli.sh /usr/bin/hush-cli
+    ln -sf /hush/zcutil/docker-hush-cli.sh /usr/bin/hush-cli
 
 CMD ["entrypoint"]
