@@ -8,13 +8,13 @@
 #include "dbwrapper.h"
 #include "cc/eval.h"
 
-class NotarisationDB : public CDBWrapper
+class NotarizationDB : public CDBWrapper
 {
 public:
-    NotarisationDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
+    NotarizationDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
 };
 
-extern NotarisationDB *pnotarisations;
+extern NotarizationDB *pnotarizations;
 typedef std::pair<uint256,NotarisationData> Notarisation;
 typedef std::vector<Notarisation> NotarisationsInBlock;
 

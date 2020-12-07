@@ -2910,10 +2910,10 @@ void ConnectNotarizations(const CBlock &block, int height)
 {
     NotarisationsInBlock notarisations = ScanBlockNotarizations(block, height);
     if (notarisations.size() > 0) {
-        CDBBatch batch = CDBBatch(*pnotarisations);
+        CDBBatch batch = CDBBatch(*pnotarizations);
         batch.Write(block.GetHash(), notarisations);
         WriteBackNotarisations(notarisations, batch);
-        pnotarisations->WriteBatch(batch, true);
+        pnotarizations->WriteBatch(batch, true);
         LogPrintf("ConnectBlock: wrote %i block notarizations in block: %s\n",
                 notarisations.size(), block.GetHash().GetHex().data());
     }
@@ -2923,10 +2923,10 @@ void DisconnectNotarizations(const CBlock &block)
 {
     NotarisationsInBlock nibs;
     if (GetBlockNotarisations(block.GetHash(), nibs)) {
-        CDBBatch batch = CDBBatch(*pnotarisations);
+        CDBBatch batch = CDBBatch(*pnotarizations);
         batch.Erase(block.GetHash());
         EraseBackNotarisations(nibs, batch);
-        pnotarisations->WriteBatch(batch, true);
+        pnotarizations->WriteBatch(batch, true);
         LogPrintf("DisconnectTip: deleted %i block notarizations in block: %s\n",
             nibs.size(), block.GetHash().GetHex().data());
     }

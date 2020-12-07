@@ -9,7 +9,7 @@
 #include "main.h"
 #include <boost/foreach.hpp>
 
-NotarizationDB *pnotarisations;
+NotarizationDB *pnotarizations;
 NotarizationDB::NotarizationDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "notarizations", nCacheSize, fMemory, fWipe, false, 64) { }
 
 NotarisationsInBlock ScanBlockNotarizations(const CBlock &block, int nHeight)
@@ -55,13 +55,13 @@ NotarisationsInBlock ScanBlockNotarizations(const CBlock &block, int nHeight)
 
 bool GetBlockNotarisations(uint256 blockHash, NotarisationsInBlock &nibs)
 {
-    return pnotarisations->Read(blockHash, nibs);
+    return pnotarizations->Read(blockHash, nibs);
 }
 
 
 bool GetBackNotarisation(uint256 notarisationHash, Notarisation &n)
 {
-    return pnotarisations->Read(notarisationHash, n);
+    return pnotarizations->Read(notarisationHash, n);
 }
 
 

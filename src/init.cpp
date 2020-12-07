@@ -1759,13 +1759,13 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 delete pcoinsdbview;
                 delete pcoinscatcher;
                 delete pblocktree;
-                delete pnotarisations;
+                delete pnotarizations;
 
                 pblocktree     = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex, dbCompression, dbMaxOpenFiles);
                 pcoinsdbview   = new CCoinsViewDB(nCoinDBCache, false, fReindex);
                 pcoinscatcher  = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip      = new CCoinsViewCache(pcoinscatcher);
-                pnotarisations = new NotarizationDB(100*1024*1024, false, fReindex);
+                pnotarizations = new NotarizationDB(100*1024*1024, false, fReindex);
 
 
                 if (fReindex) {
