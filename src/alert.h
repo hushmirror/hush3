@@ -24,7 +24,6 @@
 
 #include "serialize.h"
 #include "sync.h"
-
 #include <map>
 #include <set>
 #include <stdint.h>
