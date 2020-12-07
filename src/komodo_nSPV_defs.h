@@ -14,8 +14,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef KOMODO_NSPV_DEFSH
-#define KOMODO_NSPV_DEFSH
+#ifndef HUSH_NSPV_DEFSH
+#define HUSH_NSPV_DEFSH
 
 #define NSPV_PROTOCOL_VERSION 0x00000004
 #define NSPV_POLLITERS 200
@@ -189,4 +189,4 @@ struct NSPV_remoterpcresp
     char json[11000];
 };
 
-#endif // KOMODO_NSPV_DEFSH
+#endif // HUSH_NSPV_DEFSH
