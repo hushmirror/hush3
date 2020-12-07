@@ -12,7 +12,10 @@
 #include "scheduler.h"
 
 extern const std::string DEFAULT_TOR_CONTROL;
-static const bool DEFAULT_LISTEN_ONION = true;
+// Most users don't have Tor, those that do can turn it on
+// This help reduce CPU usage, thread contention and helps
+// low resource devices
+static const bool DEFAULT_LISTEN_ONION = false;
 
 void StartTorControl(boost::thread_group& threadGroup, CScheduler& scheduler);
 void InterruptTorControl();
