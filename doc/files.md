@@ -1,5 +1,7 @@
-* komodo.conf: contains configuration settings for komodod
-* komodod.pid: stores the process id of komodod while running
+# Hush Files
+
+* HUSH3.conf: contains configuration settings for hushd
+* hushd.pid: stores the process id of hushd while running
 * blocks/blk000??.dat: block data (custom, 128 MiB per file)
 * blocks/rev000??.dat; block undo data (custom)
 * blocks/index/*; block index (LevelDB)
