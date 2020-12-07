@@ -2908,7 +2908,7 @@ static bool ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& view, const CO
 
 void ConnectNotarizations(const CBlock &block, int height)
 {
-    NotarisationsInBlock notarisations = ScanBlockNotarisations(block, height);
+    NotarisationsInBlock notarisations = ScanBlockNotarizations(block, height);
     if (notarisations.size() > 0) {
         CDBBatch batch = CDBBatch(*pnotarisations);
         batch.Write(block.GetHash(), notarisations);

@@ -1765,7 +1765,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 pcoinsdbview   = new CCoinsViewDB(nCoinDBCache, false, fReindex);
                 pcoinscatcher  = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip      = new CCoinsViewCache(pcoinscatcher);
-                pnotarisations = new NotarisationDB(100*1024*1024, false, fReindex);
+                pnotarisations = new NotarizationDB(100*1024*1024, false, fReindex);
 
 
                 if (fReindex) {

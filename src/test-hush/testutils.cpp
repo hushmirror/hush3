@@ -62,7 +62,7 @@ void setupChain()
     pblocktree = new CBlockTreeDB(1 << 20, true);
     CCoinsViewDB *pcoinsdbview = new CCoinsViewDB(1 << 23, true);
     pcoinsTip = new CCoinsViewCache(pcoinsdbview);
-    pnotarisations = new NotarisationDB(1 << 20, true);
+    pnotarisations = new NotarizationDB(1 << 20, true);
     InitBlockIndex();
 }
 
