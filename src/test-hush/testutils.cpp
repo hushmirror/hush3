@@ -8,7 +8,7 @@
 #include "key.h"
 #include "main.h"
 #include "miner.h"
-#include "notarisationdb.h"
+#include "notarizationdb.h"
 #include "random.h"
 #include "rpc/server.h"
 #include "rpc/protocol.h"

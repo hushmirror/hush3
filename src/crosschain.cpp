@@ -17,7 +17,7 @@
 #include "crosschain.h"
 #include "importcoin.h"
 #include "main.h"
-#include "notarisationdb.h"
+#include "notarizationdb.h"
 #include "merkleblock.h"
 
 #include "cc/CCinclude.h"

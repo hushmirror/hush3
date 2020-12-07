@@ -3,7 +3,7 @@
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include "cc/eval.h"
 #include "crosschain.h"
-#include "notarisationdb.h"
+#include "notarizationdb.h"
 
 int GetSymbolAuthority(const char* symbol)
 {

@@ -21,7 +21,7 @@
 #include "chainparams.h"
 #include "checkpoints.h"
 #include "crosschain.h"
-#include "notarisationdb.h"
+#include "notarizationdb.h"
 #include "importcoin.h"
 #include "base58.h"
 #include "consensus/validation.h"

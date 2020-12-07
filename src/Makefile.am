@@ -302,7 +302,7 @@ libbitcoin_server_a_SOURCES = \
   miner.cpp \
   net.cpp \
   noui.cpp \
-  notarisationdb.cpp \
+  notarizationdb.cpp \
   policy/fees.cpp \
   pow.cpp \
   rest.cpp \

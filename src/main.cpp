@@ -34,7 +34,7 @@
 #include "init.h"
 #include "merkleblock.h"
 #include "metrics.h"
-#include "notarisationdb.h"
+#include "notarizationdb.h"
 #include "net.h"
 #include "pow.h"
 #include "script/interpreter.h"

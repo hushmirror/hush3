@@ -19,7 +19,7 @@
 
 // NSPV_get... functions need to return the exact serialized length, which is the size of the structure minus size of pointers, plus size of allocated data
 
-#include "notarisationdb.h"
+#include "notarizationdb.h"
 #include "rpc/server.h"
 
 static std::map<std::string,bool> nspv_remote_commands =  {{"channelsopen", true},{"channelspayment", true},{"channelsclose", true},{"channelsrefund", true},

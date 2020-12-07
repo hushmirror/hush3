@@ -33,7 +33,7 @@
 #include "httpserver.h"
 #include "httprpc.h"
 #include "key.h"
-#include "notarisationdb.h"
+#include "notarizationdb.h"
 
 #ifdef ENABLE_MINING
 #include "key_io.h"
