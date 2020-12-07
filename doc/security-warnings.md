@@ -52,8 +52,7 @@ be able to:
 
 - Determine the values of your secret spending keys, as well as which notes you
   are spending, by observing cache side-channels as you perform a JoinSplit
-  operation. This is due to probable side-channel leakage in the libsnark
-  proving machinery.
+  operation. This is due to probable side-channel leakage in C++.
 
 - Determine which notes you own by observing cache side-channel information
   leakage from the incremental witnesses as they are updated with new notes.
