@@ -1,5 +1,8 @@
 # Hush Unit tests
 
+These tests were inherited from Bitcoin. For Hush-specific tests, see
+the ./src/test-hush directory.
+
 The sources in this directory are unit test cases.  Boost includes a
 unit testing framework, and since bitcoin already uses boost, it makes
 sense to simply use this framework rather than require developers to
