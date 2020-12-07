@@ -950,7 +950,7 @@ extern int32_t KOMODO_REWIND;
 
 bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
-	fprintf(stderr,"%s start\n", __FUNCTION__);
+	//fprintf(stderr,"%s start\n", __FUNCTION__);
     // ********************************************************* Step 1: setup
 #ifdef _MSC_VER
     // Turn off Microsoft heap dump noise
@@ -977,7 +977,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     if (!SetupNetworking())
         return InitError("Error: Initializing networking failed");
-	fprintf(stderr,"%s networking setup\n", __FUNCTION__);
+    if(fDebug)
+        fprintf(stderr,"%s networking setup\n", __FUNCTION__);
 
 #ifndef _WIN32
     if (GetBoolArg("-sysperms", false)) {
@@ -1022,25 +1023,25 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // Set this early so that experimental features are correctly enabled/disabled
     fExperimentalMode = GetBoolArg("-experimentalfeatures", true);
 
-    fprintf(stderr,"%s: fExperimentalMode=%d\n", __FUNCTION__, fExperimentalMode);
+    if(fDebug)
+        fprintf(stderr,"%s: fExperimentalMode=%d\n", __FUNCTION__, fExperimentalMode);
 
     // Fail early if user has set experimental options without the global flag
     if (!fExperimentalMode) {
         if (mapArgs.count("-developerencryptwallet")) {
 			fprintf(stderr,"%s wallet encryption error\n", __FUNCTION__);
             return InitError(_("Wallet encryption requires -experimentalfeatures."));
-        //TODO: make this non experimental
         } else if (mapArgs.count("-zmergetoaddress")) {
-			fprintf(stderr,"%s zmerge error\n", __FUNCTION__);
-            return InitError(_("RPC method z_mergetoaddress requires -experimentalfeatures."));
+			//fprintf(stderr,"%s zmerge error\n", __FUNCTION__);
+            //return InitError(_("RPC method z_mergetoaddress requires -experimentalfeatures."));
         }
     }
 	//fprintf(stderr,"%s tik2\n", __FUNCTION__);
 
     // Set this early so that parameter interactions go to console
     fPrintToConsole = GetBoolArg("-printtoconsole", false);
-    fLogTimestamps = GetBoolArg("-logtimestamps", true);
-    fLogIPs = GetBoolArg("-logips", false);
+    fLogTimestamps  = GetBoolArg("-logtimestamps", true);
+    fLogIPs         = GetBoolArg("-logips", false);
 
 
     LogPrintf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -2184,7 +2185,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     // ********************************************************* Step 11: start node
 
-    fprintf(stderr,"Checking disk space...\n");
+    //fprintf(stderr,"Checking disk space...\n");
     if (!CheckDiskSpace())
         return false;
 
@@ -2203,7 +2204,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (GetBoolArg("-listenonion", DEFAULT_LISTEN_ONION))
         StartTorControl(threadGroup, scheduler);
 
-    fprintf(stderr,"Starting txnotify thread\n");
+    if(fDebug)
+        fprintf(stderr,"Starting txnotify thread\n");
     StartNode(threadGroup, scheduler);
 
 #ifdef ENABLE_MINING
@@ -2220,16 +2222,19 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // ********************************************************* Step 11: finished
 
     SetRPCWarmupFinished();
-    fprintf(stderr,"RPC warmump finished\n");
+    if(fDebug)
+        fprintf(stderr,"RPC warmump finished\n");
     uiInterface.InitMessage(_("Done loading!"));
 
 #ifdef ENABLE_WALLET
     if (pwalletMain) {
-	     fprintf(stderr,"%s Reaccepting wallet xtns\n", __FUNCTION__);
+        if(fDebug)
+	        fprintf(stderr,"%s Reaccepting wallet xtns\n", __FUNCTION__);
         // Add wallet transactions that aren't already in a block to mapTransactions
         pwalletMain->ReacceptWalletTransactions();
 
-	     fprintf(stderr,"%s Starting wallet flusher thread\n", __FUNCTION__);
+        if(fDebug)
+	        fprintf(stderr,"%s Starting wallet flusher thread\n", __FUNCTION__);
         // Run a thread to flush wallet periodically
         threadGroup.create_thread(boost::bind(&ThreadFlushWalletDB, boost::ref(pwalletMain->strWalletFile)));
     }
@@ -2238,6 +2243,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // SENDALERT
     threadGroup.create_thread(boost::bind(ThreadSendAlert));
 
-	fprintf(stderr,"%s end fRequestShutdown=%d\n", __FUNCTION__, !!fRequestShutdown);
+    if(fDebug)
+	    fprintf(stderr,"%s end fRequestShutdown=%d\n", __FUNCTION__, !!fRequestShutdown);
     return !fRequestShutdown;
 }
