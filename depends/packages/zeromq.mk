@@ -1,6 +1,7 @@
+# Unsupported until further notice
 ifeq ($(host_os),mingw32)
 $(package)_version=4.3.1
-$(package)_download_path=https://github.com/ca333/libzmq/archive
+$(package)_download_path=https://git.hush.is/duke/libzmq/archive
 $(package)_download_file=v$($(package)_version).tar.gz
 $(package)_file_name=libzmq-$($(package)_version).tar.gz
 $(package)_sha256_hash=cb8ebe5b60dadeb526745610d6237f05a98aba287114d8991dad1fa14f4be354
