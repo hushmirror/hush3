@@ -2907,7 +2907,7 @@ static bool ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& view, const CO
 }
 
 
-void ConnectNotarisations(const CBlock &block, int height)
+void ConnectNotarizations(const CBlock &block, int height)
 {
     // Record Notarisations
     NotarisationsInBlock notarisations = ScanBlockNotarisations(block, height);
@@ -2922,7 +2922,7 @@ void ConnectNotarisations(const CBlock &block, int height)
 }
 
 
-void DisconnectNotarisations(const CBlock &block)
+void DisconnectNotarizations(const CBlock &block)
 {
     // Delete from notarisations cache
     NotarisationsInBlock nibs;
@@ -3652,7 +3652,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         setDirtyBlockIndex.insert(pindex);
     }
 
-    ConnectNotarisations(block, pindex->GetHeight()); // MoMoM notarisation DB.
+    ConnectNotarizations(block, pindex->GetHeight()); // MoMoM notarisation DB.
 
     if (fTxIndex)
         if (!pblocktree->WriteTxIndex(vPos))
@@ -3907,7 +3907,7 @@ bool static DisconnectTip(CValidationState &state, bool fBare = false) {
         if (!DisconnectBlock(block, state, pindexDelete, view))
             return error("DisconnectTip(): DisconnectBlock %s failed", pindexDelete->GetBlockHash().ToString());
         assert(view.Flush());
-        DisconnectNotarisations(block);
+        DisconnectNotarizations(block);
     }
     pindexDelete->segid = -2;
     pindexDelete->nNotaryPay = 0; 
