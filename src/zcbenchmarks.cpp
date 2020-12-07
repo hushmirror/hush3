@@ -1,4 +1,6 @@
 // Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include <cstdio>
 #include <future>
@@ -6,7 +8,6 @@
 #include <thread>
 #include <unistd.h>
 #include <boost/filesystem.hpp>
-
 #include "coins.h"
 #include "util.h"
 #include "init.h"
@@ -26,9 +27,7 @@
 #include "streams.h"
 #include "txdb.h"
 #include "wallet/wallet.h"
-
 #include "zcbenchmarks.h"
-
 #include "zcash/Zcash.h"
 #include "zcash/IncrementalMerkleTree.hpp"
 #include "zcash/Note.hpp"
