@@ -2906,32 +2906,28 @@ static bool ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& view, const CO
     return fClean;
 }
 
-
 void ConnectNotarizations(const CBlock &block, int height)
 {
-    // Record Notarisations
     NotarisationsInBlock notarisations = ScanBlockNotarisations(block, height);
     if (notarisations.size() > 0) {
         CDBBatch batch = CDBBatch(*pnotarisations);
         batch.Write(block.GetHash(), notarisations);
         WriteBackNotarisations(notarisations, batch);
         pnotarisations->WriteBatch(batch, true);
-        LogPrintf("ConnectBlock: wrote %i block notarisations in block: %s\n",
+        LogPrintf("ConnectBlock: wrote %i block notarizations in block: %s\n",
                 notarisations.size(), block.GetHash().GetHex().data());
     }
 }
 
-
 void DisconnectNotarizations(const CBlock &block)
 {
-    // Delete from notarisations cache
     NotarisationsInBlock nibs;
     if (GetBlockNotarisations(block.GetHash(), nibs)) {
         CDBBatch batch = CDBBatch(*pnotarisations);
         batch.Erase(block.GetHash());
         EraseBackNotarisations(nibs, batch);
         pnotarisations->WriteBatch(batch, true);
-        LogPrintf("DisconnectTip: deleted %i block notarisations in block: %s\n",
+        LogPrintf("DisconnectTip: deleted %i block notarizations in block: %s\n",
             nibs.size(), block.GetHash().GetHex().data());
     }
 }
