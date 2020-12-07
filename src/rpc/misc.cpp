@@ -225,11 +225,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("version", CLIENT_VERSION));
     obj.push_back(Pair("protocolversion", PROTOCOL_VERSION));
-    // this KMD version represents the last time we did a full merge, we no longer merge
-    // in the post-KYC "era" of KMD
-    obj.push_back(Pair("KMDversion", KOMODO_VERSION)); // never change this again, it's set in stone. -- Duke
     obj.push_back(Pair("synced", HUSH_INSYNC!=0));
-    // any height larger than this can be attacked!
     obj.push_back(Pair("notarized", notarized_height));
     obj.push_back(Pair("prevMoMheight", prevMoMheight));
     obj.push_back(Pair("notarizedhash", notarized_hash.ToString()));
