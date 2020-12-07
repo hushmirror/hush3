@@ -5913,7 +5913,9 @@ void FindFilesToPrune(std::set<int>& setFilesToPrune)
 bool CheckDiskSpace(uint64_t nAdditionalBytes)
 {
     uint64_t nFreeBytesAvailable = boost::filesystem::space(GetDataDir()).available;
-    fprintf(stderr,"Free bytes on disk: %lu\n", nFreeBytesAvailable);
+    if(fDebug) {
+        fprintf(stderr,"Free bytes on disk: %lu\n", nFreeBytesAvailable);
+    }
     // Check for nMinDiskSpace bytes (currently 50MB)
     if (nFreeBytesAvailable < nMinDiskSpace + nAdditionalBytes)
         return AbortNode("Disk space is low!", _("Error: Disk space is low!"));
