@@ -1687,7 +1687,9 @@ std::pair<mapSaplingNoteData_t, SaplingIncomingViewingKeyMap> CWallet::FindMySap
     LOCK(cs_SpendingKeyStore);
     uint256 hash = tx.GetHash();
     uint32_t nZouts = tx.vShieldedOutput.size();
-    LogPrintf("%s: zouts=%d in tx=%s\n",__func__,nZouts, hash.ToString().c_str());
+    if(fDebug && (nZouts > 0)) {
+        LogPrintf("%s: zouts=%d in tx=%s\n",__func__,nZouts, hash.ToString().c_str());
+    }
 
     mapSaplingNoteData_t noteData;
     SaplingIncomingViewingKeyMap viewingKeysToAdd;

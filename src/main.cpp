@@ -4786,15 +4786,17 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
             fprintf(stderr,"%s: tx=%s has zspends=%d zouts=%d\n", __FUNCTION__, tx.GetHash().ToString().c_str(), nShieldedSpends, nShieldedOutputs );
         }
     }
-    fprintf(stderr,"%s: block %s has total zspends=%d zouts=%d\n", __FUNCTION__, block.GetHash().ToString().c_str(), nShieldedSpendsInBlock, nShieldedOutputsInBlock );
+    if (fDebug) {
+        fprintf(stderr,"%s: block %s has total zspends=%d zouts=%d\n", __FUNCTION__, block.GetHash().ToString().c_str(), nShieldedSpendsInBlock, nShieldedOutputsInBlock );
+    }
 
-    pindexNew->nSproutValue = sproutValue;
-    pindexNew->nChainSproutValue = boost::none;
-    pindexNew->nSaplingValue = saplingValue;
+    pindexNew->nSproutValue       = sproutValue;
+    pindexNew->nChainSproutValue  = boost::none;
+    pindexNew->nSaplingValue      = saplingValue;
     pindexNew->nChainSaplingValue = boost::none;
-    pindexNew->nFile = pos.nFile;
-    pindexNew->nDataPos = pos.nPos;
-    pindexNew->nUndoPos = 0;
+    pindexNew->nFile              = pos.nFile;
+    pindexNew->nDataPos           = pos.nPos;
+    pindexNew->nUndoPos           = 0;
     pindexNew->nStatus |= BLOCK_HAVE_DATA;
     pindexNew->RaiseValidity(BLOCK_VALID_TRANSACTIONS);
 
