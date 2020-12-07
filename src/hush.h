@@ -725,7 +725,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
                         if ( signedfp == 0 )
                         {
                             char fname[512];
-                            hush_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"signedmasks");
+                            hush_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"hushsignedmasks");
                             if ( (signedfp= fopen(fname,"rb+")) == 0 )
                                 signedfp = fopen(fname,"wb");
                             else fseek(signedfp,0,SEEK_END);
@@ -893,7 +893,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                     if ( signedfp == 0 )
                     {
                         char fname[512];
-                        hush_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"signedmasks");
+                        hush_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"hushsignedmasks");
                         if ( (signedfp= fopen(fname,"rb+")) == 0 )
                             signedfp = fopen(fname,"wb");
                         else fseek(signedfp,0,SEEK_END);

@@ -1760,18 +1760,18 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 delete pblocktree;
                 delete pnotarisations;
 
-                pblocktree = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex, dbCompression, dbMaxOpenFiles);
-                pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex);
-                pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
-                pcoinsTip = new CCoinsViewCache(pcoinscatcher);
+                pblocktree     = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex, dbCompression, dbMaxOpenFiles);
+                pcoinsdbview   = new CCoinsViewDB(nCoinDBCache, false, fReindex);
+                pcoinscatcher  = new CCoinsViewErrorCatcher(pcoinsdbview);
+                pcoinsTip      = new CCoinsViewCache(pcoinscatcher);
                 pnotarisations = new NotarisationDB(100*1024*1024, false, fReindex);
 
 
                 if (fReindex) {
                     boost::filesystem::remove(GetDataDir() / "hushstate");
-                    boost::filesystem::remove(GetDataDir() / "signedmasks");
+                    boost::filesystem::remove(GetDataDir() / "hushsignedmasks");
                     pblocktree->WriteReindexing(true);
-					fprintf(stderr, "%s: Deleted hushstate and signedmasks...\n", __FUNCTION__);
+					fprintf(stderr, "%s: Deleted hushstate and hushsignedmasks...\n", __FUNCTION__);
 
                     //If we're reindexing in prune mode, wipe away unusable block files and all undo data files
                     if (fPruneMode)
