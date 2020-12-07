@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2019 The Hush developers
+# Copyright (c) 2019-2020 The Hush developers
 # Released under the GPLv3
 
 TOPDIR=${TOPDIR:-$(git rev-parse --show-toplevel)}
@@ -12,8 +12,8 @@ HUSHTX=${HUSHTX:-$SRCDIR/hush-tx}
 
 [ ! -x $HUSHD ] && echo "$HUSHD not found or not executable." && exit 1
 
-#HUSHVER="v3.3.0"
-HUSHVER=$(./src/hushd --version|head -n2|tail -n1|cut -d' ' -f4|cut -d- -f1)
+HUSHVER="v3.6.0"
+#HUSHVER=$(./src/hushd --version|head -n2|tail -n1|cut -d' ' -f4|cut -d- -f1)
 
 # Create a footer file with copyright content.
 # This gets autodetected fine for komodod if --version-string is not set,
