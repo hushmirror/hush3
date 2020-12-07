@@ -84,6 +84,7 @@ static CBlock CreateGenesisBlock(uint32_t nTime, const uint256& nNonce, const st
  *   (no blocks before with a timestamp after, none after with
  *    timestamp before)
  * + Contains no strange transactions
+ * + Likes long walks on the blockchain
  */
 void *chainparams_commandline();
 #include "hush_defs.h"
@@ -98,7 +99,7 @@ public:
     {
 
         strNetworkID = "main";
-        strCurrencyUnits = "KMD";
+        strCurrencyUnits = "HUSH";
         bip44CoinType = 141; // As registered in https://github.com/satoshilabs/slips/blob/master/slip-0044.md 
         consensus.fCoinbaseMustBeProtected = false;
         consensus.nSubsidySlowStartInterval = 20000;
@@ -139,11 +140,11 @@ public:
         pchMessageStart[1] = 0xee;
         pchMessageStart[2] = 0xe4;
         pchMessageStart[3] = 0x8d;
-        vAlertPubKey = ParseHex("02f20607bf67133d08246570b26816fdf727e8e54bfe919576c362c6507a2f8368");
-        nDefaultPort = 7770;
-        nMinerThreads = 0;
-        nMaxTipAge = 24 * 60 * 60;
-        nPruneAfterHeight = 100000;
+        vAlertPubKey       = ParseHex("038a1bd41a08f38edda51042988022933c5775dfce81f7bae0b32a9179650352ac");
+        nDefaultPort       = 7770;
+        nMinerThreads      = 0;
+        nMaxTipAge         = 24 * 60 * 60;
+        nPruneAfterHeight  = 100000;
         const size_t N = 200, K = 9;
         BOOST_STATIC_ASSERT(equihash_parameters_acceptable(N, K));
         nEquihashN = N;
@@ -257,7 +258,6 @@ public:
         assert(maxUint/UintToArith256(consensus.powLimit) >= consensus.nPowAveragingWindow);
         consensus.nMaxFutureBlockTime = 7 * 60;
 
-        vAlertPubKey = ParseHex("00");
         nDefaultPort = 17770;
         nMinerThreads = 0;
         consensus.nPowMaxAdjustDown = 32; // 32% adjustment down
@@ -282,7 +282,7 @@ public:
         pchMessageStart[1] = 0x1F;
         pchMessageStart[2] = 0x7E;
         pchMessageStart[3] = 0x62;
-        vAlertPubKey = ParseHex("02f20607bf67133d08246570b26816fdf727e8e54bfe919576c362c6507a2f8368");
+        vAlertPubKey       = ParseHex("038a1bd41a08f38edda51042988022933c5775dfce81f7bae0b32a9179650352ac");
         nMaxTipAge = 24 * 60 * 60;
 
         nPruneAfterHeight = 1000;
@@ -508,6 +508,7 @@ std::string CChainParams::GetFoundersRewardAddressAtHeight(int nHeight) const {
     return vFoundersRewardAddress[i];
 }
 
+// TODO: this is ZEC code, HUSH does not use it, and it can be deleted
 // Block height must be >0 and <=last founders reward block height
 // The founders reward address is expected to be a multisig (P2SH) address
 CScript CChainParams::GetFoundersRewardScriptAtHeight(int nHeight) const {
