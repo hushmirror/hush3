@@ -2224,7 +2224,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     SetRPCWarmupFinished();
     if(fDebug)
         fprintf(stderr,"RPC warmump finished\n");
-    uiInterface.InitMessage(_("Done loading!"));
+    uiInterface.InitMessage(_("Hush Full Node Done Loading! :)"));
 
 #ifdef ENABLE_WALLET
     if (pwalletMain) {
