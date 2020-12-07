@@ -20,7 +20,7 @@ NotarisationsInBlock ScanBlockNotarisations(const CBlock &block, int nHeight)
     bool ishush3  = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 
     // No valid ntz's before this height on HUSH3
-    if(ishush3 && (nHeight <= 350000)) {
+    if(ishush3 && (nHeight <= 360000)) {
         return vNotarisations;
     }
 
