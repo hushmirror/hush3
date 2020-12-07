@@ -22,30 +22,24 @@
 #include "script/interpreter.h"
 #include "testutils.h"
 
-
+// We need to have control of Time Itself, otherwise block production can fail.
+int64_t nMockTime;
+extern uint32_t USE_EXTERNAL_PUBKEY;
+extern std::string NOTARY_PUBKEY;
+// This is a publicly burned keypair for Testing Purposes Only, lulz
+// Have fun, Blockchain Analysts ;)
 std::string notaryPubkey = "0205a8ad0c1dbc515f149af377981aab58b836af008d4d7ab21bd76faf80550b47";
 std::string notarySecret = "UxFWWxsf1d7w7K5TvAWSkeX4H95XQKwdwGv49DXwWUTzPTTjHBbU";
 CKey notaryKey;
 
-
-/*
- * We need to have control of clock,
- * otherwise block production can fail.
- */
-int64_t nMockTime;
-
-extern uint32_t USE_EXTERNAL_PUBKEY;
-extern std::string NOTARY_PUBKEY;
-
-void setupChain()
-{
+void setupChain() {
     SelectParams(CBaseChainParams::REGTEST);
 
     // Settings to get block reward
-    NOTARY_PUBKEY = notaryPubkey;
-    USE_EXTERNAL_PUBKEY = 1;
+    NOTARY_PUBKEY            = notaryPubkey;
+    USE_EXTERNAL_PUBKEY      = 1;
     mapArgs["-mineraddress"] = "bogus";
-    COINBASE_MATURITY = 1;
+    COINBASE_MATURITY        = 1;
     // Global mock time
     nMockTime = GetTime();
     
@@ -54,7 +48,7 @@ void setupChain()
 
     // Init blockchain
     ClearDatadirCache();
-    auto pathTemp = GetTempPath() / strprintf("test_komodo_%li_%i", GetTime(), GetRand(100000));
+    auto pathTemp = GetTempPath() / strprintf("test_hush_%li_%i", GetTime(), GetRand(100000));
     if (SMART_CHAIN_SYMBOL[0])
         pathTemp = pathTemp / strprintf("_%s", SMART_CHAIN_SYMBOL);
     boost::filesystem::create_directories(pathTemp);
@@ -74,7 +68,7 @@ void generateBlock(CBlock *block)
     params.push_back(1);
     uint256 blockId;
 
-    SetMockTime(nMockTime+=100);  // CreateNewBlock can fail if not enough time passes
+    SetMockTime(nMockTime+=100);  // CreateNewBlock can fail if not enough Time Has Happened
 
     try {
         UniValue out = generate(params, false, CPubKey());
@@ -85,20 +79,17 @@ void generateBlock(CBlock *block)
     }
 }
 
-
 void acceptTxFail(const CTransaction tx)
 {
     CValidationState state;
     if (!acceptTx(tx, state)) FAIL() << state.GetRejectReason();
 }
 
-
 bool acceptTx(const CTransaction tx, CValidationState &state)
 {
     LOCK(cs_main);
     return AcceptToMemoryPool(mempool, state, tx, false, NULL);
 }
-
 
 CMutableTransaction spendTx(const CTransaction &txIn, int nOut)
 {
@@ -111,7 +102,6 @@ CMutableTransaction spendTx(const CTransaction &txIn, int nOut)
     return mtx;
 }
 
-
 std::vector<uint8_t> getSig(const CMutableTransaction mtx, CScript inputPubKey, int nIn)
 {
     uint256 hash = SignatureHash(inputPubKey, mtx, nIn, SIGHASH_ALL, 0, 0);
@@ -120,7 +110,6 @@ std::vector<uint8_t> getSig(const CMutableTransaction mtx, CScript inputPubKey, 
     vchSig.push_back((unsigned char)SIGHASH_ALL);
     return vchSig;
 }
-
 
 /*
  * In order to do tests there needs to be inputs to spend.

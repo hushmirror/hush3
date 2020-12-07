@@ -3,7 +3,6 @@
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <cryptoconditions.h>
 #include <gtest/gtest.h>
-
 #include "cc/betprotocol.h"
 #include "cc/eval.h"
 #include "base58.h"
@@ -13,15 +12,11 @@
 #include "primitives/transaction.h"
 #include "script/interpreter.h"
 #include "script/serverchecker.h"
-
 #include "testutils.h"
-
 
 extern Eval* EVAL_TEST;
 
-
 namespace TestBet {
-
 
 static std::vector<CKey> playerSecrets;
 static std::vector<CPubKey> players;
