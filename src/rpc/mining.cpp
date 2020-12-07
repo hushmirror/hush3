@@ -52,7 +52,7 @@ using namespace std;
 #include "hush_defs.h"
 
 extern int32_t ASSETCHAINS_FOUNDERS;
-uint64_t komodo_commission(const CBlock *pblock,int32_t height);
+uint64_t the_commission(const CBlock *pblock,int32_t height);
 int32_t komodo_blockload(CBlock& block,CBlockIndex *pindex);
 arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
 
@@ -1048,13 +1048,13 @@ UniValue getblocksubsidy(const UniValue& params, bool fHelp, const CPubKey& mypk
                 CBlockIndex* pblockIndex = chainActive[nHeight];
                 CBlock block;
                 if ( komodo_blockload(block, pblockIndex) == 0 )
-                    nFoundersReward = komodo_commission(&block, nHeight);
+                    nFoundersReward = the_commission(&block, nHeight);
             }
         }
         else if ( ASSETCHAINS_FOUNDERS != 0 )
         {
             // Assetchains founders chains have a fixed reward so can be calculated at any given height.
-            nFoundersReward = komodo_commission(0, nHeight);
+            nFoundersReward = the_commission(0, nHeight);
         }
         result.push_back(Pair("ac_pubkey", ValueFromAmount(nFoundersReward)));
     }

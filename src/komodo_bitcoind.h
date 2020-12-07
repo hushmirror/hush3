@@ -1348,7 +1348,7 @@ uint64_t hush_commission(int height)
     return commission;
 }
 
-uint64_t komodo_commission(const CBlock *pblock,int32_t height)
+uint64_t the_commission(const CBlock *pblock,int32_t height)
 {
     //fprintf(stderr,"%s at height=%d\n",__func__,height);
     static bool didinit = false, ishush3 = false;
@@ -2064,7 +2064,7 @@ int64_t komodo_checkcommission(CBlock *pblock,int32_t height)
     int64_t checktoshis=0; uint8_t *script,scripthex[8192]; int32_t scriptlen,matched = 0; static bool didinit = false;
     if ( ASSETCHAINS_COMMISSION != 0 || ASSETCHAINS_FOUNDERS_REWARD != 0 )
     {
-        checktoshis = komodo_commission(pblock,height);
+        checktoshis = the_commission(pblock,height);
         if ( checktoshis >= 10000 && pblock->vtx[0].vout.size() < 2 )
         {
             fprintf(stderr,"ERROR: komodo_checkcommission vsize.%d height.%d commission %.8f has checktoshis=%lu <10000 or less than 2 vouts (vouts=%lu)\n",(int32_t)pblock->vtx[0].vout.size(),height,(double)checktoshis/COIN, checktoshis, pblock->vtx[0].vout.size() );

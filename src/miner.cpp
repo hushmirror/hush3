@@ -147,7 +147,7 @@ int32_t komodo_baseid(char *origbase);
 int32_t hush_longestchain();
 int32_t komodo_validate_interest(const CTransaction &tx,int32_t txheight,uint32_t nTime,int32_t dispflag);
 int64_t komodo_block_unlocktime(uint32_t nHeight);
-uint64_t komodo_commission(const CBlock *block,int32_t height);
+uint64_t the_commission(const CBlock *block,int32_t height);
 int32_t komodo_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *ptr);
 int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 int32_t komodo_is_notarytx(const CTransaction& tx);
@@ -630,7 +630,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
             txNew.vout[0].nValue += 5000;
         pblock->vtx[0] = txNew;
 
-        if ( nHeight > 1 && SMART_CHAIN_SYMBOL[0] != 0 && (ASSETCHAINS_OVERRIDE_PUBKEY33[0] != 0 || ASSETCHAINS_SCRIPTPUB.size() > 1) && (ASSETCHAINS_COMMISSION != 0 || ASSETCHAINS_FOUNDERS_REWARD != 0)  && (commission= komodo_commission((CBlock*)&pblocktemplate->block,(int32_t)nHeight)) != 0 )
+        if ( nHeight > 1 && SMART_CHAIN_SYMBOL[0] != 0 && (ASSETCHAINS_OVERRIDE_PUBKEY33[0] != 0 || ASSETCHAINS_SCRIPTPUB.size() > 1) && (ASSETCHAINS_COMMISSION != 0 || ASSETCHAINS_FOUNDERS_REWARD != 0)  && (commission= the_commission((CBlock*)&pblocktemplate->block,(int32_t)nHeight)) != 0 )
         {
             int32_t i; uint8_t *ptr;
             txNew.vout.resize(2);
