@@ -674,7 +674,7 @@ bool komodo_dailysnapshot(int32_t height)
     int reorglimit = 100; 
     uint256 notarized_hash,notarized_desttxid; int32_t prevMoMheight,notarized_height,undo_height,extraoffset;
     // NOTE: To make this 100% safe under all sync conditions, it should be using a notarized notarization, from the DB. 
-    // Under heavy reorg attack, its possible `komodo_notarized_height` can return a height that can't be found on chain sync.
+    // Under heavy reorg attack, its possible `hush_notarized_height` can return a height that can't be found on chain sync.
     // However, the DB can reorg the last notarization. By using 2 deep, we know 100% that the previous notarization cannot be reorged by online nodes,
     // and as such will always be notarizing the same height. May need to check heights on scan back to make sure they are confirmed in correct order.
     if ( (extraoffset= height % KOMODO_SNAPSHOT_INTERVAL) != 0 )
@@ -691,7 +691,7 @@ bool komodo_dailysnapshot(int32_t height)
     else 
     {
         // we are at the right height in connect block to scan back to last notarized height. 
-        notarized_height = komodo_notarized_height(&prevMoMheight,&notarized_hash,&notarized_desttxid);
+        notarized_height = hush_notarized_height(&prevMoMheight,&notarized_hash,&notarized_desttxid);
         notarized_height > height-reorglimit ? undo_height = notarized_height : undo_height = height-reorglimit; 
     }
     fprintf(stderr, "doing snapshot for height.%i undo_height.%i\n", height, undo_height);
@@ -3976,7 +3976,7 @@ bool static DisconnectTip(CValidationState &state, bool fBare = false) {
     //if ( SMART_CHAIN_SYMBOL[0] != 0 || pindexDelete->GetHeight() > 1400000 )
     {
         int32_t notarizedht,prevMoMheight; uint256 notarizedhash,txid;
-        notarizedht = komodo_notarized_height(&prevMoMheight,&notarizedhash,&txid);
+        notarizedht = hush_notarized_height(&prevMoMheight,&notarizedhash,&txid);
         if ( block.GetHash() == notarizedhash )
         {
             fprintf(stderr,"DisconnectTip trying to disconnect notarized block at ht.%d\n",(int32_t)pindexDelete->GetHeight());
@@ -4340,7 +4340,7 @@ static bool ActivateBestChainStep(bool fSkipdpow, CValidationState &state, CBloc
     // stop trying to reorg if the reorged chain is before last notarized height. 
     // stay on the same chain tip! 
     int32_t notarizedht,prevMoMheight; uint256 notarizedhash,txid;
-    notarizedht = komodo_notarized_height(&prevMoMheight,&notarizedhash,&txid);
+    notarizedht = hush_notarized_height(&prevMoMheight,&notarizedhash,&txid);
     if ( !fSkipdpow && pindexFork != 0 && pindexOldTip->GetHeight() > notarizedht && pindexFork->GetHeight() < notarizedht )
     {
         LogPrintf("pindexOldTip->GetHeight().%d > notarizedht %d && pindexFork->GetHeight().%d is < notarizedht %d, so ignore it\n",(int32_t)pindexOldTip->GetHeight(),notarizedht,(int32_t)pindexFork->GetHeight(),notarizedht);
@@ -5886,7 +5886,7 @@ uint64_t CalculateCurrentUsage()
 bool PruneOneBlockFile(bool tempfile, const int fileNumber)
 {
     uint256 notarized_hash,notarized_desttxid; int32_t prevMoMheight,notarized_height;
-    notarized_height = komodo_notarized_height(&prevMoMheight,&notarized_hash,&notarized_desttxid);
+    notarized_height = hush_notarized_height(&prevMoMheight,&notarized_hash,&notarized_desttxid);
     //fprintf(stderr, "pruneblockfile.%i\n",fileNumber); sleep(15);
     for (BlockMap::iterator it = mapBlockIndex.begin(); it != mapBlockIndex.end(); ++it) 
     {

@@ -287,7 +287,7 @@ int32_t komodo_prevMoMheight()
     return(0);
 }
 
-int32_t komodo_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *txidp)
+int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *txidp)
 {
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
     *prevMoMheightp = 0;
