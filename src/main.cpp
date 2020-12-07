@@ -5331,10 +5331,8 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     // Check proof of work
     if ( (SMART_CHAIN_SYMBOL[0] != 0 || nHeight < 235300 || nHeight > 236000) && block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
     {
-        cout << block.nBits << " block.nBits vs. calc " << GetNextWorkRequired(pindexPrev, &block, consensusParams) <<
-                               " for block #" << nHeight << endl;
-        return state.DoS(100, error("%s: incorrect proof of work", __func__),
-                        REJECT_INVALID, "bad-diffbits");
+        cout << block.nBits << " block.nBits vs. calc " << GetNextWorkRequired(pindexPrev, &block, consensusParams) << " for block #" << nHeight << endl;
+        return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
     }
 
     // Check timestamp against prev
@@ -5343,25 +5341,20 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         if (block.GetBlockTime() <= pindexPrev->GetMedianTimePast() )
         {
             fprintf(stderr,"ht.%d too early %u vs %u\n",(int32_t)nHeight,(uint32_t)block.GetBlockTime(),(uint32_t)pindexPrev->GetMedianTimePast());
-            return state.Invalid(error("%s: block's timestamp is too early", __func__),
-                                 REJECT_INVALID, "time-too-old");
+            return state.Invalid(error("%s: block's timestamp is too early", __func__), REJECT_INVALID, "time-too-old");
         }
-    }
-    else
-    {
+    } else {
         if ( block.GetBlockTime() <= pindexPrev->nTime )
         {
             fprintf(stderr,"ht.%d too early2 %u vs %u\n",(int32_t)nHeight,(uint32_t)block.GetBlockTime(),(uint32_t)pindexPrev->nTime);
-            return state.Invalid(error("%s: block's timestamp is too early2", __func__),
-                                 REJECT_INVALID, "time-too-old");
+            return state.Invalid(error("%s: block's timestamp is too early2", __func__), REJECT_INVALID, "time-too-old");
         }
     }
 
     // Check that timestamp is not too far in the future
     if (block.GetBlockTime() > GetTime() + consensusParams.nMaxFutureBlockTime)
     {
-        return state.Invalid(error("%s: block timestamp too far in the future", __func__),
-                        REJECT_INVALID, "time-too-new");
+        return state.Invalid(error("%s: block timestamp too far in the future", __func__), REJECT_INVALID, "time-too-new");
     }
 
     if (fCheckpointsEnabled)
@@ -5404,8 +5397,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     }
     // Reject block.nVersion < 4 blocks
     if (block.nVersion < 4)
-        return state.Invalid(error("%s : rejected nVersion<4 block", __func__),
-                             REJECT_OBSOLETE, "bad-version");
+        return state.Invalid(error("%s : rejected nVersion<4 block", __func__), REJECT_OBSOLETE, "bad-version");
 
     return true;
 }
