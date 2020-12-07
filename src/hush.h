@@ -39,7 +39,7 @@ uint256 NOTARIZED_HASH,NOTARIZED_DESTTXID;
 #include "utlist.h"
 
 int32_t gettxout_scriptPubKey(uint8_t *scriptPubkey,int32_t maxsize,uint256 txid,int32_t n);
-void komodo_event_rewind(struct komodo_state *sp,char *symbol,int32_t height);
+void komodo_event_rewind(struct hush_state *sp,char *symbol,int32_t height);
 int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block);
 bool check_pprevnotarizedht();
 
@@ -53,7 +53,7 @@ bool check_pprevnotarizedht();
 #include "komodo_pax.h"
 #include "hush_notary.h"
 
-int32_t komodo_parsestatefile(struct komodo_state *sp,FILE *fp,char *symbol,char *dest);
+int32_t komodo_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *dest);
 #include "komodo_kv.h"
 #include "komodo_gateway.h"
 #include "komodo_events.h"
@@ -61,25 +61,25 @@ int32_t komodo_parsestatefile(struct komodo_state *sp,FILE *fp,char *symbol,char
 
 void komodo_currentheight_set(int32_t height)
 {
-    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
-    if ( (sp= komodo_stateptr(symbol,dest)) != 0 )
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
+    if ( (sp= hush_stateptr(symbol,dest)) != 0 )
         sp->CURRENT_HEIGHT = height;
 }
 
 extern struct NSPV_inforesp NSPV_inforesult;
 int32_t komodo_currentheight()
 {
-    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
     if ( KOMODO_NSPV_SUPERLITE )
     {
         return (NSPV_inforesult.height);
     }
-    if ( (sp= komodo_stateptr(symbol,dest)) != 0 )
+    if ( (sp= hush_stateptr(symbol,dest)) != 0 )
         return(sp->CURRENT_HEIGHT);
     else return(0);
 }
 
-int32_t komodo_parsestatefile(struct komodo_state *sp,FILE *fp,char *symbol,char *dest)
+int32_t komodo_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *dest)
 {
     static int32_t errs;
     int32_t func,ht,notarized_height,num,matched=0,MoMdepth; uint256 MoM,notarized_hash,notarized_desttxid; uint8_t pubkeys[64][33];
@@ -225,7 +225,7 @@ int32_t memread(void *dest,int32_t size,uint8_t *filedata,long *fposp,long datal
     return(-1);
 }
 
-int32_t komodo_parsestatefiledata(struct komodo_state *sp,uint8_t *filedata,long *fposp,long datalen,char *symbol,char *dest)
+int32_t komodo_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fposp,long datalen,char *symbol,char *dest)
 {
     static int32_t errs;
     int32_t func= -1,ht,notarized_height,MoMdepth,num,matched=0; uint256 MoM,notarized_hash,notarized_desttxid; uint8_t pubkeys[64][33]; long fpos = *fposp;
@@ -356,26 +356,26 @@ int32_t komodo_parsestatefiledata(struct komodo_state *sp,uint8_t *filedata,long
     return(-1);
 }
 
-void komodo_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotaries,uint8_t notaryid,uint256 txhash,uint64_t voutmask,uint8_t numvouts,uint32_t *pvals,uint8_t numpvals,int32_t KMDheight,uint32_t KMDtimestamp,uint64_t opretvalue,uint8_t *opretbuf,uint16_t opretlen,uint16_t vout,uint256 MoM,int32_t MoMdepth)
+void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotaries,uint8_t notaryid,uint256 txhash,uint64_t voutmask,uint8_t numvouts,uint32_t *pvals,uint8_t numpvals,int32_t KMDheight,uint32_t KMDtimestamp,uint64_t opretvalue,uint8_t *opretbuf,uint16_t opretlen,uint16_t vout,uint256 MoM,int32_t MoMdepth)
 {
     static FILE *fp; static int32_t errs,didinit; static uint256 zero;
-    struct komodo_state *sp; char fname[512],symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t retval,ht,func; uint8_t num,pubkeys[64][33];
+    struct hush_state *sp; char fname[512],symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t retval,ht,func; uint8_t num,pubkeys[64][33];
     if ( didinit == 0 )
     {
         portable_mutex_init(&KOMODO_KV_mutex);
         portable_mutex_init(&KOMODO_CC_mutex);
         didinit = 1;
     }
-    if ( (sp= komodo_stateptr(symbol,dest)) == 0 )
+    if ( (sp= hush_stateptr(symbol,dest)) == 0 )
     {
         HUSH_INITDONE = (uint32_t)time(NULL);
-        printf("[%s] no komodo_stateptr\n",SMART_CHAIN_SYMBOL);
+        printf("[%s] no hush_stateptr\n",SMART_CHAIN_SYMBOL);
         return;
     }
     //printf("[%s] (%s) -> (%s)\n",SMART_CHAIN_SYMBOL,symbol,dest);
     if ( fp == 0 )
     {
-        komodo_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"komodostate");
+        hush_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"hushstate");
         if ( (fp= fopen(fname,"rb+")) != 0 )
         {
             if ( (retval= hush_faststateinit(sp,fname,symbol,dest)) > 0 )
@@ -515,8 +515,8 @@ void komodo_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotar
 
 int32_t komodo_validate_chain(uint256 srchash,int32_t notarized_height)
 {
-    static int32_t last_rewind; int32_t rewindtarget; CBlockIndex *pindex; struct komodo_state *sp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN];
-    if ( (sp= komodo_stateptr(symbol,dest)) == 0 )
+    static int32_t last_rewind; int32_t rewindtarget; CBlockIndex *pindex; struct hush_state *sp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN];
+    if ( (sp= hush_stateptr(symbol,dest)) == 0 )
         return(0);
     if ( IsInitialBlockDownload() == 0 && ((pindex= komodo_getblockindex(srchash)) == 0 || pindex->GetHeight() != notarized_height) )
     {
@@ -541,8 +541,8 @@ int32_t komodo_validate_chain(uint256 srchash,int32_t notarized_height)
 int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryid,uint8_t *scriptbuf,int32_t scriptlen,int32_t height,uint256 txhash,int32_t i,int32_t j,uint64_t *voutmaskp,int32_t *specialtxp,int32_t *notarizedheightp,uint64_t value,int32_t notarized,uint64_t signedmask,uint32_t timestamp)
 {
     static uint256 zero; static FILE *signedfp;
-    int32_t opretlen,nid,offset,k,MoMdepth,matched,len = 0; uint256 MoM,srchash,desttxid; uint8_t crypto555[33]; struct komodo_state *sp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN];
-    if ( (sp= komodo_stateptr(symbol,dest)) == 0 )
+    int32_t opretlen,nid,offset,k,MoMdepth,matched,len = 0; uint256 MoM,srchash,desttxid; uint8_t crypto555[33]; struct hush_state *sp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN];
+    if ( (sp= hush_stateptr(symbol,dest)) == 0 )
         return(-1);
     if ( scriptlen == 35 && scriptbuf[0] == 33 && scriptbuf[34] == 0xac )
     {
@@ -609,7 +609,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
             if ( scriptbuf[len] == 'K' )
             {
                 //fprintf(stderr,"i.%d j.%d KV OPRET len.%d %.8f\n",i,j,opretlen,dstr(value));
-                komodo_stateupdate(height,0,0,0,txhash,0,0,0,0,0,0,value,&scriptbuf[len],opretlen,j,zero,0);
+                hush_stateupdate(height,0,0,0,txhash,0,0,0,0,0,0,value,&scriptbuf[len],opretlen,j,zero,0);
                 return(-1);
             }
             if ( strcmp(SMART_CHAIN_SYMBOL,(char *)&scriptbuf[len+32*2+4]) == 0 )
@@ -716,7 +716,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
                         sp->MoM = MoM;
                         sp->MoMdepth = MoMdepth;
                     }
-                    komodo_stateupdate(height,0,0,0,zero,0,0,0,0,0,0,0,0,0,0,sp->MoM,sp->MoMdepth);
+                    hush_stateupdate(height,0,0,0,zero,0,0,0,0,0,0,0,0,0,0,sp->MoM,sp->MoMdepth);
                     //if ( SMART_CHAIN_SYMBOL[0] != 0 )
                         printf("[%s] ht.%d NOTARIZED.%d %s.%s %sTXID.%s lens.(%d %d) MoM.%s %d\n",SMART_CHAIN_SYMBOL,height,sp->NOTARIZED_HEIGHT,SMART_CHAIN_SYMBOL[0]==0?"KMD":SMART_CHAIN_SYMBOL,srchash.ToString().c_str(),SMART_CHAIN_SYMBOL[0]==0?"BTC":"KMD",desttxid.ToString().c_str(),opretlen,len,sp->MoM.ToString().c_str(),sp->MoMdepth);
                     
@@ -725,7 +725,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
                         if ( signedfp == 0 )
                         {
                             char fname[512];
-                            komodo_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"signedmasks");
+                            hush_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"signedmasks");
                             if ( (signedfp= fopen(fname,"rb+")) == 0 )
                                 signedfp = fopen(fname,"wb");
                             else fseek(signedfp,0,SEEK_END);
@@ -741,7 +741,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
                             //for (i=0; i<opretlen-len; i++)
                             //    printf("%02x",scriptbuf[len+i]);
                             //printf(" Found extradata.[%d] %d - %d\n",opretlen-len,opretlen,len);
-                            komodo_stateupdate(height,0,0,0,txhash,0,0,0,0,0,0,value,&scriptbuf[len],opretlen-len+4+3+(scriptbuf[1] == 0x4d),j,zero,0);
+                            hush_stateupdate(height,0,0,0,txhash,0,0,0,0,0,0,value,&scriptbuf[len],opretlen-len+4+3+(scriptbuf[1] == 0x4d),j,zero,0);
                         }
                     }
                 } //else if ( fJustCheck )
@@ -772,7 +772,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
             }
 
             if ( *isratificationp == 0 && (signedmask != 0 || (scriptbuf[len] != 'X' && scriptbuf[len] != 'A')) ) // && scriptbuf[len] != 'I')
-                komodo_stateupdate(height,0,0,0,txhash,0,0,0,0,0,0,value,&scriptbuf[len],opretlen,j,zero,0);
+                hush_stateupdate(height,0,0,0,txhash,0,0,0,0,0,0,value,&scriptbuf[len],opretlen,j,zero,0);
         }
     }
     return(notaryid);
@@ -812,7 +812,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
 {
     static int32_t hwmheight;
     std::vector<int32_t> notarisations;
-    uint64_t signedmask,voutmask; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
+    uint64_t signedmask,voutmask; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
     uint8_t scriptbuf[10001],pubkeys[64][33],rmd160[20],scriptPubKey[35]; uint256 zero,btctxid,txhash;
     int32_t i,j,k,numnotaries,notarized,scriptlen,isratification,nid,numvalid,specialtx,notarizedheight,notaryid,len,numvouts,numvins,height,txn_count;
     if ( pindex == 0 )
@@ -823,7 +823,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
     memset(&zero,0,sizeof(zero));
     komodo_init(pindex->GetHeight());
     HUSH_INITDONE = (uint32_t)time(NULL);
-    if ( (sp= komodo_stateptr(symbol,dest)) == 0 )
+    if ( (sp= hush_stateptr(symbol,dest)) == 0 )
     {
         fprintf(stderr,"unexpected null stateptr.[%s]\n",SMART_CHAIN_SYMBOL);
         return(0);
@@ -845,7 +845,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
         if (!fJustCheck)
         {
             komodo_event_rewind(sp,symbol,pindex->GetHeight());
-            komodo_stateupdate(pindex->GetHeight(),0,0,0,zero,0,0,0,0,-pindex->GetHeight(),pindex->nTime,0,0,0,0,zero,0);
+            hush_stateupdate(pindex->GetHeight(),0,0,0,zero,0,0,0,0,-pindex->GetHeight(),pindex->nTime,0,0,0,0,zero,0);
         }
     }
     komodo_currentheight_set(chainActive.LastTip()->GetHeight());
@@ -893,7 +893,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                     if ( signedfp == 0 )
                     {
                         char fname[512];
-                        komodo_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"signedmasks");
+                        hush_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"signedmasks");
                         if ( (signedfp= fopen(fname,"rb+")) == 0 )
                             signedfp = fopen(fname,"wb");
                         else fseek(signedfp,0,SEEK_END);
@@ -990,7 +990,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                         if ( ((signedmask & 1) != 0 && numvalid >= KOMODO_MINRATIFY) || bitweight(signedmask) > (numnotaries/3) )
                         {
                             memset(&txhash,0,sizeof(txhash));
-                            komodo_stateupdate(height,pubkeys,numvalid,0,txhash,0,0,0,0,0,0,0,0,0,0,zero,0);
+                            hush_stateupdate(height,pubkeys,numvalid,0,txhash,0,0,0,0,0,0,0,0,0,0,zero,0);
                             printf("RATIFIED! >>>>>>>>>> new notaries.%d newheight.%d from height.%d\n",numvalid,(((height+KOMODO_ELECTION_GAP/2)/KOMODO_ELECTION_GAP)+1)*KOMODO_ELECTION_GAP,height);
                         } else printf("signedmask.%llx numvalid.%d wt.%d numnotaries.%d\n",(long long)signedmask,numvalid,bitweight(signedmask),numnotaries);
                     }
@@ -1000,7 +1000,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
         if ( !fJustCheck && IS_HUSH_NOTARY != 0 && SMART_CHAIN_SYMBOL[0] == 0 )
             printf("%s ht.%d\n",SMART_CHAIN_SYMBOL[0] == 0 ? "KMD" : SMART_CHAIN_SYMBOL,height);
         if ( !fJustCheck && pindex->GetHeight() == hwmheight )
-            komodo_stateupdate(height,0,0,0,zero,0,0,0,0,height,(uint32_t)pindex->nTime,0,0,0,0,zero,0);
+            hush_stateupdate(height,0,0,0,zero,0,0,0,0,height,(uint32_t)pindex->nTime,0,0,0,0,zero,0);
     } 
     else 
         { fprintf(stderr,"hush_connectblock: unexpected null pindex\n"); return(0); }

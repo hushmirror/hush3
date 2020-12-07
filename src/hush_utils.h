@@ -1330,7 +1330,7 @@ uint16_t _komodo_userpass(char *username,char *password,FILE *fp)
     return(port);
 }
 
-void komodo_statefname(char *fname,char *symbol,char *str)
+void hush_statefname(char *fname,char *symbol,char *str)
 {
     int32_t n,len;
     sprintf(fname,"%s",GetDataDir(false).string().c_str());
@@ -1452,7 +1452,7 @@ uint16_t komodo_userpass(char *userpass,char *symbol)
 #endif
     }
     else sprintf(confname,"%s.conf",symbol);
-    komodo_statefname(fname,symbol,confname);
+    hush_statefname(fname,symbol,confname);
     if ( (fp= fopen(fname,"rb")) != 0 )
     {
         port = _komodo_userpass(username,password,fp);
@@ -2518,7 +2518,7 @@ void komodo_nameset(char *symbol,char *dest,char *source)
     }
 }
 
-struct komodo_state *komodo_stateptrget(char *base)
+struct hush_state *hush_stateptrget(char *base)
 {
     int32_t baseid;
     if ( base == 0 || base[0] == 0 || strcmp(base,(char *)"KMD") == 0 )
@@ -2528,11 +2528,11 @@ struct komodo_state *komodo_stateptrget(char *base)
     else return(&KOMODO_STATES[0]);
 }
 
-struct komodo_state *komodo_stateptr(char *symbol,char *dest)
+struct hush_state *hush_stateptr(char *symbol,char *dest)
 {
     int32_t baseid;
     komodo_nameset(symbol,dest,SMART_CHAIN_SYMBOL);
-    return(komodo_stateptrget(symbol));
+    return(hush_stateptrget(symbol));
 }
 
 void komodo_prefetch(FILE *fp)

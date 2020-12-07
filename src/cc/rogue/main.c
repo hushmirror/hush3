@@ -657,7 +657,7 @@ uint16_t _komodo_userpass(char *username, char *password, FILE *fp)
     return(port);
 }
 
-/*void komodo_statefname(char *fname,char *symbol,char *str)
+/*void hush_statefname(char *fname,char *symbol,char *str)
 {
     int32_t n,len;
     sprintf(fname,"%s",getDataDir());
@@ -707,7 +707,7 @@ uint16_t komodo_userpass(char *userpass,char *symbol)
 #endif
     }
     else sprintf(confname,"%s.conf",symbol);
-    //komodo_statefname(fname,symbol,confname);
+    //hush_statefname(fname,symbol,confname);
     if ( (fp= fopen(confname,"rb")) != 0 )
     {
         port = _komodo_userpass(username,password,fp);

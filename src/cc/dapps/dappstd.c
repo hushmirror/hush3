@@ -660,7 +660,7 @@ uint16_t komodo_userpass(char *userpass,char *symbol)
 #endif
     }
     else sprintf(confname,"%s.conf",symbol);
-    //komodo_statefname(fname,symbol,confname);
+    //hush_statefname(fname,symbol,confname);
     if ( (fp= fopen(confname,"rb")) != 0 )
     {
         port = _komodo_userpass(username,password,fp);

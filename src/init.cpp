@@ -3,7 +3,6 @@
 // Copyright (c) 2019-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
 #endif
@@ -657,8 +655,8 @@ void CleanupBlockRevFiles()
                 remove(it->path());
         }
     }
-    path komodostate = GetDataDir() / "komodostate";
-    remove(komodostate);
+    path hushstate = GetDataDir() / "hushstate";
+    remove(hushstate);
     path minerids = GetDataDir() / "minerids";
     remove(minerids);
     // Remove all block files that aren't part of a contiguous set starting at
@@ -1770,10 +1768,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
 
                 if (fReindex) {
-                    boost::filesystem::remove(GetDataDir() / "komodostate");
+                    boost::filesystem::remove(GetDataDir() / "hushstate");
                     boost::filesystem::remove(GetDataDir() / "signedmasks");
                     pblocktree->WriteReindexing(true);
-					fprintf(stderr, "%s: Deleted komodostate and signedmasks...\n", __FUNCTION__);
+					fprintf(stderr, "%s: Deleted hushstate and signedmasks...\n", __FUNCTION__);
 
                     //If we're reindexing in prune mode, wipe away unusable block files and all undo data files
                     if (fPruneMode)

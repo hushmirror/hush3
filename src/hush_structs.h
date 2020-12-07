@@ -118,7 +118,7 @@ struct komodo_ccdata
     char symbol[65];
 };
 
-struct komodo_state
+struct hush_state
 {
     uint256 NOTARIZED_HASH,NOTARIZED_DESTTXID,MoM;
     int32_t SAVEDHEIGHT,CURRENT_HEIGHT,NOTARIZED_HEIGHT,MoMdepth;

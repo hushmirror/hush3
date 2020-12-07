@@ -17,7 +17,7 @@
 #define H_KOMODOEVENTS_H
 #include "hush_defs.h"
 
-struct komodo_event *komodo_eventadd(struct komodo_state *sp,int32_t height,char *symbol,uint8_t type,uint8_t *data,uint16_t datalen)
+struct komodo_event *komodo_eventadd(struct hush_state *sp,int32_t height,char *symbol,uint8_t type,uint8_t *data,uint16_t datalen)
 {
     struct komodo_event *ep=0; uint16_t len = (uint16_t)(sizeof(*ep) + datalen);
     if ( sp != 0 && SMART_CHAIN_SYMBOL[0] != 0 )
@@ -37,7 +37,7 @@ struct komodo_event *komodo_eventadd(struct komodo_state *sp,int32_t height,char
     return(ep);
 }
 
-void komodo_eventadd_notarized(struct komodo_state *sp,char *symbol,int32_t height,char *dest,uint256 notarized_hash,uint256 notarized_desttxid,int32_t notarizedheight,uint256 MoM,int32_t MoMdepth)
+void komodo_eventadd_notarized(struct hush_state *sp,char *symbol,int32_t height,char *dest,uint256 notarized_hash,uint256 notarized_desttxid,int32_t notarizedheight,uint256 MoM,int32_t MoMdepth)
 {
     static uint32_t counter; int32_t verified=0; char *coin; struct komodo_event_notarized N;
     coin = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"KMD" : SMART_CHAIN_SYMBOL;
@@ -63,7 +63,7 @@ void komodo_eventadd_notarized(struct komodo_state *sp,char *symbol,int32_t heig
     }
 }
 
-void komodo_eventadd_pubkeys(struct komodo_state *sp,char *symbol,int32_t height,uint8_t num,uint8_t pubkeys[64][33])
+void komodo_eventadd_pubkeys(struct hush_state *sp,char *symbol,int32_t height,uint8_t num,uint8_t pubkeys[64][33])
 {
     struct komodo_event_pubkeys P;
     //printf("eventadd pubkeys ht.%d\n",height);
@@ -75,7 +75,7 @@ void komodo_eventadd_pubkeys(struct komodo_state *sp,char *symbol,int32_t height
         komodo_notarysinit(height,pubkeys,num);
 }
 
-void komodo_eventadd_pricefeed(struct komodo_state *sp,char *symbol,int32_t height,uint32_t *prices,uint8_t num)
+void komodo_eventadd_pricefeed(struct hush_state *sp,char *symbol,int32_t height,uint32_t *prices,uint8_t num)
 {
     struct komodo_event_pricefeed F;
     if ( num == sizeof(F.prices)/sizeof(*F.prices) )
@@ -89,7 +89,7 @@ void komodo_eventadd_pricefeed(struct komodo_state *sp,char *symbol,int32_t heig
     } //else fprintf(stderr,"skip pricefeed[%d]\n",num);
 }
 
-void komodo_eventadd_opreturn(struct komodo_state *sp,char *symbol,int32_t height,uint256 txid,uint64_t value,uint16_t vout,uint8_t *buf,uint16_t opretlen)
+void komodo_eventadd_opreturn(struct hush_state *sp,char *symbol,int32_t height,uint256 txid,uint64_t value,uint16_t vout,uint8_t *buf,uint16_t opretlen)
 {
     struct komodo_event_opreturn O; uint8_t *opret;
     if ( SMART_CHAIN_SYMBOL[0] != 0 )
@@ -108,7 +108,7 @@ void komodo_eventadd_opreturn(struct komodo_state *sp,char *symbol,int32_t heigh
     }
 }
 
-void komodo_event_undo(struct komodo_state *sp,struct komodo_event *ep)
+void komodo_event_undo(struct hush_state *sp,struct komodo_event *ep)
 {
     switch ( ep->type )
     {
@@ -127,7 +127,7 @@ void komodo_event_undo(struct komodo_state *sp,struct komodo_event *ep)
     }
 }
 
-void komodo_event_rewind(struct komodo_state *sp,char *symbol,int32_t height)
+void komodo_event_rewind(struct hush_state *sp,char *symbol,int32_t height)
 {
     struct komodo_event *ep;
     if ( sp != 0 )
@@ -152,7 +152,7 @@ void komodo_event_rewind(struct komodo_state *sp,char *symbol,int32_t height)
     }
 }
 
-void komodo_setkmdheight(struct komodo_state *sp,int32_t kmdheight,uint32_t timestamp)
+void komodo_setkmdheight(struct hush_state *sp,int32_t kmdheight,uint32_t timestamp)
 {
     if ( sp != 0 )
     {
@@ -166,7 +166,7 @@ void komodo_setkmdheight(struct komodo_state *sp,int32_t kmdheight,uint32_t time
     }
 }
 
-void komodo_eventadd_kmdheight(struct komodo_state *sp,char *symbol,int32_t height,int32_t kmdheight,uint32_t timestamp)
+void komodo_eventadd_kmdheight(struct hush_state *sp,char *symbol,int32_t height,int32_t kmdheight,uint32_t timestamp)
 {
     uint32_t buf[2];
     if ( kmdheight > 0 )

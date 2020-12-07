@@ -724,14 +724,14 @@ int32_t komodo_isPoS(CBlock *pblock,int32_t height,bool fJustCheck)
 
 void komodo_disconnect(CBlockIndex *pindex,CBlock& block)
 {
-    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct komodo_state *sp;
+    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
     //fprintf(stderr,"disconnect ht.%d\n",pindex->GetHeight());
     komodo_init(pindex->GetHeight());
-    if ( (sp= komodo_stateptr(symbol,dest)) != 0 )
+    if ( (sp= hush_stateptr(symbol,dest)) != 0 )
     {
         //sp->rewinding = pindex->GetHeight();
         //fprintf(stderr,"-%d ",pindex->GetHeight());
-    } else printf("komodo_disconnect: ht.%d cant get komodo_state.(%s)\n",pindex->GetHeight(),SMART_CHAIN_SYMBOL);
+    } else printf("komodo_disconnect: ht.%d cant get hush_state.(%s)\n",pindex->GetHeight(),SMART_CHAIN_SYMBOL);
 }
 
 int32_t komodo_is_notarytx(const CTransaction& tx)
@@ -1191,8 +1191,8 @@ int32_t komodo_nextheight()
 
 int32_t komodo_isrealtime(int32_t *kmdheightp)
 {
-    struct komodo_state *sp; CBlockIndex *pindex;
-    if ( (sp= komodo_stateptrget((char *)"KMD")) != 0 )
+    struct hush_state *sp; CBlockIndex *pindex;
+    if ( (sp= hush_stateptrget((char *)"KMD")) != 0 )
         *kmdheightp = sp->CURRENT_HEIGHT;
     else *kmdheightp = 0;
     if ( (pindex= chainActive.LastTip()) != 0 && pindex->GetHeight() >= (int32_t)hush_longestchain() )
