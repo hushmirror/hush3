@@ -1,10 +1,12 @@
-#ifndef NOTARISATIONDB_H
-#define NOTARISATIONDB_H
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+#ifndef HUSH_NOTARISATIONDB_H
+#define HUSH_NOTARISATIONDB_H
 
 #include "uint256.h"
 #include "dbwrapper.h"
 #include "cc/eval.h"
-
 
 class NotarisationDB : public CDBWrapper
 {
@@ -12,9 +14,7 @@ public:
     NotarisationDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
 };
 
-
 extern NotarisationDB *pnotarisations;
-
 typedef std::pair<uint256,NotarisationData> Notarisation;
 typedef std::vector<Notarisation> NotarisationsInBlock;
 
@@ -25,6 +25,5 @@ void WriteBackNotarisations(const NotarisationsInBlock notarisations, CDBBatch &
 void EraseBackNotarisations(const NotarisationsInBlock notarisations, CDBBatch &batch);
 int ScanNotarisationsDB(int height, std::string symbol, int scanLimitBlocks, Notarisation& out);
 int ScanNotarisationsDB2(int height, std::string symbol, int scanLimitBlocks, Notarisation& out);
-bool IsTXSCL(const char* symbol);
 
-#endif  /* NOTARISATIONDB_H */
+#endif  /* HUSH_NOTARISATIONDB_H */

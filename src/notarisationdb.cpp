@@ -10,15 +10,19 @@
 #include <boost/foreach.hpp>
 
 NotarisationDB *pnotarisations;
-
-NotarisationDB::NotarisationDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "notarisations", nCacheSize, fMemory, fWipe, false, 64) { }
-
+NotarisationDB::NotarisationDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "notarizations", nCacheSize, fMemory, fWipe, false, 64) { }
 
 NotarisationsInBlock ScanBlockNotarisations(const CBlock &block, int nHeight)
 {
     EvalRef eval;
     NotarisationsInBlock vNotarisations;
     int timestamp = block.nTime;
+    bool ishush3  = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
+
+    // No valid ntz's before this height
+    if(ishush3 && (nHeight <= 340420)) {
+        return vNotarisations;
+    }
 
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
         CTransaction tx = block.vtx[i];
@@ -44,17 +48,10 @@ NotarisationsInBlock ScanBlockNotarisations(const CBlock &block, int nHeight)
             //      data.symbol, tx.GetHash().GetHex().data(), data.ccId, data.MoMDepth);
             //if (!data.MoMoM.IsNull()) printf("MoMoM:%s\n", data.MoMoM.GetHex().data());
         } else
-            LogPrintf("WARNING: Couldn't parse notarisation for tx: %s at height %i\n",
-                    tx.GetHash().GetHex().data(), nHeight);
+            LogPrintf("WARNING: Couldn't parse notarisation for tx: %s at height %i\n", tx.GetHash().GetHex().data(), nHeight);
     }
     return vNotarisations;
 }
-
-bool IsTXSCL(const char* symbol)
-{
-    return strlen(symbol) >= 5 && strncmp(symbol, "TXSCL", 5) == 0;
-}
-
 
 bool GetBlockNotarisations(uint256 blockHash, NotarisationsInBlock &nibs)
 {
@@ -69,7 +66,7 @@ bool GetBackNotarisation(uint256 notarisationHash, Notarisation &n)
 
 
 /*
- * Write an index of KMD notarisation id -> backnotarisation
+ * Write an index of HUSH notarisation id -> backnotarisation
  */
 void WriteBackNotarisations(const NotarisationsInBlock notarisations, CDBBatch &batch)
 {
