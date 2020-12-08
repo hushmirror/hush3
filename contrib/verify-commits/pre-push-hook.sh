@@ -1,5 +1,8 @@
 #!/bin/bash
-if ! [[ "$2" =~ [git@]?[www.]?github.com[:|/]bitcoin/bitcoin[.git]? ]]; then
+# Copyright (c) 2019-2020 Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+if ! [[ "$2" =~ [git@]?[www.]?hush.is[:|/]bitcoin/bitcoin[.git]? ]]; then
     exit 0
 fi
 
