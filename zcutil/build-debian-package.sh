@@ -22,8 +22,7 @@ if [ ! -d $BUILD_PATH ]; then
     mkdir $BUILD_PATH
 fi
 
-## PACKAGE_VERSION=$($SRC_PATH/src/zcashd --version | grep version | cut -d' ' -f4 | tr -d v)
-#PACKAGE_VERSION=3.2.0
+#PACKAGE_VERSION=3.6.0
 PACKAGE_VERSION=$($SRC_PATH/src/hushd --version|grep version|cut -d' ' -f4|cut -d- -f1|sed 's/v//g')
 DEBVERSION=$(echo $PACKAGE_VERSION | sed 's/-beta/~beta/' | sed 's/-rc/~rc/' | sed 's/-/+/')
 BUILD_DIR="$BUILD_PATH/$PACKAGE_NAME-$PACKAGE_VERSION-amd64"
@@ -58,7 +57,6 @@ strip $DEB_BIN/hush-komodo-tx
 cp $SRC_PATH/src/hushd $DEB_BIN
 cp $SRC_PATH/src/hush-cli $DEB_BIN
 cp $SRC_PATH/src/hush-tx $DEB_BIN
-#cp $SRC_PATH/zcutil/fetch-params.sh $DEB_BIN/zcash-fetch-params
 #cp $SRC_DEB/changelog $DEB_DOC/changelog.Debian
 cp $SRC_DEB/copyright $DEB_DOC
 cp -r $SRC_DEB/examples $DEB_DOC
@@ -72,7 +70,6 @@ cp $SRC_DOC/man/komodo-cli.1 $DEB_MAN/hush-cli.1
 cp $SRC_DOC/man/komodo-tx.1 $DEB_MAN/hush-tx.1
 #TODO: process these copies and update names/binaries/etc
 
-#cp $SRC_DOC/man/zcash-fetch-params.1 $DEB_MAN
 # Copy bash completion files
 cp $SRC_PATH/contrib/hushd.bash-completion $DEB_CMP/hushd
 cp $SRC_PATH/contrib/hush-cli.bash-completion $DEB_CMP/hush-cli
@@ -86,7 +83,6 @@ gzip --best -n $DEB_MAN/hush-komodo-tx.1
 gzip --best -n $DEB_MAN/hushd.1
 gzip --best -n $DEB_MAN/hush-cli.1
 gzip --best -n $DEB_MAN/hush-tx.1
-#gzip --best -n $DEB_MAN/zcash-fetch-params.1
 
 cd $SRC_PATH/contrib
 
