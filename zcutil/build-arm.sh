@@ -2,18 +2,22 @@
 # Copyright (c) 2019-2020 radix42
 # Copyright (c) 2019-2020 The Hush developers
 # Original aarch64 port by radix42. Thank you!
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 set -eu -o pipefail
 
 cat <<'EOF'
- ________________
-< Building Hush! >
- ----------------
+ .~~~~~~~~~~~~~~~~.
+{{ Building Hush!! }}
+ `~~~~~~~~~~~~~~~~`
         \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
+         \  (@@)\_______            
+            (__)\ HUSH  )\/\      $
+    z        zz ||----w |      z  |
+zz  zz  z       || z   ||xxx   z z|z zz
+zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
 EOF
 
 if [ "x$*" = 'x--help' ]
