@@ -237,39 +237,35 @@ void CChainParams::SetCheckpointData(CChainParams::CCheckpointData checkpointDat
 
 */
 
-/**
- * Testnet (v3)
- */
+// Unused Testnet, for completeness. We make testcoins instead.
 class CTestNetParams : public CChainParams {
 public:
     CTestNetParams() {
-        strNetworkID = "test";
-        strCurrencyUnits = "TUSH";
-        bip44CoinType = 1;
-        consensus.fCoinbaseMustBeProtected = true;
-        consensus.nSubsidySlowStartInterval = 20000;
-        consensus.nSubsidyHalvingInterval = 840000;
+        strNetworkID                           = "test";
+        strCurrencyUnits                       = "TUSH";
+        bip44CoinType                          = 1;
+        nDefaultPort                           = 15550;
+        nMinerThreads                          = 0;
+        consensus.fCoinbaseMustBeProtected     = true;
+        consensus.nSubsidySlowStartInterval    = 20000;
+        consensus.nSubsidyHalvingInterval      = 840000;
         consensus.nMajorityEnforceBlockUpgrade = 51;
         consensus.nMajorityRejectBlockOutdated = 75;
-        consensus.nMajorityWindow = 400;
-        consensus.powLimit = uint256S("07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.powAlternate = uint256S("07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowAveragingWindow = 17;
+        consensus.nMajorityWindow              = 400;
+        consensus.nMaxFutureBlockTime          = 5 * 60;
+        consensus.powLimit                     = uint256S("07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        consensus.powAlternate                 = uint256S("07ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        consensus.nPowAveragingWindow          = 17; // respect to zawy
         assert(maxUint/UintToArith256(consensus.powLimit) >= consensus.nPowAveragingWindow);
-        consensus.nMaxFutureBlockTime = 7 * 60;
 
-        nDefaultPort = 17770;
-        nMinerThreads = 0;
         consensus.nPowMaxAdjustDown = 32; // 32% adjustment down
-        consensus.nPowMaxAdjustUp = 16; // 16% adjustment up
+        consensus.nPowMaxAdjustUp   = 16; // 16% adjustment up
         consensus.nPowTargetSpacing = 2.5 * 60;
         consensus.nPowAllowMinDifficultyBlocksAfterHeight = 299187;
         consensus.vUpgrades[Consensus::BASE_SPROUT].nProtocolVersion = 170002;
-        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight =
-            Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
+        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight = Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
         consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nProtocolVersion = 170002;
-        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
-            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight = Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
         consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170003;
         consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = 207500;
         consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nProtocolVersion = 170007;
