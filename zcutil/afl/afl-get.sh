@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2019-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 # Obtains and builds a copy of AFL from source.
 #   ./zcutil/afl/afl-get.sh <directory to build and install AFL in>
 
@@ -27,7 +30,7 @@ mv afl-*/* .
 # Build AFL
 make
 
-echo "You can now build zcashd with AFL instrumentation as follows:"
-echo "$ make clean # if you've already built zcashd without AFL instrumentation"
+echo "You can now build hushd with AFL instrumentation as follows:"
+echo "$ make clean # if you've already built hushd without AFL instrumentation"
 echo "$ ./zcutil/afl/afl-build.sh '$(pwd)' <fuzz case> -j\$(nproc)"
 echo "...where <fuzz case> is the name of a directory in src/fuzzing."

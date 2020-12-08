@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Builds AFL and an instrumented zcashd, then begins fuzzing.
-# This script must be run from within the top level directory of a zcash clone.
+# Copyright (c) 2019-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+# Builds AFL and an instrumented hushd, then begins fuzzing.
+# This script must be run from within the top level directory of a hush clone.
 # Pass it the name of a directory in ./src/fuzzing.
 # Additional arguments are passed-through to AFL.
 
