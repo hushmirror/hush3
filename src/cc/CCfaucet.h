@@ -1,3 +1,6 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -12,13 +15,9 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-
 #ifndef CC_FAUCET_H
 #define CC_FAUCET_H
-
 #include "CCinclude.h"
-
 #define EVAL_FAUCET 0xe4
 #define FAUCETSIZE (COIN / 10)
 

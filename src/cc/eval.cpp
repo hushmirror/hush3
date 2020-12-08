@@ -180,9 +180,7 @@ bool Eval::CheckNotaryInputs(const CTransaction &tx, uint32_t height, uint32_t t
     return CheckTxAuthority(tx, auth);
 }
 
-/*
- * Get MoM from a notarisation tx hash (on KMD)
- */
+// Get MoM from a notarisation tx hash (on HUSH)
 bool Eval::GetNotarisationData(const uint256 notaryHash, NotarisationData &data) const
 {
     CTransaction notarisationTx;
@@ -218,10 +216,7 @@ bool ParseNotarisationOpReturn(const CTransaction &tx, NotarisationData &data)
     return out;
 }
 
-
-/*
- * Misc
- */
+// Misc
 std::string EvalToStr(EvalCode c)
 {
     FOREACH_EVAL(EVAL_GENERATE_STRING);
@@ -230,7 +225,6 @@ std::string EvalToStr(EvalCode c)
     return std::string(s);
 
 }
-
 
 uint256 SafeCheckMerkleBranch(uint256 hash, const std::vector<uint256>& vMerkleBranch, int nIndex)
 {
@@ -251,7 +245,6 @@ uint256 SafeCheckMerkleBranch(uint256 hash, const std::vector<uint256>& vMerkleB
     }
     return hash;
 }
-
 
 uint256 GetMerkleRoot(const std::vector<uint256>& vLeaves)
 {
