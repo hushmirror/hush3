@@ -8,13 +8,9 @@
 #define HUSH_SUPPORT_ALLOCATORS_SECURE_H
 
 #include "support/pagelocker.h"
-
 #include <string>
-
-//
 // Allocator that locks its contents from being paged
 // out of memory and clears its contents before deletion.
-//
 template <typename T>
 struct secure_allocator : public std::allocator<T> {
     // MSVC8 default copy constructor is broken

@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # Copyright 2014 BitPay, Inc.
-# Distributed under the MIT software license, see the accompanying
-# file COPYING or https://www.opensource.org/licenses/mit-license.php
+# Copyright (c) 2019-2020 The Hush developers
+## Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import subprocess
 import os
@@ -29,9 +30,9 @@ if __name__ == '__main__':
 
     output = json.loads(outs[0])
 
-    assert_equal(output[0], "13EngsxkRi7SJPPqCyJsKf34U8FoX9E9Av")
-    assert_equal(output[1], "1FKCLGTpPeYBUqfNxktck8k5nqxB8sjim8")
-    assert_equal(output[2], "13cdtE9tnNeXCZJ8KQ5WELgEmLSBLnr48F")
+    assert_equal(output[0], "R3EngsxkRi7SJPPqCyJsKf34U8FoX9E9Av")
+    assert_equal(output[1], "RFKCLGTpPeYBUqfNxktck8k5nqxB8sjim8")
+    assert_equal(output[2], "R3cdtE9tnNeXCZJ8KQ5WELgEmLSBLnr48F")
 
     execargs = '-datadir=' + datadir + ' -dumppass'
     execrun = execprog + ' ' + execargs
@@ -45,12 +46,12 @@ if __name__ == '__main__':
 
     output = json.loads(outs[0])
 
-    assert_equal(output[0]['addr'], "13EngsxkRi7SJPPqCyJsKf34U8FoX9E9Av")
-    assert_equal(output[0]['pkey'], "5Jz5BWE2WQxp1hGqDZeisQFV1mRFR2AVBAgiXCbNcZyXNjD9aUd")
-    assert_equal(output[1]['addr'], "1FKCLGTpPeYBUqfNxktck8k5nqxB8sjim8")
-    assert_equal(output[1]['pkey'], "5HsX2b3v2GjngYQ5ZM4mLp2b2apw6aMNVaPELV1YmpiYR1S4jzc")
-    assert_equal(output[2]['addr'], "13cdtE9tnNeXCZJ8KQ5WELgEmLSBLnr48F")
-    assert_equal(output[2]['pkey'], "5KCWAs1wX2ESiL4PfDR8XYVSSETHFd2jaRGxt1QdanBFTit4XcH")
+    assert_equal(output[0]['addr'], "R3EngsxkRi7SJPPqCyJsKf34U8FoX9E9Av")
+    assert_equal(output[0]['pkey'], "UJz5BWE2WQxp1hGqDZeisQFV1mRFR2AVBAgiXCbNcZyXNjD9aUd")
+    assert_equal(output[1]['addr'], "RFKCLGTpPeYBUqfNxktck8k5nqxB8sjim8")
+    assert_equal(output[1]['pkey'], "UHsX2b3v2GjngYQ5ZM4mLp2b2apw6aMNVaPELV1YmpiYR1S4jzc")
+    assert_equal(output[2]['addr'], "R3cdtE9tnNeXCZJ8KQ5WELgEmLSBLnr48F")
+    assert_equal(output[2]['pkey'], "UKCWAs1wX2ESiL4PfDR8XYVSSETHFd2jaRGxt1QdanBFTit4XcH")
 
     if os.path.exists(datadir + '/database'):
         if os.path.isdir(datadir + '/database'):
