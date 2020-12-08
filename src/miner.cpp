@@ -1291,7 +1291,7 @@ void static BitcoinMiner()
                     } else fprintf(stderr,"no nonz pubkeys\n");
                     if ( (Mining_height >= 235300 && Mining_height < 236000) || (j == 65 && Mining_height > KOMODO_MAYBEMINED+1 && Mining_height > KOMODO_LASTMINED+64) )
                     {
-                        HASHTarget = arith_uint256().SetCompact(KOMODO_MINDIFF_NBITS);
+                        HASHTarget = arith_uint256().SetCompact(HUSH_MINDIFF_NBITS);
                         fprintf(stderr,"I am the chosen one for %s ht.%d\n",SMART_CHAIN_SYMBOL,pindexPrev->GetHeight()+1);
                     } //else fprintf(stderr,"duplicate at j.%d\n",j);
                 } else Mining_start = 0;
@@ -1301,7 +1301,7 @@ void static BitcoinMiner()
             {
                 int32_t percPoS,z; bool fNegative,fOverflow;
                 HASHTarget_POW = komodo_PoWtarget(&percPoS,HASHTarget,Mining_height,ASSETCHAINS_STAKED);
-                HASHTarget.SetCompact(KOMODO_MINDIFF_NBITS,&fNegative,&fOverflow);
+                HASHTarget.SetCompact(HUSH_MINDIFF_NBITS,&fNegative,&fOverflow);
                 if ( ASSETCHAINS_STAKED < 100 )
                     LogPrintf("Block %d : PoS %d%% vs target %d%% \n",Mining_height,percPoS,(int32_t)ASSETCHAINS_STAKED);
             }
