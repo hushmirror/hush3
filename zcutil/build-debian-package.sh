@@ -1,10 +1,11 @@
 #!/bin/bash
-# Copyright 2019 Hush Developers
 # Released under the GPLv3
-## Usage:
-##  ./zcutil/build-debian-package.sh
+# Copyright (c) 2019-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+## Usage: ./zcutil/build-debian-package.sh
 
-echo "Let There Be Debian Packages"
+echo "Let There Be Hush Debian Packages"
 
 set -e
 set -x
