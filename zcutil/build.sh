@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Copyright (c) 2019-2020 The Hush developers
-# Released under the GPLv3
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 set -eu -o pipefail
 
@@ -12,14 +13,16 @@ function cmd_pref() {
     fi
 }
 cat <<'EOF'
- ________________
-< Building Hush! >
- ----------------
+ .~~~~~~~~~~~~~~~~.
+{{ Building Hush!! }}
+ `~~~~~~~~~~~~~~~~`
         \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
+         \  (@@)\_______            
+            (__)\ HUSH  )\/\      $
+    z        zz ||----w |      z  |
+zz  zz  z       || z   ||xxx   z z|z zz
+zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
 EOF
 
 # If a g-prefixed version of the command exists, use it preferentially.
