@@ -203,7 +203,7 @@ public:
     uint256 hash;
     // Index into CTransaction.vjoinsplit
     uint64_t js;
-    // Index into JSDescription fields of length ZC_NUM_JS_OUTPUTS
+    // Index into JSDescription fields of length HUSH_NUM_JS_OUTPUTS
     uint8_t n;
 
     JSOutPoint() { SetNull(); }

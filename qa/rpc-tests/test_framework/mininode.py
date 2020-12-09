@@ -410,8 +410,8 @@ class ZCProof(object):
                repr(self.g_K), repr(self.g_H))
 
 
-ZC_NUM_JS_INPUTS = 2
-ZC_NUM_JS_OUTPUTS = 2
+HUSH_NUM_JS_INPUTS = 2
+HUSH_NUM_JS_OUTPUTS = 2
 
 ZC_NOTEPLAINTEXT_LEADING = 1
 ZC_V_SIZE = 8
@@ -439,13 +439,13 @@ class JSDescription(object):
         self.vpub_old = 0
         self.vpub_new = 0
         self.anchor = 0
-        self.nullifiers = [0] * ZC_NUM_JS_INPUTS
-        self.commitments = [0] * ZC_NUM_JS_OUTPUTS
+        self.nullifiers = [0] * HUSH_NUM_JS_INPUTS
+        self.commitments = [0] * HUSH_NUM_JS_OUTPUTS
         self.onetimePubKey = 0
         self.randomSeed = 0
-        self.macs = [0] * ZC_NUM_JS_INPUTS
+        self.macs = [0] * HUSH_NUM_JS_INPUTS
         self.proof = None
-        self.ciphertexts = [None] * ZC_NUM_JS_OUTPUTS
+        self.ciphertexts = [None] * HUSH_NUM_JS_OUTPUTS
 
     def deserialize(self, f):
         self.vpub_old = struct.unpack("<q", f.read(8))[0]
@@ -453,25 +453,25 @@ class JSDescription(object):
         self.anchor = deser_uint256(f)
 
         self.nullifiers = []
-        for i in range(ZC_NUM_JS_INPUTS):
+        for i in range(HUSH_NUM_JS_INPUTS):
             self.nullifiers.append(deser_uint256(f))
 
         self.commitments = []
-        for i in range(ZC_NUM_JS_OUTPUTS):
+        for i in range(HUSH_NUM_JS_OUTPUTS):
             self.commitments.append(deser_uint256(f))
 
         self.onetimePubKey = deser_uint256(f)
         self.randomSeed = deser_uint256(f)
 
         self.macs = []
-        for i in range(ZC_NUM_JS_INPUTS):
+        for i in range(HUSH_NUM_JS_INPUTS):
             self.macs.append(deser_uint256(f))
 
         self.proof = ZCProof()
         self.proof.deserialize(f)
 
         self.ciphertexts = []
-        for i in range(ZC_NUM_JS_OUTPUTS):
+        for i in range(HUSH_NUM_JS_OUTPUTS):
             self.ciphertexts.append(f.read(ZC_NOTECIPHERTEXT_SIZE))
 
     def serialize(self):
@@ -479,16 +479,16 @@ class JSDescription(object):
         r += struct.pack("<q", self.vpub_old)
         r += struct.pack("<q", self.vpub_new)
         r += ser_uint256(self.anchor)
-        for i in range(ZC_NUM_JS_INPUTS):
+        for i in range(HUSH_NUM_JS_INPUTS):
             r += ser_uint256(self.nullifiers[i])
-        for i in range(ZC_NUM_JS_OUTPUTS):
+        for i in range(HUSH_NUM_JS_OUTPUTS):
             r += ser_uint256(self.commitments[i])
         r += ser_uint256(self.onetimePubKey)
         r += ser_uint256(self.randomSeed)
-        for i in range(ZC_NUM_JS_INPUTS):
+        for i in range(HUSH_NUM_JS_INPUTS):
             r += ser_uint256(self.macs[i])
         r += self.proof.serialize()
-        for i in range(ZC_NUM_JS_OUTPUTS):
+        for i in range(HUSH_NUM_JS_OUTPUTS):
             r += ser_uint256(self.ciphertexts[i])
         return r
 

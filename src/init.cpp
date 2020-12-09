@@ -93,10 +93,7 @@ extern bool komodo_dailysnapshot(int32_t height);
 extern int32_t KOMODO_LOADINGBLOCKS;
 extern char SMART_CHAIN_SYMBOL[];
 extern int32_t KOMODO_SNAPSHOT_INTERVAL;
-
 extern void komodo_init(int32_t height);
-
-//ZCJoinSplit* pzcashParams = NULL;
 
 #ifdef ENABLE_WALLET
 CWallet* pwalletMain = NULL;

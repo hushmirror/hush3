@@ -7,7 +7,6 @@
 #include "pubkey.h"
 #include "zcash/JoinSplit.hpp"
 #include "util.h"
-
 #include "librustzcash.h"
 
 struct ECCryptoClosure
@@ -17,13 +16,9 @@ struct ECCryptoClosure
 
 ECCryptoClosure instance_of_eccryptoclosure;
 
-ZCJoinSplit* params;
-
 int main(int argc, char **argv) {
   assert(init_and_check_sodium() != -1);
   ECC_Start();
-
-  params = ZCJoinSplit::Prepared();
 
   boost::filesystem::path sapling_spend = ZC_GetParamsDir() / "sapling-spend.params";
   boost::filesystem::path sapling_output = ZC_GetParamsDir() / "sapling-output.params";
@@ -31,7 +26,7 @@ int main(int argc, char **argv) {
     static_assert(
         sizeof(boost::filesystem::path::value_type) == sizeof(codeunit),
         "librustzcash not configured correctly");
-    auto sapling_spend_str = sapling_spend.native();
+    auto sapling_spend_str  = sapling_spend.native();
     auto sapling_output_str = sapling_output.native();
 
     librustzcash_init_zksnark_params(

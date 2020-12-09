@@ -37,9 +37,7 @@
 #endif
 
 #include <array>
-
 #include <boost/variant.hpp>
-
 #include "zcash/NoteEncryption.hpp"
 #include "zcash/Zcash.h"
 #include "zcash/JoinSplit.hpp"
@@ -53,20 +51,15 @@ extern std::string ASSETCHAINS_SELFIMPORT;
 #define OUTPUTDESCRIPTION_SIZE GetSerializeSize(OutputDescription(), SER_NETWORK, PROTOCOL_VERSION)
 #define SPENDDESCRIPTION_SIZE GetSerializeSize(SpendDescription(), SER_NETWORK, PROTOCOL_VERSION)
 
-
 // Overwinter transaction version
 static const int32_t OVERWINTER_TX_VERSION = 3;
-static_assert(OVERWINTER_TX_VERSION >= OVERWINTER_MIN_TX_VERSION,
-    "Overwinter tx version must not be lower than minimum");
-static_assert(OVERWINTER_TX_VERSION <= OVERWINTER_MAX_TX_VERSION,
-    "Overwinter tx version must not be higher than maximum");
+static_assert(OVERWINTER_TX_VERSION >= OVERWINTER_MIN_TX_VERSION, "Overwinter tx version must not be lower than minimum");
+static_assert(OVERWINTER_TX_VERSION <= OVERWINTER_MAX_TX_VERSION, "Overwinter tx version must not be higher than maximum");
 
 // Sapling transaction version
 static const int32_t SAPLING_TX_VERSION = 4;
-static_assert(SAPLING_TX_VERSION >= SAPLING_MIN_TX_VERSION,
-    "Sapling tx version must not be lower than minimum");
-static_assert(SAPLING_TX_VERSION <= SAPLING_MAX_TX_VERSION,
-    "Sapling tx version must not be higher than maximum");
+static_assert(SAPLING_TX_VERSION >= SAPLING_MIN_TX_VERSION, "Sapling tx version must not be lower than minimum");
+static_assert(SAPLING_TX_VERSION <= SAPLING_MAX_TX_VERSION, "Sapling tx version must not be higher than maximum");
 
 /**
  * A shielded input to a transaction. It contains data that describes a Spend transfer.
@@ -225,14 +218,14 @@ public:
     // are derived from the secrets placed in the note
     // and the secret spend-authority key known by the
     // spender.
-    std::array<uint256, ZC_NUM_JS_INPUTS> nullifiers;
+    std::array<uint256, HUSH_NUM_JS_INPUTS> nullifiers;
 
     // Note commitments are introduced into the commitment
     // tree, blinding the public about the values and
     // destinations involved in the JoinSplit. The presence of
     // a commitment in the note commitment tree is required
     // to spend it.
-    std::array<uint256, ZC_NUM_JS_OUTPUTS> commitments;
+    std::array<uint256, HUSH_NUM_JS_OUTPUTS> commitments;
 
     // Ephemeral key
     uint256 ephemeralKey;
@@ -241,7 +234,7 @@ public:
     // These contain trapdoors, values and other information
     // that the recipient needs, including a memo field. It
     // is encrypted using the scheme implemented in crypto/NoteEncryption.cpp
-    std::array<ZCNoteEncryption::Ciphertext, ZC_NUM_JS_OUTPUTS> ciphertexts = {{ {{0}} }};
+    std::array<ZCNoteEncryption::Ciphertext, HUSH_NUM_JS_OUTPUTS> ciphertexts = {{ {{0}} }};
 
     // Random seed
     uint256 randomSeed;
@@ -249,7 +242,7 @@ public:
     // MACs
     // The verification of the JoinSplit requires these MACs
     // to be provided as an input.
-    std::array<uint256, ZC_NUM_JS_INPUTS> macs;
+    std::array<uint256, HUSH_NUM_JS_INPUTS> macs;
 
     // JoinSplit proof
     // This is a zk-SNARK which ensures that this JoinSplit is valid.
@@ -261,8 +254,8 @@ public:
             ZCJoinSplit& params,
             const uint256& joinSplitPubKey,
             const uint256& rt,
-            const std::array<libzcash::JSInput, ZC_NUM_JS_INPUTS>& inputs,
-            const std::array<libzcash::JSOutput, ZC_NUM_JS_OUTPUTS>& outputs,
+            const std::array<libzcash::JSInput, HUSH_NUM_JS_INPUTS>& inputs,
+            const std::array<libzcash::JSOutput, HUSH_NUM_JS_OUTPUTS>& outputs,
             CAmount vpub_old,
             CAmount vpub_new,
             bool computeProof = true, // Set to false in some tests
@@ -273,10 +266,10 @@ public:
             ZCJoinSplit& params,
             const uint256& joinSplitPubKey,
             const uint256& rt,
-            std::array<libzcash::JSInput, ZC_NUM_JS_INPUTS>& inputs,
-            std::array<libzcash::JSOutput, ZC_NUM_JS_OUTPUTS>& outputs,
-            std::array<size_t, ZC_NUM_JS_INPUTS>& inputMap,
-            std::array<size_t, ZC_NUM_JS_OUTPUTS>& outputMap,
+            std::array<libzcash::JSInput, HUSH_NUM_JS_INPUTS>& inputs,
+            std::array<libzcash::JSOutput, HUSH_NUM_JS_OUTPUTS>& outputs,
+            std::array<size_t, HUSH_NUM_JS_INPUTS>& inputMap,
+            std::array<size_t, HUSH_NUM_JS_OUTPUTS>& outputMap,
             CAmount vpub_old,
             CAmount vpub_new,
             bool computeProof = true, // Set to false in some tests

@@ -2,8 +2,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef ZC_JOINSPLIT_H_
-#define ZC_JOINSPLIT_H_
+#ifndef HUSH_JOINSPLIT_H_
+#define HUSH_JOINSPLIT_H_
 
 #include "Zcash.h"
 #include "Proof.hpp"
@@ -13,7 +13,6 @@
 #include "NoteEncryption.hpp"
 #include "uint256.h"
 #include "uint252.h"
-
 #include <array>
 
 namespace libzcash {
@@ -25,16 +24,13 @@ static constexpr size_t GROTH_PROOF_SIZE = (
 
 typedef std::array<unsigned char, GROTH_PROOF_SIZE> GrothProof;
 typedef boost::variant<PHGRProof, GrothProof> SproutProof;
-
 class JSInput { };
-
 class JSOutput { };
-
 template<size_t NumInputs, size_t NumOutputs>
 class JoinSplit { };
 
 }
 
-typedef libzcash::JoinSplit<ZC_NUM_JS_INPUTS, ZC_NUM_JS_OUTPUTS> ZCJoinSplit;
+typedef libzcash::JoinSplit<HUSH_NUM_JS_INPUTS, HUSH_NUM_JS_OUTPUTS> ZCJoinSplit;
 
-#endif // ZC_JOINSPLIT_H_
+#endif // HUSH_JOINSPLIT_H_

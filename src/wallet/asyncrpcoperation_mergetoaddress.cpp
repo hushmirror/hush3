@@ -60,7 +60,7 @@ int mta_find_output(UniValue obj, int n)
     }
 
     UniValue outputMap = outputMapValue.get_array();
-    assert(outputMap.size() == ZC_NUM_JS_OUTPUTS);
+    assert(outputMap.size() == HUSH_NUM_JS_OUTPUTS);
     for (size_t i = 0; i < outputMap.size(); i++) {
         if (outputMap[i].get_int() == n) {
             return i;
