@@ -5330,7 +5330,7 @@ bool ContextualCheckBlock(int32_t slowflag,const CBlock& block, CValidationState
     }
 
     // Enforce BIP 34 rule that the coinbase starts with serialized block height.
-    // In Zcash this has been enforced since launch, except that the genesis
+    // In Hush this has been enforced since launch, except that the genesis
     // block didn't include the height in the coinbase (see Zcash protocol spec
     // section '6.8 Bitcoin Improvement Proposals').
     if (nHeight > 0)
@@ -5365,21 +5365,11 @@ bool AcceptBlockHeader(int32_t *futureblockp,const CBlockHeader& block, CValidat
         {
             if ( ASSETCHAINS_CC == 0 )//&& (ASSETCHAINS_PRIVATE == 0 || HUSH_INSYNC >= Params().GetConsensus().vUpgrades[Consensus::UPGRADE_SAPLING].nActivationHeight) )
                 return state.Invalid(error("%s: block is marked invalid", __func__), 0, "duplicate");
-            else
-            {
+            } else {
                 fprintf(stderr,"reconsider block %s\n",hash.GetHex().c_str());
                 pindex->nStatus &= ~BLOCK_FAILED_MASK;
             }
         }
-        /*if ( pindex != 0 && hash == komodo_requestedhash )
-        {
-            fprintf(stderr,"AddToBlockIndex A komodo_requestedhash %s\n",komodo_requestedhash.ToString().c_str());
-            memset(&komodo_requestedhash,0,sizeof(komodo_requestedhash));
-            komodo_requestedcount = 0;
-        }*/
-
-        //if ( pindex == 0 )
-        //    fprintf(stderr,"accepthdr %s already known but no pindex\n",hash.ToString().c_str());
         return true;
     }
     if (!CheckBlockHeader(futureblockp,*ppindex!=0?(*ppindex)->GetHeight():0,*ppindex, block, state,0))
@@ -5429,12 +5419,6 @@ bool AcceptBlockHeader(int32_t *futureblockp,const CBlockHeader& block, CValidat
     }
     if (ppindex)
         *ppindex = pindex;
-    /*if ( pindex != 0 && hash == komodo_requestedhash )
-    {
-        fprintf(stderr,"AddToBlockIndex komodo_requestedhash %s\n",komodo_requestedhash.ToString().c_str());
-        memset(&komodo_requestedhash,0,sizeof(komodo_requestedhash));
-        komodo_requestedcount = 0;
-    }*/
     return true;
 }
 
