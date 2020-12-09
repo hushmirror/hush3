@@ -5240,16 +5240,15 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     int nHeight = pindexPrev->GetHeight()+1;
 
-    // Check proof of work
+    // Check Proof-of-Work
     if ( (SMART_CHAIN_SYMBOL[0] != 0 || nHeight < 235300 || nHeight > 236000) && block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
     {
-        cout << block.nBits << " block.nBits vs. calc " << GetNextWorkRequired(pindexPrev, &block, consensusParams) << " for block #" << nHeight << endl;
+        cout "Incorrect Proof-of-Work! " << block.nBits << " block.nBits vs. calc " << GetNextWorkRequired(pindexPrev, &block, consensusParams) << " for height " << nHeight << " " << block.GetHash().ToString() << " with time " << block.GetBlockTime() <<  endl;
         return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
     }
 
     // Check timestamp against prev
-    if ( ASSETCHAINS_ADAPTIVEPOW <= 0 || nHeight < 30 )
-    {
+    if ( ASSETCHAINS_ADAPTIVEPOW <= 0 || nHeight < 30 ) {
         if (block.GetBlockTime() <= pindexPrev->GetMedianTimePast() )
         {
             fprintf(stderr,"ht.%d too early %u vs %u\n",(int32_t)nHeight,(uint32_t)block.GetBlockTime(),(uint32_t)pindexPrev->GetMedianTimePast());
@@ -5264,22 +5263,14 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     }
 
     // Check that timestamp is not too far in the future
-    if (block.GetBlockTime() > GetTime() + consensusParams.nMaxFutureBlockTime)
-    {
+    if (block.GetBlockTime() > GetTime() + consensusParams.nMaxFutureBlockTime) {
         return state.Invalid(error("%s: block timestamp too far in the future", __func__), REJECT_INVALID, "time-too-new");
     }
 
-    if (fCheckpointsEnabled)
-    {
+    if (fCheckpointsEnabled) {
         // Check that the block chain matches the known block chain up to a checkpoint
         if (!Checkpoints::CheckBlock(chainParams.Checkpoints(), nHeight, hash))
         {
-            /*CBlockIndex *heightblock = chainActive[nHeight];
-            if ( heightblock != 0 && heightblock->GetBlockHash() == hash )
-            {
-                //fprintf(stderr,"got a pre notarization block that matches height.%d\n",(int32_t)nHeight);
-                return true;
-            }*/
             return state.DoS(100, error("%s: rejected by checkpoint lock-in at %d", __func__, nHeight),REJECT_CHECKPOINT, "checkpoint mismatch");
         }
         // Don't accept any forks from the main chain prior to last checkpoint
