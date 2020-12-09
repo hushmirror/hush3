@@ -1,7 +1,8 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <iostream>
 #include <string>
-
-// Include local headers
 #include "wallet/walletdb.h"
 #include "util.h"
 #include "base58.h"

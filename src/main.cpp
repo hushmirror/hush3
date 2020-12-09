@@ -264,11 +264,7 @@ namespace {
     set<int> setDirtyFileInfo;
 } // anon namespace
 
-//////////////////////////////////////////////////////////////////////////////
-//
 // Registration of network node signals.
-//
-
 namespace {
 
     struct CBlockReject {
@@ -5356,9 +5352,11 @@ bool AcceptBlockHeader(int32_t *futureblockp,const CBlockHeader& block, CValidat
     // Check for duplicate
     uint256 hash = block.GetHash();
     BlockMap::iterator miSelf = mapBlockIndex.find(hash);
+    if(fDebug) {
+        std::cerr << __func__ << ": blockhash=" << hash.ToString() << endl;
+    }
     CBlockIndex *pindex = NULL;
-    if (miSelf != mapBlockIndex.end())
-    {
+    if (miSelf != mapBlockIndex.end()) {
         // Block header is already known.
         if ( (pindex = miSelf->second) == 0 )
             miSelf->second = pindex = AddToBlockIndex(block);
@@ -5366,6 +5364,7 @@ bool AcceptBlockHeader(int32_t *futureblockp,const CBlockHeader& block, CValidat
             *ppindex = pindex;
         if ( pindex != 0 && (pindex->nStatus & BLOCK_FAILED_MASK) != 0 ) {
             if ( ASSETCHAINS_CC == 0 ) {
+                std::cerr << __func__ << ": block " << hash.ToString() << " marked invalid";
                 return state.Invalid(error("%s: block is marked invalid", __func__), 0, "duplicate");
             } else {
                 fprintf(stderr,"reconsider block %s\n",hash.GetHex().c_str());
@@ -5379,6 +5378,9 @@ bool AcceptBlockHeader(int32_t *futureblockp,const CBlockHeader& block, CValidat
             LogPrintf("%s: CheckBlockHeader futureblock=0\n", __func__);
             return false;
         }
+    }
+    if(fDebug) {
+       fprintf(stderr,"%s: CheckBlockHeader passed\n",__func__);
     }
     // Get prev block index
     CBlockIndex* pindexPrev = NULL;
@@ -5401,11 +5403,13 @@ bool AcceptBlockHeader(int32_t *futureblockp,const CBlockHeader& block, CValidat
         if ( (pindexPrev->nStatus & BLOCK_FAILED_MASK) )
             return state.DoS(100, error("%s: prev block invalid", __func__), REJECT_INVALID, "bad-prevblk");
     }
-    if (!ContextualCheckBlockHeader(block, state, pindexPrev))
-    {
+    if (!ContextualCheckBlockHeader(block, state, pindexPrev)) {
         //fprintf(stderr,"AcceptBlockHeader ContextualCheckBlockHeader failed\n");
         LogPrintf("%s: ContextualCheckBlockHeader failed\n",__func__);
         return false;
+    }
+    if(fDebug) {
+        fprintf(stderr,"%s: ContextualCheckBlockHeader passed\n", hash.ToString());
     }
     if (pindex == NULL)
     {
@@ -7775,8 +7779,10 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
         CBlockIndex *pindexLast = NULL;
         BOOST_FOREACH(const CBlockHeader& header, headers) {
-            //printf("size.%i, solution size.%i\n", (int)sizeof(header), (int)header.nSolution.size());
-            //printf("hash.%s prevhash.%s nonce.%s\n", header.GetHash().ToString().c_str(), header.hashPrevBlock.ToString().c_str(), header.nNonce.ToString().c_str());
+            if(fDebug) {
+                printf("%s: size.%i, solution size.%i\n", __func__,  (int)sizeof(header), (int)header.nSolution.size());
+                printf("%s: hash.%s prevhash.%s nonce.%s\n", __func__,  header.GetHash().ToString().c_str(), header.hashPrevBlock.ToString().c_str(), header.nNonce.ToString().c_str());
+            }
 
             CValidationState state;
             if (pindexLast != NULL && header.hashPrevBlock != pindexLast->GetBlockHash()) {
