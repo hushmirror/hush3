@@ -17,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "key_io.h"
 #include "main.h"
 #include "crypto/equihash.h"
@@ -670,9 +669,10 @@ void *chainparams_commandline()
                                 (346000,     uint256S("0x0000000114bcd5b0b4a3c6dd175ee4c2173c7408edba61fc40826209044b717f"))
                                 (347000,     uint256S("0x00000007ab3ec746a2e279a784cc6710d41a518d2b27941d231a7ff4e4a834ea"))
                                 (348000,     uint256S("0x0000000c0b772a11bb41c362b74890d4538c325386aea4abbaae15d6789e6acc"))
-                                (349000,     uint256S("0x0000000138e50eded6f2f3cf8048d0332209c2b0f8093c6bf2695ce6e6e1c149")),
-                                (int64_t) 1607389064,  // time of last checkpointed block
-                                (int64_t) 645127,      // total txs (double)
+                                (349000,     uint256S("0x0000000138e50eded6f2f3cf8048d0332209c2b0f8093c6bf2695ce6e6e1c149"))
+                                (349686,     uint256S("0x0000000ea29fff8d05b3755407269e25cf220a918260e43cea2c9957abfca16a")),
+                                (int64_t) 1607519064,  // time of last checkpointed block
+                                (int64_t) 645127,      // total txs
                                 (double)  1134         // txs in the last day before last checkpoint block
                 };
         } else {
