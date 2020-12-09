@@ -181,13 +181,13 @@ bool Eval::CheckNotaryInputs(const CTransaction &tx, uint32_t height, uint32_t t
 }
 
 // Get MoM from a notarisation tx hash (on HUSH)
-bool Eval::GetNotarisationData(const uint256 notaryHash, NotarisationData &data) const
+bool Eval::GetNotarizationData(const uint256 notaryHash, NotarizationData &data) const
 {
     CTransaction notarisationTx;
     CBlockIndex block;
     if (!GetTxConfirmed(notaryHash, notarisationTx, block)) return false;
     if (!CheckNotaryInputs(notarisationTx, block.GetHeight(), block.nTime)) return false;
-    if (!ParseNotarisationOpReturn(notarisationTx, data)) return false;
+    if (!ParseNotarizationOpReturn(notarisationTx, data)) return false;
     return true;
 }
 
@@ -205,9 +205,9 @@ std::string Eval::GetAssetchainsSymbol() const
 
 
 /*
- * Notarisation data, ie, OP_RETURN payload in notarisation transactions
+ * Notarization data, ie, OP_RETURN payload in notarisation transactions
  */
-bool ParseNotarisationOpReturn(const CTransaction &tx, NotarisationData &data)
+bool ParseNotarizationOpReturn(const CTransaction &tx, NotarizationData &data)
 {
     if (tx.vout.size() < 2) return false;
     std::vector<unsigned char> vdata;

@@ -15,15 +15,14 @@ public:
 };
 
 extern NotarizationDB *pnotarizations;
-typedef std::pair<uint256,NotarisationData> Notarisation;
-typedef std::vector<Notarisation> NotarisationsInBlock;
+typedef std::pair<uint256,NotarizationData> Notarization;
+typedef std::vector<Notarization> NotarizationsInBlock;
 
-NotarisationsInBlock ScanBlockNotarizations(const CBlock &block, int nHeight);
-bool GetBlockNotarisations(uint256 blockHash, NotarisationsInBlock &nibs);
-bool GetBackNotarisation(uint256 notarisationHash, Notarisation &n);
-void WriteBackNotarisations(const NotarisationsInBlock notarisations, CDBBatch &batch);
-void EraseBackNotarisations(const NotarisationsInBlock notarisations, CDBBatch &batch);
-int ScanNotarisationsDB(int height, std::string symbol, int scanLimitBlocks, Notarisation& out);
-int ScanNotarisationsDB2(int height, std::string symbol, int scanLimitBlocks, Notarisation& out);
+NotarizationsInBlock ScanBlockNotarizations(const CBlock &block, int nHeight);
+bool GetBlockNotarizations(uint256 blockHash, NotarizationsInBlock &nibs);
+bool GetBackNotarization(uint256 notarisationHash, Notarization &n);
+void WriteBackNotarizations(const NotarizationsInBlock notarisations, CDBBatch &batch);
+void EraseBackNotarizations(const NotarizationsInBlock notarisations, CDBBatch &batch);
+int ScanNotarizationsDB(int height, std::string symbol, int scanLimitBlocks, Notarization& out);
 
 #endif  /* HUSH_NOTARISATIONDB_H */

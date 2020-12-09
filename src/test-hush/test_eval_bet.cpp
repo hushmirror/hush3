@@ -123,16 +123,16 @@ public:
         return true;
     }
 
-    bool GetNotarisationData(uint256 notarisationHash, NotarisationData &data) const
+    bool GetNotarizationData(uint256 notarisationHash, NotarizationData &data) const
     {
-        if (notarisationHash == NotarisationHash()) {
+        if (notarisationHash == NotarizationHash()) {
             data.MoM = MoM;
             return true;
         }
         return false;
     }
 
-    static uint256 NotarisationHash()
+    static uint256 NotarizationHash()
     {
         uint256 h;
         h.begin()[0] = 123;
@@ -206,7 +206,7 @@ public:
         int nIndex = 5;
         std::vector<uint256> vBranch;
         vBranch.resize(3);
-        return {MerkleBranch(nIndex, vBranch), EvalMock::NotarisationHash()};
+        return {MerkleBranch(nIndex, vBranch), EvalMock::NotarizationHash()};
     }
 
     CMutableTransaction ImportPayoutTx()
@@ -562,7 +562,7 @@ TEST_F(TestBet, testImportPayoutMangleSessionId)
 }
 
 
-TEST_F(TestBet, testImportPayoutInvalidNotarisationHash)
+TEST_F(TestBet, testImportPayoutInvalidNotarizationHash)
 {
     EvalMock eval = ebet.SetEvalMock(12);
 

@@ -918,7 +918,7 @@ void CWallet::DecrementNoteWitnesses(const CBlockIndex* pindex)
 {
     LOCK(cs_wallet);
 
-    extern int32_t KOMODO_REWIND;
+    extern int32_t HUSH_REWIND;
 
     for (std::pair<const uint256, CWalletTx>& wtxItem : mapWallet) {
         //Sapling
@@ -937,7 +937,7 @@ void CWallet::DecrementNoteWitnesses(const CBlockIndex* pindex)
             }
         }
     }
-    assert(KOMODO_REWIND != 0 || WITNESS_CACHE_SIZE != _COINBASE_MATURITY+10);
+    assert(HUSH_REWIND != 0 || WITNESS_CACHE_SIZE != _COINBASE_MATURITY+10);
 }
 
 template<typename NoteData>

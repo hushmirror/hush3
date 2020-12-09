@@ -21,7 +21,7 @@
 extern int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 
 
-namespace TestEvalNotarisation {
+namespace TestEvalNotarization {
 
 
     class EvalMock : public Eval
@@ -96,14 +96,14 @@ namespace TestEvalNotarisation {
     static auto vMomProof = ParseHex("0303faecbdd4b3da128c2cd2701bb143820a967069375b2ec5b612f39bbfe78a8611978871c193457ab1e21b9520f4139f113b8d75892eb93ee247c18bccfd067efed7eacbfcdc8946cf22de45ad536ec0719034fb9bc825048fe6ab61fee5bd6e9aae0bb279738d46673c53d68eb2a72da6dbff215ee41a4d405a74ff7cd355805b");  // $ fiat/bots txMoMproof $proofTxHash
 
     /*
-       TEST(TestEvalNotarisation, testGetNotarisation)
+       TEST(TestEvalNotarization, testGetNotarization)
        {
        EvalMock eval;
        CMutableTransaction notary(notaryTx);
        SetupEval(eval, notary, noop);
 
-       NotarisationData data;
-    ASSERT_TRUE(eval.GetNotarisationData(notary.GetHash(), data));
+       NotarizationData data;
+    ASSERT_TRUE(eval.GetNotarizationData(notary.GetHash(), data));
     EXPECT_EQ(data.height, 77455);
     EXPECT_EQ(data.blockHash.GetHex(), "000030ef29d072f417cec86ad5a5ab4f8c413c7f96f572a098e45d6e3e0f8eae");
     EXPECT_STREQ(data.symbol, "BOTS");
@@ -116,7 +116,7 @@ namespace TestEvalNotarisation {
 }
 
 
-TEST(TestEvalNotarisation, testInvalidNotaryPubkey)
+TEST(TestEvalNotarization, testInvalidNotaryPubkey)
 {
     EvalMock eval;
     CMutableTransaction notary(notaryTx);
@@ -124,13 +124,13 @@ TEST(TestEvalNotarisation, testInvalidNotaryPubkey)
 
     memset(eval.notaries[10], 0, 33);
 
-    NotarisationData data;
-    ASSERT_FALSE(eval.GetNotarisationData(notary.GetHash(), data));
+    NotarizationData data;
+    ASSERT_FALSE(eval.GetNotarizationData(notary.GetHash(), data));
 }
 */
 
 
-TEST(TestEvalNotarisation, testInvalidNotarisationBadOpReturn)
+TEST(TestEvalNotarization, testInvalidNotarizationBadOpReturn)
 {
     EvalMock eval;
     CMutableTransaction notary(notaryTx);
@@ -138,12 +138,12 @@ TEST(TestEvalNotarisation, testInvalidNotarisationBadOpReturn)
     notary.vout[1].scriptPubKey = CScript() << OP_RETURN << 0;
     SetupEval(eval, notary, noop);
 
-    NotarisationData data(0);
-    ASSERT_FALSE(eval.GetNotarisationData(notary.GetHash(), data));
+    NotarizationData data(0);
+    ASSERT_FALSE(eval.GetNotarizationData(notary.GetHash(), data));
 }
 
 
-TEST(TestEvalNotarisation, testInvalidNotarisationTxNotEnoughSigs)
+TEST(TestEvalNotarization, testInvalidNotarizationTxNotEnoughSigs)
 {
     EvalMock eval;
     CMutableTransaction notary(notaryTx);
@@ -152,24 +152,24 @@ TEST(TestEvalNotarisation, testInvalidNotarisationTxNotEnoughSigs)
         tx.vin.resize(10);
     });
 
-    NotarisationData data(0);
-    ASSERT_FALSE(eval.GetNotarisationData(notary.GetHash(), data));
+    NotarizationData data(0);
+    ASSERT_FALSE(eval.GetNotarizationData(notary.GetHash(), data));
 }
 
 
-TEST(TestEvalNotarisation, testInvalidNotarisationTxDoesntExist)
+TEST(TestEvalNotarization, testInvalidNotarizationTxDoesntExist)
 {
     EvalMock eval;
     CMutableTransaction notary(notaryTx);
 
     SetupEval(eval, notary, noop);
 
-    NotarisationData data(0);
-    ASSERT_FALSE(eval.GetNotarisationData(uint256(), data));
+    NotarizationData data(0);
+    ASSERT_FALSE(eval.GetNotarizationData(uint256(), data));
 }
 
 
-TEST(TestEvalNotarisation, testInvalidNotarisationDupeNotary)
+TEST(TestEvalNotarization, testInvalidNotarizationDupeNotary)
 {
     EvalMock eval;
     CMutableTransaction notary(notaryTx);
@@ -178,12 +178,12 @@ TEST(TestEvalNotarisation, testInvalidNotarisationDupeNotary)
         tx.vin[1] = tx.vin[3];
     });
 
-    NotarisationData data(0);
-    ASSERT_FALSE(eval.GetNotarisationData(notary.GetHash(), data));
+    NotarizationData data(0);
+    ASSERT_FALSE(eval.GetNotarizationData(notary.GetHash(), data));
 }
 
 
-TEST(TestEvalNotarisation, testInvalidNotarisationInputNotCheckSig)
+TEST(TestEvalNotarization, testInvalidNotarizationInputNotCheckSig)
 {
     EvalMock eval;
     CMutableTransaction notary(notaryTx);
@@ -197,10 +197,10 @@ TEST(TestEvalNotarisation, testInvalidNotarisationInputNotCheckSig)
         eval.txs[txIn.GetHash()] = CTransaction(txIn);
     });
 
-    NotarisationData data(0);
-    ASSERT_FALSE(eval.GetNotarisationData(notary.GetHash(), data));
+    NotarizationData data(0);
+    ASSERT_FALSE(eval.GetNotarizationData(notary.GetHash(), data));
 }
 
 
 
-} /* namespace TestEvalNotarisation */
+} /* namespace TestEvalNotarization */

@@ -495,8 +495,8 @@ extern UniValue calc_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk
 extern UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue assetchainproof(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue crosschainproof(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue scanNotarisationsDB(const UniValue& params, bool fHelp, const CPubKey& mypk);
+extern UniValue getNotarizationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk);
+extern UniValue scanNotarizationsDB(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getimports(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getwalletburntransactions(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue migrate_converttoexport(const UniValue& params, bool fHelp, const CPubKey& mypk);

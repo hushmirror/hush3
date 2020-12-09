@@ -17,7 +17,6 @@
  ******************************************************************************/
 
 #include "hush_defs.h"
-
 void komodo_prefetch(FILE *fp);
 uint32_t komodo_heightstamp(int32_t height);
 void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotaries,uint8_t notaryid,uint256 txhash,uint64_t voutmask,uint8_t numvouts,uint32_t *pvals,uint8_t numpvals,int32_t kheight,uint32_t ktime,uint64_t opretvalue,uint8_t *opretbuf,uint16_t opretlen,uint16_t vout,uint256 MoM,int32_t MoMdepth);
@@ -33,7 +32,6 @@ int32_t hush_longestchain();
 uint64_t komodo_maxallowed(int32_t baseid);
 int32_t komodo_bannedset(int32_t *indallvoutsp,uint256 *array,int32_t max);
 int32_t komodo_checkvout(int32_t vout,int32_t k,int32_t indallvouts);
-
 pthread_mutex_t komodo_mutex,staked_mutex;
 
 #define KOMODO_ELECTION_GAP 2000    //((SMART_CHAIN_SYMBOL[0] == 0) ? 2000 : 100)
@@ -42,7 +40,6 @@ pthread_mutex_t komodo_mutex,staked_mutex;
 struct pax_transaction *PAX;
 int32_t NUM_PRICES; uint32_t *PVALS;
 struct knotaries_entry *Pubkeys;
-
 struct hush_state KOMODO_STATES[34];
 
 #define _COINBASE_MATURITY 100
@@ -50,7 +47,7 @@ int COINBASE_MATURITY = _COINBASE_MATURITY;//100;
 unsigned int WITNESS_CACHE_SIZE = _COINBASE_MATURITY+10;
 uint256 KOMODO_EARLYTXID;
 
-int32_t HUSH_MININGTHREADS = -1,IS_HUSH_NOTARY,USE_EXTERNAL_PUBKEY,KOMODO_CHOSEN_ONE,ASSETCHAINS_SEED,KOMODO_ON_DEMAND,KOMODO_EXTERNAL_NOTARIES,HUSH_PASSPORT_INITDONE,KOMODO_PAX,HUSH_EXCHANGEWALLET,KOMODO_REWIND,STAKED_ERA,KOMODO_CONNECTING = -1,KOMODO_DEALERNODE,KOMODO_EXTRASATOSHI,ASSETCHAINS_FOUNDERS,ASSETCHAINS_CBMATURITY,KOMODO_NSPV;
+int32_t HUSH_MININGTHREADS = -1,IS_HUSH_NOTARY,USE_EXTERNAL_PUBKEY,KOMODO_CHOSEN_ONE,ASSETCHAINS_SEED,KOMODO_ON_DEMAND,KOMODO_EXTERNAL_NOTARIES,HUSH_PASSPORT_INITDONE,KOMODO_PAX,HUSH_EXCHANGEWALLET,HUSH_REWIND,HUSH_CONNECTING = -1,KOMODO_DEALERNODE,HUSH_EXTRASATOSHI,ASSETCHAINS_FOUNDERS,ASSETCHAINS_CBMATURITY,KOMODO_NSPV;
 int32_t HUSH_INSYNC,KOMODO_LASTMINED,prevKOMODO_LASTMINED,KOMODO_CCACTIVATE,JUMBLR_PAUSE = 1;
 std::string NOTARY_PUBKEY,ASSETCHAINS_NOTARIES,ASSETCHAINS_OVERRIDE_PUBKEY,DONATION_PUBKEY,ASSETCHAINS_SCRIPTPUB,NOTARY_ADDRESS,ASSETCHAINS_SELFIMPORT,ASSETCHAINS_CCLIB;
 uint8_t NOTARY_PUBKEY33[33],ASSETCHAINS_OVERRIDE_PUBKEY33[33],ASSETCHAINS_OVERRIDE_PUBKEYHASH[20],ASSETCHAINS_PUBLIC,ASSETCHAINS_PRIVATE,ASSETCHAINS_TXPOW,ASSETCHAINS_MARMARA;
@@ -62,7 +59,7 @@ char NOTARY_ADDRESSES[NUM_HUSH_SEASONS][64][64];
 
 char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN],ASSETCHAINS_USERPASS[4096];
 uint16_t ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT,ASSETCHAINS_BEAMPORT,ASSETCHAINS_CODAPORT;
-uint32_t ASSETCHAIN_INIT,ASSETCHAINS_CC,KOMODO_STOPAT,KOMODO_DPOWCONFS = 1,STAKING_MIN_DIFF;
+uint32_t ASSETCHAIN_INIT,ASSETCHAINS_CC,KOMODO_STOPAT,HUSH_DPOWCONFS = 1,STAKING_MIN_DIFF;
 uint32_t ASSETCHAINS_MAGIC = 2387029918;
 int64_t ASSETCHAINS_GENESISTXVAL = 5000000000;
 
@@ -101,7 +98,7 @@ uint64_t ASSETCHAINS_COMMISSION,ASSETCHAINS_SUPPLY = 10,ASSETCHAINS_FOUNDERS_REW
 uint32_t HUSH_INITDONE;
 char KMDUSERPASS[8192+512+1],BTCUSERPASS[8192]; uint16_t KMD_PORT = 7771,BITCOIND_RPCPORT = 7771;
 uint64_t PENDING_KOMODO_TX;
-extern int32_t KOMODO_LOADINGBLOCKS;
+extern int32_t HUSH_LOADINGBLOCKS;
 unsigned int MAX_BLOCK_SIGOPS = 20000;
 int32_t HUSH_TESTNODE, KOMODO_SNAPSHOT_INTERVAL;
 CScript KOMODO_EARLYTXID_SCRIPTPUB;
@@ -131,7 +128,7 @@ int32_t komodo_baseid(char *origbase)
 #ifndef SATOSHIDEN
 #define SATOSHIDEN ((uint64_t)100000000L)
 #endif
-uint64_t komodo_current_supply(uint32_t nHeight)
+uint64_t hush_current_supply(uint32_t nHeight)
 {
     uint64_t cur_money;
     int32_t baseid;
@@ -255,9 +252,7 @@ uint64_t komodo_current_supply(uint32_t nHeight)
 
                         // add more for the base rectangle if lowest subsidy is not 0
                         cur_money += lowestSubsidy * (curEnd - lastEnd);
-                    }
-                    else
-                    {
+                    } else {
                         for ( int k = lastEnd; k < curEnd; k += period )
                         {
                             cur_money += period * reward;
@@ -272,8 +267,7 @@ uint64_t komodo_current_supply(uint32_t nHeight)
     }    
     if ( KOMODO_BIT63SET(cur_money) != 0 )
         return(KOMODO_MAXNVALUE);
-    if ( ASSETCHAINS_COMMISSION != 0 )
-    {
+    if ( ASSETCHAINS_COMMISSION != 0 ) {
         uint64_t newval = (cur_money + (cur_money/COIN * ASSETCHAINS_COMMISSION));
         if ( KOMODO_BIT63SET(newval) != 0 )
             return(KOMODO_MAXNVALUE);

@@ -1541,7 +1541,7 @@ char *argv0names[] = {
 // Large total supplies lead to numerical errors, beware!
 uint64_t hush_max_money()
 {
-    return komodo_current_supply(10000000);
+    return hush_current_supply(10000000);
 }
 
 
@@ -1859,9 +1859,9 @@ void hush_args(char *argv0)
         i++;
     }
     
-    if ( (KOMODO_REWIND= GetArg("-rewind",0)) != 0 )
+    if ( (HUSH_REWIND= GetArg("-rewind",0)) != 0 )
     {
-        printf("KOMODO_REWIND %d\n",KOMODO_REWIND);
+        printf("HUSH_REWIND %d\n",HUSH_REWIND);
     }
     KOMODO_EARLYTXID = Parseuint256(GetArg("-earlytxid","0").c_str());    
     ASSETCHAINS_EARLYTXIDCONTRACT = GetArg("-ac_earlytxidcontract",0);
@@ -2433,7 +2433,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
                 break;
         }
     }
-    int32_t dpowconfs = KOMODO_DPOWCONFS;
+    int32_t dpowconfs = HUSH_DPOWCONFS;
     if ( SMART_CHAIN_SYMBOL[0] != 0 )
     {
         BITCOIND_RPCPORT = GetArg("-rpcport", ASSETCHAINS_RPCPORT);
@@ -2502,9 +2502,9 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
             CCENABLE(EVAL_ORACLES);
         }
     } else BITCOIND_RPCPORT = GetArg("-rpcport", BaseParams().RPCPort());
-    KOMODO_DPOWCONFS = GetArg("-dpowconfs",dpowconfs);
+    HUSH_DPOWCONFS = GetArg("-dpowconfs",dpowconfs);
     if ( SMART_CHAIN_SYMBOL[0] == 0 || strcmp(SMART_CHAIN_SYMBOL,"SUPERNET") == 0 || strcmp(SMART_CHAIN_SYMBOL,"DEX") == 0 || strcmp(SMART_CHAIN_SYMBOL,"COQUI") == 0 || strcmp(SMART_CHAIN_SYMBOL,"PIRATE") == 0 || strcmp(SMART_CHAIN_SYMBOL,"KMDICE") == 0 )
-        KOMODO_EXTRASATOSHI = 1;
+        HUSH_EXTRASATOSHI = 1;
 }
 
 void komodo_nameset(char *symbol,char *dest,char *source)

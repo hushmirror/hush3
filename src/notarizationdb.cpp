@@ -12,66 +12,64 @@
 NotarizationDB *pnotarizations;
 NotarizationDB::NotarizationDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "notarizations", nCacheSize, fMemory, fWipe, false, 64) { }
 
-NotarisationsInBlock ScanBlockNotarizations(const CBlock &block, int nHeight)
+NotarizationsInBlock ScanBlockNotarizations(const CBlock &block, int nHeight)
 {
     EvalRef eval;
-    NotarisationsInBlock vNotarisations;
+    NotarizationsInBlock vNotarizations;
     int timestamp = block.nTime;
     bool ishush3  = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 
-    // No valid ntz's before this height on HUSH3
-    if(ishush3 && (nHeight <= 360000)) {
-        return vNotarisations;
+    // No valid ntz's before this height
+    int minheight = ishush3 ? 360000 : 1;
+    if(ishush3 && (nHeight <= GetArg("-dpow_height",minheight))) {
+        return vNotarizations;
     }
 
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
         CTransaction tx = block.vtx[i];
 
-        NotarisationData data;
-        bool parsed = ParseNotarisationOpReturn(tx, data);
-        if (!parsed) data = NotarisationData();
+        NotarizationData data;
+        bool parsed = ParseNotarizationOpReturn(tx, data);
+        if (!parsed) data = NotarizationData();
         if (strlen(data.symbol) == 0)
           continue;
 
-        //printf("Checked notarisation data for %s \n",data.symbol);
+        //printf("Checked notarization data for %s \n",data.symbol);
         int authority = GetSymbolAuthority(data.symbol);
 
         if (authority == CROSSCHAIN_HUSH) {
             if (!eval->CheckNotaryInputs(tx, nHeight, block.nTime))
                 continue;
-            //printf("Authorised notarisation data for %s \n",data.symbol);
         }
 
         if (parsed) {
-            vNotarisations.push_back(std::make_pair(tx.GetHash(), data));
-            //printf("Parsed a notarisation for: %s, txid:%s, ccid:%i, momdepth:%i\n",
-            //      data.symbol, tx.GetHash().GetHex().data(), data.ccId, data.MoMDepth);
-            //if (!data.MoMoM.IsNull()) printf("MoMoM:%s\n", data.MoMoM.GetHex().data());
+            vNotarizations.push_back(std::make_pair(tx.GetHash(), data));
+            if(fDebug) {
+                printf("Parsed a notarization for: %s, txid:%s, ccid:%i, momdepth:%i\n", data.symbol, tx.GetHash().GetHex().data(), data.ccId, data.MoMDepth);
+                if (!data.MoMoM.IsNull()) printf("MoMoM:%s\n", data.MoMoM.GetHex().data());
+            }
         } else
-            LogPrintf("WARNING: Couldn't parse notarisation for tx: %s at height %i\n", tx.GetHash().GetHex().data(), nHeight);
+            LogPrintf("WARNING: Couldn't parse notarization for tx: %s at height %i\n", tx.GetHash().GetHex().data(), nHeight);
     }
-    return vNotarisations;
+    return vNotarizations;
 }
 
-bool GetBlockNotarisations(uint256 blockHash, NotarisationsInBlock &nibs)
+bool GetBlockNotarizations(uint256 blockHash, NotarizationsInBlock &nibs)
 {
     return pnotarizations->Read(blockHash, nibs);
 }
 
 
-bool GetBackNotarisation(uint256 notarisationHash, Notarisation &n)
+bool GetBackNotarization(uint256 notarisationHash, Notarization &n)
 {
     return pnotarizations->Read(notarisationHash, n);
 }
 
-
-/*
- * Write an index of HUSH notarisation id -> backnotarisation
- */
-void WriteBackNotarisations(const NotarisationsInBlock notarisations, CDBBatch &batch)
+// Write an index of HUSH notarisation id -> backnotarisation
+void WriteBackNotarizations(const NotarizationsInBlock notarisations, CDBBatch &batch)
 {
     int wrote = 0;
-    BOOST_FOREACH(const Notarisation &n, notarisations)
+    BOOST_FOREACH(const Notarization &n, notarisations)
     {
         if (!n.second.txHash.IsNull()) {
             batch.Write(n.second.txHash, n);
@@ -80,63 +78,33 @@ void WriteBackNotarisations(const NotarisationsInBlock notarisations, CDBBatch &
     }
 }
 
-
-void EraseBackNotarisations(const NotarisationsInBlock notarisations, CDBBatch &batch)
+void EraseBackNotarizations(const NotarizationsInBlock notarisations, CDBBatch &batch)
 {
-    BOOST_FOREACH(const Notarisation &n, notarisations)
+    BOOST_FOREACH(const Notarization &n, notarisations)
     {
         if (!n.second.txHash.IsNull())
             batch.Erase(n.second.txHash);
     }
 }
 
-/*
- * Scan notarisationsdb backwards for blocks containing a notarisation
- * for given symbol. Return height of matched notarisation or 0.
- */
-int ScanNotarisationsDB(int height, std::string symbol, int scanLimitBlocks, Notarisation& out)
+// Scan notarisationsdb backwards for blocks containing a notarisation
+// for given symbol. Return height of matched notarisation or 0.
+int ScanNotarizationsDB(int height, std::string symbol, int scanLimitBlocks, Notarization& out)
 {
     if (height < 0 || height > chainActive.Height())
         return false;
 
     for (int i=0; i<scanLimitBlocks; i++) {
         if (i > height) break;
-        NotarisationsInBlock notarisations;
+        NotarizationsInBlock notarisations;
         uint256 blockHash = *chainActive[height-i]->phashBlock;
-        if (!GetBlockNotarisations(blockHash, notarisations))
+        if (!GetBlockNotarizations(blockHash, notarisations))
             continue;
 
-        BOOST_FOREACH(Notarisation& nota, notarisations) {
+        BOOST_FOREACH(Notarization& nota, notarisations) {
             if (strcmp(nota.second.symbol, symbol.data()) == 0) {
                 out = nota;
                 return height-i;
-            }
-        }
-    }
-    return 0;
-}
-
-int ScanNotarisationsDB2(int height, std::string symbol, int scanLimitBlocks, Notarisation& out)
-{
-    int32_t i,maxheight,ht;
-    maxheight = chainActive.Height();
-    if ( height < 0 || height > maxheight )
-        return false;
-    for (i=0; i<scanLimitBlocks; i++)
-    {
-        ht = height+i;
-        if ( ht > maxheight )
-            break;
-        NotarisationsInBlock notarisations;
-        uint256 blockHash = *chainActive[ht]->phashBlock;
-        if ( !GetBlockNotarisations(blockHash,notarisations) )
-            continue;
-        BOOST_FOREACH(Notarisation& nota,notarisations)
-        {
-            if ( strcmp(nota.second.symbol,symbol.data()) == 0 )
-            {
-                out = nota;
-                return(ht);
             }
         }
     }

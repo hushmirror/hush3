@@ -143,14 +143,14 @@ UniValue MoMoMdata(const UniValue& params, bool fHelp, const CPubKey& mypk)
     ret.push_back(Pair("kmdheight",kmdheight-5));
     ret.push_back(Pair("ccid", (int) ccid));
 
-    uint256 destNotarisationTxid;
+    uint256 destNotarizationTxid;
     std::vector<uint256> moms;
-    uint256 MoMoM = CalculateProofRoot(symbol, ccid, kmdheight-5, moms, destNotarisationTxid);
+    uint256 MoMoM = CalculateProofRoot(symbol, ccid, kmdheight-5, moms, destNotarizationTxid);
 
     UniValue valMoms(UniValue::VARR);
     for (int i=0; i<moms.size(); i++) valMoms.push_back(moms[i].GetHex());
     ret.push_back(Pair("MoMs", valMoms));
-    ret.push_back(Pair("notarization_hash", destNotarisationTxid.GetHex()));
+    ret.push_back(Pair("notarization_hash", destNotarizationTxid.GetHex()));
     ret.push_back(Pair("MoMoM", MoMoM.GetHex()));
     auto vmomomdata = E_MARSHAL(ss << MoMoM; ss << ((uint32_t)0));
     ret.push_back(Pair("data", HexStr(vmomomdata)));
@@ -789,7 +789,7 @@ UniValue selfimport(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return result;
 }
 
-bool GetNotarisationNotaries(uint8_t notarypubkeys[64][33], int8_t &numNN, const std::vector<CTxIn> &vin, std::vector<int8_t> &NotarisationNotaries);
+bool GetNotarizationNotaries(uint8_t notarypubkeys[64][33], int8_t &numNN, const std::vector<CTxIn> &vin, std::vector<int8_t> &NotarizationNotaries);
 
 
 UniValue importdual(const UniValue& params, bool fHelp, const CPubKey& mypk)
@@ -1121,11 +1121,11 @@ UniValue importgatewaydumpprivkey(const UniValue& params, bool fHelp, const CPub
     return(ImportGatewayDumpPrivKey(bindtxid,vchSecret));
 }
 
-UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
+UniValue getNotarizationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     // TODO take timestamp as param, and loop blockindex to get starting/finish height.
     if (fHelp || params.size() != 1)
-        throw runtime_error("getNotarisationsForBlock height\n\n"
+        throw runtime_error("getNotarizationsForBlock height\n\n"
                 "Takes a block height and returns notarisation information "
                 "within the block");
 
@@ -1136,21 +1136,21 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
     
     uint256 blockHash = chainActive[height]->GetBlockHash(); 
     
-    NotarisationsInBlock nibs;
-    GetBlockNotarisations(blockHash, nibs);
+    NotarizationsInBlock nibs;
+    GetBlockNotarizations(blockHash, nibs);
     UniValue out(UniValue::VOBJ);
     //out.push_back(make_pair("blocktime",(int)));
     UniValue hush(UniValue::VARR);
     int8_t numNN = 0; uint8_t notarypubkeys[64][33] = {0};
     numNN = hush_notaries(notarypubkeys, height, chainActive[height]->nTime);
 
-    BOOST_FOREACH(const Notarisation& n, nibs)
+    BOOST_FOREACH(const Notarization& n, nibs)
     {
-        UniValue item(UniValue::VOBJ); UniValue notaryarr(UniValue::VARR); std::vector<int8_t> NotarisationNotaries;
+        UniValue item(UniValue::VOBJ); UniValue notaryarr(UniValue::VARR); std::vector<int8_t> NotarizationNotaries;
         uint256 hash; CTransaction tx;
         if ( myGetTransaction(n.first,tx,hash) )
         {
-            if ( !GetNotarisationNotaries(notarypubkeys, numNN, tx.vin, NotarisationNotaries) )
+            if ( !GetNotarizationNotaries(notarypubkeys, numNN, tx.vin, NotarizationNotaries) )
                 continue;
         }
         item.push_back(make_pair("txid", n.first.GetHex()));
@@ -1159,7 +1159,7 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
         item.push_back(make_pair("blockhash", n.second.blockHash.GetHex()));
         //item.push_back(make_pair("HUSH_height", height)); // for when timstamp input is used.
         
-        for ( auto notary : NotarisationNotaries )
+        for ( auto notary : NotarizationNotaries )
             notaryarr.push_back(notary);
         item.push_back(make_pair("notaries",notaryarr));
         hush.push_back(item);
@@ -1168,19 +1168,19 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
     return out;
 }
 
-/*UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
+/*UniValue getNotarizationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     if (fHelp || params.size() != 1)
-        throw runtime_error("getNotarisationsForBlock blockHash\n\n"
+        throw runtime_error("getNotarizationsForBlock blockHash\n\n"
                 "Takes a block hash and returns notarisation transactions "
                 "within the block");
 
     uint256 blockHash = uint256S(params[0].get_str());
 
-    NotarisationsInBlock nibs;
-    GetBlockNotarisations(blockHash, nibs);
+    NotarizationsInBlock nibs;
+    GetBlockNotarizations(blockHash, nibs);
     UniValue out(UniValue::VARR);
-    BOOST_FOREACH(const Notarisation& n, nibs)
+    BOOST_FOREACH(const Notarization& n, nibs)
     {
         UniValue item(UniValue::VARR);
         item.push_back(n.first.GetHex());
@@ -1191,10 +1191,10 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
 }*/
 
 
-UniValue scanNotarisationsDB(const UniValue& params, bool fHelp, const CPubKey& mypk)
+UniValue scanNotarizationsDB(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     if (fHelp || params.size() < 2 || params.size() > 3)
-        throw runtime_error("scanNotarisationsDB blockHeight symbol [blocksLimit=1440]\n\n"
+        throw runtime_error("scanNotarizationsDB blockHeight symbol [blocksLimit=1440]\n\n"
                 "Scans notarisationsdb backwards from height for a notarisation"
                 " of given symbol");
     int height = atoi(params[0].get_str().c_str());
@@ -1209,8 +1209,8 @@ UniValue scanNotarisationsDB(const UniValue& params, bool fHelp, const CPubKey& 
         height = chainActive.Height();
     }
 
-    Notarisation nota;
-    int matchedHeight = ScanNotarisationsDB(height, symbol, limit, nota);
+    Notarization nota;
+    int matchedHeight = ScanNotarizationsDB(height, symbol, limit, nota);
     if (!matchedHeight) return NullUniValue;
     UniValue out(UniValue::VOBJ);
     out.pushKV("height", matchedHeight);

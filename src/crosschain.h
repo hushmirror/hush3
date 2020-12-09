@@ -36,13 +36,13 @@ TxProof GetAssetchainProof(uint256 hash,CTransaction burnTx);
 
 /* On HUSH */
 uint256 CalculateProofRoot(const char* symbol, uint32_t targetCCid, int kmdHeight,
-        std::vector<uint256> &moms, uint256 &destNotarisationTxid);
+        std::vector<uint256> &moms, uint256 &destNotarizationTxid);
 TxProof GetCrossChainProof(const uint256 txid, const char* targetSymbol, uint32_t targetCCid,
         const TxProof assetChainProof,int32_t offset);
 void CompleteImportTransaction(CTransaction &importTx,int32_t offset);
 
 /* On assetchain */
-bool CheckMoMoM(uint256 kmdNotarisationHash, uint256 momom);
+bool CheckMoMoM(uint256 kmdNotarizationHash, uint256 momom);
 bool CheckNotariesApproval(uint256 burntxid, const std::vector<uint256> & notaryTxids);
 
 #endif /* CROSSCHAIN_H */

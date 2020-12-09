@@ -15,17 +15,15 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-#ifndef H_KOMODO_H
-#define H_KOMODO_H
+#ifndef H_HUSH_H
+#define H_HUSH_H
 #include "hush_defs.h"
 
 #ifdef _WIN32
 #define printf(...)
 #endif
 
-// Todo: verify: reorgs
-
+// Todo: verify: reorgs, lollerskates
 #define HUSH_SMART_CHAINS_WAITNOTARIZE
 #define KOMODO_PAXMAX (10000 * COIN)
 extern int32_t NOTARIZED_HEIGHT;
@@ -59,7 +57,7 @@ int32_t komodo_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *
 #include "komodo_events.h"
 #include "komodo_ccdata.h"
 
-void komodo_currentheight_set(int32_t height)
+void hush_currentheight_set(int32_t height)
 {
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
     if ( (sp= hush_stateptr(symbol,dest)) != 0 )
@@ -525,11 +523,11 @@ int32_t komodo_validate_chain(uint256 srchash,int32_t notarized_height)
         else if ( notarized_height > 101 )
             rewindtarget = notarized_height - 101;
         else rewindtarget = 0;
-        if ( rewindtarget != 0 && rewindtarget > KOMODO_REWIND && rewindtarget > last_rewind )
+        if ( rewindtarget != 0 && rewindtarget > HUSH_REWIND && rewindtarget > last_rewind )
         {
             if ( last_rewind != 0 )
             {
-                //KOMODO_REWIND = rewindtarget;
+                //HUSH_REWIND = rewindtarget;
                 fprintf(stderr,"%s FORK detected. notarized.%d %s not in this chain! last notarization %d -> rewindtarget.%d\n",SMART_CHAIN_SYMBOL,notarized_height,srchash.ToString().c_str(),sp->NOTARIZED_HEIGHT,rewindtarget);
             }
             last_rewind = rewindtarget;
@@ -848,7 +846,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
             hush_stateupdate(pindex->GetHeight(),0,0,0,zero,0,0,0,0,-pindex->GetHeight(),pindex->nTime,0,0,0,0,zero,0);
         }
     }
-    komodo_currentheight_set(chainActive.LastTip()->GetHeight());
+    hush_currentheight_set(chainActive.LastTip()->GetHeight());
     int transaction = 0;
     if ( pindex != 0 )
     {

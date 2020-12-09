@@ -317,7 +317,7 @@ int32_t hush_dpowconfs(int32_t txheight,int32_t numconfs)
 {
     static int32_t hadnotarization;
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
-    if ( KOMODO_DPOWCONFS != 0 && txheight > 0 && numconfs > 0 && (sp= hush_stateptr(symbol,dest)) != 0 )
+    if ( HUSH_DPOWCONFS != 0 && txheight > 0 && numconfs > 0 && (sp= hush_stateptr(symbol,dest)) != 0 )
     {
         if ( sp->NOTARIZED_HEIGHT > 0 )
         {

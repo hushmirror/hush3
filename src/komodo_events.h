@@ -1,3 +1,6 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -13,8 +16,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef H_KOMODOEVENTS_H
-#define H_KOMODOEVENTS_H
+#ifndef H_HUSHEVENTS_H
+#define H_HUSHEVENTS_H
 #include "hush_defs.h"
 
 struct komodo_event *komodo_eventadd(struct hush_state *sp,int32_t height,char *symbol,uint8_t type,uint8_t *data,uint16_t datalen)
@@ -169,16 +172,13 @@ void komodo_setkmdheight(struct hush_state *sp,int32_t kmdheight,uint32_t timest
 void komodo_eventadd_kmdheight(struct hush_state *sp,char *symbol,int32_t height,int32_t kmdheight,uint32_t timestamp)
 {
     uint32_t buf[2];
-    if ( kmdheight > 0 )
-    {
+    if ( kmdheight > 0 ) {
         buf[0] = (uint32_t)kmdheight;
         buf[1] = timestamp;
         komodo_eventadd(sp,height,symbol,KOMODO_EVENT_KMDHEIGHT,(uint8_t *)buf,sizeof(buf));
         if ( sp != 0 )
             komodo_setkmdheight(sp,kmdheight,timestamp);
-    }
-    else
-    {
+    } else {
         //fprintf(stderr,"REWIND kmdheight.%d\n",kmdheight);
         kmdheight = -kmdheight;
         komodo_eventadd(sp,height,symbol,KOMODO_EVENT_REWIND,(uint8_t *)&height,sizeof(height));
@@ -187,32 +187,5 @@ void komodo_eventadd_kmdheight(struct hush_state *sp,char *symbol,int32_t height
     }
 }
 
-
-/*void komodo_eventadd_deposit(int32_t actionflag,char *symbol,int32_t height,uint64_t komodoshis,char *fiat,uint64_t fiatoshis,uint8_t rmd160[20],bits256 kmdtxid,uint16_t kmdvout,uint64_t price)
- {
- uint8_t opret[512]; uint16_t opretlen;
- komodo_eventadd_opreturn(symbol,height,KOMODO_OPRETURN_DEPOSIT,kmdtxid,komodoshis,kmdvout,opret,opretlen);
- }
- 
- void komodo_eventadd_issued(int32_t actionflag,char *symbol,int32_t height,int32_t fiatheight,bits256 fiattxid,uint16_t fiatvout,bits256 kmdtxid,uint16_t kmdvout,uint64_t fiatoshis)
- {
- uint8_t opret[512]; uint16_t opretlen;
- komodo_eventadd_opreturn(symbol,height,KOMODO_OPRETURN_ISSUED,fiattxid,fiatoshis,fiatvout,opret,opretlen);
- }
- 
- void komodo_eventadd_withdraw(int32_t actionflag,char *symbol,int32_t height,uint64_t komodoshis,char *fiat,uint64_t fiatoshis,uint8_t rmd160[20],bits256 fiattxid,int32_t fiatvout,uint64_t price)
- {
- uint8_t opret[512]; uint16_t opretlen;
- komodo_eventadd_opreturn(symbol,height,KOMODO_OPRETURN_WITHDRAW,fiattxid,fiatoshis,fiatvout,opret,opretlen);
- }
- 
- void komodo_eventadd_redeemed(int32_t actionflag,char *symbol,int32_t height,bits256 kmdtxid,uint16_t kmdvout,int32_t fiatheight,bits256 fiattxid,uint16_t fiatvout,uint64_t komodoshis)
- {
- uint8_t opret[512]; uint16_t opretlen;
- komodo_eventadd_opreturn(symbol,height,KOMODO_OPRETURN_REDEEMED,kmdtxid,komodoshis,kmdvout,opret,opretlen);
- }*/
-
-// process events
-//
 
 #endif
