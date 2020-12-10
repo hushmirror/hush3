@@ -1,7 +1,6 @@
 // Copyright 2019-2020 The Hush Developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -16,9 +15,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-// Hush + Komodo functions that interact with bitcoind C++
-
+// Hush functions that interact with bitcoind C++
 #include <curl/curl.h>
 #include <curl/easy.h>
 #include "consensus/params.h"
@@ -1261,7 +1258,7 @@ uint64_t hush_commission(int height)
         // With 150s blocks, we have 210,000 blocks per year
         // With 75s blocks,  we have 420,000 blocks per year
         INTERVAL = GetArg("-ac_halving2",1680000);  // ~4 years worth of 75s blocks
-        fprintf(stderr,"%s: height=%d increasing interval to %d\n", __func__, height, INTERVAL);
+        //fprintf(stderr,"%s: height=%d increasing interval to %d\n", __func__, height, INTERVAL);
     }
 
     // Block 128 had a miner subsidy but no FR!!! Discovered by Denio
