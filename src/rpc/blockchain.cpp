@@ -942,7 +942,7 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
             }
             for (i=0; i<64; i++)
             {
-                UniValue item(UniValue::VOBJ); std::string hex,kmdaddress; char *hexstr,kmdaddr[64],*ptr; int32_t m;
+                UniValue item(UniValue::VOBJ); std::string hex,hushaddress; char *hexstr,kmdaddr[64],*ptr; int32_t m;
                 hex.resize(66);
                 hexstr = (char *)hex.data();
                 for (j=0; j<33; j++)
@@ -951,10 +951,10 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
                 bitcoin_address(kmdaddr,60,pubkeys[i],33);
                 m = (int32_t)strlen(kmdaddr);
-                kmdaddress.resize(m);
-                ptr = (char *)kmdaddress.data();
+                hushaddress.resize(m);
+                ptr = (char *)hushaddress.data();
                 memcpy(ptr,kmdaddr,m);
-                item.push_back(Pair("HUSHaddress", kmdaddress));
+                item.push_back(Pair("HUSHaddress", hushaddress));
 
                 item.push_back(Pair("pubkey", hex));
                 item.push_back(Pair("blocks", tally[i]));
@@ -997,7 +997,7 @@ UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
         for (i=0; i<n; i++)
         {
             UniValue item(UniValue::VOBJ);
-            std::string btcaddress,kmdaddress,hex;
+            std::string btcaddress,hushaddress,hex;
             hex.resize(66);
             hexstr = (char *)hex.data();
             for (j=0; j<33; j++)
@@ -1013,10 +1013,10 @@ UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
             bitcoin_address(kmdaddr,60,pubkeys[i],33);
             m = (int32_t)strlen(kmdaddr);
-            kmdaddress.resize(m);
-            ptr = (char *)kmdaddress.data();
+            hushaddress.resize(m);
+            ptr = (char *)hushaddress.data();
             memcpy(ptr,kmdaddr,m);
-            item.push_back(Pair("HUSHaddress", kmdaddress));
+            item.push_back(Pair("HUSHaddress", hushaddress));
             a.push_back(item);
         }
     }
