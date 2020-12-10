@@ -5678,14 +5678,10 @@ int32_t ensure_CCrequirements(uint8_t evalcode)
     {
         fprintf(stderr,"no -pubkey set\n");
         return(-1);
-    }
-    else if ( GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX) == 0 )
-    {
+    } else if ( GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX) == 0 ) {
         fprintf(stderr,"no -addressindex\n");
         return(-1);
-    }
-    else if ( GetBoolArg("-spentindex", DEFAULT_SPENTINDEX) == 0 )
-    {
+    } else if ( GetBoolArg("-spentindex", DEFAULT_SPENTINDEX) == 0 ) {
         fprintf(stderr,"no -spentindex\n");
         return(-1);
     }
