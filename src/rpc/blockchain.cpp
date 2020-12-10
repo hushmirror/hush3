@@ -3,7 +3,6 @@
 // Copyright (c) 2019-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "amount.h"
 #include "chain.h"
 #include "chainparams.h"
@@ -38,13 +36,9 @@
 #include "script/sign.h"
 #include "script/standard.h"
 #include "wallet/wallet.h"
-
 #include <stdint.h>
-
 #include <univalue.h>
-
 #include <regex>
-
 #include "cc/CCinclude.h"
 #include "cc/CCPrices.h"
 
@@ -960,7 +954,7 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
                 kmdaddress.resize(m);
                 ptr = (char *)kmdaddress.data();
                 memcpy(ptr,kmdaddr,m);
-                item.push_back(Pair("KMDaddress", kmdaddress));
+                item.push_back(Pair("HUSHaddress", kmdaddress));
 
                 item.push_back(Pair("pubkey", hex));
                 item.push_back(Pair("blocks", tally[i]));
@@ -1022,7 +1016,7 @@ UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
             kmdaddress.resize(m);
             ptr = (char *)kmdaddress.data();
             memcpy(ptr,kmdaddr,m);
-            item.push_back(Pair("KMDaddress", kmdaddress));
+            item.push_back(Pair("HUSHaddress", kmdaddress));
             a.push_back(item);
         }
     }
