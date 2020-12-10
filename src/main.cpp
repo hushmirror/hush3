@@ -105,8 +105,7 @@ bool fCoinbaseEnforcedProtectionEnabled = true;
 size_t nCoinCacheUsage = 5000 * 300;
 uint64_t nPruneTarget = 0;
 bool fAlerts = DEFAULT_ALERTS;
-/* If the tip is older than this (in seconds), the node is considered to be in initial block download.
- */
+// If the tip is older than this (in seconds), the node is considered to be in initial block download.
 int64_t nMaxTipAge = DEFAULT_MAX_TIP_AGE;
 bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 int32_t nFirstHalvingHeight = 340000;
@@ -5232,25 +5231,25 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     assert(pindexPrev);
 
-    int nHeight = pindexPrev->GetHeight()+1;
-
+    int nHeight  = pindexPrev->GetHeight()+1;
     bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
     // Check Proof-of-Work
     if(ishush3) {
+        // The change of blocktime from 150s to 75s caused Weird Stuff in the difficulty/work calculations
+        // caused by the fact that Difficulty Adjustment Algorithms do not take into account blocktime
+        // changing at run-time, which breaks assumptions in the algorithm
         unsigned int nNextWork = GetNextWorkRequired(pindexPrev, &block, consensusParams);
-        unsigned int diffbits  = nNextWork > block.nBits ? nNextWork-block.nBits : block.nBits-nNextWork;
-
-        // The change of blocktime from 150s to 75s seems to have messed up our difficulty calc
         if ((nHeight < 340000 || nHeight > 342500) && block.nBits != nNextWork) {
             cout << "Incorrect HUSH Proof-of-Work at height " << nHeight << " " << block.nBits << " block.nBits vs. calc " <<
                     nNextWork << " " << block.GetHash().ToString() << " @ " << block.GetBlockTime() <<  endl;
 
-                return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d diffbits=%u", __func__, nHeight, diffbits), REJECT_INVALID, "bad-diffbits");
+                return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
         } else {
-            fprintf(stderr,"%s: Ignoring weird nBits %u with diffbits %u for height %d\n", __func__, block.nBits, diffbits, nHeight);
+            if( nHeight >= 340000 || nHeight <= 342500)
+                fprintf(stderr,"%s: Ignoring weird nBits with block.nBits=%u vs GetNextWorkRequired=%u for height %d\n", __func__, block.nBits, nNextWork, nHeight);
         }
     } else {
-        // TODO: unify this with the code above
+        // Hush Smart Chains
         if ( block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams)) {
             cout << "Incorrect Proof-of-Work! " << block.nBits << " block.nBits vs. calc " <<
                     GetNextWorkRequired(pindexPrev, &block, consensusParams) <<
@@ -8422,7 +8421,6 @@ extern "C" const char* getDataDir()
 {
     return GetDataDir().string().c_str();
 }
-
 
 // Set default values of new CMutableTransaction based on consensus rules at given height.
 CMutableTransaction CreateNewContextualCMutableTransaction(const Consensus::Params& consensusParams, int nHeight)
