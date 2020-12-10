@@ -548,17 +548,17 @@ void hush_changeblocktime()
 
 void hush_setactivation(int32_t height)
 {
-    pCurrentParams->consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nActivationHeight = height;
+    pCurrentParams->consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nActivationHeight    = height;
     pCurrentParams->consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = height;
     ASSETCHAINS_SAPLING = height;
     fprintf(stderr,"SET SAPLING ACTIVATION height.%d\n",height);
 }
 
-void *chainparams_commandline()
-{
-    fprintf(stderr,"chainparams_commandline called\n");
+void *chainparams_commandline() {
     CChainParams::CCheckpointData checkpointData;
-    //fprintf(stderr,">>>>>>>> port.%u\n",ASSETCHAINS_P2PPORT);
+    if(fDebug) {
+        fprintf(stderr,"chainparams_commandline called with port=%u\n", ASSETCHAINS_P2PPORT);
+    }
     if ( SMART_CHAIN_SYMBOL[0] != 0 )
     {
         if ( ASSETCHAINS_BLOCKTIME != 60 )

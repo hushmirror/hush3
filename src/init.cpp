@@ -127,11 +127,7 @@ static const char* DEFAULT_ASMAP_FILENAME="ip_asn.map";
 
 CClientUIInterface uiInterface; // Declared but not defined in ui_interface.h
 
-//////////////////////////////////////////////////////////////////////////////
-//
 // Shutdown
-//
-
 //
 // Thread management and startup/shutdown:
 //
@@ -151,7 +147,6 @@ CClientUIInterface uiInterface; // Declared but not defined in ui_interface.h
 // Note that if running -daemon the parent process returns from AppInit2
 // before adding any threads to the threadGroup, so .join_all() returns
 // immediately and the parent exits from main().
-//
 
 std::atomic<bool> fRequestShutdown(false);
 
@@ -201,7 +196,8 @@ void Interrupt(boost::thread_group& threadGroup)
 
 void Shutdown()
 {
-	fprintf(stderr,"%s: start\n", __FUNCTION__);
+    if(fDebug)
+	    fprintf(stderr,"%s: start\n", __FUNCTION__);
     LogPrintf("%s: In progress...\n", __func__);
     static CCriticalSection cs_Shutdown;
     TRY_LOCK(cs_Shutdown, lockShutdown);
@@ -217,7 +213,7 @@ void Shutdown()
     RenameThread(shutoffstr);
     mempool.AddTransactionsUpdated(1);
 
-	fprintf(stderr,"%s: stopping HTTP/REST/RPC\n", __FUNCTION__);
+	fprintf(stderr,"%s: stopping HUSH HTTP/REST/RPC\n", __FUNCTION__);
     StopHTTPRPC();
     StopREST();
     StopRPC();
@@ -288,17 +284,13 @@ void Shutdown()
     delete pwalletMain;
     pwalletMain = NULL;
 #endif
-    //delete pzcashParams;
-    //pzcashParams = NULL;
     globalVerifyHandle.reset();
     ECC_Stop();
     CNode::NetCleanup();
     LogPrintf("%s: done\n", __func__);
 }
 
-/**
- * Signal handlers are very limited in what they are allowed to do, so:
- */
+// Signal handlers are very limited in what they are allowed to do, so:
 void HandleSIGTERM(int)
 {
 	fprintf(stderr,"%s\n",__FUNCTION__);
@@ -359,7 +351,6 @@ std::string HelpMessage(HelpMessageMode mode)
 
     string strUsage = HelpMessageGroup(_("Options:"));
     strUsage += HelpMessageOpt("-?", _("This help message"));
-    strUsage += HelpMessageOpt("-alerts", strprintf(_("Receive and display P2P network alerts (default: %u)"), DEFAULT_ALERTS));
     strUsage += HelpMessageOpt("-alertnotify=<cmd>", _("Execute command when a relevant alert is received or we see a really long fork (%s in cmd is replaced by message)"));
     strUsage += HelpMessageOpt("-blocknotify=<cmd>", _("Execute command when the best block changes (%s in cmd is replaced by block hash)"));
     strUsage += HelpMessageOpt("-checkblocks=<n>", strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 288));
@@ -1028,9 +1019,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         if (mapArgs.count("-developerencryptwallet")) {
 			fprintf(stderr,"%s wallet encryption error\n", __FUNCTION__);
             return InitError(_("Wallet encryption requires -experimentalfeatures."));
-        } else if (mapArgs.count("-zmergetoaddress")) {
-			//fprintf(stderr,"%s zmerge error\n", __FUNCTION__);
-            //return InitError(_("RPC method z_mergetoaddress requires -experimentalfeatures."));
         }
     }
 	//fprintf(stderr,"%s tik2\n", __FUNCTION__);
@@ -2024,9 +2012,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         {
             pwalletMain->ClearNoteWitnessCache();
             pindexRescan = chainActive.Genesis();
-        }
-        else
-        {
+        } else {
             CWalletDB walletdb(strWalletFile);
             CBlockLocator locator;
             if (walletdb.ReadBestBlock(locator))

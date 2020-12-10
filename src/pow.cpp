@@ -499,7 +499,8 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         nbits = bnTarget.GetCompact();
         nbits = (nbits & 0xfffffffc) | zawyflag;
     }
-    fprintf(stderr,"%s: nbits=%d\n", __func__, nbits);
+    if(fDebug)
+        fprintf(stderr,"%s: nbits=%d\n", __func__, nbits);
     return(nbits);
 }
 
@@ -542,6 +543,8 @@ unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
     LogPrint("pow", "Current average: %08x  %s\n", bnAvg.GetCompact(), bnAvg.ToString());
     LogPrint("pow", "After:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString());
 
+    if(fDebug)
+        fprintf(stderr,"%s: nbits=%u\n",__func__,nbits);
     return bnNew.GetCompact();
 }
 

@@ -17,9 +17,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "rpc/server.h"
-
 #include "clientversion.h"
 #include "main.h"
 #include "net.h"
@@ -31,9 +29,7 @@
 #include "version.h"
 #include "deprecation.h"
 #include "hush/utiltls.h"
-
 #include <boost/foreach.hpp>
-
 #include <univalue.h>
 
 using namespace std;
