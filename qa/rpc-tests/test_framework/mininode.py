@@ -1,11 +1,12 @@
 # mininode.py - Bitcoin P2P network half-a-node
-# Copyright (c) 2019 The Hush developers
-# Released under the GPLv3
+# Copyright (c) 2016-2020 The Hush developers
+# Lovingly maintained and released under the GPLv3
 #
 # This python code was modified from ArtForz' public domain  half-a-node, as
 # found in the mini-node branch of http://github.com/jgarzik/pynode.
 # oringally from https://pastebin.com/ZSM7iHZw
 # Mad respect to ArtForz!!!!
+# No seriously, deep crazy respect for ArtForz. Thank you. -- Duke
 #
 # NodeConn: an object which manages p2p connectivity to a bitcoin node
 # NodeConnCB: a base class that describes the interface for receiving
@@ -16,7 +17,6 @@
 # msg_block, msg_tx, msg_headers, etc.:
 #     data structures that represent network messages
 # ser_*, deser_*: functions that handle serialization/deserialization
-
 
 import struct
 import socket

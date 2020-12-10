@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 /******************************************************************************
  * Copyright © 2014-2020 The SuperNET Developers.                             *
  *                                                                            *

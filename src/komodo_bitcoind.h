@@ -1,4 +1,4 @@
-// Copyright 2019-2020 The Hush Developers
+// Copyright 2016-2020 The Hush Developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
