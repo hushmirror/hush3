@@ -1284,7 +1284,7 @@ UniValue getsnapshot(const UniValue& params, bool fHelp, const CPubKey& mypk)
         top = atoi(params[0].get_str().c_str());
         if ( top < 0 ) 
         {
-            if ( KOMODO_SNAPSHOT_INTERVAL == 0 )
+            if ( HUSH_SNAPSHOT_INTERVAL == 0 )
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, top must be a positive integer");
             else 
                 top = -1;
