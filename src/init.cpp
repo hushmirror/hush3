@@ -92,7 +92,7 @@ extern void ThreadSendAlert();
 extern bool komodo_dailysnapshot(int32_t height);
 extern int32_t HUSH_LOADINGBLOCKS;
 extern char SMART_CHAIN_SYMBOL[];
-extern int32_t KOMODO_SNAPSHOT_INTERVAL;
+extern int32_t HUSH_SNAPSHOT_INTERVAL;
 extern void komodo_init(int32_t height);
 
 #ifdef ENABLE_WALLET
@@ -1800,7 +1800,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     break;
                 }
                 
-                if ( ASSETCHAINS_CC != 0 && KOMODO_SNAPSHOT_INTERVAL != 0 && chainActive.Height() >= KOMODO_SNAPSHOT_INTERVAL )
+                if ( ASSETCHAINS_CC != 0 && HUSH_SNAPSHOT_INTERVAL != 0 && chainActive.Height() >= HUSH_SNAPSHOT_INTERVAL )
                 {
                     if ( !komodo_dailysnapshot(chainActive.Height()) )
                     {
