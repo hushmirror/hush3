@@ -2024,7 +2024,7 @@ void GetKomodoEarlytxidScriptPub()
         StartShutdown();
         return;
     }
-    if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && KOMODO_SNAPSHOT_INTERVAL == 0 )
+    if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && HUSH_SNAPSHOT_INTERVAL == 0 )
     {
         fprintf(stderr, "Prices->paymentsCC contract must have -ac_snapshot enabled to pay out.\n");
         StartShutdown();
