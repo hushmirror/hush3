@@ -544,7 +544,7 @@ unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
     LogPrint("pow", "After:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString());
 
     if(fDebug)
-        fprintf(stderr,"%s: nbits=%u\n",__func__,nbits);
+        fprintf(stderr,"%s: nbits=%u\n",__func__,bnNew.GetCompact());
     return bnNew.GetCompact();
 }
 

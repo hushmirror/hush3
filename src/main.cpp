@@ -5234,16 +5234,32 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     int nHeight = pindexPrev->GetHeight()+1;
 
+    bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
     // Check Proof-of-Work
-    if ( (SMART_CHAIN_SYMBOL[0] != 0 || nHeight < 235300 || nHeight > 236000) && block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams)) {
-        cout << "Incorrect Proof-of-Work! " << 
-            block.nBits << " block.nBits vs. calc " <<
-            GetNextWorkRequired(pindexPrev, &block, consensusParams) <<
-            " for height " << nHeight << " " << 
-            block.GetHash().ToString() << " with time " <<
-            block.GetBlockTime() <<  endl;
+    if(ishush3) {
+        unsigned int nNextWork = GetNextWorkRequired(pindexPrev, &block, consensusParams);
+        unsigned int diffbits  = nNextWork > block.nBits ? nNextWork-block.nBits : block.nBits-nNextWork;
 
-        return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
+        // The change of blocktime from 150s to 75s seems to have messed up our difficulty calc
+        if ((nHeight < 340000 || nHeight > 342500) && block.nBits != nNextWork) {
+            cout << "Incorrect HUSH Proof-of-Work at height " << nHeight << " " << block.nBits << " block.nBits vs. calc " <<
+                    nNextWork << " " << block.GetHash().ToString() << " @ " << block.GetBlockTime() <<  endl;
+
+                return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d diffbits=%u", __func__, nHeight, diffbits), REJECT_INVALID, "bad-diffbits");
+        } else {
+            fprintf(stderr,"%s: Ignoring weird nBits %u with diffbits %u for height %d\n", __func__, block.nBits, diffbits, nHeight);
+        }
+    } else {
+        // TODO: unify this with the code above
+        if ( block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams)) {
+            cout << "Incorrect Proof-of-Work! " << block.nBits << " block.nBits vs. calc " <<
+                    GetNextWorkRequired(pindexPrev, &block, consensusParams) <<
+                    " for height " << nHeight << " " <<
+                    block.GetHash().ToString() << " with time " <<
+                    block.GetBlockTime() <<  endl;
+
+            return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
+        }
     }
 
     // Check timestamp against prev
@@ -5409,7 +5425,7 @@ bool AcceptBlockHeader(int32_t *futureblockp,const CBlockHeader& block, CValidat
         return false;
     }
     if(fDebug) {
-        fprintf(stderr,"%s: ContextualCheckBlockHeader passed\n", hash.ToString());
+        fprintf(stderr,"%s: ContextualCheckBlockHeader passed: %s\n", __func__, hash.ToString().c_str());
     }
     if (pindex == NULL)
     {
