@@ -668,7 +668,7 @@ bool komodo_dailysnapshot(int32_t height)
     // Under heavy reorg attack, its possible `hush_notarized_height` can return a height that can't be found on chain sync.
     // However, the DB can reorg the last notarization. By using 2 deep, we know 100% that the previous notarization cannot be reorged by online nodes,
     // and as such will always be notarizing the same height. May need to check heights on scan back to make sure they are confirmed in correct order.
-    if ( (extraoffset= height % KOMODO_SNAPSHOT_INTERVAL) != 0 )
+    if ( (extraoffset= height % HUSH_SNAPSHOT_INTERVAL) != 0 )
     {
         // we are on chain init, and need to scan all the way back to the correct height, other wise our node will have a diffrent snapshot to online nodes.
         // use the notarizationsDB to scan back from the consesnus height to get the offset we need.
@@ -3227,7 +3227,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     const CChainParams& chainparams = Params();
     if ( HUSH_NSPV_SUPERLITE )
         return(true);
-    if ( KOMODO_STOPAT != 0 && pindex->GetHeight() > KOMODO_STOPAT )
+    if ( HUSH_STOPAT != 0 && pindex->GetHeight() > HUSH_STOPAT )
         return(false);
     //fprintf(stderr,"connectblock ht.%d\n",(int32_t)pindex->GetHeight());
     AssertLockHeld(cs_main);
@@ -4117,7 +4117,7 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *
             komodo_pricesupdate(pindexNew->GetHeight(),pblock);
         if ( ASSETCHAINS_SAPLING <= 0 && pindexNew->nTime > KOMODO_SAPLING_ACTIVATION - 24*3600 )
             komodo_activate_sapling(pindexNew);
-        if ( ASSETCHAINS_CC != 0 && KOMODO_SNAPSHOT_INTERVAL != 0 && (pindexNew->GetHeight() % KOMODO_SNAPSHOT_INTERVAL) == 0 && pindexNew->GetHeight() >= KOMODO_SNAPSHOT_INTERVAL )
+        if ( ASSETCHAINS_CC != 0 && HUSH_SNAPSHOT_INTERVAL != 0 && (pindexNew->GetHeight() % HUSH_SNAPSHOT_INTERVAL) == 0 && pindexNew->GetHeight() >= HUSH_SNAPSHOT_INTERVAL )
         {
             uint64_t start = time(NULL);
             if ( !komodo_dailysnapshot(pindexNew->GetHeight()) )
