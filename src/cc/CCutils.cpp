@@ -172,7 +172,7 @@ bool CheckTxFee(const CTransaction &tx, uint64_t txfee, uint32_t height, uint64_
 
 uint32_t GetLatestTimestamp(int32_t height)
 {
-    if ( KOMODO_NSPV_SUPERLITE ) return ((uint32_t)NSPV_blocktime(height));
+    if ( HUSH_NSPV_SUPERLITE ) return ((uint32_t)NSPV_blocktime(height));
     return(komodo_heightstamp(height));
 } // :P
 
@@ -451,7 +451,7 @@ extern uint32_t NSPV_logintime;
 bool Myprivkey(uint8_t myprivkey[])
 {
     char coinaddr[64],checkaddr[64]; std::string strAddress; char *dest; int32_t i,n; CBitcoinAddress address; CKeyID keyID; CKey vchSecret; uint8_t buf33[33];
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         if ( NSPV_logintime == 0 || time(NULL) > NSPV_logintime+NSPV_AUTOLOGOUT )
         {
@@ -591,7 +591,7 @@ int32_t NSPV_coinaddr_inmempool(char const *logcategory,char *coinaddr,uint8_t C
 int32_t myIs_coinaddr_inmempoolvout(char const *logcategory,char *coinaddr)
 {
     int32_t i,n; char destaddr[64];
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
         return(NSPV_coinaddr_inmempool(logcategory,coinaddr,1));
     BOOST_FOREACH(const CTxMemPoolEntry &e,mempool.mapTx)
     {
@@ -620,7 +620,7 @@ int32_t myGet_mempool_txs(std::vector<CTransaction> &txs,uint8_t evalcode,uint8_
 {
     int i=0;
 
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         CTransaction tx; uint256 hashBlock;
 
@@ -668,7 +668,7 @@ uint256 BitcoinGetProofMerkleRoot(const std::vector<uint8_t> &proofData, std::ve
 extern struct NSPV_inforesp NSPV_inforesult;
 int32_t komodo_get_current_height()
 {
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         return (NSPV_inforesult.height);
     }
@@ -684,7 +684,7 @@ bool komodo_txnotarizedconfirmed(uint256 txid)
     CBlockIndex *pindex;    
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
 
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         if ( NSPV_myGetTransaction(txid,tx,hashBlock,txheight,currentheight) == 0 )
         {

@@ -18,16 +18,16 @@
  ******************************************************************************/
 
 #include "consensus/upgrades.h"
-extern int32_t KOMODO_NSPV;
+extern int32_t HUSH_NSPV;
 #define NSPV_BRANCHID 0x76b809bb
 
-#ifndef KOMODO_NSPV_FULLNODE
-#define KOMODO_NSPV_FULLNODE (KOMODO_NSPV <= 0)
-#endif // !KOMODO_NSPV_FULLNODE
+#ifndef HUSH_NSPV_FULLNODE
+#define HUSH_NSPV_FULLNODE (HUSH_NSPV <= 0)
+#endif // !HUSH_NSPV_FULLNODE
 
-#ifndef KOMODO_NSPV_SUPERLITE
-#define KOMODO_NSPV_SUPERLITE (KOMODO_NSPV > 0)
-#endif // !KOMODO_NSPV_SUPERLITE
+#ifndef HUSH_NSPV_SUPERLITE
+#define HUSH_NSPV_SUPERLITE (HUSH_NSPV > 0)
+#endif // !HUSH_NSPV_SUPERLITE
 
 /**
  * General information about each network upgrade.
@@ -109,7 +109,7 @@ int CurrentEpoch(int nHeight, const Consensus::Params& params) {
 
 uint32_t CurrentEpochBranchId(int nHeight, const Consensus::Params& params)
 {
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
         return(NSPV_BRANCHID);
     return NetworkUpgradeInfo[CurrentEpoch(nHeight, params)].nBranchId;
 }

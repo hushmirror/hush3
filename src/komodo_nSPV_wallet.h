@@ -14,8 +14,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef KOMODO_NSPVWALLET_H
-#define KOMODO_NSPVWALLET_H
+#ifndef HUSH_NSPVWALLET_H
+#define HUSH_NSPVWALLET_H
 
 // nSPV wallet uses superlite functions (and some komodod built in functions) to implement nSPV_spend
 extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
@@ -537,4 +537,4 @@ void NSPV_CCtxids(std::vector<uint256> &txids,char *coinaddr,bool ccflag, uint8_
     for(int i=0;i<NSPV_mempoolresult.numtxids;i++) txids.push_back(NSPV_mempoolresult.txids[i]);
 }
 
-#endif // KOMODO_NSPVWALLET_H
+#endif // HUSH_NSPVWALLET_H

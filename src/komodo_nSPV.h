@@ -23,8 +23,8 @@
 // make sure no files are updated (this is to allow nSPV=1 and later nSPV=0 without affecting database)
 // bug: under load, fullnode was returning all 0 nServices
 
-#ifndef KOMODO_NSPV_H
-#define KOMODO_NSPV_H
+#ifndef HUSH_NSPV_H
+#define HUSH_NSPV_H
 
 int32_t dragon_rwbuf(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *buf)
 {
@@ -599,4 +599,4 @@ int32_t NSPV_notarizationextract(int32_t verifyntz,int32_t *ntzheightp,uint256 *
         }
     } else return(-1);
 }
-#endif // KOMODO_NSPV_H
+#endif // HUSH_NSPV_H

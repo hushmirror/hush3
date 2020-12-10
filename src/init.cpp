@@ -1220,7 +1220,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     RegisterAllCoreRPCCommands(tableRPC);
 #ifdef ENABLE_WALLET
     bool fDisableWallet = GetBoolArg("-disablewallet", false);
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         fDisableWallet = true;
         nLocalServices = 0;
@@ -1302,7 +1302,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // Option to startup with mocktime set (used for regression testing):
     SetMockTime(GetArg("-mocktime", 0)); // SetMockTime(0) is a no-op
 
-    if ( KOMODO_NSPV_FULLNODE )
+    if ( HUSH_NSPV_FULLNODE )
     {
         if (GetBoolArg("-peerbloomfilters", true))
             nLocalServices |= NODE_BLOOM;
@@ -1458,7 +1458,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
 	//fprintf(stderr,"%s tik15\n", __FUNCTION__);
 
-    if ( KOMODO_NSPV_FULLNODE )
+    if ( HUSH_NSPV_FULLNODE )
     {
         // Initialize Zcash circuit parameters
         ZC_LoadParams(chainparams);
@@ -1650,7 +1650,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     }
 #endif
 
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         std::vector<boost::filesystem::path> vImportFiles;
         threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));
@@ -2117,7 +2117,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             PruneAndFlush();
         }
     }
-    if ( KOMODO_NSPV == 0 )
+    if ( HUSH_NSPV == 0 )
     {
         if ( GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX) != 0 )
             nLocalServices |= NODE_ADDRINDEX;

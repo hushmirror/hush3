@@ -568,14 +568,14 @@ void CNode::CloseSocketDisconnect()
         vRecvMsg.clear();
 }
 
-extern int32_t KOMODO_NSPV;
-#ifndef KOMODO_NSPV_FULLNODE
-#define KOMODO_NSPV_FULLNODE (KOMODO_NSPV <= 0)
-#endif // !KOMODO_NSPV_FULLNODE
+extern int32_t HUSH_NSPV;
+#ifndef HUSH_NSPV_FULLNODE
+#define HUSH_NSPV_FULLNODE (HUSH_NSPV <= 0)
+#endif // !HUSH_NSPV_FULLNODE
 
-#ifndef KOMODO_NSPV_SUPERLITE
-#define KOMODO_NSPV_SUPERLITE (KOMODO_NSPV > 0)
-#endif // !KOMODO_NSPV_SUPERLITE
+#ifndef HUSH_NSPV_SUPERLITE
+#define HUSH_NSPV_SUPERLITE (HUSH_NSPV > 0)
+#endif // !HUSH_NSPV_SUPERLITE
 
 void CNode::PushVersion()
 {
@@ -591,7 +591,7 @@ void CNode::PushVersion()
         LogPrint("net", "send version message: version %d, blocks=%d, us=%s, peer=%d\n", PROTOCOL_VERSION, nBestHeight, addrMe.ToString(), id);
     PushMessage("version", PROTOCOL_VERSION, nLocalServices, nTime, addrYou, addrMe,
                 nLocalHostNonce, strSubVersion, nBestHeight, true);
-//fprintf(stderr,"KOMODO_NSPV.%d PUSH services.%llx\n",KOMODO_NSPV,(long long)nLocalServices);
+//fprintf(stderr,"HUSH_NSPV.%d PUSH services.%llx\n",HUSH_NSPV,(long long)nLocalServices);
 }
 
 
@@ -2106,7 +2106,7 @@ bool StopNode()
         for (int i=0; i<MAX_OUTBOUND_CONNECTIONS; i++)
             semOutbound->post();
 
-    if (KOMODO_NSPV_FULLNODE && fAddressesInitialized)
+    if (HUSH_NSPV_FULLNODE && fAddressesInitialized)
     {
         DumpAddresses();
         fAddressesInitialized = false;

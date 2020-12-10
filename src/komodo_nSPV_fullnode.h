@@ -14,8 +14,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef KOMODO_NSPVFULLNODE_H
-#define KOMODO_NSPVFULLNODE_H
+#ifndef HUSH_NSPVFULLNODE_H
+#define HUSH_NSPVFULLNODE_H
 
 // NSPV_get... functions need to return the exact serialized length, which is the size of the structure minus size of pointers, plus size of allocated data
 
@@ -1227,4 +1227,4 @@ void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a req
     }
 }
 
-#endif // KOMODO_NSPVFULLNODE_H
+#endif // HUSH_NSPVFULLNODE_H

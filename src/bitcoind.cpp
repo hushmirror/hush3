@@ -80,7 +80,7 @@ void WaitForShutdown(boost::thread_group* threadGroup)
         //fprintf(stderr,"call passport iteration\n");
         if ( SMART_CHAIN_SYMBOL[0] == 0 )
         {
-            if ( KOMODO_NSPV_FULLNODE )
+            if ( HUSH_NSPV_FULLNODE )
                 hush_passport_iteration();
             for (i=0; i<10; i++)
             {

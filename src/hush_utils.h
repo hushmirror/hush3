@@ -1770,7 +1770,7 @@ void hush_args(char *argv0)
     FILE *fp; uint64_t val; uint16_t port; int32_t i,nonz=0,baseid,len,n,extralen = 0; uint64_t ccenables[256], ccEnablesHeight[512] = {0}; CTransaction earlytx; uint256 hashBlock;
 
     IS_HUSH_NOTARY = GetBoolArg("-notary", false);
-    KOMODO_NSPV = GetArg("-nSPV",0);
+    HUSH_NSPV = GetArg("-nSPV",0);
     memset(ccenables,0,sizeof(ccenables));
     memset(disablebits,0,sizeof(disablebits));
     memset(ccEnablesHeight,0,sizeof(ccEnablesHeight));

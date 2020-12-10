@@ -641,7 +641,7 @@ bool OraclesDataValidate(struct CCcontract_info *cp,Eval* eval,const CTransactio
 
 /*nt32_t GetLatestTimestamp(int32_t height)
 {
-    if ( KOMODO_NSPV_SUPERLITE ) return (NSPV_blocktime(height));
+    if ( HUSH_NSPV_SUPERLITE ) return (NSPV_blocktime(height));
     return(komodo_heightstamp(height));
 } */
 

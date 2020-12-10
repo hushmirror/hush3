@@ -68,7 +68,7 @@ extern struct NSPV_inforesp NSPV_inforesult;
 int32_t komodo_currentheight()
 {
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         return (NSPV_inforesult.height);
     }
