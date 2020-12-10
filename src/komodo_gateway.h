@@ -1474,7 +1474,7 @@ void hush_passport_iteration()
             {
                 refsp->RTmask &= ~(1LL << baseid);
                 hush_statefname(fname,baseid<32?base:(char *)"",(char *)"hushstate");
-                komodo_nameset(symbol,dest,base);
+                hush_nameset(symbol,dest,base);
                 sp = hush_stateptrget(symbol);
                 n = 0;
                 if ( lastpos[baseid] == 0 && (filedata= OS_fileptr(&datalen,fname)) != 0 )
