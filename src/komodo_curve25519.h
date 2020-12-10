@@ -1,3 +1,6 @@
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -13,8 +16,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef H_KOMODO25519_H
-#define H_KOMODO25519_H
+#ifndef H_HUSH25519_H
+#define H_HUSH25519_H
 // derived from curve25519_donna
 
 #include <stdint.h>
