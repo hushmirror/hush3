@@ -406,7 +406,7 @@ bool PaymentsValidate(struct CCcontract_info *cp,Eval* eval,const CTransaction &
                 else if ( funcid == 'S' || funcid == 'O' )
                 {
                     // snapshot payment
-                    if ( KOMODO_SNAPSHOT_INTERVAL == 0 )
+                    if ( HUSH_SNAPSHOT_INTERVAL == 0 )
                         return(eval->Invalid("snapshots not activated on this chain"));
                     if ( vAddressSnapshot.size() == 0 )
                         return(eval->Invalid("need first snapshot"));
@@ -1220,7 +1220,7 @@ UniValue PaymentsAirdrop(struct CCcontract_info *cp,char *jsonstr)
     UniValue result(UniValue::VOBJ); 
     uint256 hashBlock; CTransaction tx; CPubKey Paymentspk,mypk; char markeraddr[64]; std::string rawtx; 
     int32_t lockedblocks,minrelease,top,bottom,n,i,minimum=10000; std::vector<std::vector<uint8_t>> excludeScriptPubKeys; int8_t fixedAmount;
-    if ( KOMODO_SNAPSHOT_INTERVAL == 0 )
+    if ( HUSH_SNAPSHOT_INTERVAL == 0 )
     {
         result.push_back(Pair("result","error"));
         result.push_back(Pair("error","cannot use airdrop wihtout -ac_snapshot set."));
