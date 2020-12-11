@@ -562,7 +562,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
             *specialtxp = 1;
             //printf(">>>>>>>> ");
         }
-        else if ( komodo_chosennotary(&nid,height,scriptbuf + 1,timestamp) >= 0 )
+        else if ( hush_chosennotary(&nid,height,scriptbuf + 1,timestamp) >= 0 )
         {
             //printf("found notary.k%d\n",k);
             if ( notaryid < 64 )

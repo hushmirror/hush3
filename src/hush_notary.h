@@ -194,14 +194,14 @@ void komodo_notarysinit(int32_t origheight,uint8_t pubkeys[64][33],int32_t num)
         hwmheight = origheight;
 }
 
-int32_t komodo_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp)
+int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp)
 {
     // -1 if not notary, 0 if notary, 1 if special notary
     struct knotary_entry *kp; int32_t numnotaries=0,htind,modval = -1;
     *notaryidp = -1;
     if ( height < 0 )//|| height >= KOMODO_MAXBLOCKS )
     {
-        printf("komodo_chosennotary ht.%d illegal\n",height);
+        printf("hush_chosennotary ht.%d illegal\n",height);
         return(-1);
     }
     if ( height >= KOMODO_NOTARIES_HARDCODED || SMART_CHAIN_SYMBOL[0] != 0 )

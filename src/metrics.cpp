@@ -1,8 +1,7 @@
-// Copyright (c) 2016 The Zcash developers
 // Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016 The Zcash developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,9 +16,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "metrics.h"
-
 #include "chainparams.h"
 #include "checkpoints.h"
 #include "main.h"
@@ -28,7 +25,6 @@
 #include "utiltime.h"
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
-
 #include <boost/thread.hpp>
 #include <boost/thread/synchronized_value.hpp>
 #include <string>
@@ -39,7 +35,6 @@
 #include <sys/ioctl.h>
 #endif
 #include <unistd.h>
-
 #include "hush_defs.h"
 int64_t komodo_block_unlocktime(uint32_t nHeight);
 
@@ -362,10 +357,8 @@ int printMetrics(size_t cols, bool mining)
                 if (mapBlockIndex.count(hash) > 0 &&
                         chainActive.Contains(mapBlockIndex[hash])) {
                     int height = mapBlockIndex[hash]->GetHeight();
+                    //TODO: this likely has bugz
                     CAmount subsidy = GetBlockSubsidy(height, consensusParams);
-                    if ((height > 0) && (height <= consensusParams.GetLastFoundersRewardBlockHeight())) {
-                        subsidy -= subsidy/5;
-                    }
 
                     if ((std::max(0, COINBASE_MATURITY - (tipHeight - height)) > 0) ||
                         (tipHeight < komodo_block_unlocktime(height) && subsidy >= ASSETCHAINS_TIMELOCKGTE)) {

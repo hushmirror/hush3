@@ -389,7 +389,8 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         return nProofOfWorkLimit;
 
     bool fNegative,fOverflow; int32_t zawyflag = 0; arith_uint256 easy,origtarget,bnAvg {bnTot / params.nPowAveragingWindow};
-    nbits = CalculateNextWorkRequired(bnAvg, pindexLast->GetMedianTimePast(), pindexFirst->GetMedianTimePast(), params);
+    nbits = CalculateNextWorkRequired(bnAvg, pindexLast->GetMedianTimePast(), pindexFirst->GetMedianTimePast(), params, height);
+
     if ( ASSETCHAINS_ADAPTIVEPOW > 0 )
     {
         bnTarget = arith_uint256().SetCompact(nbits);
@@ -504,23 +505,42 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     return(nbits);
 }
 
+// Changing this requires changing many other things and
+// changes consensus. Have fun -- Duke
+int64_t AveragingWindowTimespan(int32_t height) {
+    int64_t AWT = 2550;
+    if (height >= 340000) {
+        //trying to emulate 3.5.0 behavior
+        //AWT = 1275;
+    }
+    // TODO: 
+    //if (height >= XXX){
+    //    AWT = 1275;
+    //}
+    return AWT;
+}
+
 unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
                                        int64_t nLastBlockTime, int64_t nFirstBlockTime,
-                                       const Consensus::Params& params)
+                                       const Consensus::Params& params,
+                                       int32_t height)
 {
-    // Limit adjustment step
-    // Use medians to prevent time-warp attacks
+    // Limit adjustment step and use medians to prevent time-warp attacks
     int64_t nActualTimespan = nLastBlockTime - nFirstBlockTime;
     LogPrint("pow", "  nActualTimespan = %d  before dampening\n", nActualTimespan);
-    nActualTimespan = params.AveragingWindowTimespan() + (nActualTimespan - params.AveragingWindowTimespan())/4;
+    int64_t AWT = AveragingWindowTimespan(height) ;
+    nActualTimespan = AWT + (nActualTimespan - AWT)/4;
     LogPrint("pow", "  nActualTimespan = %d  before bounds\n", nActualTimespan);
 
-    if ( ASSETCHAINS_ADAPTIVEPOW <= 0 )
-    {
-        if (nActualTimespan < params.MinActualTimespan())
+    if ( ASSETCHAINS_ADAPTIVEPOW <= 0 ) {
+        if (nActualTimespan < params.MinActualTimespan()) {
+            fprintf(stderr,"%s: Adjusting nActualTimespan up to min value %li\n", __func__, params.MinActualTimespan() );
             nActualTimespan = params.MinActualTimespan();
-        if (nActualTimespan > params.MaxActualTimespan())
+        }
+        if (nActualTimespan > params.MaxActualTimespan()) {
+            fprintf(stderr,"%s: Adjusting nActualTimespan down to max value %li\n", __func__, params.MaxActualTimespan() );
             nActualTimespan = params.MaxActualTimespan();
+        }
     }
     // Retarget
     arith_uint256 bnLimit;
@@ -531,7 +551,7 @@ unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
 
     const arith_uint256 bnPowLimit = bnLimit; //UintToArith256(params.powLimit);
     arith_uint256 bnNew {bnAvg};
-    bnNew /= params.AveragingWindowTimespan();
+    bnNew /= AWT;
     bnNew *= nActualTimespan;
 
     if (bnNew > bnPowLimit)
@@ -539,15 +559,19 @@ unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
 
     /// debug print
     LogPrint("pow", "GetNextWorkRequired RETARGET\n");
-    LogPrint("pow", "params.AveragingWindowTimespan() = %d    nActualTimespan = %d\n", params.AveragingWindowTimespan(), nActualTimespan);
+    LogPrint("pow", "AveragingWindowTimespan = %d nActualTimespan = %d\n", AWT, nActualTimespan);
     LogPrint("pow", "Current average: %08x  %s\n", bnAvg.GetCompact(), bnAvg.ToString());
     LogPrint("pow", "After:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString());
-
-    if(fDebug)
-        fprintf(stderr,"%s: nbits=%u\n",__func__,bnNew.GetCompact());
+    //if(fDebug) {
+    fprintf(stderr, "%s: nbits Current average: %08x  %s\n", __func__, bnAvg.GetCompact(), bnAvg.ToString().c_str());
+    fprintf(stderr, "%s: bits After:  %08x  %s\n", __func__, bnNew.GetCompact(), bnNew.ToString().c_str());
+    fprintf(stderr,"%s: AWT=%lu ActualTimeSpan=%li MinActual=%li MaxActual=%li\n",__func__, AWT, nActualTimespan, params.MinActualTimespan(), params.MaxActualTimespan());
+    //}
     return bnNew.GetCompact();
 }
 
+// HUSH does not use these functions but Hush Smart Chains can opt-in to using more bleeding edge DAA's
+// ASIC chains do not need these protections as much -- Duke Leto
 unsigned int lwmaGetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
     return lwmaCalculateNextWorkRequired(pindexLast, params);
@@ -564,7 +588,6 @@ unsigned int lwmaCalculateNextWorkRequired(const CBlockIndex* pindexLast, const 
     unsigned int nProofOfWorkLimit = bnLimit.GetCompact();
     
     //printf("PoWLimit: %u\n", nProofOfWorkLimit);
-
     // Find the first block in the averaging interval as we total the linearly weighted average
     const CBlockIndex* pindexFirst = pindexLast;
     const CBlockIndex* pindexNext;
@@ -652,7 +675,7 @@ bool CheckEquihashSolution(const CBlockHeader *pblock, const CChainParams& param
     return true;
 }
 
-int32_t komodo_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
+int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
 int32_t komodo_is_special(uint8_t pubkeys[66][33],int32_t mids[66],uint32_t blocktimes[66],int32_t height,uint8_t pubkey33[33],uint32_t blocktime);
 int32_t komodo_currentheight();
 void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
@@ -687,7 +710,7 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
     }
     if ( height > 34000 && SMART_CHAIN_SYMBOL[0] == 0 ) // 0 -> non-special notary
     {
-        special = komodo_chosennotary(&notaryid,height,pubkey33,tiptime);
+        special = hush_chosennotary(&notaryid,height,pubkey33,tiptime);
         for (i=0; i<33; i++)
         {
             if ( pubkey33[i] != 0 )
