@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -949,9 +949,7 @@ int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endian
             case 4: *(uint32_t *)endianedp = (uint32_t)x; break;
             case 8: *(uint64_t *)endianedp = (uint64_t)x; break;
         }
-    }
-    else
-    {
+    } else {
         x = 0;
         switch ( len )
         {
@@ -1443,12 +1441,12 @@ uint16_t komodo_userpass(char *userpass,char *symbol)
 {
     FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[HUSH_SMART_CHAIN_MAXLEN];
     userpass[0] = 0;
-    if ( strcmp("KMD",symbol) == 0 )
+    if ( strcmp("SPECIAL",symbol) == 0 )
     {
 #ifdef __APPLE__
-        sprintf(confname,"Komodo.conf");
+        sprintf(confname,"Something.conf");
 #else
-        sprintf(confname,"komodo.conf");
+        sprintf(confname,"Something.conf");
 #endif
     }
     else sprintf(confname,"%s.conf",symbol);
@@ -1464,11 +1462,11 @@ uint16_t komodo_userpass(char *userpass,char *symbol)
     return(port);
 }
 
-uint32_t komodo_assetmagic(char *symbol,uint64_t supply,uint8_t *extraptr,int32_t extralen)
+#define HUSH_MAGIC 0xd394d36e
+
+uint32_t hush_smartmagic(char *symbol,uint64_t supply,uint8_t *extraptr,int32_t extralen)
 {
     uint8_t buf[512]; uint32_t crc0=0; int32_t len = 0; bits256 hash;
-    if ( strcmp(symbol,"KMD") == 0 )
-        return(0x8de4eef9);
     len = dragon_rwnum(1,&buf[len],sizeof(supply),(void *)&supply);
     strcpy((char *)&buf[len],symbol);
     len += strlen(symbol);
@@ -1476,55 +1474,50 @@ uint32_t komodo_assetmagic(char *symbol,uint64_t supply,uint8_t *extraptr,int32_
     {
         vcalc_sha256(0,hash.bytes,extraptr,extralen);
         crc0 = hash.uints[0];
+        fprintf(stderr,"HUSH raw magic=");
         int32_t i; for (i=0; i<extralen; i++)
             fprintf(stderr,"%02x",extraptr[i]);
-        fprintf(stderr," extralen.%d crc0.%x\n",extralen,crc0);
+        fprintf(stderr," extralen=%d crc0=%x\n",extralen,crc0);
     }
     return(calc_crc32(crc0,buf,len));
 }
 
-uint16_t komodo_assetport(uint32_t magic,int32_t extralen)
+uint16_t hush_smartport(uint32_t magic,int32_t extralen)
 {
-    if ( magic == 0x8de4eef9 )
-        return(7770);
-    else if ( extralen == 0 )
+    if(fDebug)
+        fprintf(stderr,"%s: extralen=%d\n",__func__,extralen);
+
+    if ( extralen == 0 )
         return(8000 + (magic % 7777));
     else return(16000 + (magic % 49500));
 }
 
-uint16_t komodo_port(char *symbol,uint64_t supply,uint32_t *magicp,uint8_t *extraptr,int32_t extralen)
+// DUKE: extralen is sometimes wrong which causes wrong diffbits?
+// This function is only called on startup, blocktime changing code does not modify magic
+// Hush 3.5.x and Hush 3.6.x have same history and p2p ports, but different magic??? Seems not.
+uint16_t hush_port(char *symbol,uint64_t supply,uint32_t *magicp,uint8_t *extraptr,int32_t extralen)
 {
-    if ( symbol == 0 || symbol[0] == 0 || strcmp("KMD",symbol) == 0 )
+    if(fDebug)
+        fprintf(stderr,"%s: extralen=%d\n",__func__,extralen);
+    if ( strcmp("SPECIAL",symbol) == 0 )
     {
-        *magicp = 0x8de4eef9;
-        return(7770);
+        *magicp = 0xdeadbeef;
+        return(6969);
     }
-    *magicp = komodo_assetmagic(symbol,supply,extraptr,extralen);
-    return(komodo_assetport(*magicp,extralen));
+    *magicp = hush_smartmagic(symbol,supply,extraptr,extralen);
+    if(fDebug)
+        fprintf(stderr,"%s: extralen=%d, supply=%lu\n",__func__,extralen, supply);
+
+    return(hush_smartport(*magicp,extralen));
 }
 
-/*void komodo_ports(uint16_t ports[MAX_CURRENCIES])
-{
-    int32_t i; uint32_t magic;
-    for (i=0; i<MAX_CURRENCIES; i++)
-    {
-        ports[i] = komodo_port(CURRENCIES[i],10,&magic);
-        printf("%u ",ports[i]);
-    }
-    printf("ports\n");
-}*/
-
-char *dragonfmtstr = (char *)"curl --url \"http://127.0.0.1:7776\" --data \"{\\\"conf\\\":\\\"%s.conf\\\",\\\"path\\\":\\\"${HOME#\"/\"}/.komodo/%s\\\",\\\"unitval\\\":\\\"20\\\",\\\"zcash\\\":1,\\\"RELAY\\\":-1,\\\"VALIDATE\\\":0,\\\"prefetchlag\\\":-1,\\\"poll\\\":100,\\\"active\\\":1,\\\"agent\\\":\\\"dragon\\\",\\\"method\\\":\\\"addcoin\\\",\\\"startpend\\\":4,\\\"endpend\\\":4,\\\"services\\\":129,\\\"maxpeers\\\":8,\\\"newcoin\\\":\\\"%s\\\",\\\"name\\\":\\\"%s\\\",\\\"hasheaders\\\":1,\\\"useaddmultisig\\\":0,\\\"netmagic\\\":\\\"%s\\\",\\\"p2p\\\":%u,\\\"rpc\\\":%u,\\\"pubval\\\":60,\\\"p2shval\\\":85,\\\"wifval\\\":188,\\\"txfee_satoshis\\\":\\\"10000\\\",\\\"isPoS\\\":0,\\\"minoutput\\\":10000,\\\"minconfirms\\\":2,\\\"genesishash\\\":\\\"027e3758c3a65b12aa1046462b486d0a63bfa1beae327897f56c5cfb7daaae71\\\",\\\"protover\\\":170002,\\\"genesisblock\\\":\\\"0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a000000000000000000000000000000000000000000000000000000000000000029ab5f490f0f0f200b00000000000000000000000000000000000000000000000000000000000000fd4005000d5ba7cda5d473947263bf194285317179d2b0d307119c2e7cc4bd8ac456f0774bd52b0cd9249be9d40718b6397a4c7bbd8f2b3272fed2823cd2af4bd1632200ba4bf796727d6347b225f670f292343274cc35099466f5fb5f0cd1c105121b28213d15db2ed7bdba490b4cedc69742a57b7c25af24485e523aadbb77a0144fc76f79ef73bd8530d42b9f3b9bed1c135ad1fe152923fafe98f95f76f1615e64c4abb1137f4c31b218ba2782bc15534788dda2cc08a0ee2987c8b27ff41bd4e31cd5fb5643dfe862c9a02ca9f90c8c51a6671d681d04ad47e4b53b1518d4befafefe8cadfb912f3d03051b1efbf1dfe37b56e93a741d8dfd80d576ca250bee55fab1311fc7b3255977558cdda6f7d6f875306e43a14413facdaed2f46093e0ef1e8f8a963e1632dcbeebd8e49fd16b57d49b08f9762de89157c65233f60c8e38a1f503a48c555f8ec45dedecd574a37601323c27be597b956343107f8bd80f3a925afaf30811df83c402116bb9c1e5231c70fff899a7c82f73c902ba54da53cc459b7bf1113db65cc8f6914d3618560ea69abd13658fa7b6af92d374d6eca9529f8bd565166e4fcbf2a8dfb3c9b69539d4d2ee2e9321b85b331925df195915f2757637c2805e1d4131e1ad9ef9bc1bb1c732d8dba4738716d351ab30c996c8657bab39567ee3b29c6d054b711495c0d52e1cd5d8e55b4f0f0325b97369280755b46a02afd54be4ddd9f77c22272b8bbb17ff5118fedbae2564524e797bd28b5f74f7079d532ccc059807989f94d267f47e724b3f1ecfe00ec9e6541c961080d8891251b84b4480bc292f6a180bea089fef5bbda56e1e41390d7c0e85ba0ef530f7177413481a226465a36ef6afe1e2bca69d2078712b3912bba1a99b1fbff0d355d6ffe726d2bb6fbc103c4ac5756e5bee6e47e17424ebcbf1b63d8cb90ce2e40198b4f4198689daea254307e52a25562f4c1455340f0ffeb10f9d8e914775e37d0edca019fb1b9c6ef81255ed86bc51c5391e0591480f66e2d88c5f4fd7277697968656a9b113ab97f874fdd5f2465e5559533e01ba13ef4a8f7a21d02c30c8ded68e8c54603ab9c8084ef6d9eb4e92c75b078539e2ae786ebab6dab73a09e0aa9ac575bcefb29e930ae656e58bcb513f7e3c17e079dce4f05b5dbc18c2a872b22509740ebe6a3903e00ad1abc55076441862643f93606e3dc35e8d9f2caef3ee6be14d513b2e062b21d0061de3bd56881713a1a5c17f5ace05e1ec09da53f99442df175a49bd154aa96e4949decd52fed79ccf7ccbce32941419c314e374e4a396ac553e17b5340336a1a25c22f9e42a243ba5404450b650acfc826a6e432971ace776e15719515e1634ceb9a4a35061b668c74998d3dfb5827f6238ec015377e6f9c94f38108768cf6e5c8b132e0303fb5a200368f845ad9d46343035a6ff94031df8d8309415bb3f6cd5ede9c135fdabcc030599858d803c0f85be7661c88984d88faa3d26fb0e9aac0056a53f1b5d0baed713c853c4a2726869a0a124a8a5bbc0fc0ef80c8ae4cb53636aa02503b86a1eb9836fcc259823e2692d921d88e1ffc1e6cb2bde43939ceb3f32a611686f539f8f7c9f0bf00381f743607d40960f06d347d1cd8ac8a51969c25e37150efdf7aa4c2037a2fd0516fb444525ab157a0ed0a7412b2fa69b217fe397263153782c0f64351fbdf2678fa0dc8569912dcd8e3ccad38f34f23bbbce14c6a26ac24911b308b82c7e43062d180baeac4ba7153858365c72c63dcf5f6a5b08070b730adb017aeae925b7d0439979e2679f45ed2f25a7edcfd2fb77a8794630285ccb0a071f5cce410b46dbf9750b0354aae8b65574501cc69efb5b6a43444074fee116641bb29da56c2b4a7f456991fc92b2\\\",\\\"debug\\\":0,\\\"seedipaddr\\\":\\\"%s\\\",\\\"sapling\\\":1,\\\"notarypay\\\":%i}\"";
-
-
-
-int32_t komodo_whoami(char *pubkeystr,int32_t height,uint32_t timestamp)
+int32_t hush_whoami(char *pubkeystr,int32_t height,uint32_t timestamp)
 {
     int32_t i,notaryid;
     for (i=0; i<33; i++)
         sprintf(&pubkeystr[i<<1],"%02x",NOTARY_PUBKEY33[i]);
     pubkeystr[66] = 0;
-    komodo_chosennotary(&notaryid,height,NOTARY_PUBKEY33,timestamp);
+    hush_chosennotary(&notaryid,height,NOTARY_PUBKEY33,timestamp);
     return(notaryid);
 }
 
@@ -1537,13 +1530,11 @@ char *argv0names[] = {
     (char *)"FUCKJL777", (char *)"FUCKJL777", (char *)"FUCKJL777", (char *)"FUCKJL777", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH"
 };
 
-
 // Large total supplies lead to numerical errors, beware!
 uint64_t hush_max_money()
 {
     return hush_current_supply(10000000);
 }
-
 
 // This implements the Hush Emission Curve, the miner subsidy part,
 // and must be kept in sync with hush_commision() in komoto_bitcoind.h!
@@ -1764,6 +1755,8 @@ int8_t equihash_params_possible(uint64_t n, uint64_t k)
     return(-1);
 }
 
+char *dragonfmtstr = (char *)"curl --url \"http://127.0.0.1:7776\" --data \"{\\\"conf\\\":\\\"%s.conf\\\",\\\"path\\\":\\\"${HOME#\"/\"}/.komodo/%s\\\",\\\"unitval\\\":\\\"20\\\",\\\"zcash\\\":1,\\\"RELAY\\\":-1,\\\"VALIDATE\\\":0,\\\"prefetchlag\\\":-1,\\\"poll\\\":100,\\\"active\\\":1,\\\"agent\\\":\\\"dragon\\\",\\\"method\\\":\\\"addcoin\\\",\\\"startpend\\\":4,\\\"endpend\\\":4,\\\"services\\\":129,\\\"maxpeers\\\":8,\\\"newcoin\\\":\\\"%s\\\",\\\"name\\\":\\\"%s\\\",\\\"hasheaders\\\":1,\\\"useaddmultisig\\\":0,\\\"netmagic\\\":\\\"%s\\\",\\\"p2p\\\":%u,\\\"rpc\\\":%u,\\\"pubval\\\":60,\\\"p2shval\\\":85,\\\"wifval\\\":188,\\\"txfee_satoshis\\\":\\\"10000\\\",\\\"isPoS\\\":0,\\\"minoutput\\\":10000,\\\"minconfirms\\\":2,\\\"genesishash\\\":\\\"027e3758c3a65b12aa1046462b486d0a63bfa1beae327897f56c5cfb7daaae71\\\",\\\"protover\\\":170002,\\\"genesisblock\\\":\\\"0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a000000000000000000000000000000000000000000000000000000000000000029ab5f490f0f0f200b00000000000000000000000000000000000000000000000000000000000000fd4005000d5ba7cda5d473947263bf194285317179d2b0d307119c2e7cc4bd8ac456f0774bd52b0cd9249be9d40718b6397a4c7bbd8f2b3272fed2823cd2af4bd1632200ba4bf796727d6347b225f670f292343274cc35099466f5fb5f0cd1c105121b28213d15db2ed7bdba490b4cedc69742a57b7c25af24485e523aadbb77a0144fc76f79ef73bd8530d42b9f3b9bed1c135ad1fe152923fafe98f95f76f1615e64c4abb1137f4c31b218ba2782bc15534788dda2cc08a0ee2987c8b27ff41bd4e31cd5fb5643dfe862c9a02ca9f90c8c51a6671d681d04ad47e4b53b1518d4befafefe8cadfb912f3d03051b1efbf1dfe37b56e93a741d8dfd80d576ca250bee55fab1311fc7b3255977558cdda6f7d6f875306e43a14413facdaed2f46093e0ef1e8f8a963e1632dcbeebd8e49fd16b57d49b08f9762de89157c65233f60c8e38a1f503a48c555f8ec45dedecd574a37601323c27be597b956343107f8bd80f3a925afaf30811df83c402116bb9c1e5231c70fff899a7c82f73c902ba54da53cc459b7bf1113db65cc8f6914d3618560ea69abd13658fa7b6af92d374d6eca9529f8bd565166e4fcbf2a8dfb3c9b69539d4d2ee2e9321b85b331925df195915f2757637c2805e1d4131e1ad9ef9bc1bb1c732d8dba4738716d351ab30c996c8657bab39567ee3b29c6d054b711495c0d52e1cd5d8e55b4f0f0325b97369280755b46a02afd54be4ddd9f77c22272b8bbb17ff5118fedbae2564524e797bd28b5f74f7079d532ccc059807989f94d267f47e724b3f1ecfe00ec9e6541c961080d8891251b84b4480bc292f6a180bea089fef5bbda56e1e41390d7c0e85ba0ef530f7177413481a226465a36ef6afe1e2bca69d2078712b3912bba1a99b1fbff0d355d6ffe726d2bb6fbc103c4ac5756e5bee6e47e17424ebcbf1b63d8cb90ce2e40198b4f4198689daea254307e52a25562f4c1455340f0ffeb10f9d8e914775e37d0edca019fb1b9c6ef81255ed86bc51c5391e0591480f66e2d88c5f4fd7277697968656a9b113ab97f874fdd5f2465e5559533e01ba13ef4a8f7a21d02c30c8ded68e8c54603ab9c8084ef6d9eb4e92c75b078539e2ae786ebab6dab73a09e0aa9ac575bcefb29e930ae656e58bcb513f7e3c17e079dce4f05b5dbc18c2a872b22509740ebe6a3903e00ad1abc55076441862643f93606e3dc35e8d9f2caef3ee6be14d513b2e062b21d0061de3bd56881713a1a5c17f5ace05e1ec09da53f99442df175a49bd154aa96e4949decd52fed79ccf7ccbce32941419c314e374e4a396ac553e17b5340336a1a25c22f9e42a243ba5404450b650acfc826a6e432971ace776e15719515e1634ceb9a4a35061b668c74998d3dfb5827f6238ec015377e6f9c94f38108768cf6e5c8b132e0303fb5a200368f845ad9d46343035a6ff94031df8d8309415bb3f6cd5ede9c135fdabcc030599858d803c0f85be7661c88984d88faa3d26fb0e9aac0056a53f1b5d0baed713c853c4a2726869a0a124a8a5bbc0fc0ef80c8ae4cb53636aa02503b86a1eb9836fcc259823e2692d921d88e1ffc1e6cb2bde43939ceb3f32a611686f539f8f7c9f0bf00381f743607d40960f06d347d1cd8ac8a51969c25e37150efdf7aa4c2037a2fd0516fb444525ab157a0ed0a7412b2fa69b217fe397263153782c0f64351fbdf2678fa0dc8569912dcd8e3ccad38f34f23bbbce14c6a26ac24911b308b82c7e43062d180baeac4ba7153858365c72c63dcf5f6a5b08070b730adb017aeae925b7d0439979e2679f45ed2f25a7edcfd2fb77a8794630285ccb0a071f5cce410b46dbf9750b0354aae8b65574501cc69efb5b6a43444074fee116641bb29da56c2b4a7f456991fc92b2\\\",\\\"debug\\\":0,\\\"seedipaddr\\\":\\\"%s\\\",\\\"sapling\\\":1,\\\"notarypay\\\":%i}\"";
+
 void hush_args(char *argv0)
 {
     std::string name,addn,hexstr,symbol; char *dirname,fname[512],arg0str[64],magicstr[9]; uint8_t magic[4],extrabuf[32756],disablebits[32],*extraptr=0;
@@ -1774,6 +1767,7 @@ void hush_args(char *argv0)
     memset(ccenables,0,sizeof(ccenables));
     memset(disablebits,0,sizeof(disablebits));
     memset(ccEnablesHeight,0,sizeof(ccEnablesHeight));
+
     if ( GetBoolArg("-gen", false) != 0 )
     {
         HUSH_MININGTHREADS = GetArg("-genproclimit",-1);
@@ -1787,7 +1781,8 @@ void hush_args(char *argv0)
     DONATION_PUBKEY   = GetArg("-donation", "");
     NOTARY_PUBKEY     = GetArg("-pubkey", "");
     KOMODO_DEALERNODE = GetArg("-dealer",0);
-    HUSH_TESTNODE   = GetArg("-testnode",0);
+    HUSH_TESTNODE     = GetArg("-testnode",0);
+
     if ( strlen(NOTARY_PUBKEY.c_str()) == 66 )
     {
         decode_hex(NOTARY_PUBKEY33,33,(char *)NOTARY_PUBKEY.c_str());
@@ -1801,7 +1796,7 @@ void hush_args(char *argv0)
             {
                 if ( strcmp(NOTARY_PUBKEY.c_str(),notaries_elected[hush_season-1][i][1]) == 0 )
                 {
-                    IS_HUSH_NOTARY = 1;
+                    IS_HUSH_NOTARY     = 1;
                     HUSH_MININGTHREADS = 1;
                     mapArgs ["-genproclimit"] = itostr(HUSH_MININGTHREADS);
                     fprintf(stderr,"running as notary.%d %s\n",i,notaries_elected[hush_season-1][i][0]);
@@ -1826,16 +1821,18 @@ void hush_args(char *argv0)
             }
         }
     }
-    KOMODO_STOPAT = GetArg("-stopat",0);
-    MAX_REORG_LENGTH = GetArg("-maxreorg",MAX_REORG_LENGTH);
-    WITNESS_CACHE_SIZE = MAX_REORG_LENGTH+10;
-    ASSETCHAINS_CC = GetArg("-ac_cc",0);
-    KOMODO_CCACTIVATE = GetArg("-ac_ccactivate",0);
-    ASSETCHAINS_BLOCKTIME = GetArg("-ac_blocktime",60);
-    ASSETCHAINS_PUBLIC = GetArg("-ac_public",0);
-    ASSETCHAINS_PRIVATE = GetArg("-ac_private",0);
-    KOMODO_SNAPSHOT_INTERVAL = GetArg("-ac_snapshot",0);
+    HUSH_STOPAT              = GetArg("-stopat",0);
+    MAX_REORG_LENGTH         = GetArg("-maxreorg",MAX_REORG_LENGTH);
+    WITNESS_CACHE_SIZE       = MAX_REORG_LENGTH+10;
+    ASSETCHAINS_CC           = GetArg("-ac_cc",0);
+    KOMODO_CCACTIVATE        = GetArg("-ac_ccactivate",0);
+    ASSETCHAINS_BLOCKTIME    = GetArg("-ac_blocktime",60);
+    ASSETCHAINS_PUBLIC       = GetArg("-ac_public",0);
+    ASSETCHAINS_PRIVATE      = GetArg("-ac_private",0);
+    HUSH_SNAPSHOT_INTERVAL = GetArg("-ac_snapshot",0);
     Split(GetArg("-ac_nk",""), sizeof(ASSETCHAINS_NK)/sizeof(*ASSETCHAINS_NK), ASSETCHAINS_NK, 0);
+
+    fprintf(stderr,".oO Starting HUSH Full Node with genproc=%d notary=%d\n",HUSH_MININGTHREADS, IS_HUSH_NOTARY);
     
     // -ac_ccactivateht=evalcode,height,evalcode,height,evalcode,height....
     Split(GetArg("-ac_ccactivateht",""), sizeof(ccEnablesHeight)/sizeof(*ccEnablesHeight), ccEnablesHeight, 0);
@@ -1934,8 +1931,6 @@ void hush_args(char *argv0)
             ASSETCHAINS_ENDSUBSIDY[0] = 129;
             ASSETCHAINS_ENDSUBSIDY[1] = GetArg("-z2zheight",340000);
             ASSETCHAINS_ENDSUBSIDY[2] = 2*5422111; // TODO: Fix this, twice the previous end of rewards is an estimate
-            // TODO: fill in all possible values for each halving/reward interval
-            // based on simple halving schedule
         }
         Split(GetArg("-ac_decay",""), sizeof(ASSETCHAINS_DECAY)/sizeof(*ASSETCHAINS_DECAY),  ASSETCHAINS_DECAY, 0);
         Split(GetArg("-ac_notarypay",""), sizeof(ASSETCHAINS_NOTARY_PAY)/sizeof(*ASSETCHAINS_NOTARY_PAY),  ASSETCHAINS_NOTARY_PAY, 0);
@@ -1954,29 +1949,30 @@ void hush_args(char *argv0)
             }
         }
 
-        MAX_BLOCK_SIGOPS = 60000;
-        ASSETCHAINS_TXPOW = GetArg("-ac_txpow",0) & 3;
-        ASSETCHAINS_FOUNDERS = GetArg("-ac_founders",0);// & 1;
+        MAX_BLOCK_SIGOPS            = 60000;
+        ASSETCHAINS_TXPOW           = GetArg("-ac_txpow",0) & 3;
+        ASSETCHAINS_FOUNDERS        = GetArg("-ac_founders",0);// & 1;
 		ASSETCHAINS_FOUNDERS_REWARD = GetArg("-ac_founders_reward",0);
-        ASSETCHAINS_SUPPLY = GetArg("-ac_supply",10);
+        ASSETCHAINS_SUPPLY          = GetArg("-ac_supply",10);
         if ( ASSETCHAINS_SUPPLY > (uint64_t)90*1000*1000000 )
         {
-            fprintf(stderr,"-ac_supply must be less than 90 billion\n");
+            fprintf(stderr,"-ac_supply must be less than 90 billion, derpz\n");
             StartShutdown();
         }
-        fprintf(stderr,"ASSETCHAINS_SUPPLY %llu\n",(long long)ASSETCHAINS_SUPPLY);
+        if(fDebug)
+            fprintf(stderr,"ASSETCHAINS_SUPPLY %llu\n",(long long)ASSETCHAINS_SUPPLY);
         
-        ASSETCHAINS_COMMISSION = GetArg("-ac_perc",0);
+        ASSETCHAINS_COMMISSION      = GetArg("-ac_perc",0);
         ASSETCHAINS_OVERRIDE_PUBKEY = GetArg("-ac_pubkey","");
-        ASSETCHAINS_SCRIPTPUB = GetArg("-ac_script","");
-        ASSETCHAINS_BEAMPORT = GetArg("-ac_beam",0);
-        ASSETCHAINS_CODAPORT = GetArg("-ac_coda",0);
-        ASSETCHAINS_CBOPRET = GetArg("-ac_cbopret",0);
-        ASSETCHAINS_CBMATURITY = GetArg("-ac_cbmaturity",0);
-        ASSETCHAINS_ADAPTIVEPOW = GetArg("-ac_adaptivepow",0);
-        //fprintf(stderr,"ASSETCHAINS_CBOPRET.%llx\n",(long long)ASSETCHAINS_CBOPRET);
-        if ( ASSETCHAINS_CBOPRET != 0 )
-        {
+        ASSETCHAINS_SCRIPTPUB       = GetArg("-ac_script","");
+        ASSETCHAINS_BEAMPORT        = GetArg("-ac_beam",0);
+        ASSETCHAINS_CODAPORT        = GetArg("-ac_coda",0);
+        ASSETCHAINS_CBOPRET         = GetArg("-ac_cbopret",0);
+        ASSETCHAINS_CBMATURITY      = GetArg("-ac_cbmaturity",0);
+        ASSETCHAINS_ADAPTIVEPOW     = GetArg("-ac_adaptivepow",0);
+        if(fDebug)
+            fprintf(stderr,"ASSETCHAINS_CBOPRET.%llx\n",(long long)ASSETCHAINS_CBOPRET);
+        if ( ASSETCHAINS_CBOPRET != 0 ) {
             SplitStr(GetArg("-ac_prices",""),  ASSETCHAINS_PRICES);
             if ( ASSETCHAINS_PRICES.size() > 0 )
                 ASSETCHAINS_CBOPRET |= 4;
@@ -2088,14 +2084,12 @@ void hush_args(char *argv0)
             StartShutdown();
         }
         
-
+        // HUSH will always be The First Pure Sapling Coin, no Sprout JoinSplits in our history! ;)
         ASSETCHAINS_SAPLING = GetArg("-ac_sapling", -1);
         if (ASSETCHAINS_SAPLING == -1)
         {
             ASSETCHAINS_OVERWINTER = GetArg("-ac_overwinter", -1);
-        }
-        else
-        {
+        } else {
             ASSETCHAINS_OVERWINTER = GetArg("-ac_overwinter", ASSETCHAINS_SAPLING);
         }
         if ( strlen(ASSETCHAINS_OVERRIDE_PUBKEY.c_str()) == 66 || ASSETCHAINS_SCRIPTPUB.size() > 1 )
@@ -2121,9 +2115,7 @@ void hush_args(char *argv0)
                 {
                     ASSETCHAINS_COMMISSION = 53846154; // maps to 35%
                     printf("ASSETCHAINS_COMMISSION defaulted to 35%% when founders reward active\n");
-                }
-                else
-                {
+                } else {
                     printf("ASSETCHAINS_FOUNDERS_REWARD set to %ld\n", ASSETCHAINS_FOUNDERS_REWARD);
                 }
                 /*else if ( ASSETCHAINS_SELFIMPORT.size() == 0 )
@@ -2132,9 +2124,7 @@ void hush_args(char *argv0)
                     printf("-ac_perc must be set with -ac_pubkey\n");
                 }*/
             }
-        }
-        else
-        {
+        } else {
             if ( ASSETCHAINS_COMMISSION != 0 )
             {
                 ASSETCHAINS_COMMISSION = 0;
@@ -2147,23 +2137,26 @@ void hush_args(char *argv0)
             }
         }
 
-        if ( ASSETCHAINS_ENDSUBSIDY[0] != 0 || ASSETCHAINS_REWARD[0] != 0 || ASSETCHAINS_HALVING[0] != 0 || ASSETCHAINS_DECAY[0] != 0 || ASSETCHAINS_COMMISSION != 0 || ASSETCHAINS_PUBLIC != 0 || ASSETCHAINS_PRIVATE != 0 || ASSETCHAINS_TXPOW != 0 || ASSETCHAINS_FOUNDERS != 0 || ASSETCHAINS_SCRIPTPUB.size() > 1 || ASSETCHAINS_SELFIMPORT.size() > 0 || ASSETCHAINS_OVERRIDE_PUBKEY33[0] != 0 || ASSETCHAINS_TIMELOCKGTE != _ASSETCHAINS_TIMELOCKOFF|| ASSETCHAINS_ALGO != ASSETCHAINS_EQUIHASH || ASSETCHAINS_LWMAPOS != 0 || ASSETCHAINS_LASTERA > 0 || ASSETCHAINS_BEAMPORT != 0 || ASSETCHAINS_CODAPORT != 0 || ASSETCHAINS_MARMARA != 0 || nonz > 0 || ASSETCHAINS_CCLIB.size() > 0 || ASSETCHAINS_FOUNDERS_REWARD != 0 || ASSETCHAINS_NOTARY_PAY[0] != 0 || ASSETCHAINS_BLOCKTIME != 60 || ASSETCHAINS_CBOPRET != 0 || Mineropret.size() != 0 || (ASSETCHAINS_NK[0] != 0 && ASSETCHAINS_NK[1] != 0) || KOMODO_SNAPSHOT_INTERVAL != 0 || ASSETCHAINS_EARLYTXIDCONTRACT != 0 || ASSETCHAINS_CBMATURITY != 0 || ASSETCHAINS_ADAPTIVEPOW != 0 )
+        if ( ASSETCHAINS_ENDSUBSIDY[0] != 0 || ASSETCHAINS_REWARD[0] != 0 || ASSETCHAINS_HALVING[0] != 0 || ASSETCHAINS_DECAY[0] != 0 || ASSETCHAINS_COMMISSION != 0 || ASSETCHAINS_PUBLIC != 0 || ASSETCHAINS_PRIVATE != 0 || ASSETCHAINS_TXPOW != 0 || ASSETCHAINS_FOUNDERS != 0 || ASSETCHAINS_SCRIPTPUB.size() > 1 || ASSETCHAINS_SELFIMPORT.size() > 0 || ASSETCHAINS_OVERRIDE_PUBKEY33[0] != 0 || ASSETCHAINS_TIMELOCKGTE != _ASSETCHAINS_TIMELOCKOFF|| ASSETCHAINS_ALGO != ASSETCHAINS_EQUIHASH || ASSETCHAINS_LWMAPOS != 0 || ASSETCHAINS_LASTERA > 0 || ASSETCHAINS_BEAMPORT != 0 || ASSETCHAINS_CODAPORT != 0 || ASSETCHAINS_MARMARA != 0 || nonz > 0 || ASSETCHAINS_CCLIB.size() > 0 || ASSETCHAINS_FOUNDERS_REWARD != 0 || ASSETCHAINS_NOTARY_PAY[0] != 0 || ASSETCHAINS_BLOCKTIME != 60 || ASSETCHAINS_CBOPRET != 0 || Mineropret.size() != 0 || (ASSETCHAINS_NK[0] != 0 && ASSETCHAINS_NK[1] != 0) || HUSH_SNAPSHOT_INTERVAL != 0 || ASSETCHAINS_EARLYTXIDCONTRACT != 0 || ASSETCHAINS_CBMATURITY != 0 || ASSETCHAINS_ADAPTIVEPOW != 0 )
         {
-            fprintf(stderr,"perc %.4f%% ac_pub=[%02x%02x%02x...] acsize.%d\n",dstr(ASSETCHAINS_COMMISSION)*100,ASSETCHAINS_OVERRIDE_PUBKEY33[0],ASSETCHAINS_OVERRIDE_PUBKEY33[1],ASSETCHAINS_OVERRIDE_PUBKEY33[2],(int32_t)ASSETCHAINS_SCRIPTPUB.size());
+            if(fDebug)
+                fprintf(stderr,"perc %.4f%% ac_pub=[%02x%02x%02x...] acsize.%d\n",dstr(ASSETCHAINS_COMMISSION)*100,ASSETCHAINS_OVERRIDE_PUBKEY33[0],ASSETCHAINS_OVERRIDE_PUBKEY33[1],ASSETCHAINS_OVERRIDE_PUBKEY33[2],(int32_t)ASSETCHAINS_SCRIPTPUB.size());
             extraptr = extrabuf;
             memcpy(extraptr,ASSETCHAINS_OVERRIDE_PUBKEY33,33), extralen = 33;
 
             // if we have one era, this should create the same data structure as it used to, same if we increase _MAX_ERAS
             for ( int i = 0; i <= ASSETCHAINS_LASTERA; i++ )
             {
-                printf("ERA%u: end.%llu reward.%llu halving.%llu decay.%llu notarypay.%llu\n", i,
+                if (fDebug) {
+                    printf("ERA%u: end.%llu reward.%llu halving.%llu decay.%llu notarypay.%llu\n", i,
                        (long long)ASSETCHAINS_ENDSUBSIDY[i],
                        (long long)ASSETCHAINS_REWARD[i],
                        (long long)ASSETCHAINS_HALVING[i],
                        (long long)ASSETCHAINS_DECAY[i],
                        (long long)ASSETCHAINS_NOTARY_PAY[i]);
+                }
 
-                // TODO: Verify that we don't overrun extrabuf here, which is a 256 byte buffer
+                // TODO: Verify that we don't overrun extrabuf here, which is a 32KB byte buffer
                 extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(ASSETCHAINS_ENDSUBSIDY[i]),(void *)&ASSETCHAINS_ENDSUBSIDY[i]);
                 extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(ASSETCHAINS_REWARD[i]),(void *)&ASSETCHAINS_REWARD[i]);
                 extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(ASSETCHAINS_HALVING[i]),(void *)&ASSETCHAINS_HALVING[i]);
@@ -2205,6 +2198,7 @@ void hush_args(char *argv0)
                 extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(tmp),(void *)&tmp);
                 if ( ASSETCHAINS_FOUNDERS > 1 )
                     extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(ASSETCHAINS_FOUNDERS),(void *)&ASSETCHAINS_FOUNDERS);
+                // NOTE: Hush does not use this, we use -ac_script to implement our FR -- Duke
                 if ( ASSETCHAINS_FOUNDERS_REWARD != 0 )
                 {
                     fprintf(stderr, "set founders reward.%lld\n",(long long)ASSETCHAINS_FOUNDERS_REWARD);
@@ -2232,9 +2226,10 @@ void hush_args(char *argv0)
                 extraptr[extralen++] = 'c';
             if ( ASSETCHAINS_MARMARA != 0 )
                 extraptr[extralen++] = ASSETCHAINS_MARMARA;
-fprintf(stderr,"extralen.%d before disable bits\n",extralen);
-            if ( nonz > 0 )
-            {
+
+            fprintf(stderr,"extralen.%d before disable bits\n",extralen);
+
+            if ( nonz > 0 ) {
                 memcpy(&extraptr[extralen],disablebits,sizeof(disablebits));
                 extralen += sizeof(disablebits);
             }
@@ -2247,8 +2242,12 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
                 }
                 fprintf(stderr," <- CCLIB name\n");
             }
-            if ( ASSETCHAINS_BLOCKTIME != 60 )
+            // is this not being run correctly?
+            if ( ASSETCHAINS_BLOCKTIME != 60 ) {
                 extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(ASSETCHAINS_BLOCKTIME),(void *)&ASSETCHAINS_BLOCKTIME);
+                fprintf(stderr,"%s: ASSETCHAINS_BLOCKTIME=%d, extralen=%d\n", __func__, ASSETCHAINS_BLOCKTIME, extralen);
+            }
+
             if ( Mineropret.size() != 0 )
             {
                 for (i=0; i<Mineropret.size(); i++)
@@ -2284,9 +2283,9 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
                 extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(ASSETCHAINS_NK[0]),(void *)&ASSETCHAINS_NK[0]);
                 extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(ASSETCHAINS_NK[1]),(void *)&ASSETCHAINS_NK[1]);
             }
-            if ( KOMODO_SNAPSHOT_INTERVAL != 0 )
+            if ( HUSH_SNAPSHOT_INTERVAL != 0 )
             {
-                extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(KOMODO_SNAPSHOT_INTERVAL),(void *)&KOMODO_SNAPSHOT_INTERVAL);
+                extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(HUSH_SNAPSHOT_INTERVAL),(void *)&HUSH_SNAPSHOT_INTERVAL);
             }
             if ( ASSETCHAINS_EARLYTXIDCONTRACT != 0 )
             {
@@ -2311,19 +2310,22 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
         if ( (baseid = komodo_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
         {
             //komodo_maxallowed(baseid);
-            printf("baseid.%d MAX_MONEY.%s %.8f\n",baseid,SMART_CHAIN_SYMBOL,(double)MAX_MONEY/SATOSHIDEN);
+            if(fDebug) 
+                printf("baseid.%d MAX_MONEY.%s %.8f\n",baseid,SMART_CHAIN_SYMBOL,(double)MAX_MONEY/SATOSHIDEN);
         }
 
         if ( ASSETCHAINS_CC >= HUSH_FIRSTFUNGIBLEID && MAX_MONEY < 1000000LL*SATOSHIDEN )
             MAX_MONEY = 1000000LL*SATOSHIDEN;
         if ( KOMODO_BIT63SET(MAX_MONEY) != 0 )
             MAX_MONEY = KOMODO_MAXNVALUE;
-        fprintf(stderr,"MAX_MONEY %llu %.8f\n",(long long)MAX_MONEY,(double)MAX_MONEY/SATOSHIDEN);
+        if(fDebug)
+            fprintf(stderr,"MAX_MONEY %llu %.8f\n",(long long)MAX_MONEY,(double)MAX_MONEY/SATOSHIDEN);
         //printf("baseid.%d MAX_MONEY.%s %.8f\n",baseid,SMART_CHAIN_SYMBOL,(double)MAX_MONEY/SATOSHIDEN);
-        uint16_t tmpport = komodo_port(SMART_CHAIN_SYMBOL,ASSETCHAINS_SUPPLY,&ASSETCHAINS_MAGIC,extraptr,extralen);
+        uint16_t tmpport = hush_port(SMART_CHAIN_SYMBOL,ASSETCHAINS_SUPPLY,&ASSETCHAINS_MAGIC,extraptr,extralen);
         if ( GetArg("-port",0) != 0 )
         {
             ASSETCHAINS_P2PPORT = GetArg("-port",0);
+        if(fDebug)
             fprintf(stderr,"set p2pport.%u\n",ASSETCHAINS_P2PPORT);
         } else ASSETCHAINS_P2PPORT = tmpport;
 
@@ -2343,8 +2345,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
             extern int COINBASE_MATURITY;
             if ( strcmp(SMART_CHAIN_SYMBOL,"KMD") == 0 )
             {
-                fprintf(stderr,"cant have assetchain named KMD\n");
-                StartShutdown();
+                fprintf(stderr,"Oh hellz yezzz\n");
             }
             if ( (port= komodo_userpass(ASSETCHAINS_USERPASS,SMART_CHAIN_SYMBOL)) != 0 )
                 ASSETCHAINS_RPCPORT = port;
@@ -2371,6 +2372,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
         magicstr[8] = 0;
 #ifndef FROM_CLI
         sprintf(fname,"%s_7776",SMART_CHAIN_SYMBOL);
+        // TODO: why are we doing this again? Most users do not need this
         if ( (fp= fopen(fname,"wb")) != 0 )
         {
             int8_t notarypay = 0;
@@ -2394,9 +2396,7 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
                 fprintf(stderr,"smart utxo CC contract %d will activate at height.%d\n",(int32_t)ccEnablesHeight[0],(int32_t)ccEnablesHeight[1]);
             }
         }
-    }
-    else
-    {
+    } else {
         char fname[512],username[512],password[4096]; int32_t iter; FILE *fp;
         ASSETCHAINS_P2PPORT = 7770;
         ASSETCHAINS_RPCPORT = 7771;
@@ -2439,75 +2439,20 @@ fprintf(stderr,"extralen.%d before disable bits\n",extralen);
         BITCOIND_RPCPORT = GetArg("-rpcport", ASSETCHAINS_RPCPORT);
         //fprintf(stderr,"(%s) port.%u chain params initialized\n",SMART_CHAIN_SYMBOL,BITCOIND_RPCPORT);
 
-        // Set cc enables for all existing ac_cc chains here. 
-        if ( strcmp("AXO",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            // No CCs used on this chain yet.
-            CCDISABLEALL;
-        }
-        if ( strcmp("CCL",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            // No CCs used on this chain yet. 
-            CCDISABLEALL;
-            CCENABLE(EVAL_TOKENS);
-            CCENABLE(EVAL_HEIR);
-        }
-        if ( strcmp("COQUI",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            CCDISABLEALL;
-            CCENABLE(EVAL_DICE);
-            CCENABLE(EVAL_CHANNELS);
-            CCENABLE(EVAL_ORACLES);
-            CCENABLE(EVAL_ASSETS);
-            CCENABLE(EVAL_TOKENS);
-        }
-        if ( strcmp("DION",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            // No CCs used on this chain yet. 
-            CCDISABLEALL;
-        }
-        
-        if ( strcmp("EQL",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            // No CCs used on this chain yet. 
-            CCDISABLEALL;
-        }
-        if ( strcmp("ILN",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            // No CCs used on this chain yet. 
-            CCDISABLEALL;
-        }
-        if ( strcmp("OUR",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            // No CCs used on this chain yet. 
-            CCDISABLEALL;
-        }
-        if ( strcmp("ZEXO",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            // No CCs used on this chain yet. 
-            CCDISABLEALL;
-        }
-        if ( strcmp("SEC",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            CCDISABLEALL;
-            CCENABLE(EVAL_ASSETS);
-            CCENABLE(EVAL_TOKENS);
-            CCENABLE(EVAL_ORACLES);
-        }
-        if ( strcmp("KMDICE",SMART_CHAIN_SYMBOL) == 0 )
-        {
-            CCDISABLEALL;
-            CCENABLE(EVAL_FAUCET);
-            CCENABLE(EVAL_DICE);
-            CCENABLE(EVAL_ORACLES);
+        // Set custom cc rulse for chains here
+        if ( strcmp("HUSH3",SMART_CHAIN_SYMBOL) == 0 ) {
+            // Disable all CC's
+            if(GetArg("-ac_disable_cc",false)) {
+                CCDISABLEALL;
+            }
         }
     } else BITCOIND_RPCPORT = GetArg("-rpcport", BaseParams().RPCPort());
     HUSH_DPOWCONFS = GetArg("-dpowconfs",dpowconfs);
-    if ( SMART_CHAIN_SYMBOL[0] == 0 || strcmp(SMART_CHAIN_SYMBOL,"SUPERNET") == 0 || strcmp(SMART_CHAIN_SYMBOL,"DEX") == 0 || strcmp(SMART_CHAIN_SYMBOL,"COQUI") == 0 || strcmp(SMART_CHAIN_SYMBOL,"PIRATE") == 0 || strcmp(SMART_CHAIN_SYMBOL,"KMDICE") == 0 )
+    if ( strcmp(SMART_CHAIN_SYMBOL,"CA333LIES") == 0 )
         HUSH_EXTRASATOSHI = 1;
 }
 
-void komodo_nameset(char *symbol,char *dest,char *source)
+void hush_nameset(char *symbol,char *dest,char *source)
 {
     if ( source[0] == 0 ) {
         strcpy(symbol,(char *)"HUSH3");
@@ -2521,7 +2466,7 @@ void komodo_nameset(char *symbol,char *dest,char *source)
 struct hush_state *hush_stateptrget(char *base)
 {
     int32_t baseid;
-    if ( base == 0 || base[0] == 0 || strcmp(base,(char *)"KMD") == 0 )
+    if ( base == 0 || base[0] == 0 || strcmp(base,(char *)"KYCSELLOUTS") == 0 )
         return(&KOMODO_STATES[33]);
     else if ( (baseid= komodo_baseid(base)) >= 0 )
         return(&KOMODO_STATES[baseid+1]);
@@ -2531,7 +2476,7 @@ struct hush_state *hush_stateptrget(char *base)
 struct hush_state *hush_stateptr(char *symbol,char *dest)
 {
     int32_t baseid;
-    komodo_nameset(symbol,dest,SMART_CHAIN_SYMBOL);
+    hush_nameset(symbol,dest,SMART_CHAIN_SYMBOL);
     return(hush_stateptrget(symbol));
 }
 

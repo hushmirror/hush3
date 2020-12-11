@@ -5239,14 +5239,17 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         // caused by the fact that Difficulty Adjustment Algorithms do not take into account blocktime
         // changing at run-time, which breaks assumptions in the algorithm
         unsigned int nNextWork = GetNextWorkRequired(pindexPrev, &block, consensusParams);
-        if ((nHeight < 340000 || nHeight > 342500) && block.nBits != nNextWork) {
-            cout << "Incorrect HUSH Proof-of-Work at height " << nHeight << " " << block.nBits << " block.nBits vs. calc " <<
-                    nNextWork << " " << block.GetHash().ToString() << " @ " << block.GetBlockTime() <<  endl;
-
-                return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
-        } else {
-            if( nHeight >= 340000 || nHeight <= 342500)
-                fprintf(stderr,"%s: Ignoring weird nBits with block.nBits=%u vs GetNextWorkRequired=%u for height %d\n", __func__, block.nBits, nNextWork, nHeight);
+        //if ((nHeight < 340000 || nHeight > 342500) && block.nBits != nNextWork) {
+        if (block.nBits != nNextWork) {
+            cout << "Incorrect HUSH Proof-of-Work at height " << nHeight   <<
+                " " << block.nBits << " block.nBits vs. calc "    << nNextWork <<
+                " " << block.GetHash().ToString() << " @ " << block.GetBlockTime() <<  endl;
+                // Don't use this CLI option unless you know what you are doing -- Duke
+                if(!GetArg("-dev-ignore-bad-nbits",false))  {
+                   return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
+                } else {
+                    cout << "Ignoring bad nBits!!!" << endl;
+                }
         }
     } else {
         // Hush Smart Chains

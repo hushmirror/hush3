@@ -3,7 +3,6 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,12 +17,10 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #ifndef HUSH_CONSENSUS_PARAMS_H
 #define HUSH_CONSENSUS_PARAMS_H
 
 #include "uint256.h"
-
 #include <boost/optional.hpp>
 
 int32_t MAX_BLOCK_SIZE(int32_t height);
@@ -39,7 +36,7 @@ namespace Consensus {
  * several functions depend on the enum being sorted.
  */
 enum UpgradeIndex {
-    // Sprout must be first
+    // Sprout must be first, puke
     BASE_SPROUT,
     UPGRADE_TESTDUMMY,
     UPGRADE_OVERWINTER,
@@ -77,32 +74,11 @@ struct NetworkUpgrade {
     static constexpr int NO_ACTIVATION_HEIGHT = -1;
 };
 
-/**
- * Parameters that influence chain consensus.
- */
+// Parameters that influence chain consensus.
 struct Params {
     uint256 hashGenesisBlock;
-
     bool fCoinbaseMustBeProtected;
 
-    /** Needs to evenly divide MAX_SUBSIDY to avoid rounding errors. */
-    int nSubsidySlowStartInterval;
-    /**
-     * Shift based on a linear ramp for slow start:
-     *
-     * MAX_SUBSIDY*(t_s/2 + t_r) = MAX_SUBSIDY*t_h  Coin balance
-     *              t_s   + t_r  = t_h + t_c        Block balance
-     *
-     * t_s = nSubsidySlowStartInterval
-     * t_r = number of blocks between end of slow start and first halving
-     * t_h = nSubsidyHalvingInterval
-     * t_c = SubsidySlowStartShift()
-     */
-    int SubsidySlowStartShift() const { return nSubsidySlowStartInterval / 2; }
-    int nSubsidyHalvingInterval;
-    int GetLastFoundersRewardBlockHeight() const {
-        return nSubsidyHalvingInterval + SubsidySlowStartShift() - 1;
-    }
     /** Used to check majorities for block version upgrade */
     int nMajorityEnforceBlockUpgrade;
     int nMajorityRejectBlockOutdated;
@@ -119,18 +95,15 @@ struct Params {
     int64_t nPowTargetSpacing;
     int64_t nLwmaAjustedWeight;
 
-    /* Proof of stake parameters */
-    uint256 posLimit;
-    int64_t nPOSAveragingWindow;    // can be completely different than POW and initially trying a relatively large number, like 100
-    int64_t nPOSTargetSpacing;      // spacing is 1000 units per block to get better resolution, (100 % = 1000, 50% = 2000, 10% = 10000)
-    int64_t nLwmaPOSAjustedWeight;
-
     /* applied to all block times */
     int64_t nMaxFutureBlockTime;
 
+    // NOTE: These 3 functions should not have const return values because our blocktime halved at block 340k
+    // but the entire codebase assumes Consensus::Params are const, route around the damange
     int64_t AveragingWindowTimespan() const { return nPowAveragingWindow * nPowTargetSpacing; }
     int64_t MinActualTimespan() const { return (AveragingWindowTimespan() * (100 - nPowMaxAdjustUp  )) / 100; }
     int64_t MaxActualTimespan() const { return (AveragingWindowTimespan() * (100 + nPowMaxAdjustDown)) / 100; }
+
     void SetSaplingHeight(int32_t height) { vUpgrades[Consensus::UPGRADE_SAPLING].nActivationHeight = height; }
     void SetOverwinterHeight(int32_t height) { vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight = height; }
     uint256 nMinimumChainWork;

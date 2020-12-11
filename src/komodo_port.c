@@ -764,7 +764,7 @@ int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endian
     return(len);
 }
 
-uint32_t komodo_assetmagic(char *symbol,uint64_t supply,uint8_t *extraptr,int32_t extralen)
+uint32_t hush_smartmagic(char *symbol,uint64_t supply,uint8_t *extraptr,int32_t extralen)
 {
     uint8_t buf[512]; uint32_t crc0=0; int32_t len = 0; bits256 hash;
     if ( strcmp(symbol,"KMD") == 0 )
@@ -789,14 +789,14 @@ uint16_t komodo_assetport(uint32_t magic,int32_t extralen)
     else return(16000 + (magic % 49500));
 }
 
-uint16_t komodo_port(char *symbol,uint64_t supply,uint32_t *magicp,uint8_t *extraptr,int32_t extralen)
+uint16_t hush_port(char *symbol,uint64_t supply,uint32_t *magicp,uint8_t *extraptr,int32_t extralen)
 {
     if ( symbol == 0 || symbol[0] == 0 || strcmp("KMD",symbol) == 0 )
     {
         *magicp = 0x8de4eef9;
         return(7770);
     }
-    *magicp = komodo_assetmagic(symbol,supply,extraptr,extralen);
+    *magicp = hush_smartmagic(symbol,supply,extraptr,extralen);
     return(komodo_assetport(*magicp,extralen));
 }
 
@@ -830,7 +830,7 @@ uint16_t komodo_calcport(char *name,uint64_t supply,uint64_t endsubsidy,uint64_t
         val = commission | (((uint64_t)staked & 0xff) << 32) | (((uint64_t)cc & 0xffffff) << 40);
         extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(val),(void *)&val);
     }
-    return(komodo_port(name,supply,&ASSETCHAINS_MAGIC,extraptr,extralen));
+    return(hush_port(name,supply,&ASSETCHAINS_MAGIC,extraptr,extralen));
 }
 
 int main(int argc, char * argv[])

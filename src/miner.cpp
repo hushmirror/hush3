@@ -139,7 +139,7 @@ void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uin
 
 uint32_t Mining_start,Mining_height;
 int32_t My_notaryid = -1;
-int32_t komodo_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
+int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
 int32_t komodo_pax_opreturn(int32_t height,uint8_t *opret,int32_t maxsize);
 int32_t komodo_baseid(char *origbase);
 int32_t hush_longestchain();
@@ -603,8 +603,6 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
         else blocktime = 1 + std::max((int64_t)(pindexPrev->nTime+1), GetTime());
         //pblock->nTime = blocktime + 1;
         pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
-
-        int32_t stakeHeight = chainActive.Height() + 1;
 
         LogPrintf("CreateNewBlock(): total size %u blocktime.%u nBits.%08x stake.%i\n", nBlockSize,blocktime,pblock->nBits,isStake);
         
@@ -1115,7 +1113,7 @@ void static BitcoinMiner()
             break;
     }
     if ( SMART_CHAIN_SYMBOL[0] == 0 )
-        komodo_chosennotary(&notaryid,chainActive.LastTip()->GetHeight(),NOTARY_PUBKEY33,(uint32_t)chainActive.LastTip()->GetBlockTime());
+        hush_chosennotary(&notaryid,chainActive.LastTip()->GetHeight(),NOTARY_PUBKEY33,(uint32_t)chainActive.LastTip()->GetBlockTime());
     if ( notaryid != My_notaryid )
         My_notaryid = notaryid;
     std::string solver;
@@ -1581,7 +1579,8 @@ void static BitcoinMiner()
             minerThreads = NULL;
         }
 
-        fprintf(stderr,"%s: nThreads.%d fGenerate.%d\n",__FUNCTION__, (int32_t)nThreads,fGenerate);
+        if(fDebug)
+            fprintf(stderr,"%s: nThreads.%d fGenerate.%d\n",__FUNCTION__, (int32_t)nThreads,fGenerate);
 
         if (nThreads == 0)
             return;

@@ -1,8 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,13 +17,11 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #ifndef HUSH_POW_H
 #define HUSH_POW_H
 
 #include "chain.h"
 #include "consensus/params.h"
-
 #include <stdint.h>
 
 class CBlockHeader;
@@ -35,7 +33,7 @@ class arith_uint256;
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params&);
 unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
                                        int64_t nLastBlockTime, int64_t nFirstBlockTime,
-                                       const Consensus::Params&);
+                                       const Consensus::Params&, int32_t height);
 
 /** Check whether the Equihash solution in a block header is valid */
 bool CheckEquihashSolution(const CBlockHeader *pblock, const CChainParams&);
