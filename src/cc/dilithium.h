@@ -1,143 +1,20 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <stdint.h>
 
-/*
-#ifndef CPUCYCLES_H
-#define CPUCYCLES_H
-
-#ifdef DBENCH
-#define DBENCH_START() uint64_t time = cpucycles_start()
-#define DBENCH_STOP(t) t += cpucycles_stop() - time - timing_overhead
-#else
-#define DBENCH_START()
-#define DBENCH_STOP(t)
-#endif
-
-#ifdef USE_RDPMC  // Needs echo 2 > /sys/devices/cpu/rdpmc
-#ifdef SERIALIZE_RDC
-
-static inline uint64_t cpucycles_start(void) {
-    const uint32_t ecx = (1U << 30) + 1;
-    uint64_t result;
-    
-    asm volatile("cpuid; movl %1,%%ecx; rdpmc; shlq $32,%%rdx; orq %%rdx,%%rax"
-                 : "=&a" (result) : "r" (ecx) : "rbx", "rcx", "rdx");
-    
-    return result;
-}
-
-static inline uint64_t cpucycles_stop(void) {
-    const uint32_t ecx = (1U << 30) + 1;
-    uint64_t result, dummy;
-    
-    asm volatile("rdpmc; shlq $32,%%rdx; orq %%rdx,%%rax; movq %%rax,%0; cpuid"
-                 : "=&r" (result), "=c" (dummy) : "c" (ecx) : "rax", "rbx", "rdx");
-    
-    return result;
-}
-
-#else
-
-static inline uint64_t cpucycles_start(void) {
-    const uint32_t ecx = (1U << 30) + 1;
-    uint64_t result;
-    
-    asm volatile("rdpmc; shlq $32,%%rdx; orq %%rdx,%%rax"
-                 : "=a" (result) : "c" (ecx) : "rdx");
-    
-    return result;
-}
-
-static inline uint64_t cpucycles_stop(void) {
-    const uint32_t ecx = (1U << 30) + 1;
-    uint64_t result;
-    
-    asm volatile("rdpmc; shlq $32,%%rdx; orq %%rdx,%%rax"
-                 : "=a" (result) : "c" (ecx) : "rdx");
-    
-    return result;
-}
-
-#endif
-#else
-#ifdef SERIALIZE_RDC
-
-static inline uint64_t cpucycles_start(void) {
-    uint64_t result;
-    
-    asm volatile("cpuid; rdtsc; shlq $32,%%rdx; orq %%rdx,%%rax"
-                 : "=a" (result) : : "%rbx", "%rcx", "%rdx");
-    
-    return result;
-}
-
-static inline uint64_t cpucycles_stop(void) {
-    uint64_t result;
-    
-    asm volatile("rdtscp; shlq $32,%%rdx; orq %%rdx,%%rax; mov %%rax,%0; cpuid"
-                 : "=r" (result) : : "%rax", "%rbx", "%rcx", "%rdx");
-    
-    return result;
-}
-
-#else
-
-static inline uint64_t cpucycles_start(void) {
-    uint64_t result;
-    
-    asm volatile("rdtsc; shlq $32,%%rdx; orq %%rdx,%%rax"
-                 : "=a" (result) : : "%rdx");
-    
-    return result;
-}
-
-static inline uint64_t cpucycles_stop(void) {
-    uint64_t result;
-    
-    asm volatile("rdtsc; shlq $32,%%rdx; orq %%rdx,%%rax"
-                 : "=a" (result) : : "%rdx");
-    
-    return result;
-}
-
-#endif
-#endif
-
-int64_t cpucycles_overhead(void);
-
-#endif*/
-
-#ifndef FIPS202_H
-#define FIPS202_H
-
+#ifndef HUSH_DILITHIUM_H
+#define HUSH_DILITHIUM_H
 
 #define SHAKE128_RATE 168
 #define SHAKE256_RATE 136
 
-void shake128_absorb(uint64_t *s,
-                     const uint8_t *input,
-                     int32_t inlen);
-
-void shake128_squeezeblocks(uint8_t *output,
-                            int32_t nblocks,
-                            uint64_t *s);
-
-void shake256_absorb(uint64_t *s,
-                     const uint8_t *input,
-                     int32_t inlen);
-
-void shake256_squeezeblocks(uint8_t *output,
-                            int32_t nblocks,
-                            uint64_t *s);
-
-void shake128(uint8_t *output,
-              int32_t outlen,
-              const uint8_t *input,
-              int32_t inlen);
-
-void shake256(uint8_t *output,
-              int32_t outlen,
-              const uint8_t *input,
-              int32_t inlen);
+void shake128_absorb(uint64_t *s, const uint8_t *input, int32_t inlen); 
+void shake128_squeezeblocks(uint8_t *output, int32_t nblocks, uint64_t *s); 
+void shake256_absorb(uint64_t *s, const uint8_t *input, int32_t inlen); 
+void shake256_squeezeblocks(uint8_t *output, int32_t nblocks, uint64_t *s); 
+void shake128(uint8_t *output, int32_t outlen, const uint8_t *input, int32_t inlen);
+void shake256(uint8_t *output, int32_t outlen, const uint8_t *input, int32_t inlen);
 
 #endif
 
@@ -463,13 +340,7 @@ CRYPTO_BYTES size error
 #define CRYPTO_ALGNAME "Dilithium"
 
 int crypto_sign_keypair(uint8_t *pk, uint8_t *sk);
-
-int crypto_sign(uint8_t *sm, int32_t *smlen,
-                const uint8_t *msg, int32_t len,
-                const uint8_t *sk);
-
-int crypto_sign_open(uint8_t *m, int32_t *mlen,
-                     const uint8_t *sm, int32_t smlen,
-                     const uint8_t *pk);
+int crypto_sign(uint8_t *sm, int32_t *smlen, const uint8_t *msg, int32_t len, const uint8_t *sk);
+int crypto_sign_open(uint8_t *m, int32_t *mlen, const uint8_t *sm, int32_t smlen, const uint8_t *pk);
 
 #endif

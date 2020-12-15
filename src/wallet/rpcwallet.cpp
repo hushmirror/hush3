@@ -130,11 +130,8 @@ void Unlock2NSPV(const CPubKey &pk)
     }
 }
 
-uint64_t komodo_accrued_interest(int32_t *txheightp,uint32_t *locktimep,uint256 hash,int32_t n,int32_t checkheight,uint64_t checkvalue,int32_t tipheight);
-
 void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
 {
-    //int32_t i,n,txheight; uint32_t locktime; uint64_t interest = 0;
     int confirms = wtx.GetDepthInMainChain();
     entry.push_back(Pair("rawconfirmations", confirms));
     if (wtx.IsCoinBase())
@@ -976,11 +973,11 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp, const CPubKey&
                     int nHeight    = tx_height(wtx.GetHash());
                     int dpowconfs  = hush_dpowconfs(nHeight, nDepth);
                     if (dpowconfs >= nMinDepth) {
-                        nAmount   += txout.nValue; // komodo_interest?
+                        nAmount   += txout.nValue;
                     }
                 } else {
                     if (nDepth  >= nMinDepth) {
-                        nAmount += txout.nValue; // komodo_interest?
+                        nAmount += txout.nValue;
                     }
                 }
             }
@@ -1039,7 +1036,7 @@ UniValue getreceivedbyaccount(const UniValue& params, bool fHelp, const CPubKey&
             CTxDestination address;
             if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*pwalletMain, address) && setAddress.count(address))
                 if (wtx.GetDepthInMainChain() >= nMinDepth)
-                    nAmount += txout.nValue; // komodo_interest?
+                    nAmount += txout.nValue;
         }
     }
 
@@ -1660,7 +1657,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
                 continue;
 
             tallyitem& item = mapTally[address];
-            item.nAmount += txout.nValue; // komodo_interest?
+            item.nAmount += txout.nValue;
             item.nConf = min(item.nConf, nDepth);
             item.nHeight = komodo_blockheight(wtx.hashBlock);
             item.txids.push_back(wtx.GetHash());
@@ -2967,13 +2964,7 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
         {
             BlockMap::iterator it = mapBlockIndex.find(pcoinsTip->GetBestBlock());
             CBlockIndex *tipindex,*pindex = it->second;
-            uint64_t interest; uint32_t locktime;
-            if ( pindex != 0 && (tipindex= chainActive.LastTip()) != 0 )
-            {
-                interest = komodo_accrued_interest(&txheight,&locktime,out.tx->GetHash(),out.i,0,nValue,(int32_t)tipindex->GetHeight());
-                //interest = komodo_interest(txheight,nValue,out.tx->nLockTime,tipindex->nTime);
-                entry.push_back(Pair("interest",ValueFromAmount(interest)));
-            }
+            uint32_t locktime;
             //fprintf(stderr,"nValue %.8f pindex.%p tipindex.%p locktime.%u txheight.%d pindexht.%d\n",(double)nValue/COIN,pindex,chainActive.LastTip(),locktime,txheight,pindex->GetHeight());
         }
         else if ( chainActive.LastTip() != 0 )
@@ -2987,42 +2978,7 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return results;
 }
 
-uint64_t komodo_interestsum()
-{
-#ifdef ENABLE_WALLET
-    if ( SMART_CHAIN_SYMBOL[0] == 0 && GetBoolArg("-disablewallet", false) == 0 && HUSH_NSPV_FULLNODE )
-    {
-        uint64_t interest,sum = 0; int32_t txheight; uint32_t locktime;
-        vector<COutput> vecOutputs;
-        assert(pwalletMain != NULL);
-        LOCK2(cs_main, pwalletMain->cs_wallet);
-        pwalletMain->AvailableCoins(vecOutputs, false, NULL, true);
-        BOOST_FOREACH(const COutput& out,vecOutputs)
-        {
-            CAmount nValue = out.tx->vout[out.i].nValue;
-            if ( out.tx->nLockTime != 0 && out.fSpendable != 0 )
-            {
-                BlockMap::iterator it = mapBlockIndex.find(pcoinsTip->GetBestBlock());
-                CBlockIndex *tipindex,*pindex = it->second;
-                if ( pindex != 0 && (tipindex= chainActive.LastTip()) != 0 )
-                {
-                    interest = komodo_accrued_interest(&txheight,&locktime,out.tx->GetHash(),out.i,0,nValue,(int32_t)tipindex->GetHeight());
-                    //interest = komodo_interest(pindex->GetHeight(),nValue,out.tx->nLockTime,tipindex->nTime);
-                    sum += interest;
-                }
-            }
-        }
-        KOMODO_INTERESTSUM = sum;
-        KOMODO_WALLETBALANCE = pwalletMain->GetBalance();
-        return(sum);
-    }
-#endif
-    return(0);
-}
-
-/**
- *Return current blockchain status, wallet balance, address balance and the last 200 transactions
-**/
+// Return current blockchain status, wallet balance, address balance and the last 200 transactions
 UniValue getalldata(const UniValue& params, bool fHelp,const CPubKey&)
 {
     if (fHelp || params.size() > 3)
@@ -3059,23 +3015,20 @@ UniValue getalldata(const UniValue& params, bool fHelp,const CPubKey&)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
     int nMinDepth = 1;
-
-    CAmount confirmed = 0;
-    CAmount unconfirmed = 0;
-    CAmount locked = 0;
-    CAmount immature = 0;
-
-    CAmount privateConfirmed = 0;
-    CAmount privateUnconfirmed = 0;
-    CAmount privateLocked = 0;
-    CAmount privateImmature = 0;
-
     balancestruct txAmounts;
-    txAmounts.confirmed = 0;
-    txAmounts.unconfirmed = 0;
-    txAmounts.locked = 0;
-    txAmounts.immature = 0;
 
+    CAmount confirmed          = 0;
+    CAmount unconfirmed        = 0;
+    CAmount locked             = 0;
+    CAmount immature           = 0;
+    CAmount privateConfirmed   = 0;
+    CAmount privateUnconfirmed = 0;
+    CAmount privateLocked      = 0;
+    CAmount privateImmature    = 0;
+    txAmounts.confirmed        = 0;
+    txAmounts.unconfirmed      = 0;
+    txAmounts.locked           = 0;
+    txAmounts.immature         = 0;
 
     //Create map of addresses
     //Add all Transaparent addresses to list
@@ -3087,7 +3040,7 @@ UniValue getalldata(const UniValue& params, bool fHelp,const CPubKey&)
           addressBalances.insert(make_pair(addressString,txAmounts));
     }
 
-    //Add all Sapling addresses to map
+    // Add all zaddrs
     std::set<libzcash::SaplingPaymentAddress> zs_addresses;
     pwalletMain->GetSaplingPaymentAddresses(zs_addresses);
     for (auto addr : zs_addresses) {
@@ -4038,7 +3991,7 @@ CAmount getBalanceTaddr(std::string transparentAddress, int minDepth=1, bool ign
             }
         }
 
-        CAmount nValue = out.tx->vout[out.i].nValue; // komodo_interest
+        CAmount nValue = out.tx->vout[out.i].nValue;
         balance += nValue;
     }
     return balance;
@@ -4299,14 +4252,12 @@ UniValue z_gettotalbalance(const UniValue& params, bool fHelp, const CPubKey& my
     // getbalance and "getbalance * 1 true" should return the same number
     // but they don't because wtx.GetAmounts() does not handle tx where there are no outputs
     // pwalletMain->GetBalance() does not accept min depth parameter
-    // so we use our own method to get balance of utxos.
-    CAmount nBalance = getBalanceTaddr("", nMinDepth, !fIncludeWatchonly);
+    // so we use our own method to get balance of utxos, lulzwtfbbq
+    CAmount nBalance        = getBalanceTaddr("", nMinDepth, !fIncludeWatchonly);
     CAmount nPrivateBalance = getBalanceZaddr("", nMinDepth, !fIncludeWatchonly);
-    uint64_t interest = komodo_interestsum();
-    CAmount nTotalBalance = nBalance + nPrivateBalance;
+    CAmount nTotalBalance   = nBalance + nPrivateBalance;
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("transparent", FormatMoney(nBalance)));
-    result.push_back(Pair("interest", FormatMoney(interest)));
     result.push_back(Pair("private", FormatMoney(nPrivateBalance)));
     result.push_back(Pair("total", FormatMoney(nTotalBalance)));
     return result;

@@ -3,7 +3,6 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,9 +17,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "rpc/server.h"
-
 #include "init.h"
 #include "key_io.h"
 #include "random.h"
@@ -29,11 +26,8 @@
 #include "util.h"
 #include "utilstrencodings.h"
 #include "asyncrpcqueue.h"
-
 #include <memory>
-
 #include <univalue.h>
-
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
@@ -889,7 +883,7 @@ std::string HelpExampleRpc(const std::string& methodname, const std::string& arg
 
 string experimentalDisabledHelpMsg(const string& rpc, const string& enableArg)
 {
-    string daemon = SMART_CHAIN_SYMBOL[0] == 0 ? "komodod" : "hushd";
+    string daemon = "hushd";
     string ticker = SMART_CHAIN_SYMBOL[0] == 0 ? "komodo" : SMART_CHAIN_SYMBOL;
 
     return "\nWARNING: " + rpc + " is disabled.\n"

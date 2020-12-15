@@ -1,4 +1,6 @@
-
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -13,7 +15,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #ifndef HUSH_NSPVFULLNODE_H
 #define HUSH_NSPVFULLNODE_H
 
@@ -185,11 +186,6 @@ int32_t NSPV_getaddressutxos(struct NSPV_utxosresp *ptr,char *coinaddr,bool isCC
                         ptr->utxos[ind].vout = (int32_t)it->first.index;
                         ptr->utxos[ind].satoshis = it->second.satoshis;
                         ptr->utxos[ind].height = it->second.blockHeight;
-                        if ( SMART_CHAIN_SYMBOL[0] == 0 && it->second.satoshis >= 10*COIN )
-                        {
-                            ptr->utxos[n].extradata = komodo_accrued_interest(&txheight,&locktime,ptr->utxos[ind].txid,ptr->utxos[ind].vout,ptr->utxos[ind].height,ptr->utxos[ind].satoshis,tipheight);
-                            interest += ptr->utxos[ind].extradata;
-                        }
                         ind++;
                         total += it->second.satoshis;
                     }

@@ -1,4 +1,6 @@
-
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -13,11 +15,10 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #ifndef HUSH_NSPVWALLET_H
 #define HUSH_NSPVWALLET_H
 
-// nSPV wallet uses superlite functions (and some komodod built in functions) to implement nSPV_spend
+// nSPV wallet uses superlite functions (and some hushd built in functions) to implement nSPV_spend
 extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
 
 int32_t NSPV_validatehdrs(struct NSPV_ntzsproofresp *ptr)
@@ -83,13 +84,7 @@ int32_t NSPV_gettransaction(int32_t skipvalidation,int32_t vout,uint256 txid,int
         retval = -2001;
     else if ( skipvalidation == 0 && ptr->unspentvalue <= 0 )
         retval = -2002;
-    else if ( SMART_CHAIN_SYMBOL[0] == 0 && tiptime != 0 )
-    {
-        rewards = komodo_interestnew(height,tx.vout[vout].nValue,tx.nLockTime,tiptime);
-        if ( rewards != extradata )
-            fprintf(stderr,"extradata %.8f vs rewards %.8f\n",dstr(extradata),dstr(rewards));
-        rewardsum += rewards;
-    }
+
     //char coinaddr[64];
     //Getscriptaddress(coinaddr,tx.vout[0].scriptPubKey);  causes crash??
     //fprintf(stderr,"%s txid.%s vs hash.%s\n",coinaddr,txid.GetHex().c_str(),tx.GetHash().GetHex().c_str());

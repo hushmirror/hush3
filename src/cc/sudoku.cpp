@@ -1,4 +1,7 @@
-// start https://github.com/attractivechaos/plb/blob/master/sudoku/incoming/sudoku_solver.c
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+// From https://github.com/attractivechaos/plb/blob/master/sudoku/incoming/sudoku_solver.c
 /************************************************************************************/
 /*                                                                                  */
 /* Author: Bill DuPree                                                              */
@@ -192,10 +195,10 @@
 /*                                                                                  */
 /* CHANGE LOG:                                                                      */
 /*                                                                                  */
-/* Rev.	  Date        Init.	Description                                         */
+/* Rev.	  Date        Init.	Description                                             */
 /* -------------------------------------------------------------------------------- */
-/* 1.00   2006-02-25  WD	Initial version.                                    */
-/* 1.01   2006-03-13  WD	Fixed return code calc. Added signon message.       */
+/* 1.00   2006-02-25  WD	Initial version.                                        */
+/* 1.01   2006-03-13  WD	Fixed return code calc. Added signon message.           */
 /* 1.10   2006-03-20  WD        Added explain option, add'l speed optimizations     */
 /* 1.11   2006-03-23  WD        More simple speed optimizations, cleanup, bug fixes */
 /*                                                                                  */

@@ -3,7 +3,6 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,12 +17,8 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #ifndef HUSH_COINS_H
 #define HUSH_COINS_H
-
-#define KOMODO_ENABLE_INTEREST //enabling this is a hardfork, activate with new RR method
-
 #include "compressor.h"
 #include "core_memusage.h"
 #include "memusage.h"
@@ -31,12 +26,10 @@
 #include "uint256.h"
 #include "base58.h"
 #include "pubkey.h"
-
 #include <assert.h>
 #include <stdint.h>
 #include <vector>
 #include <unordered_map>
-
 #include <boost/foreach.hpp>
 #include <boost/unordered_map.hpp>
 #include "zcash/IncrementalMerkleTree.hpp"

@@ -1,10 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Copyright (c) 2016-2020 The Hush developers
-
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -19,9 +17,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "txmempool.h"
-
 #include "clientversion.h"
 #include "consensus/consensus.h"
 #include "consensus/validation.h"
@@ -510,7 +506,6 @@ void CTxMemPool::removeConflicts(const CTransaction &tx, std::list<CTransaction>
     }
 }
 
-int32_t komodo_validate_interest(const CTransaction &tx,int32_t txheight,uint32_t nTime,int32_t dispflag);
 extern char SMART_CHAIN_SYMBOL[];
 
 std::vector<uint256> CTxMemPool::removeExpired(unsigned int nBlockHeight)
@@ -524,6 +519,7 @@ std::vector<uint256> CTxMemPool::removeExpired(unsigned int nBlockHeight)
         const CTransaction& tx = it->GetTx();
         tipindex = chainActive.LastTip();
 
+        /*
         bool fInterestNotValidated = SMART_CHAIN_SYMBOL[0] == 0 && tipindex != 0 && komodo_validate_interest(tx,tipindex->GetHeight()+1,tipindex->GetMedianTimePast() + 777,0) < 0;
         if (IsExpiredTx(tx, nBlockHeight) || fInterestNotValidated)
         {
@@ -531,6 +527,7 @@ std::vector<uint256> CTxMemPool::removeExpired(unsigned int nBlockHeight)
                 LogPrintf("Removing interest violate txid.%s nHeight.%d nTime.%u vs locktime.%u\n",tx.GetHash().ToString(),tipindex->GetHeight()+1,tipindex->GetMedianTimePast() + 777,tx.nLockTime);
             transactionsToRemove.push_back(tx);
         }
+        */
     }
     std::vector<uint256> ids;
     for (const CTransaction& tx : transactionsToRemove) {
@@ -542,9 +539,7 @@ std::vector<uint256> CTxMemPool::removeExpired(unsigned int nBlockHeight)
     return ids;
 }
 
-/**
- * Called when a block is connected. Removes from mempool and updates the miner fee estimator.
- */
+// Called when a block is connected. Removes from mempool and updates the miner fee estimator.
 void CTxMemPool::removeForBlock(const std::vector<CTransaction>& vtx, unsigned int nBlockHeight,
                                 std::list<CTransaction>& conflicts, bool fCurrentEstimate)
 {

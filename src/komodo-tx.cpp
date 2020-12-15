@@ -41,14 +41,9 @@ using namespace std;
 #include "hush_structs.h"
 #include "hush_globals.h"
 #include "hush_defs.h"
-#include "komodo_interest.h"
 
 CKey NSPV_key;
 char NSPV_pubkeystr[67],NSPV_wifstr[64];
-uint64_t komodo_accrued_interest(int32_t *txheightp,uint32_t *locktimep,uint256 hash,int32_t n,int32_t checkheight,uint64_t checkvalue,int32_t tipheight)
-{
-    return(0);
-}
 
 static bool fCreateBlank;
 static std::map<std::string,UniValue> registers;

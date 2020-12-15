@@ -47,7 +47,6 @@ bool check_pprevnotarizedht();
 #include "komodo_curve25519.h"
 #include "komodo_cJSON.c"
 #include "hush_bitcoind.h"
-#include "komodo_interest.h"
 #include "komodo_pax.h"
 #include "hush_notary.h"
 
@@ -805,7 +804,7 @@ int32_t komodo_notarycmp(uint8_t *scriptPubKey,int32_t scriptlen,uint8_t pubkeys
     return(-1);
 }
 
-// Connect a Hush Block
+// Connect a Hush Block, foshizzle
 int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
 {
     static int32_t hwmheight;

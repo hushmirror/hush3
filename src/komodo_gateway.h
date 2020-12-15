@@ -1422,8 +1422,6 @@ int32_t hush_faststateinit(struct hush_state *sp,char *fname,char *symbol,char *
     return(-1);
 }
 
-uint64_t komodo_interestsum();
-
 void hush_passport_iteration()
 {
     static long lastpos[34]; static char userpass[33][1024]; static uint32_t lasttime,callcounter,lastinterest;
@@ -1437,9 +1435,6 @@ void hush_passport_iteration()
     }
     if ( komodo_chainactive_timestamp() > lastinterest )
     {
-        if ( SMART_CHAIN_SYMBOL[0] == 0 )
-            komodo_interestsum();
-        //hush_longestchain();
         lastinterest = komodo_chainactive_timestamp();
     }
     refsp = hush_stateptr(symbol,dest);

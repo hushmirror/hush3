@@ -3,7 +3,6 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "clientversion.h"
 #include "rpc/server.h"
 #include "init.h"
@@ -61,7 +59,6 @@ extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 extern int32_t ASSETCHAINS_BLOCKTIME;
 extern uint64_t ASSETCHAINS_CBOPRET;
 void hush_passport_iteration();
-uint64_t komodo_interestsum();
 int32_t hush_longestchain();
 void komodo_cbopretupdate(int32_t forceflag);
 CBlockIndex *komodo_chainactive(int32_t height);
@@ -90,7 +87,6 @@ void WaitForShutdown(boost::thread_group* threadGroup)
                 MilliSleep(1000);
             }
         } else {
-            //komodo_interestsum();
             //hush_longestchain();
             if ( ASSETCHAINS_CBOPRET != 0 )
                 komodo_cbopretupdate(0);
