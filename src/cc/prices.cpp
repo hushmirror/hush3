@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -12,7 +15,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  *****************************************************************************/
-
+//TODO: delete all this jl777 garbage
  /*
  CBOPRET creates trustless oracles, which can be used for making a synthetic cash settlement system based on real world prices;
 
@@ -66,7 +69,6 @@ if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && KOMODO_EARLYTXID_SCRIPTPUB.
 
 This will fetch the op_return, calculate the scriptPubKey and save it to the global. 
 On daemon restart as soon as validation for BETTX happens the global will be filled, after this the transaction never needs to be looked up again. 
-GetKomodoEarlytxidScriptPub is on line #2080 of komodo_bitcoind.h
  */
 
 #include "CCassets.h"
