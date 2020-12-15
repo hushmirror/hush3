@@ -3,6 +3,9 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+/////////////////////////////////////////////////////////////////////////////////
+// We believe in Extreme Privacy and reject surveillance. -- The Hush Developers
+/////////////////////////////////////////////////////////////////////////////////
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -334,6 +337,7 @@ public:
     }
 };
 static CTestNetParams testNetParams;
+#define NUNU Consensus::NetworkUpgrade
 
 /**
  * Regression test
@@ -341,9 +345,10 @@ static CTestNetParams testNetParams;
 class CRegTestParams : public CChainParams {
 public:
     CRegTestParams() {
-        strNetworkID = "regtest";
-        strCurrencyUnits = "REG";
-        bip44CoinType = 1;
+        auto ups                               = consensus.vUpgrades;
+        strNetworkID                           = "regtest";
+        strCurrencyUnits                       = "REG";
+        bip44CoinType                          = 1;
         consensus.fCoinbaseMustBeProtected     = false;
         consensus.nMajorityEnforceBlockUpgrade = 750;
         consensus.nMajorityRejectBlockOutdated = 950;
@@ -353,22 +358,18 @@ public:
         consensus.nPowAveragingWindow          = 17;
         consensus.nMaxFutureBlockTime          = 7 * 60; // 7 mins
         assert(maxUint/UintToArith256(consensus.powLimit) >= consensus.nPowAveragingWindow);
-        consensus.nPowMaxAdjustDown  = 0; // Turn off adjustment down
-        consensus.nPowMaxAdjustUp    = 0; // Turn off adjustment up
-        consensus.nPowTargetSpacing  = 2.5 * 60;
-        consensus.nPowAllowMinDifficultyBlocksAfterHeight = 0;
-        consensus.vUpgrades[Consensus::BASE_SPROUT].nProtocolVersion = 170002;
-        consensus.vUpgrades[Consensus::BASE_SPROUT].nActivationHeight =
-            Consensus::NetworkUpgrade::ALWAYS_ACTIVE;
-        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nProtocolVersion = 170002;
-        consensus.vUpgrades[Consensus::UPGRADE_TESTDUMMY].nActivationHeight =
-            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
-        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nProtocolVersion = 170003;
-        consensus.vUpgrades[Consensus::UPGRADE_OVERWINTER].nActivationHeight =
-            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
-        consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nProtocolVersion = 170006;
-        consensus.vUpgrades[Consensus::UPGRADE_SAPLING].nActivationHeight =
-            Consensus::NetworkUpgrade::NO_ACTIVATION_HEIGHT;
+        consensus.nPowMaxAdjustDown                          = 0;  // Turn off adjustment down
+        consensus.nPowMaxAdjustUp                            = 0;  // Turn off adjustment up
+        consensus.nPowTargetSpacing                          = 60; // HSC's default to 60 seconds so a theoretical testnet should as well
+        consensus.nPowAllowMinDifficultyBlocksAfterHeight    = 0;
+        ups[Consensus::BASE_SPROUT].nProtocolVersion         = 170002;
+        ups[Consensus::BASE_SPROUT].nActivationHeight        = NUNU::ALWAYS_ACTIVE;
+        ups[Consensus::UPGRADE_TESTDUMMY].nProtocolVersion   = 170002;
+        ups[Consensus::UPGRADE_TESTDUMMY].nActivationHeight  = NUNU::NO_ACTIVATION_HEIGHT;
+        ups[Consensus::UPGRADE_OVERWINTER].nProtocolVersion  = 170003;
+        ups[Consensus::UPGRADE_OVERWINTER].nActivationHeight = NUNU::NO_ACTIVATION_HEIGHT;
+        ups[Consensus::UPGRADE_SAPLING].nProtocolVersion     = 170006;
+        ups[Consensus::UPGRADE_SAPLING].nActivationHeight    = NUNU::NO_ACTIVATION_HEIGHT;
 
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
@@ -377,9 +378,9 @@ public:
         pchMessageStart[1] = 0x8e;
         pchMessageStart[2] = 0xf3;
         pchMessageStart[3] = 0xf5;
-        nMinerThreads = 1;
-        nMaxTipAge = 24 * 60 * 60;
-        nPruneAfterHeight = 1000;
+        nMinerThreads      = 1;
+        nMaxTipAge         = 24 * 60 * 60;
+        nPruneAfterHeight  = 1000;
         const size_t N = 48, K = 5;
         BOOST_STATIC_ASSERT(equihash_parameters_acceptable(N, K));
         nEquihashN = N;
@@ -396,16 +397,16 @@ public:
         assert(consensus.hashGenesisBlock == uint256S("0x029f11d80ef9765602235e1bc9727e3eb6ba20839319f761fee920d63401e327"));
         assert(genesis.hashMerkleRoot == uint256S("0xc4eaa58879081de3c24a7b117ed2b28300e7ec4c4c1dff1d3f1268b7857a4ddb"));
 
-        nDefaultPort = 17779;
+        nDefaultPort      = 15420;
         nPruneAfterHeight = 1000;
 
         vFixedSeeds.clear(); //! Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();  //! Regtest mode doesn't have any DNS seeds.
 
-        fMiningRequiresPeers = false;
-        fDefaultConsistencyChecks = true;
-        fRequireStandard = false;
-        fMineBlocksOnDemand = true;
+        fMiningRequiresPeers           = false;
+        fDefaultConsistencyChecks      = true;
+        fRequireStandard               = false;
+        fMineBlocksOnDemand            = true;
         fTestnetToBeDeprecatedFieldRPC = false;
 
         checkpointData = (CCheckpointData){
