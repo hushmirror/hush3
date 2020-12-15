@@ -2,7 +2,7 @@
 # Copyright (c) 2016-2020 The Hush developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
+#TODO: detect other versions of gcc/clang
 tools=("gcc-8" "g++-8" "otool" "nm")
 
 echo "Platform: `uname -a`"
