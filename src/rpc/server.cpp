@@ -277,7 +277,7 @@ UniValue stop(const UniValue& params, bool fHelp, const CPubKey& mypk)
     StartShutdown();
 
     if ((strncmp(SMART_CHAIN_SYMBOL, "HUSH3", 5) == 0) ) {
-        sprintf(buf,"Hush server stopping...");
+        sprintf(buf,"Hush server stopping, for now...");
 	} else {
         sprintf(buf,"%s server stopping...",SMART_CHAIN_SYMBOL);
 	}

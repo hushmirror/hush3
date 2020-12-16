@@ -625,8 +625,7 @@ CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& loc
 CCoinsViewCache *pcoinsTip = NULL;
 CBlockTreeDB *pblocktree = NULL;
 
-// Komodo globals
-
+// Hush globals
 #define HUSH_ZCASH
 #include "hush.h"
 
