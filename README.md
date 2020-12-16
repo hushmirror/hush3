@@ -17,14 +17,38 @@ computer and network connection, it will likely take a few hours at least, but
 some people report full nodes syncing in less than 1.5 hours. A competing privacy
 coin takes over 24 hours to sync their full nodes because of Sprout Transactions, lulz.
 
-**Hush is unfinished and highly experimental.** Use at your own risk!
+## BANNED BY GITHUB
 
-## Telegram
+In working on this release, Duke Leto was suspended from Github, which gave Hush developers
+the impetus to completely leave that racist and censorship-loving platform.
 
-Please feel free to join us on Telegram :
+Hush now has it's own <a href="https://git.hush.is/hush">git.hush.is</a> Gitea instance,
+because we will not be silenced by Microsoft.
+
+All Hush software will be released from git.hush.is and hush.is, downloads from any other
+domains should be assumed to be backdoored.
+
+**Hush is unfinished and highly experimental.** Use at your own risk! Just like Bitcoin.
+
+## Socials
+
+Please feel free to join us on Telegram for official support :
     * Main group: https://hush.is/tg
     * Support group: https://hush.is/telegram_support
     * Mining group: https://hush.is/telegram_mining
+
+Other socials:
+
+    * <a href="https://hush.is/twitter">@MyHushTeam</a> on Twitter</a>
+    * <a href="https://hush.is/yt">Hush</a> on YouTube</a>
+    * <a href="https://hush.is/reddit">Hush</a> on Reddit</a>
+
+## Official Explorer
+
+<a href="https://explorer.hush.is">explorer.hush.is</a>
+
+We are looking for alternate explorers to be run on Tor, i2P and other TLDs, if you are interested
+please join TG and ask questions.
 
 ## Claiming Funds From Old Hush Wallets
 

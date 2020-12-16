@@ -20,8 +20,8 @@ evil organizations.
       on low resource devices (like internet-of-shit light bulbs/etc)
   * Hush Docker scripts are now officially maintained!
   * Faster release binaries with -03
-  * Optimized and hardened memory pool code to remove KMD-isms
-  * Updated all our error messages and things for https://hush.is,
+  * Optimized and hardened memory pool code
+  * Updated all our error messages and things for https://hush.is ,
     our new official domain
   * getblocktemplate RPC now provides better error reporting about
     whether there are no peers or if it's not in sync
