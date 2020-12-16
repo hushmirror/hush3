@@ -13,7 +13,7 @@ and now are officially part of our Git repo.
       on low resource devices (like internet-of-shit light bulbs/etc)
   * Hush Docker scripts are now officially maintained!
   * Faster release binaries with -03
-  * Optimized AcceptToMemoryPool, deleting things which do not apply
+  * Optimized and hardened memory pool code to remove KMD-isms
   * Updated all our error messages and things for https://hush.is,
     our new official domain
   * getblocktemplate RPC now provides better error reporting about
