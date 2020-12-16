@@ -127,7 +127,7 @@ int64_t prices_blockinfo(int32_t height,char *acaddr)
 
 UniValue games_settle(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    UniValue result(UniValue::VOBJ);  char acaddr[64]; CPubKey acpk,mypk,gamespk; int64_t prizefund = 0; int32_t height,nextheight = komodo_nextheight();
+    UniValue result(UniValue::VOBJ);  char acaddr[64]; CPubKey acpk,mypk,gamespk; int64_t prizefund = 0; int32_t height,nextheight = hush_nextheight();
     if ( ASSETCHAINS_OVERRIDE_PUBKEY33[0] == 0 )
     {
         result.push_back(Pair("result","error"));
@@ -169,7 +169,7 @@ UniValue games_settle(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 
 UniValue games_bet(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     UniValue result(UniValue::VOBJ); std::string rawtx; int64_t amount,inputsum; uint64_t price; CPubKey gamespk,mypk,acpk;
     if ( ASSETCHAINS_OVERRIDE_PUBKEY33[0] == 0 )
     {

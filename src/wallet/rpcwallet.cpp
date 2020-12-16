@@ -8304,7 +8304,7 @@ UniValue opreturn_burn(const UniValue& params, bool fHelp, const CPubKey& mypk)
         throw JSONRPCError(RPC_TYPE_ERROR, "keypool error.");
     }
 
-	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
 	int64_t normalInputs = AddNormalinputs(mtx, myPubkey, nAmount+txfee, 60);
 	if (normalInputs < nAmount)
