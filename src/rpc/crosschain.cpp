@@ -305,7 +305,7 @@ UniValue migrate_createburntransaction(const UniValue& params, bool fHelp, const
     struct CCcontract_info *cpTokens, C;
     cpTokens = CCinit(&C, EVAL_TOKENS);
 
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     const std::string chainSymbol(SMART_CHAIN_SYMBOL);
     std::vector<uint8_t> rawproof; //(chainSymbol.begin(), chainSymbol.end());
@@ -694,7 +694,7 @@ UniValue migrate_createnotaryapprovaltransaction(const UniValue& params, bool fH
     cpDummy = CCinit(&C, EVAL_TOKENS);  // just for FinalizeCCtx to work 
 
     // creating a tx with proof:
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     if (AddNormalinputs(mtx, Mypubkey(), txfee*2, 4) == 0) 
         throw runtime_error("Cannot find normal inputs\n");
     

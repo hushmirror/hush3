@@ -82,7 +82,7 @@ CMutableTransaction MakeSelfImportSourceTx(CTxDestination &dest, int64_t amount)
 
     cpDummy = CCinit(&C, EVAL_TOKENS);  // this is just for FinalizeCCTx to work
 
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     if (AddNormalinputs(mtx, myPubKey, 2 * txfee, 4) == 0) {
         LOGSTREAM("importcoin", CCLOG_INFO, stream << "MakeSelfImportSourceTx() warning: cannot find normal inputs for txfee" << std::endl);
@@ -129,7 +129,7 @@ int32_t GetSelfimportProof(const CMutableTransaction sourceMtx, CMutableTransact
     CMutableTransaction tmpmtx; 
     //CTransaction sourcetx; 
 
-    tmpmtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    tmpmtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     /*
     if (!E_UNMARSHAL(ParseHex(rawsourcetx), ss >> sourcetx)) {
@@ -203,7 +203,7 @@ int32_t GetSelfimportProof(const CMutableTransaction sourceMtx, CMutableTransact
 // make import tx with burntx and dual daemon
 std::string MakeCodaImportTx(uint64_t txfee, std::string receipt, std::string srcaddr, std::vector<CTxOut> vouts)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight()),burntx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight()),burntx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CPubKey mypk; uint256 codaburntxid; std::vector<unsigned char> dummyproof;
     int32_t i,numvouts,n,m; std::string coin,error; struct CCcontract_info *cp, C;
     cJSON *result,*tmp,*tmp1; unsigned char hash[SHA256_DIGEST_LENGTH+1];

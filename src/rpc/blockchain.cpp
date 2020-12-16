@@ -1149,7 +1149,7 @@ UniValue prices(const UniValue& params, bool fHelp, const CPubKey& mypk)
     int32_t maxsamples = atoi(params[0].get_str().c_str());
     if ( maxsamples < 1 )
         maxsamples = 1;
-    nextheight = komodo_nextheight();
+    nextheight = hush_nextheight();
     UniValue a(UniValue::VARR);
     if ( PRICES_DAYWINDOW < 7 )
         throw JSONRPCError(RPC_INVALID_PARAMETER, "daywindow is too small");

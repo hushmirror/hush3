@@ -60,7 +60,7 @@ UniValue custom_func0(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 
 UniValue custom_func1(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight()); std::string rawtx;
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight()); std::string rawtx;
     UniValue result(UniValue::VOBJ); CPubKey mypk; int64_t amount = COIN; int32_t broadcastflag=0;
     if ( txfee == 0 )
         txfee = CUSTOM_TXFEE;

@@ -244,7 +244,7 @@ extern CWallet* pwalletMain;  //!< global wallet object pointer to access wallet
 /// @private seems old-style
 bool GetAddressUnspent(uint160 addressHash, int type,std::vector<std::pair<CAddressUnspentKey,CAddressUnspentValue> > &unspentOutputs);
 //CBlockIndex *komodo_getblockindex(uint256 hash);  //moved to komodo_def.h
-//int32_t komodo_nextheight();  //moved to komodo_def.h
+//int32_t hush_nextheight();  //moved to komodo_def.h
 
 /// CCgetspenttxid finds the txid of the transaction which spends a transaction output. The function does this without loading transactions from the chain, by using spent index
 /// @param[out] spenttxid transaction id of the spending transaction

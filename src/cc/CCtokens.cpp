@@ -802,7 +802,7 @@ CPubKey GetTokenOriginatorPubKey(CScript scriptPubKey) {
 // returns token creation signed raw tx
 std::string CreateToken(int64_t txfee, int64_t tokensupply, std::string name, std::string description, vscript_t nonfungibleData)
 {
-	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 	CPubKey mypk; struct CCcontract_info *cp, C;
 	if (tokensupply < 0)	{
         CCerror = "negative tokensupply";
@@ -857,7 +857,7 @@ std::string CreateToken(int64_t txfee, int64_t tokensupply, std::string name, st
 // param additionalEvalCode allows transfer of dual-eval non-fungible tokens
 std::string TokenTransfer(int64_t txfee, uint256 tokenid, vscript_t destpubkey, int64_t total)
 {
-	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 	CPubKey mypk; uint64_t mask; int64_t CCchange = 0, inputs = 0;  struct CCcontract_info *cp, C;
 	vscript_t vopretNonfungible, vopretEmpty;
 
@@ -921,7 +921,7 @@ std::string TokenTransfer(int64_t txfee, uint256 tokenid, vscript_t destpubkey, 
 int64_t GetTokenBalance(CPubKey pk, uint256 tokenid)
 {
 	uint256 hashBlock;
-	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 	CTransaction tokentx;
 
 	// CCerror = strprintf("obsolete, cannot return correct value without eval");

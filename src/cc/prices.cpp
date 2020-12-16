@@ -1455,7 +1455,7 @@ int64_t prices_enumaddedbets(uint256 &batontxid, std::vector<OneBetData> &bets, 
 // pricesbet rpc impl: make betting tx
 UniValue PricesBet(int64_t txfee, int64_t amount, int16_t leverage, std::vector<std::string> synthetic)
 {
-    int32_t nextheight = komodo_nextheight();
+    int32_t nextheight = hush_nextheight();
     CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextheight); UniValue result(UniValue::VOBJ);
     struct CCcontract_info *cp, C; 
     CPubKey pricespk, mypk; 
@@ -1526,7 +1526,7 @@ UniValue PricesBet(int64_t txfee, int64_t amount, int16_t leverage, std::vector<
 // pricesaddfunding rpc impl: add yet another bet
 UniValue PricesAddFunding(int64_t txfee, uint256 bettxid, int64_t amount)
 {
-    int32_t nextheight = komodo_nextheight();
+    int32_t nextheight = hush_nextheight();
     CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextheight); UniValue result(UniValue::VOBJ);
     struct CCcontract_info *cp, C; 
     CTransaction bettx; 
@@ -1646,7 +1646,7 @@ int32_t prices_scanchain(std::vector<OneBetData> &bets, int16_t leverage, std::v
 // pricescostbasis rpc impl: set cost basis (open price) for the bet (deprecated)
 UniValue PricesSetcostbasis(int64_t txfee, uint256 bettxid)
 {
-    int32_t nextheight = komodo_nextheight();
+    int32_t nextheight = hush_nextheight();
     CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextheight);
     UniValue result(UniValue::VOBJ);
     struct CCcontract_info *cp, C; CTransaction bettx; uint256 hashBlock, batontxid, tokenid;
@@ -1718,7 +1718,7 @@ UniValue PricesSetcostbasis(int64_t txfee, uint256 bettxid)
 // pricesaddfunding rpc impl: add yet another bet
 UniValue PricesRefillFund(int64_t amount)
 {
-    int32_t nextheight = komodo_nextheight();
+    int32_t nextheight = hush_nextheight();
     CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextheight); UniValue result(UniValue::VOBJ);
     struct CCcontract_info *cp, C;
     CPubKey pricespk, mypk, pk;
@@ -1885,7 +1885,7 @@ int32_t prices_getbetinfo(uint256 bettxid, BetInfo &betinfo)
 // pricesrekt rpc: anyone can rekt a bet at some block where losses reached limit, collecting fee
 UniValue PricesRekt(int64_t txfee, uint256 bettxid, int32_t rektheight)
 {
-    int32_t nextheight = komodo_nextheight();
+    int32_t nextheight = hush_nextheight();
     CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextheight); UniValue result(UniValue::VOBJ);
     struct CCcontract_info *cp, C; 
     CTransaction bettx; 
@@ -1999,7 +1999,7 @@ UniValue PricesRekt(int64_t txfee, uint256 bettxid, int32_t rektheight)
 // pricescashout rpc impl: bettor can cashout hit bet if it is not rekt
 UniValue PricesCashout(int64_t txfee, uint256 bettxid)
 {
-    int32_t nextheight = komodo_nextheight();
+    int32_t nextheight = hush_nextheight();
     CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextheight); 
     UniValue result(UniValue::VOBJ);
     struct CCcontract_info *cp, C; char destaddr[64]; 

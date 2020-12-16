@@ -184,7 +184,7 @@ static void RegisterLoad(const std::string& strInput)
 }
 
 
-int32_t komodo_nextheight()
+int32_t hush_nextheight()
 {
     return(100000000);
 }

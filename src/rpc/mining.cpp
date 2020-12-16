@@ -390,7 +390,7 @@ UniValue genminingCSV(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( (fp= fopen(fname,"wb")) != 0 )
     {
         fprintf(fp,"height,nTime,nBits,bnTarget,bnTargetB,diff,solvetime\n");
-        height = komodo_nextheight();
+        height = hush_nextheight();
         for (i=0; i<height; i++)
         {
             if ( (pindex= komodo_chainactive(i)) != 0 )

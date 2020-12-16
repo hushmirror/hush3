@@ -558,7 +558,7 @@ int64_t AddCClibtxfee(struct CCcontract_info *cp,CMutableTransaction &mtx,CPubKe
 
 std::string Faucet2Fund(struct CCcontract_info *cp,uint64_t txfee,int64_t funds)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CPubKey mypk,cclibpk; CScript opret;
     if ( txfee == 0 )
         txfee = 10000;
@@ -574,7 +574,7 @@ std::string Faucet2Fund(struct CCcontract_info *cp,uint64_t txfee,int64_t funds)
 
 std::string CClib_rawtxgen(struct CCcontract_info *cp,uint8_t funcid,cJSON *params)
 {
-    CMutableTransaction tmpmtx,mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction tmpmtx,mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CPubKey mypk,cclibpk; int64_t funds,txfee=0,inputs,CCchange=0,nValue=FAUCET2SIZE; std::string rawhex; uint32_t j; int32_t i,len; uint8_t buf[32768]; bits256 hash;
     if ( txfee == 0 )
         txfee = 10000;
