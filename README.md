@@ -1,26 +1,28 @@
-# HUSH
+# Hush
 
-## What is HUSH?
+## What is Hush?
 
 ![Logo](doc/hush/hush.png "Logo")
 
-HUSH (originally Zdash) is a source code fork of [ZCash](https://z.cash/) and has
-it's own genesis block. It is not a chain fork of another coin.  Based on
-Bitcoin's code, it intends to offer a far higher standard of privacy through a
-sophisticated zero-knowledge proving scheme that preserves confidentiality of
-transaction metadata.
+Hush implements Extreme Privacy via blockchain tech. We have our own
+genesis block. We are not a chain fork (copy) of another coin. We are based on
+Bitcoin code, with sophisticated zero-knowledge mathematics added for privacy.
+This keeps your transaction metadata private!
 
-This software is the HUSH node and command-line client. It downloads and stores
-the entire history of HUSH transactions; depending on the speed of your
-computer and network connection, the synchronization process could take a day
-or more once the blockchain has reached a significant size.
+## This repository
 
-**HUSH is unfinished and highly experimental.** Use at your own risk!
+This software is the Hush node and command-line client. It downloads and stores
+the entire history of Hush transactions; depending on the speed of your
+computer and network connection, it will likely take a few hours at least, but
+some people report full nodes syncing in less than 1.5 hours. A competing privacy
+coin takes over 24 hours to sync their full nodes because of Sprout Transactions, lulz.
+
+**Hush is unfinished and highly experimental.** Use at your own risk!
 
 ## Telegram
 
 Please feel free to join us on Telegram :
-    * Main group: https://hush.is/telegram
+    * Main group: https://hush.is/tg
     * Support group: https://hush.is/telegram_support
     * Mining group: https://hush.is/telegram_mining
 
