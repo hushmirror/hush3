@@ -635,10 +635,17 @@ void *chainparams_commandline() {
                                 (347000,     uint256S("0x00000007ab3ec746a2e279a784cc6710d41a518d2b27941d231a7ff4e4a834ea"))
                                 (348000,     uint256S("0x0000000c0b772a11bb41c362b74890d4538c325386aea4abbaae15d6789e6acc"))
                                 (349000,     uint256S("0x0000000138e50eded6f2f3cf8048d0332209c2b0f8093c6bf2695ce6e6e1c149"))
-                                (349686,     uint256S("0x0000000ea29fff8d05b3755407269e25cf220a918260e43cea2c9957abfca16a")),
-                                (int64_t) 1607519064,  // time of last checkpointed block
-                                (int64_t) 645127,      // total txs
-                                (double)  1134         // txs in the last day before last checkpoint block
+                                (350000,     uint256S("0x0000000656e29123cd550fc58eebacc37e77e61783d32d0235cde81796a033ac"))
+                                (351000,     uint256S("0x000000031517a325e1d9c838c81d88263f7fe0362ede1091a2230c9bf730b21e"))
+                                (352000,     uint256S("0x000000026a80af033ac7be8f45fcfc5c0665be0073cc773daf584d6f03af7dae"))
+                                (353000,     uint256S("0x00000006cfc77e91f9656fb115b2a1cc75b3def543103e3181aeb5c064929ba1"))
+                                (354000,     uint256S("0x00000000488c19fd232d9f524b76480d40621e475f9d07de567323e895ea2d77"))
+                                (355000,     uint256S("0x00000006a09508363685c036bbf97abddf1102d7e364a82f4e74139ca185c53a"))
+                                (356000,     uint256S("0x000000075259426ff06e73fc17a784d9b8a4a932b95e28a769cc51192c096299"))
+                                (357000,     uint256S("0x00000009133b5a079dac92de7371f73af077ca43ce0e435ac727cce95716bf6b")),
+                                (int64_t)  1608068955, // time of last checkpointed block
+                                (int64_t) 654996,      // total txs
+                                (double)  584        // txs in the last day before block 357576
                 };
         } else {
             checkpointData = //(Checkpoints::CCheckpointData)
