@@ -21,9 +21,7 @@
 #include "include/cJSON.h"
 #include "cryptoconditions.h"
 
-
 struct CCType CC_AnonType;
-
 
 CC *mkAnon(const Condition_t *asnCond) {
 
