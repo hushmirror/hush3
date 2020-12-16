@@ -19,3 +19,7 @@ open-source licenses. For further details see 'contrib/debian/copyright'.
 This product includes software developed by the OpenSSL Project for use in the
 OpenSSL Toolkit (https://www.openssl.org/). This product includes cryptographic
 software written by Eric Young (eay@cryptsoft.com).
+
+We are open to granting more permissive (such as MIT or Apache 2.0) licenses to Hush
+software on a *case-by-case* basis, for an agreed upon price. Please contact
+The Hush developers if you are interested.
