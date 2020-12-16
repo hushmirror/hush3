@@ -3,6 +3,13 @@
 Hush release notes were done on Github until 3.5.2,
 and now are officially part of our Git repo.
 
+## Downloading Releases
+
+Hush releases are on our own Gitea at <a href="https://git.hush.is/">git.hush.is</a>
+and no longer on Github, since they banned Duke Leto and
+also because they censor many people around the world and work with
+evil organizations.
+
 # 3.6.0
 
   * Fixes "block 340k" sync issues!
