@@ -1,16 +1,8 @@
-Format: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?rev=174
-Upstream-Name: Zcash
-Upstream-Contact: Zcash Company <team@z.cash>
-Source: https://github.com/zcash/zcash
-
 Files: *
-Copyright: 2016-2018, The Zcash developers
- 2009-2018, Bitcoin Core developers
- 2009-2018, Bitcoin Developers
-License: Expat
-Comment: The Bitcoin Core developers encompasses the current developers listed on bitcoin.org,
- as well as the numerous contributors to the project.
- The Zcash developers are listed at https://z.cash/team.html.
+Copyright: 2016-2020, The Hush developers
+ 2009-2016, Bitcoin Core developers
+License: GPLv3
+Comment: https://hush.is/developers
 
 Files: depends/sources/libsodium-*.tar.gz
 Copyright: 2013-2016 Frank Denis
@@ -30,10 +22,6 @@ Copyright: 1990, 2016 Oracle and/or its affiliates;
  1995, 1996 The President and Fellows of Harvard University;
  2000-2005 INRIA, France Telecom
 License: BDB
-
-Files: depends/sources/openssl-*.tar.gz
-Copyright: 1998-2016 The OpenSSL Project and 1995-1998 Eric Young
-License: OpenSSL+SSLeay
 
 Files: depends/sources/zeromq-*.tar.gz
 Copyright:
