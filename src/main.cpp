@@ -5216,49 +5216,41 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     int nHeight  = pindexPrev->GetHeight()+1;
     bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
-    // Check Proof-of-Work
-    if(ishush3) {
+    // Check Proof-of-Work difficulty
+    if (ishush3) {
         // The change of blocktime from 150s to 75s caused Weird Stuff in the difficulty/work calculations
         // caused by the fact that Difficulty Adjustment Algorithms do not take into account blocktime
         // changing at run-time, which breaks assumptions in the algorithm
         unsigned int nNextWork = GetNextWorkRequired(pindexPrev, &block, consensusParams);
         //if ((nHeight < 340000 || nHeight > 342500) && block.nBits != nNextWork) {
         if (block.nBits != nNextWork) {
-            cout << "Incorrect HUSH Proof-of-Work at height " << nHeight   <<
-                " " << block.nBits << " block.nBits vs. calc "    << nNextWork <<
-                " " << block.GetHash().ToString() << " @ " << block.GetBlockTime() <<  endl;
+            cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
+                " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
+                " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
                 // Don't use this CLI option unless you know what you are doing -- Duke
-                if(!GetArg("-dev-ignore-bad-nbits",false))  {
-                   return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
+                //if(!GetArg("-dev-ignore-bad-nbits",false))  {
+                if (nHeight < 340000) {
+                   return state.DoS(100, error("%s: Incorrect diffbits at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
                 } else {
-                    cout << "Ignoring bad nBits!!!" << endl;
+                    LogPrintf("%s: Ignoring nbits calc : %lu\n",__func__, nNextWork   );
+                    LogPrintf("%s: Ignoring nbits block: %lu\n",__func__, block.nBits );
+                    cout << "Ignoring nbits for height=" << nHeight << endl;
                 }
-        }
-    } else {
-        // Hush Smart Chains
-        if ( block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams)) {
-            cout << "Incorrect Proof-of-Work! " << block.nBits << " block.nBits vs. calc " <<
-                    GetNextWorkRequired(pindexPrev, &block, consensusParams) <<
-                    " for height " << nHeight << " " <<
-                    block.GetHash().ToString() << " with time " <<
-                    block.GetBlockTime() <<  endl;
-
-            return state.DoS(100, error("%s: Incorrect Proof-of-Work at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
         }
     }
 
     // Check timestamp against prev
-    if ( ASSETCHAINS_ADAPTIVEPOW <= 0 || nHeight < 30 ) {
+    if (ASSETCHAINS_ADAPTIVEPOW <= 0 || nHeight < 30) {
         if (block.GetBlockTime() <= pindexPrev->GetMedianTimePast() )
         {
             fprintf(stderr,"ht.%d too early %u vs %u\n",(int32_t)nHeight,(uint32_t)block.GetBlockTime(),(uint32_t)pindexPrev->GetMedianTimePast());
-            return state.Invalid(error("%s: block's timestamp is too early", __func__), REJECT_INVALID, "time-too-old");
+            return state.Invalid(error("%s: block's timestamp is too early based on median time", __func__), REJECT_INVALID, "time-too-old-median");
         }
     } else {
         if ( block.GetBlockTime() <= pindexPrev->nTime )
         {
             fprintf(stderr,"ht.%d too early2 %u vs %u\n",(int32_t)nHeight,(uint32_t)block.GetBlockTime(),(uint32_t)pindexPrev->nTime);
-            return state.Invalid(error("%s: block's timestamp is too early2", __func__), REJECT_INVALID, "time-too-old");
+            return state.Invalid(error("%s: block's timestamp is too early based on previous block", __func__), REJECT_INVALID, "time-too-old-prevblock");
         }
     }
 
@@ -5287,7 +5279,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         {
             if ( pcheckpoint != 0 && nHeight < pcheckpoint->GetHeight() )
                 return state.DoS(1, error("%s: forked chain older than last checkpoint (height %d) vs %d", __func__, nHeight,pcheckpoint->GetHeight()));
-            if ( komodo_checkpoint(&notarized_height,nHeight,hash) < 0 )
+            if ( hush_checkpoint(&notarized_height,nHeight,hash) < 0 )
             {
                 CBlockIndex *heightblock = chainActive[nHeight];
                 if ( heightblock != 0 && heightblock->GetBlockHash() == hash )
