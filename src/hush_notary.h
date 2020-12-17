@@ -298,7 +298,7 @@ int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *tx
     if ( (sp= hush_stateptr(symbol,dest)) != 0 )
     {
         CBlockIndex *pindex;
-        if ( (pindex= komodo_blockindex(sp->NOTARIZED_HASH)) == 0 || pindex->GetHeight() < 0 )
+        if ( (pindex= hush_blockindex(sp->NOTARIZED_HASH)) == 0 || pindex->GetHeight() < 0 )
         {
             //fprintf(stderr,"found orphaned notarization at ht.%d pindex.%p\n",sp->NOTARIZED_HEIGHT,(void *)pindex);
             memset(&sp->NOTARIZED_HASH,0,sizeof(sp->NOTARIZED_HASH));
@@ -334,7 +334,7 @@ int32_t hush_dpowconfs(int32_t txheight,int32_t numconfs)
     return(numconfs);
 }
 
-int32_t komodo_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t height,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip)
+int32_t hush_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t height,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip)
 {
     struct notarized_checkpoint *np = 0;
     if ( (np= komodo_npptr(height)) != 0 )

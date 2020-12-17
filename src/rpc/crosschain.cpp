@@ -56,8 +56,8 @@ int32_t ensure_CCrequirements(uint8_t evalcode);
 bool EnsureWalletIsAvailable(bool avoidException);
 
 
-int32_t komodo_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip);
-int32_t komodo_MoMoMdata(char *hexstr,int32_t hexsize,struct komodo_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height);
+int32_t hush_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip);
+int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct komodo_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height);
 struct komodo_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi);
 uint256 komodo_calcMoM(int32_t height,int32_t MoMdepth);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
@@ -108,7 +108,7 @@ UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
         height = chainActive.Tip()->GetHeight();
     }
     //fprintf(stderr,"height_MoM height.%d\n",height);
-    depth = komodo_MoM(&notarized_height,&MoM,&kmdtxid,height,&MoMoM,&MoMoMoffset,&MoMoMdepth,&kmdstarti,&kmdendi);
+    depth = hush_MoM(&notarized_height,&MoM,&kmdtxid,height,&MoMoM,&MoMoMoffset,&MoMoMdepth,&kmdstarti,&kmdendi);
     ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL)));
     ret.push_back(Pair("height",height));
     ret.push_back(Pair("timestamp",(uint64_t)timestamp));

@@ -33,7 +33,7 @@ uint256 komodo_calcMoM(int32_t height,int32_t MoMdepth)
         return(zero);
     for (i=0; i<MoMdepth; i++)
     {
-        if ( (pindex= komodo_chainactive(height - i)) != 0 )
+        if ( (pindex= hush_chainactive(height - i)) != 0 )
             leaves.push_back(pindex->hashMerkleRoot);
         else
             return(zero);
@@ -100,7 +100,7 @@ int32_t komodo_addpair(struct komodo_ccdataMoMoM *mdata,int32_t notarized_height
     return(maxpairs);
 }
 
-int32_t komodo_MoMoMdata(char *hexstr,int32_t hexsize,struct komodo_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height)
+int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct komodo_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height)
 {
     uint8_t hexdata[8192]; struct komodo_ccdata *ccdata,*tmpptr; int32_t len,maxpairs,i,retval=-1,depth,starti,endi,CCid=0; struct komodo_ccdata_entry *allMoMs;
     starti = endi = depth = len = maxpairs = 0;

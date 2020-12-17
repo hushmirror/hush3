@@ -44,15 +44,15 @@ bool check_pprevnotarizedht();
 #include "hush_structs.h"
 #include "hush_globals.h"
 #include "hush_utils.h"
-#include "komodo_curve25519.h"
+#include "hush_curve25519.h"
 #include "komodo_cJSON.c"
 #include "hush_bitcoind.h"
 #include "komodo_pax.h"
 #include "hush_notary.h"
 
-int32_t komodo_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *dest);
+int32_t hush_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *dest);
 #include "komodo_kv.h"
-#include "komodo_gateway.h"
+#include "hush_gateway.h"
 #include "komodo_events.h"
 #include "komodo_ccdata.h"
 
@@ -64,7 +64,7 @@ void hush_currentheight_set(int32_t height)
 }
 
 extern struct NSPV_inforesp NSPV_inforesult;
-int32_t komodo_currentheight()
+int32_t hush_currentheight()
 {
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
     if ( HUSH_NSPV_SUPERLITE )
@@ -76,7 +76,7 @@ int32_t komodo_currentheight()
     else return(0);
 }
 
-int32_t komodo_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *dest)
+int32_t hush_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *dest)
 {
     static int32_t errs;
     int32_t func,ht,notarized_height,num,matched=0,MoMdepth; uint256 MoM,notarized_hash,notarized_desttxid; uint8_t pubkeys[64][33];
@@ -222,7 +222,7 @@ int32_t memread(void *dest,int32_t size,uint8_t *filedata,long *fposp,long datal
     return(-1);
 }
 
-int32_t komodo_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fposp,long datalen,char *symbol,char *dest)
+int32_t hush_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fposp,long datalen,char *symbol,char *dest)
 {
     static int32_t errs;
     int32_t func= -1,ht,notarized_height,MoMdepth,num,matched=0; uint256 MoM,notarized_hash,notarized_desttxid; uint8_t pubkeys[64][33]; long fpos = *fposp;
@@ -380,7 +380,7 @@ void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotarie
             else
             {
                 fprintf(stderr,"hush_faststateinit retval.%d\n",retval);
-                while ( komodo_parsestatefile(sp,fp,symbol,dest) >= 0 )
+                while ( hush_parsestatefile(sp,fp,symbol,dest) >= 0 )
                     ;
             }
         } else fp = fopen(fname,"wb+");

@@ -903,7 +903,7 @@ UniValue OracleFund(const CPubKey& pk, int64_t txfee,uint256 oracletxid)
     CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight()); CTransaction tx;
     CPubKey mypk,oraclespk; struct CCcontract_info *cp,C; std::string name,desc,format; int32_t numvouts; uint256 hashBlock;
 
-    if (GetLatestTimestamp(komodo_currentheight())<PUBKEY_SPOOFING_FIX_ACTIVATION)
+    if (GetLatestTimestamp(hush_currentheight())<PUBKEY_SPOOFING_FIX_ACTIVATION)
         CCERR_RESULT("oraclescc",CCLOG_INFO, stream << "oraclesfund not active yet, activation scheduled for July 15th");
     if (myGetTransaction(oracletxid,tx,hashBlock)==0 || (numvouts=tx.vout.size())<=0)
         CCERR_RESULT("oraclecc",CCLOG_INFO, stream << "cant find oracletxid " << oracletxid.GetHex());
@@ -942,7 +942,7 @@ UniValue OracleRegister(const CPubKey& pk, int64_t txfee,uint256 oracletxid,int6
     markerpubkey = CCtxidaddr(markeraddr,oracletxid);
     if (AddNormalinputs(mtx,mypk,3*txfee,4,pk.IsValid()))
     {
-        if (GetLatestTimestamp(komodo_currentheight())>PUBKEY_SPOOFING_FIX_ACTIVATION && AddMyOraclesFunds(cp,mtx,mypk,oracletxid)!=CC_MARKER_VALUE)
+        if (GetLatestTimestamp(hush_currentheight())>PUBKEY_SPOOFING_FIX_ACTIVATION && AddMyOraclesFunds(cp,mtx,mypk,oracletxid)!=CC_MARKER_VALUE)
             CCERR_RESULT("oraclescc",CCLOG_INFO, stream << "error adding inputs from your Oracles CC address, please fund it first with oraclesfund rpc!");
         mtx.vout.push_back(CTxOut(txfee,CScript() << ParseHex(HexStr(markerpubkey)) << OP_CHECKSIG));
         mtx.vout.push_back(MakeCC1vout(cp->evalcode,txfee,batonpk));

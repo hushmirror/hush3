@@ -548,7 +548,7 @@ char *bitcoin_address(char *coinaddr,uint8_t addrtype,uint8_t *pubkey_or_rmd160,
 int32_t komodo_minerids(uint8_t *minerids,int32_t height,int32_t width);
 int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
 
-uint32_t komodo_blocktime(uint256 hash);
+uint32_t hush_blocktime(uint256 hash);
 int32_t hush_longestchain();
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int8_t komodo_segid(int32_t nocache,int32_t height);
@@ -562,7 +562,7 @@ int32_t hush_nextheight();
 uint32_t komodo_heightstamp(int32_t height);
 int64_t komodo_pricemult(int32_t ind);
 int32_t komodo_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblocks);
-int32_t komodo_currentheight();
+int32_t hush_currentheight();
 int32_t komodo_notarized_bracket(struct notarized_checkpoint *nps[2],int32_t height);
 arith_uint256 komodo_adaptivepow_target(int32_t height,arith_uint256 bnTarget,uint32_t nTime);
 bool hush_hardfork_active(uint32_t time);
@@ -571,12 +571,12 @@ uint256 Parseuint256(const char *hexstr);
 void komodo_sendmessage(int32_t minpeers, int32_t maxpeers, const char *message, std::vector<uint8_t> payload);
 CBlockIndex *komodo_getblockindex(uint256 hash);
 int32_t hush_nextheight();
-CBlockIndex *komodo_blockindex(uint256 hash);
-CBlockIndex *komodo_chainactive(int32_t height);
-int32_t komodo_blockheight(uint256 hash);
+CBlockIndex *hush_blockindex(uint256 hash);
+CBlockIndex *hush_chainactive(int32_t height);
+int32_t hush_blockheight(uint256 hash);
 bool komodo_txnotarizedconfirmed(uint256 txid);
 int32_t komodo_blockload(CBlock& block, CBlockIndex *pindex);
-uint32_t komodo_chainactive_timestamp();
+uint32_t hush_chainactive_timestamp();
 uint32_t GetLatestTimestamp(int32_t height);
 
 #ifndef HUSH_NSPV_FULLNODE

@@ -38,7 +38,7 @@ using namespace std;
 
 static uint64_t nAccountingEntryNumber = 0;
 static list<uint256> deadTxns; 
-extern CBlockIndex *komodo_blockindex(uint256 hash);
+extern CBlockIndex *hush_blockindex(uint256 hash);
 
 //
 // CWalletDB
@@ -932,7 +932,7 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
             if (!EraseTx(hash))
                 fprintf(stderr, "could not delete tx.%s\n",hash.ToString().c_str());
             uint256 blockhash; CTransaction tx; CBlockIndex* pindex;
-            if ( GetTransaction(hash,tx,blockhash,false) && (pindex= komodo_blockindex(blockhash)) != 0 && chainActive.Contains(pindex) )
+            if ( GetTransaction(hash,tx,blockhash,false) && (pindex= hush_blockindex(blockhash)) != 0 && chainActive.Contains(pindex) )
             {
                 CWalletTx wtx(pwallet,tx);
                 pwallet->AddToWallet(wtx, true, NULL);

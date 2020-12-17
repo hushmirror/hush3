@@ -138,10 +138,10 @@ void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
         entry.push_back(Pair("generated", true));
     if (confirms > 0)
     {
-        entry.push_back(Pair("confirmations", hush_dpowconfs((int32_t)komodo_blockheight(wtx.hashBlock),confirms)));
+        entry.push_back(Pair("confirmations", hush_dpowconfs((int32_t)hush_blockheight(wtx.hashBlock),confirms)));
         entry.push_back(Pair("blockhash", wtx.hashBlock.GetHex()));
         entry.push_back(Pair("blockindex", wtx.nIndex));
-        entry.push_back(Pair("blocktime", (uint64_t)komodo_blocktime(wtx.hashBlock)));
+        entry.push_back(Pair("blocktime", (uint64_t)hush_blocktime(wtx.hashBlock)));
         entry.push_back(Pair("expiryheight", (int64_t)wtx.nExpiryHeight));
     } else entry.push_back(Pair("confirmations", confirms));
     uint256 hash = wtx.GetHash();
@@ -1659,7 +1659,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
             tallyitem& item = mapTally[address];
             item.nAmount += txout.nValue;
             item.nConf = min(item.nConf, nDepth);
-            item.nHeight = komodo_blockheight(wtx.hashBlock);
+            item.nHeight = hush_blockheight(wtx.hashBlock);
             item.txids.push_back(wtx.GetHash());
             if (mine & ISMINE_WATCH_ONLY)
                 item.fIsWatchonly = true;
@@ -5561,8 +5561,8 @@ int32_t ensure_CCrequirements(uint8_t evalcode) {
     if ( ASSETCHAINS_CCDISABLES[evalcode] != 0 || (evalcode == EVAL_MARMARA && ASSETCHAINS_MARMARA == 0) )
     {
         // check if a height activation has been set. 
-        fprintf(stderr, "evalcode.%i activates at height. %i current height.%i\n", evalcode, mapHeightEvalActivate[evalcode], komodo_currentheight());
-        if ( mapHeightEvalActivate[evalcode] == 0 || komodo_currentheight() == 0 || mapHeightEvalActivate[evalcode] > komodo_currentheight() )
+        fprintf(stderr, "evalcode.%i activates at height. %i current height.%i\n", evalcode, mapHeightEvalActivate[evalcode], hush_currentheight());
+        if ( mapHeightEvalActivate[evalcode] == 0 || hush_currentheight() == 0 || mapHeightEvalActivate[evalcode] > hush_currentheight() )
         {
             fprintf(stderr,"evalcode %d disabled\n",evalcode);
             return(-1);

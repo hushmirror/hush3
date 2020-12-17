@@ -144,7 +144,7 @@ int64_t komodo_block_unlocktime(uint32_t nHeight);
 uint64_t the_commission(const CBlock *block,int32_t height);
 int32_t hush_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *ptr);
 int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
-int32_t komodo_is_notarytx(const CTransaction& tx);
+int32_t hush_is_notarytx(const CTransaction& tx);
 uint64_t komodo_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 int32_t komodo_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *script, int32_t len);
@@ -303,7 +303,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
             } else {
                 TMP_NotarizationNotaries.clear();
                 bool fToCryptoAddress = false;
-                if ( numSN != 0 && notarypubkeys[0][0] != 0 && komodo_is_notarytx(tx) == 1 )
+                if ( numSN != 0 && notarypubkeys[0][0] != 0 && hush_is_notarytx(tx) == 1 )
                     fToCryptoAddress = true;
 
                 BOOST_FOREACH(const CTxIn& txin, tx.vin)

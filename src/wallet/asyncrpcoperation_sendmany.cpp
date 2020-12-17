@@ -51,7 +51,7 @@ using namespace libzcash;
 extern char SMART_CHAIN_SYMBOL[65];
 
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
-int32_t komodo_blockheight(uint256 hash);
+int32_t hush_blockheight(uint256 hash);
 int tx_height( const uint256 &hash );
 bool hush_hardfork_active(uint32_t time);
 extern UniValue signrawtransaction(const UniValue& params, bool fHelp, const CPubKey& mypk);

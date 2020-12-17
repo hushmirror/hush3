@@ -2738,7 +2738,7 @@ UniValue sudoku_txidinfo(uint64_t txfee,struct CCcontract_info *cp,cJSON *params
                 if ( sudoku_genopreturndecode(unsolved,tx.vout[numvouts-1].scriptPubKey) == 'G' )
                 {
                     result.push_back(Pair("result","success"));
-                    if ( (pindex= komodo_blockindex(hashBlock)) != 0 )
+                    if ( (pindex= hush_blockindex(hashBlock)) != 0 )
                         result.push_back(Pair("height",pindex->GetHeight()));
                     Getscriptaddress(CCaddr,tx.vout[1].scriptPubKey);
                     result.push_back(Pair("sudokuaddr",CCaddr));
@@ -2790,7 +2790,7 @@ UniValue sudoku_pending(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
                 if ( sudoku_genopreturndecode(unsolved,tx.vout[numvouts-1].scriptPubKey) == 'G' )
                 {
                     UniValue obj(UniValue::VOBJ);
-                    if ( (pindex= komodo_blockindex(hashBlock)) != 0 )
+                    if ( (pindex= hush_blockindex(hashBlock)) != 0 )
                         obj.push_back(Pair("height",pindex->GetHeight()));
                     obj.push_back(Pair("amount",ValueFromAmount(tx.vout[1].nValue)));
                     obj.push_back(Pair("txid",txid.GetHex()));

@@ -46,7 +46,7 @@
 #include <string>
 #include <thread>
 
-int32_t komodo_blockheight(uint256 hash);
+int32_t hush_blockheight(uint256 hash);
 
 using namespace libzcash;
 

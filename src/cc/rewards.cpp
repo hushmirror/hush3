@@ -712,7 +712,7 @@ std::string RewardsUnlock(uint64_t txfee,char *planstr,uint256 fundingtxid,uint2
     }
     if ( amount > txfee )
     {
-        reward = RewardsCalc((int64_t)amount,mtx.vin[0].prevout.hash,(int64_t)APR,(int64_t)minseconds,(int64_t)maxseconds,komodo_chainactive_timestamp());
+        reward = RewardsCalc((int64_t)amount,mtx.vin[0].prevout.hash,(int64_t)APR,(int64_t)minseconds,(int64_t)maxseconds,hush_chainactive_timestamp());
         if ( scriptPubKey.size() > 0 )
         {
             if ( reward > txfee )

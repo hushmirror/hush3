@@ -61,7 +61,7 @@ extern uint64_t ASSETCHAINS_CBOPRET;
 void hush_passport_iteration();
 int32_t hush_longestchain();
 void komodo_cbopretupdate(int32_t forceflag);
-CBlockIndex *komodo_chainactive(int32_t height);
+CBlockIndex *hush_chainactive(int32_t height);
 
 void WaitForShutdown(boost::thread_group* threadGroup)
 {

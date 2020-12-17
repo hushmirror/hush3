@@ -268,7 +268,7 @@ bool payments_game(int32_t &top, int32_t &bottom)
 bool payments_lockedblocks(uint256 blockhash,int32_t lockedblocks,int32_t &blocksleft)
 {
     int32_t ht = chainActive.Height();
-    CBlockIndex* pblockindex = komodo_blockindex(blockhash);
+    CBlockIndex* pblockindex = hush_blockindex(blockhash);
     if ( pblockindex == 0 || pblockindex->GetHeight()+lockedblocks > ht)
     {
         blocksleft = pblockindex->GetHeight()+lockedblocks - ht;

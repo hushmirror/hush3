@@ -64,7 +64,7 @@ bool fSendFreeTransactions = false;
 bool fPayAtLeastCustomFee = true;
 #include "hush_defs.h"
 
-CBlockIndex *komodo_chainactive(int32_t height);
+CBlockIndex *hush_chainactive(int32_t height);
 extern std::string DONATION_PUBKEY;
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int tx_height( const uint256 &hash );

@@ -75,7 +75,7 @@ CCriticalSection cs_main;
 extern uint8_t NOTARY_PUBKEY33[33];
 extern int32_t HUSH_LOADINGBLOCKS,HUSH_LONGESTCHAIN,HUSH_INSYNC,HUSH_CONNECTING,HUSH_EXTRASATOSHI;
 int32_t HUSH_NEWBLOCKS;
-int32_t komodo_block2pubkey33(uint8_t *pubkey33,CBlock *block);
+int32_t hush_block2pubkey33(uint8_t *pubkey33,CBlock *block);
 //void komodo_broadcast(CBlock *pblock,int32_t limit);
 bool Getscriptaddress(char *destaddr,const CScript &scriptPubKey);
 void hush_setactivation(int32_t height);
@@ -697,7 +697,7 @@ bool komodo_dailysnapshot(int32_t height)
     {
         //fprintf(stderr, "undoing block.%i\n",n);
         CBlockIndex *pindex; CBlock block;
-        if ( (pindex= komodo_chainactive(n)) == 0 || komodo_blockload(block, pindex) != 0 ) 
+        if ( (pindex= hush_chainactive(n)) == 0 || komodo_blockload(block, pindex) != 0 ) 
             return false;
         // undo transactions in reverse order
         for (int32_t i = block.vtx.size() - 1; i >= 0; i--) 
@@ -1421,6 +1421,7 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
         }
     }
 
+    //TODO: desprout
     // Transactions containing empty `vin` must have either non-empty
     // `vjoinsplit` or non-empty `vShieldedSpend`.
     if (tx.vin.empty() && tx.vjoinsplit.empty() && tx.vShieldedSpend.empty()) 
@@ -1508,57 +1509,6 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
         }
     }
 
-    // Ensure that joinsplit values are well-formed
-    BOOST_FOREACH(const JSDescription& joinsplit, tx.vjoinsplit)
-    {
-        if ( acpublic != 0 )
-        {
-            return state.DoS(100, error("CheckTransaction(): this is a public chain, no privacy allowed"),
-                             REJECT_INVALID, "bad-txns-acpublic-chain");
-        }
-        if ( tiptime >= KOMODO_SAPLING_DEADLINE )
-        {
-            return state.DoS(100, error("CheckTransaction(): no more sprout after deadline"),
-                             REJECT_INVALID, "bad-txns-sprout-expired");
-        }
-        if (joinsplit.vpub_old < 0) {
-            return state.DoS(100, error("CheckTransaction(): joinsplit.vpub_old negative"),
-                             REJECT_INVALID, "bad-txns-vpub_old-negative");
-        }
-
-        if (joinsplit.vpub_new < 0) {
-            return state.DoS(100, error("CheckTransaction(): joinsplit.vpub_new negative"),
-                             REJECT_INVALID, "bad-txns-vpub_new-negative");
-        }
-
-        if (joinsplit.vpub_old > MAX_MONEY) {
-            return state.DoS(100, error("CheckTransaction(): joinsplit.vpub_old too high"),
-                             REJECT_INVALID, "bad-txns-vpub_old-toolarge");
-        }
-
-        if (joinsplit.vpub_new > MAX_MONEY) {
-            return state.DoS(100, error("CheckTransaction(): joinsplit.vpub_new too high"),
-                             REJECT_INVALID, "bad-txns-vpub_new-toolarge");
-        }
-
-        if (joinsplit.vpub_new != 0 && joinsplit.vpub_old != 0) {
-            return state.DoS(100, error("CheckTransaction(): joinsplit.vpub_new and joinsplit.vpub_old both nonzero"),
-                             REJECT_INVALID, "bad-txns-vpubs-both-nonzero");
-        }
-
-        nValueOut += joinsplit.vpub_old;
-        if (!MoneyRange(nValueOut)) {
-            return state.DoS(100, error("CheckTransaction(): txout total out of range"),
-                             REJECT_INVALID, "bad-txns-txouttotal-toolarge");
-        }
-        if ( joinsplit.vpub_new == 0 && joinsplit.vpub_old == 0 )
-            z_z++;
-        else if ( joinsplit.vpub_new == 0 && joinsplit.vpub_old != 0 )
-            t_z++;
-        else if ( joinsplit.vpub_new != 0 && joinsplit.vpub_old == 0 )
-            z_t++;
-    }
-
     if ( ASSETCHAINS_PRIVATE != 0 && invalid_private_taddr != 0 )
     {
         static uint32_t counter;
@@ -1591,15 +1541,6 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
     // to the value pool.
     {
         CAmount nValueIn = 0;
-        for (std::vector<JSDescription>::const_iterator it(tx.vjoinsplit.begin()); it != tx.vjoinsplit.end(); ++it)
-        {
-            nValueIn += it->vpub_new;
-
-            if (!MoneyRange(it->vpub_new) || !MoneyRange(nValueIn)) {
-                return state.DoS(100, error("CheckTransaction(): txin total out of range"),
-                                 REJECT_INVALID, "bad-txns-txintotal-toolarge");
-            }
-        }
 
         // Also check for Sapling
         if (tx.valueBalance >= 0) {
@@ -1623,22 +1564,6 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
         vInOutPoints.insert(txin.prevout);
     }
 
-    // Check for duplicate joinsplit nullifiers in this transaction
-    {
-        set<uint256> vJoinSplitNullifiers;
-        BOOST_FOREACH(const JSDescription& joinsplit, tx.vjoinsplit)
-        {
-            BOOST_FOREACH(const uint256& nf, joinsplit.nullifiers)
-            {
-                if (vJoinSplitNullifiers.count(nf))
-                    return state.DoS(100, error("CheckTransaction(): duplicate nullifiers"),
-                                REJECT_INVALID, "bad-joinsplits-nullifiers-duplicate");
-
-                vJoinSplitNullifiers.insert(nf);
-            }
-        }
-    }
-
     // Check for duplicate sapling nullifiers in this transaction
     {
         set<uint256> vSaplingNullifiers;
@@ -1652,8 +1577,7 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
         }
     }
 
-    if (tx.IsMint())
-    {
+    if (tx.IsMint()) {
         // There should be no joinsplits in a coinbase transaction
         if (tx.vjoinsplit.size() > 0)
             return state.DoS(100, error("CheckTransaction(): coinbase has joinsplits"),
@@ -1670,9 +1594,7 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
         if (tx.vin[0].scriptSig.size() < 2 || tx.vin[0].scriptSig.size() > 100)
             return state.DoS(100, error("CheckTransaction(): coinbase script size"),
                              REJECT_INVALID, "bad-cb-length");
-    }
-    else
-    {
+    } else {
         BOOST_FOREACH(const CTxIn& txin, tx.vin)
         if (txin.prevout.IsNull())
             return state.DoS(10, error("CheckTransaction(): prevout is null"),
@@ -2310,7 +2232,7 @@ bool ReadBlockFromDisk(int32_t height,CBlock& block, const CDiskBlockPos& pos,bo
     // Check the header
     if ( 0 && checkPOW != 0 )
     {
-        komodo_block2pubkey33(pubkey33,(CBlock *)&block);
+        hush_block2pubkey33(pubkey33,(CBlock *)&block);
         if (!(CheckEquihashSolution(&block, Params()) && CheckProofOfWork(block, pubkey33, height, Params().GetConsensus())))
         {
             int32_t i; for (i=0; i<33; i++)
@@ -5035,7 +4957,7 @@ bool CheckBlock(int32_t *futureblockp,int32_t height,CBlockIndex *pindex,const C
     {
         //if ( !CheckEquihashSolution(&block, Params()) )
         //    return state.DoS(100, error("CheckBlock: Equihash solution invalid"),REJECT_INVALID, "invalid-solution");
-        komodo_block2pubkey33(pubkey33,(CBlock *)&block);
+        hush_block2pubkey33(pubkey33,(CBlock *)&block);
         if ( !CheckProofOfWork(block,pubkey33,height,Params().GetConsensus()) )
         {
             int32_t z; for (z=31; z>=0; z--)
@@ -5474,7 +5396,7 @@ bool AcceptBlock(int32_t *futureblockp,CBlock& block, CValidationState& state, C
                 CValidationState tmpstate; CBlockIndex *tmpindex; int32_t ht,longest;
                 ht = (int32_t)pindex->GetHeight();
                 longest = hush_longestchain();
-                if ( (longest == 0 || ht < longest-6) && (tmpindex=komodo_chainactive(ht)) != 0 )
+                if ( (longest == 0 || ht < longest-6) && (tmpindex=hush_chainactive(ht)) != 0 )
                 {
                     fprintf(stderr,"reconsider height.%d, longest.%d\n",(int32_t)ht,longest);
                     if ( Queued_reconsiderblock == zeroid )
@@ -6542,8 +6464,8 @@ bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos *dbp)
                         nLoaded++;
                     if (state.IsError())
                         break;
-                } else if (hash != chainparams.GetConsensus().hashGenesisBlock && komodo_blockheight(hash) % 1000 == 0) {
-                    LogPrintf("Block Import: already had block %s at height %d\n", hash.ToString(), komodo_blockheight(hash));
+                } else if (hash != chainparams.GetConsensus().hashGenesisBlock && hush_blockheight(hash) % 1000 == 0) {
+                    LogPrintf("Block Import: already had block %s at height %d\n", hash.ToString(), hush_blockheight(hash));
                 }
 
                 // Recursively process earlier encountered successors of this block

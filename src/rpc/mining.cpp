@@ -377,7 +377,7 @@ UniValue setgenerate(const UniValue& params, bool fHelp, const CPubKey& mypk)
 }
 #endif
 
-CBlockIndex *komodo_chainactive(int32_t height);
+CBlockIndex *hush_chainactive(int32_t height);
 arith_uint256 zawy_ctB(arith_uint256 bnTarget,uint32_t solvetime);
 
 UniValue genminingCSV(const UniValue& params, bool fHelp, const CPubKey& mypk)
@@ -393,7 +393,7 @@ UniValue genminingCSV(const UniValue& params, bool fHelp, const CPubKey& mypk)
         height = hush_nextheight();
         for (i=0; i<height; i++)
         {
-            if ( (pindex= komodo_chainactive(i)) != 0 )
+            if ( (pindex= hush_chainactive(i)) != 0 )
             {
                 bnTarget.SetCompact(pindex->nBits,&fNegative,&fOverflow);
                 solvetime = (prevtime==0) ? 0 : (int32_t)(pindex->nTime - prevtime);

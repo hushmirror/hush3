@@ -601,7 +601,7 @@ int32_t games_isvalidgame(struct CCcontract_info *cp,int32_t &gameheight,CTransa
     if ( (txid == zeroid || myGetTransaction(txid,tx,hashBlock) != 0) && (numvouts= tx.vout.size()) > 1 )
     {
         if ( txid != zeroid )
-            gameheight = komodo_blockheight(hashBlock);
+            gameheight = hush_blockheight(hashBlock);
         else
         {
             txid = tx.GetHash();
@@ -674,7 +674,7 @@ int32_t games_playersalive(int32_t &openslots,int32_t &numplayers,uint256 gametx
                 {
                     if ( myGetTransaction(txid,tx,hashBlock) != 0 )
                     {
-                        if ( (pindex= komodo_blockindex(hashBlock)) != 0 )
+                        if ( (pindex= hush_blockindex(hashBlock)) != 0 )
                         {
                             if ( pindex->GetHeight() <= gameht+GAMES_MAXKEYSTROKESGAP )
                                 alive++;
@@ -857,7 +857,7 @@ int64_t games_buyins(uint256 gametxid,int32_t maxplayers)
 uint64_t games_gamefields(UniValue &obj,int64_t maxplayers,int64_t buyin,uint256 gametxid,char *mygamesaddr)
 {
     CBlockIndex *pindex; int32_t ht,openslots,delay,numplayers; uint256 hashBlock; uint64_t seed=0; char cmd[512]; CTransaction tx;
-    if ( myGetTransaction(gametxid,tx,hashBlock) != 0 && (pindex= komodo_blockindex(hashBlock)) != 0 )
+    if ( myGetTransaction(gametxid,tx,hashBlock) != 0 && (pindex= hush_blockindex(hashBlock)) != 0 )
     {
         ht = pindex->GetHeight();
         delay = GAMES_REGISTRATION * (maxplayers > 1);
@@ -865,7 +865,7 @@ uint64_t games_gamefields(UniValue &obj,int64_t maxplayers,int64_t buyin,uint256
         obj.push_back(Pair("start",ht+delay));
         if ( hush_nextheight() > ht+delay )
         {
-            if ( (pindex= komodo_chainactive(ht+delay)) != 0 )
+            if ( (pindex= hush_chainactive(ht+delay)) != 0 )
             {
                 hashBlock = pindex->GetBlockHash();
                 obj.push_back(Pair("starthash",hashBlock.ToString()));
@@ -1066,7 +1066,7 @@ int32_t games_findbaton(struct CCcontract_info *cp,uint256 &playertxid,gameseven
                 {
                     if ( hashBlock == zeroid )
                         batonht = hush_nextheight();
-                    else if ( (pindex= komodo_blockindex(hashBlock)) == 0 )
+                    else if ( (pindex= hush_blockindex(hashBlock)) == 0 )
                         return(-4);
                     else batonht = pindex->GetHeight();
                     batonvalue = batontx.vout[0].nValue;

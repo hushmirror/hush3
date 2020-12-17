@@ -27,10 +27,6 @@ define $(package)_build_cmds
 endef
 endif
 
-
-
-
-
 define $(package)_stage_cmds
   $($(package)_install) -D ./make/gmock-all.o $($(package)_staging_dir)$(host_prefix)/lib/libgmock.a && \
   cp -a ./include $($(package)_staging_dir)$(host_prefix)/include

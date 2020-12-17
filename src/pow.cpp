@@ -32,7 +32,7 @@
 #ifdef ENABLE_RUST
 #include "librustzcash.h"
 #endif // ENABLE_RUST
-uint32_t komodo_chainactive_timestamp();
+uint32_t hush_chainactive_timestamp();
 
 #include "hush_defs.h"
 
@@ -674,8 +674,7 @@ bool CheckEquihashSolution(const CBlockHeader *pblock, const CChainParams& param
 }
 
 int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
-int32_t komodo_is_special(uint8_t pubkeys[66][33],int32_t mids[66],uint32_t blocktimes[66],int32_t height,uint8_t pubkey33[33],uint32_t blocktime);
-int32_t komodo_currentheight();
+int32_t hush_currentheight();
 void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
 bool komodo_checkopret(CBlock *pblock, CScript &merkleroot);
 CScript komodo_makeopret(CBlock *pblock, bool fNew);
@@ -699,10 +698,10 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
     //fprintf(stderr," checkpow\n");
     memcpy(origpubkey33,pubkey33,33);
     memset(blocktimes,0,sizeof(blocktimes));
-    tiptime = komodo_chainactive_timestamp();
+    tiptime = hush_chainactive_timestamp();
     bnTarget.SetCompact(blkHeader.nBits, &fNegative, &fOverflow);
     if ( height == 0 ) {
-        height = komodo_currentheight() + 1;
+        height = hush_currentheight() + 1;
         //fprintf(stderr,"set height to %d\n",height);
     }
     arith_uint256 bnLimit = (height <= 1 || ASSETCHAINS_ALGO == ASSETCHAINS_EQUIHASH) ? UintToArith256(params.powLimit) : UintToArith256(params.powAlternate);

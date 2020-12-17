@@ -1153,7 +1153,7 @@ const char *komodo_opreturn(int32_t height,uint64_t value,uint8_t *opretbuf,int3
     return(typestr);
 }
 
-int32_t komodo_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fposp,long datalen,char *symbol,char *dest);
+int32_t hush_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fposp,long datalen,char *symbol,char *dest);
 
 void hush_stateind_set(struct hush_state *sp,uint32_t *inds,int32_t n,uint8_t *filedata,long datalen,char *symbol,char *dest)
 {
@@ -1232,7 +1232,7 @@ void hush_stateind_set(struct hush_state *sp,uint32_t *inds,int32_t n,uint8_t *f
                     if ( doissue != 0 )
                     {
                         //printf("issue %c total.%d lastfpos.%ld\n",func,count,lastfpos);
-                        komodo_parsestatefiledata(sp,filedata,&lastfpos,datalen,symbol,dest);
+                        hush_parsestatefiledata(sp,filedata,&lastfpos,datalen,symbol,dest);
                         count++;
                     }
                 }
@@ -1373,7 +1373,7 @@ int32_t hush_faststateinit(struct hush_state *sp,char *fname,char *symbol,char *
             if ( (indfp= fopen(indfname,"wb")) != 0 )
                 fwrite(&prevpos100,1,sizeof(prevpos100),indfp), indcounter++;
             fprintf(stderr,"processing %s %ldKB, validated.%ld\n",fname,datalen/1024,validated);
-            while ( (func= komodo_parsestatefiledata(sp,filedata,&fpos,datalen,symbol,dest)) >= 0 )
+            while ( (func= hush_parsestatefiledata(sp,filedata,&fpos,datalen,symbol,dest)) >= 0 )
             {
                 lastfpos = komodo_indfile_update(indfp,&prevpos100,lastfpos,fpos,func,&indcounter);
             }
@@ -1398,7 +1398,7 @@ int32_t hush_faststateinit(struct hush_state *sp,char *fname,char *symbol,char *
                     fseek(indfp,indcounter * sizeof(uint32_t),SEEK_SET);
                     if ( ftell(indfp) == indcounter * sizeof(uint32_t) )
                     {
-                        while ( (func= komodo_parsestatefiledata(sp,filedata,&fpos,datalen,symbol,dest)) >= 0 )
+                        while ( (func= hush_parsestatefiledata(sp,filedata,&fpos,datalen,symbol,dest)) >= 0 )
                         {
                             lastfpos = komodo_indfile_update(indfp,&prevpos100,lastfpos,fpos,func,&indcounter);
                             if ( lastfpos != fpos )
@@ -1433,9 +1433,9 @@ void hush_passport_iteration()
         fprintf(stderr,"[%s] PASSPORT iteration waiting for HUSH_INITDONE\n",SMART_CHAIN_SYMBOL);
         sleep(3);
     }
-    if ( komodo_chainactive_timestamp() > lastinterest )
+    if ( hush_chainactive_timestamp() > lastinterest )
     {
-        lastinterest = komodo_chainactive_timestamp();
+        lastinterest = hush_chainactive_timestamp();
     }
     refsp = hush_stateptr(symbol,dest);
     if ( SMART_CHAIN_SYMBOL[0] == 0 || strcmp(SMART_CHAIN_SYMBOL,"JUSTLIES") == 0 )
@@ -1476,7 +1476,7 @@ void hush_passport_iteration()
                 {
                     fpos = 0;
                     fprintf(stderr,"%s processing %s %ldKB\n",SMART_CHAIN_SYMBOL,fname,datalen/1024);
-                    while ( komodo_parsestatefiledata(sp,filedata,&fpos,datalen,symbol,dest) >= 0 )
+                    while ( hush_parsestatefiledata(sp,filedata,&fpos,datalen,symbol,dest) >= 0 )
                         lastfpos = fpos;
                     fprintf(stderr,"%s took %d seconds to process %s %ldKB\n",SMART_CHAIN_SYMBOL,(int32_t)(time(NULL)-starttime),fname,datalen/1024);
                     lastpos[baseid] = lastfpos;
@@ -1492,7 +1492,7 @@ void hush_passport_iteration()
                         if ( SMART_CHAIN_SYMBOL[0] != 0 )
                             printf("%s passport refid.%d %s fname.(%s) base.%s %ld %ld\n",SMART_CHAIN_SYMBOL,refid,symbol,fname,base,ftell(fp),lastpos[baseid]);
                         fseek(fp,lastpos[baseid],SEEK_SET);
-                        while ( komodo_parsestatefile(sp,fp,symbol,dest) >= 0 && n < limit )
+                        while ( hush_parsestatefile(sp,fp,symbol,dest) >= 0 && n < limit )
                         {
                             if ( n == limit-1 )
                             {
@@ -1628,7 +1628,7 @@ int32_t komodo_heightpricebits(uint64_t *seedp,uint32_t *heightbits,int32_t nHei
     CBlockIndex *pindex; CBlock block;
     if ( seedp != 0 )
         *seedp = 0;
-    if ( (pindex= komodo_chainactive(nHeight)) != 0 )
+    if ( (pindex= hush_chainactive(nHeight)) != 0 )
     {
         if ( komodo_blockload(block,pindex) == 0 )
         {
@@ -2306,7 +2306,7 @@ void komodo_cbopretupdate(int32_t forceflag)
                 if ( (ExtremePrice.dir > 0 && PriceCache[0][ExtremePrice.ind] >= ExtremePrice.pricebits) || (ExtremePrice.dir < 0 && PriceCache[0][ExtremePrice.ind] <= ExtremePrice.pricebits) )
                 {
                     fprintf(stderr,"future price is close enough to allow approving previously rejected block ind.%d %u vs %u\n",ExtremePrice.ind,PriceCache[0][ExtremePrice.ind],ExtremePrice.pricebits);
-                    if ( (pindex= komodo_blockindex(ExtremePrice.blockhash)) != 0 )
+                    if ( (pindex= hush_blockindex(ExtremePrice.blockhash)) != 0 )
                         pindex->nStatus &= ~BLOCK_FAILED_MASK;
                     else fprintf(stderr,"couldnt find block.%s\n",ExtremePrice.blockhash.GetHex().c_str());
                 }

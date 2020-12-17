@@ -58,13 +58,13 @@ using namespace std;
 int32_t hush_longestchain();
 int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *txidp);
 bool komodo_txnotarizedconfirmed(uint256 txid);
-uint32_t komodo_chainactive_timestamp();
+uint32_t hush_chainactive_timestamp();
 int32_t hush_whoami(char *pubkeystr,int32_t height,uint32_t timestamp);
 extern uint64_t KOMODO_INTERESTSUM,KOMODO_WALLETBALANCE;
 extern int32_t KOMODO_LASTMINED,JUMBLR_PAUSE,HUSH_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 uint32_t komodo_segid32(char *coinaddr);
-int64_t komodo_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
+int64_t hush_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
 int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_heightp);
 uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
@@ -285,7 +285,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     obj.push_back(Pair("errors",        GetWarnings("statusbar")));
      if ( NOTARY_PUBKEY33[0] != 0 ) {
         char pubkeystr[65]; int32_t notaryid; std::string notaryname;
-        if( (notaryid= hush_whoami(pubkeystr,(int32_t)chainActive.LastTip()->GetHeight(),komodo_chainactive_timestamp())) >= 0 )  {
+        if( (notaryid= hush_whoami(pubkeystr,(int32_t)chainActive.LastTip()->GetHeight(),hush_chainactive_timestamp())) >= 0 )  {
             obj.push_back(Pair("notaryid",        notaryid));
             if ( KOMODO_LASTMINED != 0 )
                 obj.push_back(Pair("lastmined", KOMODO_LASTMINED));
@@ -424,7 +424,7 @@ UniValue coinsupply(const UniValue& params, bool fHelp, const CPubKey& mypk)
     currentHeight = chainActive.Height();
 
     if (height >= 0 && height <= currentHeight) {
-        if ( (supply= komodo_coinsupply(&zfunds,&sproutfunds,height)) > 0 )
+        if ( (supply= hush_coinsupply(&zfunds,&sproutfunds,height)) > 0 )
         {
             result.push_back(Pair("result", "success"));
             result.push_back(Pair("coin", SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL));
@@ -438,9 +438,9 @@ UniValue coinsupply(const UniValue& params, bool fHelp, const CPubKey& mypk)
                 blocks_per_year = 24*3600*365 / ASSETCHAINS_BLOCKTIME;
                 if ( height > blocks_per_year )
                 {
-                    supply1 = komodo_coinsupply(&zf1,&sf1,height - blocks_per_year/12);
-                    supply3 = komodo_coinsupply(&zf3,&sf3,height - blocks_per_year/4);
-                    supply12 = komodo_coinsupply(&zf12,&sf12,height - blocks_per_year);
+                    supply1 = hush_coinsupply(&zf1,&sf1,height - blocks_per_year/12);
+                    supply3 = hush_coinsupply(&zf3,&sf3,height - blocks_per_year/4);
+                    supply12 = hush_coinsupply(&zf12,&sf12,height - blocks_per_year);
                     if ( supply1 != 0 && supply3 != 0 && supply12 != 0 )
                     {
                         result.push_back(Pair("lastmonth", ValueFromAmount(supply1+zf1)));

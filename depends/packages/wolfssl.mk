@@ -49,4 +49,3 @@ endef
 #define $(package)_postprocess_cmds
 #  rm -rf bin share
 #endef
-
