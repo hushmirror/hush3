@@ -10,11 +10,13 @@ and no longer on Github, since they banned Duke Leto and
 also because they censor many people around the world and work with
 evil organizations.
 
-# 3.6.0
+# Hush 3.6.0 "Decentralized Dominatrix"
 
 ```
 983 files changed, 7736 insertions(+), 17688 deletions(-)
 ```
+
+<img src="https://git.hush.is/hush/hush3/raw/branch/master/doc/relnotes/img/hush-3.6.0.png">
 
 :metal: :metal: :metal:
 This release consists of 25454 lines of change, almost 18000 lines of deletions
