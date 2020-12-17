@@ -41,7 +41,7 @@ all that KYC/PoS/Sprout stuff from KMD internals we inherited and improve daily.
       potential future DPoW attacks. Also: Fuck you, jl777.
     * :kiss: Hush developers will not be silenced and laugh at KMD NN ops with too much
       time on their hands
-  * :close_lock_with_key: More secure+private TLS 1.3 implementation from miodrag, thanks!
+  * :closed_lock_with_key: More secure+private TLS 1.3 implementation from miodrag, thanks!
     * :loudspeaker: We now use WolfSSL 4.5.0 instead of OpenSSL, a huge improvement and
       decrease in attack surface as well as allowing use to do TLS
       on low resource devices (like internet-of-shit light bulbs/etc)
