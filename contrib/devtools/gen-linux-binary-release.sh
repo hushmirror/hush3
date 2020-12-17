@@ -2,9 +2,8 @@
 # Copyright (c) 2016-2020 The Hush developers
 # Released under the GPLv3
 
-
 #TODO: autodect version number, error handling
-FILE="hush-3.5.0-linux-amd64.tar"
+FILE="hush-3.6.0-linux-amd64.tar"
 
 mkdir build
 cp sapling*.params build/
