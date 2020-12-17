@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -12,8 +15,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -254,9 +255,9 @@ int32_t safecopy(char *dest,char *src,long len)
 #define true 1
 #define false 0
 #ifdef STANDALONE
-#include "../komodo/src/komodo_cJSON.c"
+#include "../hush3/src/hush_cJSON.c"
 #else
-#include "../../komodo_cJSON.c"
+#include "../../hush_cJSON.c"
 #endif
 
 int32_t rogue_replay(uint64_t seed,int32_t sleeptime);

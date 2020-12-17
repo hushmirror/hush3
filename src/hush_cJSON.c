@@ -26,7 +26,7 @@
 #include <math.h>
 
 #include "cJSON.h"
-#include "komodo_cJSON.h"
+#include "hush_cJSON.h"
 #include "cJSON.c"
 
 #ifndef DBL_EPSILON

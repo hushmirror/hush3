@@ -17,7 +17,7 @@
  ******************************************************************************/
 
 #include "hush_defs.h"
-#include "komodo_cJSON.h"
+#include "hush_cJSON.h"
 
 #define KOMODO_MAINNET_START 178999
 #define KOMODO_NOTARIES_HEIGHT1 814000

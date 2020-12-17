@@ -45,16 +45,16 @@ bool check_pprevnotarizedht();
 #include "hush_globals.h"
 #include "hush_utils.h"
 #include "hush_curve25519.h"
-#include "komodo_cJSON.c"
+#include "hush_cJSON.c"
 #include "hush_bitcoind.h"
-#include "komodo_pax.h"
+#include "hush_pax.h"
 #include "hush_notary.h"
 
 int32_t hush_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *dest);
-#include "komodo_kv.h"
+#include "hush_kv.h"
 #include "hush_gateway.h"
-#include "komodo_events.h"
-#include "komodo_ccdata.h"
+#include "hush_events.h"
+#include "hush_ccdata.h"
 
 void hush_currentheight_set(int32_t height)
 {
@@ -98,7 +98,7 @@ int32_t hush_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *de
                 else
                 {
                     //printf("updated %d pubkeys at %s ht.%d\n",num,symbol,ht);
-                    if ( (KOMODO_EXTERNAL_NOTARIES != 0 && matched != 0) || (strcmp(symbol,"KMD") == 0 && KOMODO_EXTERNAL_NOTARIES == 0) )
+                    if ( (HUSH_EXTERNAL_NOTARIES != 0 && matched != 0) || (strcmp(symbol,"KMD") == 0 && HUSH_EXTERNAL_NOTARIES == 0) )
                         komodo_eventadd_pubkeys(sp,symbol,ht,num,pubkeys);
                 }
             } else printf("illegal num.%d\n",num);
@@ -243,7 +243,7 @@ int32_t hush_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fp
                 else
                 {
                     //printf("updated %d pubkeys at %s ht.%d\n",num,symbol,ht);
-                    if ( (KOMODO_EXTERNAL_NOTARIES != 0 && matched != 0) || (strcmp(symbol,"KMD") == 0 && KOMODO_EXTERNAL_NOTARIES == 0) )
+                    if ( (HUSH_EXTERNAL_NOTARIES != 0 && matched != 0) || (strcmp(symbol,"KMD") == 0 && HUSH_EXTERNAL_NOTARIES == 0) )
                         komodo_eventadd_pubkeys(sp,symbol,ht,num,pubkeys);
                 }
             } else printf("illegal num.%d\n",num);

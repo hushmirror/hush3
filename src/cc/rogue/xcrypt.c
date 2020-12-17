@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /*
  *  FreeSec: libcrypt
  *
@@ -47,6 +50,7 @@
  * This file has a static version of des_setkey() so that crypt.o exports
  * only the crypt() interface. This is required to make binaries linked
  * against crypt.o exportable or re-exportable from the USA.
+ * NOTE2: Math is freedom of speech. -- Duke Leto
  */
 
 #include <sys/types.h>

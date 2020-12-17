@@ -1,5 +1,8 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /*
- * Function(s) for dealing with potions
+ * Function(s) for dealing with potions, mmmmmmmmmm, potionzzzzzzz
  *
  * @(#)potions.c	4.46 (Berkeley) 06/07/83
  *
@@ -55,8 +58,7 @@ static PACT p_actions[] =
  *	Quaff a potion from the pack
  */
 
-void
-quaff(struct rogue_state *rs)
+void quaff(struct rogue_state *rs)
 {
     THING *obj, *tp, *mp;
     bool discardit = FALSE;

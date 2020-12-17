@@ -20,8 +20,10 @@
 #ifndef CC_MARMARA_H
 #define CC_MARMARA_H
 
+/*
+
 #include "CCinclude.h"
-#include "../komodo_cJSON.h"
+#include "../hush_cJSON.h"
 
 #define MARMARA_GROUPSIZE 60
 #define MARMARA_MINLOCK (1440 * 3 * 30)
@@ -46,5 +48,6 @@ bool MarmaraValidate(struct CCcontract_info *cp,Eval* eval,const CTransaction &t
 
 // CCcustom
 UniValue MarmaraInfo();
+*/
 
 #endif
