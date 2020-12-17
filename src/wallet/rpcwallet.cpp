@@ -64,7 +64,7 @@ const std::string ADDR_TYPE_AMNESIA = "amnesia";
 extern int32_t HUSH_INSYNC;
 uint32_t komodo_segid32(char *coinaddr);
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
-int32_t komodo_isnotaryvout(char *coinaddr,uint32_t tiptime); // from ac_private chains only
+int32_t hush_isnotaryvout(char *coinaddr,uint32_t tiptime); // from ac_private chains only
 CBlockIndex *komodo_getblockindex(uint256 hash);
 extern string randomSietchZaddr();
 extern CAmount fConsolidationTxFee;
@@ -83,7 +83,7 @@ UniValue z_getoperationstatus_IMPL(const UniValue&, bool);
 
 #define PLAN_NAME_MAX   8
 #define VALID_PLAN_NAME(x)  (strlen(x) <= PLAN_NAME_MAX)
-#define THROW_IF_SYNCING(INSYNC)  if (INSYNC == 0) { throw runtime_error(strprintf("%s: Chain still syncing at height %d, aborting to prevent linkability analysis!",__FUNCTION__,chainActive.Tip()->GetHeight())); }
+#define THROW_IF_SYNCING(INSYNC)  if (INSYNC == 0) { throw runtime_error(strprintf("%s: Extreme Privacy! Chain still syncing at height %d, aborting to prevent linkability analysis",__FUNCTION__,chainActive.Tip()->GetHeight())); }
 
 int tx_height( const uint256 &hash );
 
@@ -526,7 +526,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     if ( ASSETCHAINS_PRIVATE != 0 && AmountFromValue(params[1]) > 0 )
     {
-        if ( komodo_isnotaryvout((char *)params[0].get_str().c_str(),chainActive.LastTip()->nTime) == 0 )
+        if ( hush_isnotaryvout((char *)params[0].get_str().c_str(),chainActive.LastTip()->nTime) == 0 )
         {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid " + strprintf("%s",komodo_chainname()) + " address");
         }
@@ -563,10 +563,10 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
 #include "hush_defs.h"
 
-#define KOMODO_KVPROTECTED 1
-#define KOMODO_KVBINARY 2
-#define KOMODO_KVDURATION 1440
-#define IGUANA_MAXSCRIPTSIZE 10001
+#define HUSH_KVPROTECTED 1
+#define HUSH_KVBINARY 2
+#define HUSH_KVDURATION 1440
+#define DRAGON_MAXSCRIPTSIZE 10001
 uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pubkey37[37],char *coinaddr,int32_t height,char *base,int64_t fiatoshis);
 int32_t komodo_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen);
 extern int32_t KOMODO_PAX;
@@ -575,7 +575,7 @@ int32_t komodo_is_issuer();
 int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 int32_t komodo_isrealtime(int32_t *kmdheightp);
 int32_t pax_fiatstatus(uint64_t *available,uint64_t *deposited,uint64_t *issued,uint64_t *withdrawn,uint64_t *approved,uint64_t *redeemed,char *base);
-int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[IGUANA_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
+int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
 int32_t komodo_kvcmp(uint8_t *refvalue,uint16_t refvaluesize,uint8_t *value,uint16_t valuesize);
 uint64_t komodo_kvfee(uint32_t flags,int32_t opretlen,int32_t keylen);
 uint256 komodo_kvsig(uint8_t *buf,int32_t len,uint256 privkey);
@@ -587,7 +587,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     static uint256 zeroes;
     CWalletTx wtx; UniValue ret(UniValue::VOBJ);
-    uint8_t keyvalue[IGUANA_MAXSCRIPTSIZE*8],opretbuf[IGUANA_MAXSCRIPTSIZE*8]; int32_t i,coresize,haveprivkey,duration,opretlen,height; uint16_t keylen=0,valuesize=0,refvaluesize=0; uint8_t *key,*value=0; uint32_t flags,tmpflags,n; struct komodo_kv *ptr; uint64_t fee; uint256 privkey,pubkey,refpubkey,sig;
+    uint8_t keyvalue[DRAGON_MAXSCRIPTSIZE*8],opretbuf[DRAGON_MAXSCRIPTSIZE*8]; int32_t i,coresize,haveprivkey,duration,opretlen,height; uint16_t keylen=0,valuesize=0,refvaluesize=0; uint8_t *key,*value=0; uint32_t flags,tmpflags,n; struct komodo_kv *ptr; uint64_t fee; uint256 privkey,pubkey,refpubkey,sig;
     if (fHelp || params.size() < 3 )
         throw runtime_error(
             "kvupdate key \"value\" days passphrase\n"
@@ -651,7 +651,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         memcpy(keyvalue,key,keylen);
         if ( (refvaluesize= komodo_kvsearch(&refpubkey,chainActive.LastTip()->GetHeight(),&tmpflags,&height,&keyvalue[keylen],key,keylen)) >= 0 )
         {
-            if ( (tmpflags & KOMODO_KVPROTECTED) != 0 )
+            if ( (tmpflags & HUSH_KVPROTECTED) != 0 )
             {
                 if ( memcmp(&refpubkey,&pubkey,sizeof(refpubkey)) != 0 )
                 {
@@ -678,7 +678,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         if ( memcmp(&zeroes,&refpubkey,sizeof(refpubkey)) != 0 )
             ret.push_back(Pair("owner",refpubkey.GetHex()));
         ret.push_back(Pair("height", (int64_t)height));
-        duration = komodo_kvduration(flags); //((flags >> 2) + 1) * KOMODO_KVDURATION;
+        duration = komodo_kvduration(flags); //((flags >> 2) + 1) * HUSH_KVDURATION;
         ret.push_back(Pair("expiration", (int64_t)(height+duration)));
         ret.push_back(Pair("flags",(int64_t)flags));
         ret.push_back(Pair("key",params[0].get_str()));
@@ -4290,7 +4290,7 @@ UniValue z_viewtransaction(const UniValue& params, bool fHelp, const CPubKey& my
             "      \"outputPrev\" : n,               (numeric) the index of the output within the vShieldedOutput\n"
             "      \"address\" : \"zcashaddress\",     (string) The Hush shielded address involved in the transaction\n"
             "      \"value\" : x.xxx                 (numeric) The amount in " + CURRENCY_UNIT + "\n"
-            "      \"valueZat\" : xxxx               (numeric) The amount in zatoshis\n"
+            "      \"valueZat\" : xxxx               (numeric) The amount in puposhis\n"
             "    }\n"
             "    ,...\n"
             "  ],\n"
@@ -4301,7 +4301,7 @@ UniValue z_viewtransaction(const UniValue& params, bool fHelp, const CPubKey& my
             "      \"address\" : \"hushaddress\",     (string) The Hush address involved in the transaction\n"
             "      \"outgoing\" : true|false        (boolean) True if the output is not for an address in the wallet\n"
             "      \"value\" : x.xxx                 (numeric) The amount in " + CURRENCY_UNIT + "\n"
-            "      \"valueZat\" : xxxx               (numeric) The amount in zatoshis\n"
+            "      \"valueZat\" : xxxx               (numeric) The amount in puposhis\n"
             "      \"memo\" : \"hexmemo\",             (string) Hexademical string representation of the memo field\n"
             "      \"memoStr\" : \"memo\",             (string) Only returned if memo contains valid UTF-8 text.\n"
             "    }\n"
@@ -4535,12 +4535,6 @@ UniValue z_getoperationstatus_IMPL(const UniValue& params, bool fRemoveFinishedO
 
 
 // JSDescription size depends on the transaction version
-#define V3_JS_DESCRIPTION_SIZE    (GetSerializeSize(JSDescription(), SER_NETWORK, (OVERWINTER_TX_VERSION | (1 << 31))))
-// Here we define the maximum number of zaddr outputs that can be included in a transaction.
-// If input notes are small, we might actually require more than one joinsplit per zaddr output.
-// For now though, we assume we use one joinsplit per zaddr output (and the second output note is change).
-// We reduce the result by 1 to ensure there is room for non-joinsplit CTransaction data.
-#define Z_SENDMANY_MAX_ZADDR_OUTPUTS_BEFORE_SAPLING    ((MAX_TX_SIZE_BEFORE_SAPLING / V3_JS_DESCRIPTION_SIZE) - 1)
 
 // transaction.h comment: spending taddr output requires CTxIn >= 148 bytes and typical taddr txout is 34 bytes
 #define CTXIN_SPEND_DUST_SIZE   148
@@ -4557,7 +4551,6 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nSend multiple times. Amounts are decimal numbers with at most 8 digits of precision."
             "\nChange generated from a taddr flows to a new taddr address, while change generated from a zaddr returns to itself."
             "\nWhen sending coinbase UTXOs to a zaddr, change is not allowed. The entire value of the UTXO(s) must be consumed."
-            + strprintf("\nBefore Sapling activates, the maximum number of zaddr outputs is %d due to transaction size limits.\n", Z_SENDMANY_MAX_ZADDR_OUTPUTS_BEFORE_SAPLING)
             + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. \"fromaddress\"         (string, required) The taddr or zaddr to send the funds from.\n"
@@ -4579,11 +4572,12 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
+    // Hilarious that Komodo commented this out, opening themselves up to metadata attackz, lulz
     THROW_IF_SYNCING(HUSH_INSYNC);
 
     // Check that the from address is valid.
     auto fromaddress = params[0].get_str();
-    bool fromTaddr = false;
+    bool fromTaddr   = false;
     bool fromSapling = false;
 
     uint32_t branchId = CurrentEpochBranchId(chainActive.Height(), Params().GetConsensus());
@@ -4642,9 +4636,9 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
             } else {
                 throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, unknown address format: ")+address );
             }
-        }
-        //else if ( ASSETCHAINS_PRIVATE != 0 && komodo_isnotaryvout((char *)address.c_str()) == 0 )
-        //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "cant use transparent addresses in private chain");
+        }// else if ( ASSETCHAINS_PRIVATE != 0 && hush_isnotaryvout((char *)address.c_str()) == 0 ) {
+        //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Extreme Privacy! You must send to a zaddr");
+        //}
 
         // Allowing duplicate receivers helps various HushList protocol operations
         //if (setAddress.count(address))
@@ -4660,8 +4654,8 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
             } else if (!IsHex(memo)) {
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected memo data in hexadecimal format.");
             }
-            if (memo.length() > ZC_MEMO_SIZE*2) {
-                throw JSONRPCError(RPC_INVALID_PARAMETER,  strprintf("Invalid parameter, size of memo is larger than maximum allowed %d", ZC_MEMO_SIZE ));
+            if (memo.length() > HUSH_MEMO_SIZE*2) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER,  strprintf("Invalid parameter, size of memo is larger than maximum allowed %d", HUSH_MEMO_SIZE ));
             }
         }
 
@@ -4733,24 +4727,10 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if (!NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING)) {
         if (NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER)) {
             mtx.nVersionGroupId = OVERWINTER_VERSION_GROUP_ID;
-            mtx.nVersion = OVERWINTER_TX_VERSION;
+            mtx.nVersion        = OVERWINTER_TX_VERSION;
         } else {
             mtx.fOverwintered = false;
-            mtx.nVersion = 2;
-        }
-
-        max_tx_size = MAX_TX_SIZE_BEFORE_SAPLING;
-
-        // Check the number of zaddr outputs does not exceed the limit.
-        if (zaddrRecipients.size() > Z_SENDMANY_MAX_ZADDR_OUTPUTS_BEFORE_SAPLING)  {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, too many zaddr outputs");
-        }
-    }
-
-    // If Sapling is not active, do not allow sending from or sending to Sapling addresses.
-    if (!NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING)) {
-        if (fromSapling || containsSaplingOutput) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, Sapling has not activated");
+            mtx.nVersion      = 2;
         }
     }
 
@@ -4829,13 +4809,9 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
     boost::optional<TransactionBuilder> builder;
     builder = TransactionBuilder(Params().GetConsensus(), nextBlockHeight, pwalletMain);
 
-    // Contextual transaction we will build on
-    // (used if no Sapling addresses are involved)
-    CMutableTransaction contextualTx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextBlockHeight);
-    bool isShielded = !fromTaddr || zaddrRecipients.size() > 0;
-    if (contextualTx.nVersion == 1 && isShielded) {
-        contextualTx.nVersion = 2; // Tx format should support vjoinsplits
-    }
+    // Contextual transaction
+    CMutableTransaction contextualTx; // = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextBlockHeight);
+    contextualTx.nVersion = 2;
 
     // Create operation and add to global queue
     std::shared_ptr<AsyncRPCQueue> q = getAsyncRPCQueue();
@@ -4860,7 +4836,6 @@ When estimating the number of coinbase utxos we can shield in a single transacti
     105 + 1 + 3*(73+1) = 328 bytes of scriptSig, rounded up to 400 based on testnet experiments.
 */
 #define CTXIN_SPEND_P2SH_SIZE 400
-
 #define SHIELD_COINBASE_DEFAULT_LIMIT 50
 
 UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& mypk)
@@ -4876,8 +4851,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
             "\ncan be used to return a list of locked utxos.  The number of coinbase utxos selected for shielding can be limited"
             "\nby the caller.  If the limit parameter is set to zero, and Overwinter is not yet active, the -mempooltxinputlimit"
             "\noption will determine the number of uxtos.  Any limit is constrained by the consensus rule defining a maximum"
-            "\ntransaction size of "
-            + strprintf("%d bytes before Sapling, and %d bytes once Sapling activates.", MAX_TX_SIZE_BEFORE_SAPLING, MAX_TX_SIZE_AFTER_SAPLING)
+            "\ntransaction size of " + strprintf("%d bytes.", MAX_TX_SIZE_AFTER_SAPLING)
             + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. \"fromaddress\"         (string, required) The address is a taddr or \"*\" for all taddrs belonging to the wallet.\n"
@@ -4901,6 +4875,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
+    // Hilarious that Komodo commented this out, opening themselves up to metadata attackz, lulz
     THROW_IF_SYNCING(HUSH_INSYNC);
 
     // Validate the from address
@@ -4941,27 +4916,12 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
     int nextBlockHeight = chainActive.Height() + 1;
     bool overwinterActive = NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER);
     unsigned int max_tx_size = MAX_TX_SIZE_AFTER_SAPLING;
-    if (!NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING)) {
-        max_tx_size = MAX_TX_SIZE_BEFORE_SAPLING;
-    }
-
-    // If Sapling is not active, do not allow sending to a Sapling address.
-    if (!NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING)) {
-        auto res = DecodePaymentAddress(destaddress);
-        if (IsValidPaymentAddress(res)) {
-            bool toSapling = boost::get<libzcash::SaplingPaymentAddress>(&res) != nullptr;
-            if (toSapling) {
-                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, Sapling has not activated");
-            }
-        } else {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, unknown address format: ") + destaddress );
-        }
-    }
 
     // Prepare to get coinbase utxos
     std::vector<ShieldCoinbaseUTXO> inputs;
     CAmount shieldedValue = 0;
     CAmount remainingValue = 0;
+    //TODO: update these estimates
     size_t estimatedTxSize = 2000;  // 1802 joinsplit description + tx overhead + wiggle room
 
     #ifdef __LP64__
@@ -5087,9 +5047,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
 }
 
 #define MERGE_TO_ADDRESS_DEFAULT_TRANSPARENT_LIMIT 50
-#define MERGE_TO_ADDRESS_DEFAULT_SPROUT_LIMIT 10
-#define MERGE_TO_ADDRESS_DEFAULT_SAPLING_LIMIT 90
-
+#define MERGE_TO_ADDRESS_DEFAULT_SAPLING_LIMIT     90
 #define OUTPUTDESCRIPTION_SIZE GetSerializeSize(OutputDescription(), SER_NETWORK, PROTOCOL_VERSION)
 #define SPENDDESCRIPTION_SIZE GetSerializeSize(SpendDescription(), SER_NETWORK, PROTOCOL_VERSION)
 
@@ -5099,11 +5057,6 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         return NullUniValue;
 
     string enableArg = "zmergetoaddress";
-    //auto fEnableMergeToAddress = fExperimentalMode && GetBoolArg("-" + enableArg, true);
-    //std::string strDisabledMsg = "";
-    //if (!fEnableMergeToAddress) {
-    //    strDisabledMsg = experimentalDisabledHelpMsg("z_mergetoaddress", enableArg);
-    //}
 
     if (fHelp || params.size() < 2 || params.size() > 7)
         throw runtime_error(
@@ -5115,8 +5068,6 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
             "\n\nThe number of UTXOs and notes selected for merging can be limited by the caller.  If the transparent limit"
             "\nparameter is set to zero, and Overwinter is not yet active, the -mempooltxinputlimit option will determine the"
             "\nnumber of UTXOs.  Any limit is constrained by the consensus rule defining a maximum transaction size of"
-            + strprintf("\n%d bytes before Sapling, and %d bytes once Sapling activates.", MAX_TX_SIZE_BEFORE_SAPLING, MAX_TX_SIZE_AFTER_SAPLING)
-            + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. fromaddresses         (string, required) A JSON array with addresses.\n"
             "                         The following special strings are accepted inside the array:\n"
@@ -5157,9 +5108,10 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
+    // Hilarious that Komodo commented this out, opening themselves up to metadata attackz, lulz
     THROW_IF_SYNCING(HUSH_INSYNC);
 
-    bool useAnyUTXO = false;
+    bool useAnyUTXO    = false;
     bool useAnySapling = false;
     std::set<CTxDestination> taddrs = {};
     std::set<libzcash::PaymentAddress> zaddrs = {};
@@ -5168,7 +5120,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
     if (addresses.size()==0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, fromaddresses array is empty.");
 
-    // Keep track of addresses to spot duplicates
+    // Keep track of addresses
     std::set<std::string> setAddress;
 
     // Sources
@@ -5208,9 +5160,8 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Cannot specify specific z-addrs when using \"ANY_SAPLING\"");
     }
 
-    const int nextBlockHeight = chainActive.Height() + 1;
+    const int nextBlockHeight   = chainActive.Height() + 1;
     const bool overwinterActive = NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER);
-    const bool saplingActive = NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING);
 
     // Validate the destination address
     auto destaddress = params[1].get_str();
@@ -5221,10 +5172,6 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         if (IsValidPaymentAddress(decodeAddr)) {
             if (boost::get<libzcash::SaplingPaymentAddress>(&decodeAddr) != nullptr) {
                 isToSaplingZaddr = true;
-                // If Sapling is not active, do not allow sending to a sapling addresses.
-                if (!saplingActive) {
-                    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, Sapling has not activated");
-                }
             } else {
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Only Sapling zaddrs allowed!");
             }
@@ -5233,7 +5180,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         }
     }
 
-    // Convert fee from currency format to zatoshis
+    // Convert fee from currency format to puposhis
     CAmount nFee = SHIELD_COINBASE_DEFAULT_MINERS_FEE;
     if (params.size() > 2) {
         if (params[2].get_real() == 0.0) {
@@ -5276,10 +5223,11 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         if (!isToSaplingZaddr) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Memo can not be used with a taddr.  It can only be used with a zaddr.");
         } else if (!IsHex(memo)) {
+            //TODO: this sux, would be nice to accept in utf8
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected memo data in hexadecimal format.");
         }
-        if (memo.length() > ZC_MEMO_SIZE*2) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER,  strprintf("Invalid parameter, size of memo is larger than maximum allowed %d", ZC_MEMO_SIZE ));
+        if (memo.length() > HUSH_MEMO_SIZE*2) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER,  strprintf("Invalid parameter, size of memo is larger than maximum allowed %d", HUSH_MEMO_SIZE ));
         }
     }
 
@@ -5288,17 +5236,16 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
     // Prepare to get UTXOs and notes
     std::vector<MergeToAddressInputUTXO> utxoInputs;
     std::vector<MergeToAddressInputSaplingNote> saplingNoteInputs;
-    CAmount mergedUTXOValue = 0;
-    CAmount mergedNoteValue = 0;
+    CAmount mergedUTXOValue    = 0;
+    CAmount mergedNoteValue    = 0;
     CAmount remainingUTXOValue = 0;
     CAmount remainingNoteValue = 0;
-    size_t utxoCounter = 0;
-    size_t noteCounter = 0;
-    bool maxedOutUTXOsFlag = false;
-    bool maxedOutNotesFlag = false;
-    size_t mempoolLimit = (nUTXOLimit != 0) ? nUTXOLimit : (overwinterActive ? 0 : (size_t)GetArg("-mempooltxinputlimit", 0));
-
-    unsigned int max_tx_size = saplingActive ? MAX_TX_SIZE_AFTER_SAPLING : MAX_TX_SIZE_BEFORE_SAPLING;
+    size_t utxoCounter         = 0;
+    size_t noteCounter         = 0;
+    bool maxedOutUTXOsFlag     = false;
+    bool maxedOutNotesFlag     = false;
+    size_t mempoolLimit        = (nUTXOLimit != 0) ? nUTXOLimit : (overwinterActive ? 0 : (size_t)GetArg("-mempooltxinputlimit", 0));
+    unsigned int max_tx_size = MAX_TX_SIZE_AFTER_SAPLING;
     size_t estimatedTxSize = 200;  // tx overhead + wiggle room
 
     if (isToSaplingZaddr) {
@@ -5329,8 +5276,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
 
             CAmount nValue = out.tx->vout[out.i].nValue;
 
-            if (maximum_utxo_size != 0) 
-            {
+            if (maximum_utxo_size != 0) {
                 //fprintf(stderr, "utxo txid.%s vout.%i nValue.%li scriptpubkeylength.%i\n",out.tx->GetHash().ToString().c_str(),out.i,nValue,out.tx->vout[out.i].scriptPubKey.size());
                 if (nValue > maximum_utxo_size) 
                     continue;
@@ -5426,9 +5372,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
     contextInfo.push_back(Pair("fee", ValueFromAmount(nFee)));
 
     // Contextual transaction we will build on
-    CMutableTransaction contextualTx = CreateNewContextualCMutableTransaction(
-                                                                              Params().GetConsensus(),
-                                                                              nextBlockHeight);
+    CMutableTransaction contextualTx; //= CreateNewContextualCMutableTransaction( Params().GetConsensus(), nextBlockHeight);
 
     // Builder (used if Sapling addresses are involved)
     boost::optional<TransactionBuilder> builder;
@@ -5511,7 +5455,7 @@ UniValue z_listoperationids(const UniValue& params, bool fHelp, const CPubKey& m
 int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 extern std::string NOTARY_PUBKEY;
 
-int32_t komodo_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *pTr)
+int32_t hush_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *pTr)
 {
     set<CBitcoinAddress> setAddress; uint8_t *script,utxosig[128]; uint256 utxotxid; uint64_t utxovalue; int32_t i,siglen=0,nMinDepth = 0,nMaxDepth = 9999999; vector<COutput> vecOutputs; uint32_t utxovout,eligible,earliest = 0; CScript best_scriptPubKey; bool fNegative,fOverflow;
     bool signSuccess; SignatureData sigdata; uint64_t txfee; uint8_t *ptr;
@@ -5612,8 +5556,7 @@ int32_t komodo_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *
 #include "../cc/CCPayments.h"
 #include "../cc/CCPegs.h"
 
-int32_t ensure_CCrequirements(uint8_t evalcode)
-{
+int32_t ensure_CCrequirements(uint8_t evalcode) {
     CCerror = "";
     if ( ASSETCHAINS_CCDISABLES[evalcode] != 0 || (evalcode == EVAL_MARMARA && ASSETCHAINS_MARMARA == 0) )
     {
@@ -5725,54 +5668,46 @@ UniValue setpubkey(const UniValue& params, bool fHelp, const CPubKey& mypk)
         "    \"R-address\" : \"R address\",     (string) The pubkey\n"
         "  }\n"
         "\nExamples:\n"
-        + HelpExampleCli("setpubkey", "02f7597468703c1c5c8465dd6d43acaae697df9df30bed21494d193412a1ea193e")
-        + HelpExampleRpc("setpubkey", "02f7597468703c1c5c8465dd6d43acaae697df9df30bed21494d193412a1ea193e")
+        + HelpExampleCli("setpubkey", "0420597468703c1c5c8465dd6d43acaae697df9df30bed21494d193412a1ea1987")
+        + HelpExampleRpc("setpubkey", "0420597468703c1c5c8465dd6d43acaae697df9df30bed21494d193412a1ea1987")
       );
 
     LOCK2(cs_main, pwalletMain ? &pwalletMain->cs_wallet : NULL);
 
     char Raddress[64];
     uint8_t pubkey33[33];
-    if ( NOTARY_PUBKEY33[0] == 0 ) 
-    {
-        if (strlen(params[0].get_str().c_str()) == 66) 
-        {
+    if ( NOTARY_PUBKEY33[0] == 0 ) {
+        if (strlen(params[0].get_str().c_str()) == 66) {
             decode_hex(pubkey33,33,(char *)params[0].get_str().c_str());
             pubkey2addr((char *)Raddress,(uint8_t *)pubkey33);
             CBitcoinAddress address(Raddress);
             bool isValid = address.IsValid();
-            if (isValid)
-            {
+            if (isValid) {
                 CTxDestination dest = address.Get();
                 isminetype mine = pwalletMain ? IsMine(*pwalletMain, dest) : ISMINE_NO;
-                if ( mine == ISMINE_NO ) 
+                if ( mine == ISMINE_NO )  {
                     result.push_back(Pair("WARNING", "privkey for this pubkey is not imported to wallet!"));
-                else 
-                {
+                } else {
                     result.push_back(Pair("ismine", "true"));
                 }
                 NOTARY_PUBKEY = params[0].get_str();
                 decode_hex(NOTARY_PUBKEY33,33,(char *)NOTARY_PUBKEY.c_str());
                 USE_EXTERNAL_PUBKEY = 1;
                 NOTARY_ADDRESS = address.ToString();
-            }
-            else
+            } else {
                 result.push_back(Pair("error", "pubkey entered is invalid."));
-        }
-        else
+            }
+        } else {
             result.push_back(Pair("error", "pubkey is wrong length, must be 66 char hex string."));
-    }
-    else 
-    {
-        if ( NOTARY_ADDRESS.empty() ) 
-        {
+        }
+    } else {
+        if ( NOTARY_ADDRESS.empty() ) { 
           pubkey2addr((char *)Raddress,(uint8_t *)NOTARY_PUBKEY33);
           NOTARY_ADDRESS.assign(Raddress);
         }
         result.push_back(Pair("error", "Can only set pubkey once, to change it you need to restart your daemon."));
     }
-    if ( NOTARY_PUBKEY33[0] != 0 && !NOTARY_ADDRESS.empty() ) 
-    {
+    if ( NOTARY_PUBKEY33[0] != 0 && !NOTARY_ADDRESS.empty() ) {
         result.push_back(Pair("address", NOTARY_ADDRESS));
         result.push_back(Pair("pubkey", NOTARY_PUBKEY));
     }
@@ -7443,9 +7378,9 @@ UniValue tokencreate(const UniValue& params, bool fHelp, const CPubKey& mypk)
     
     if (params.size() == 4)    {
         nonfungibleData = ParseHex(params[3].get_str());
-        if (nonfungibleData.size() > IGUANA_MAXSCRIPTSIZE) // opret limit
+        if (nonfungibleData.size() > DRAGON_MAXSCRIPTSIZE) // opret limit
         {
-            ERR_RESULT("Non-fungible data size must be <= " + std::to_string(IGUANA_MAXSCRIPTSIZE));
+            ERR_RESULT("Non-fungible data size must be <= " + std::to_string(DRAGON_MAXSCRIPTSIZE));
             return(result);
         }
         if( nonfungibleData.empty() ) {

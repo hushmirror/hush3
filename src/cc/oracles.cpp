@@ -363,7 +363,7 @@ int32_t oracle_format(uint256 *hashp,int64_t *valp,char *str,uint8_t fmt,uint8_t
     {
         if ( str != 0 )
         {
-            if ( slen < IGUANA_MAXSCRIPTSIZE && offset+slen <= datalen )
+            if ( slen < DRAGON_MAXSCRIPTSIZE && offset+slen <= datalen )
             {
                 for (i=0; i<slen; i++)
                     str[i] = data[offset++];
@@ -375,7 +375,7 @@ int32_t oracle_format(uint256 *hashp,int64_t *valp,char *str,uint8_t fmt,uint8_t
     {
         if ( str != 0 )
         {
-            if ( dlen < IGUANA_MAXSCRIPTSIZE && offset+dlen <= datalen )
+            if ( dlen < DRAGON_MAXSCRIPTSIZE && offset+dlen <= datalen )
             {
                 for (i=0; i<dlen; i++)
                     sprintf(&str[i<<1],"%02x",data[offset++]);
@@ -1024,7 +1024,7 @@ UniValue OracleData(const CPubKey& pk, int64_t txfee,uint256 oracletxid,std::vec
 
 UniValue OracleFormat(uint8_t *data,int32_t datalen,char *format,int32_t formatlen)
 {
-    UniValue obj(UniValue::VARR); uint256 hash; int32_t i,j=0; int64_t val; char str[IGUANA_MAXSCRIPTSIZE*2+1];
+    UniValue obj(UniValue::VARR); uint256 hash; int32_t i,j=0; int64_t val; char str[DRAGON_MAXSCRIPTSIZE*2+1];
     for (i=0; i<formatlen && j<datalen; i++)
     {
         str[0] = 0;

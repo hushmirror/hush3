@@ -1,7 +1,11 @@
+#!/usr/bin/env python2
+# Copyright (c) 2016-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 import sys
-sys.path.append('../../src/tui')
-
-from lib import tuilib
+# tuilib was removed, tests left here as inspiration
+#sys.path.append('../../src/tui')
+#from lib import tuilib
 import unittest
 import time
 
@@ -11,17 +15,17 @@ change chain parameters if needed or add a new chain to test below
 added 1 second sleep after each case to surely not face the nSPV server limitation (1 call/second)
 '''
 
-wif = ''
+wif          = ''
 dest_address = ''
-amount = '0.01'
-chain = 'ILN'
+amount       = '0.01'
+chain        = 'HUSH3'
 
 if not wif or not dest_address:
     raise Exception("Please set test wif and address to send transactions to")
 
 rpc_proxy = tuilib.def_credentials(chain)
 
-chain_params = {"KMD": {
+chain_params = {"HUSH3": {
                         'tx_list_address': 'RGShWG446Pv24CKzzxjA23obrzYwNbs1kA',
                         'min_chain_height': 1468080,
                         'notarization_height': '1468000',
@@ -33,19 +37,6 @@ chain_params = {"KMD": {
                         'tx_proof_id': 'f7beb36a65bc5bcbc9c8f398345aab7948160493955eb4a1f05da08c4ac3784f',
                         'tx_spent_height': 1456212,
                         'tx_proof_height': '1468520',
-                       },
-                "ILN": {
-                        'tx_list_address': 'RUp3xudmdTtxvaRnt3oq78FJBjotXy55uu',
-                        'min_chain_height': 3689,
-                        'notarization_height': '2000',
-                        'prev_notarization_h': 1998,
-                        'next_notarization_h': 2008,
-                        'hdrs_proof_low': '2000',
-                        'hdrs_proof_high': '2100',
-                        'numhdrs_expected': 113,
-                        'tx_proof_id': '67ffe0eaecd6081de04675c492a59090b573ee78955c4e8a85b8ac0be0e8e418',
-                        'tx_spent_height': 2681,
-                        'tx_proof_height': '2690',
                        }
                 }
 
@@ -98,7 +89,7 @@ class TestNspvClient(unittest.TestCase):
         print("testing nspv_login")
         result = rpc_proxy.nspv_login(wif)
         self.assertEqual(result["result"], "success")
-        self.assertEqual(result["status"], "wif will expire in 777 seconds")
+        self.assertEqual(result["status"], "wif will expire in 555 seconds")
         time.sleep(1)
 
     def test_nspv_listunspent(self):
@@ -156,9 +147,9 @@ class TestNspvClient(unittest.TestCase):
         time.sleep(1)
 
     def test_nspv_login_timout(self):
-        print("testing auto-logout in 777 seconds")
+        print("testing auto-logout in 555 seconds")
         rpc_proxy.nspv_login(wif)
-        time.sleep(778)
+        time.sleep(556)
         result = rpc_proxy.nspv_spend(dest_address, amount)
         self.assertEqual(result["result"], "error")
         self.assertEqual(result["error"], "wif expired")

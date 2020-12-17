@@ -1,6 +1,7 @@
-# mininode.py - Bitcoin P2P network half-a-node
 # Copyright (c) 2016-2020 The Hush developers
-# Lovingly maintained and released under the GPLv3
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+# mininode.py - Bitcoin P2P network half-a-node
 #
 # This python code was modified from ArtForz' public domain  half-a-node, as
 # found in the mini-node branch of http://github.com/jgarzik/pynode.
@@ -40,18 +41,14 @@ from .equihash import (
     zcash_person,
 )
 
-OVERWINTER_PROTO_VERSION = 170003
-BIP0031_VERSION = 60000
-SPROUT_PROTO_VERSION = 170002  # past bip-31 for ping/pong
-SAPLING_PROTO_VERSION = 170006
-MY_SUBVERSION = "/python-mininode-hush-tester:3.3.0/"
-
+OVERWINTER_PROTO_VERSION    = 170003
+BIP0031_VERSION             = 60000
+SPROUT_PROTO_VERSION        = 170002  # past bip-31 for ping/pong
+SAPLING_PROTO_VERSION       = 1987420
+MY_SUBVERSION               = "/SpicySand/"
 OVERWINTER_VERSION_GROUP_ID = 0x03C48270
-
-MAX_INV_SZ = 50000
-
-
-COIN = 100000000 # 1 HUSH in puposhis
+MAX_INV_SZ                  = 50000
+COIN                        = 100000000 # 1 HUSH in puposhis
 
 # Keep our own socket map for asyncore, so that we can track disconnects
 # ourselves (to workaround an issue with closing an asyncore socket when
@@ -417,14 +414,14 @@ ZC_NOTEPLAINTEXT_LEADING = 1
 ZC_V_SIZE = 8
 ZC_RHO_SIZE = 32
 ZC_R_SIZE = 32
-ZC_MEMO_SIZE = 512
+HUSH_MEMO_SIZE = 512
 
 ZC_NOTEPLAINTEXT_SIZE = (
   ZC_NOTEPLAINTEXT_LEADING +
   ZC_V_SIZE +
   ZC_RHO_SIZE +
   ZC_R_SIZE +
-  ZC_MEMO_SIZE
+  HUSH_MEMO_SIZE
 )
 
 NOTEENCRYPTION_AUTH_BYTES = 16

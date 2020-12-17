@@ -99,7 +99,7 @@ private:
     TransactionBuilder builder_;
     CTransaction tx_;
     
-    std::array<unsigned char, ZC_MEMO_SIZE> get_memo_from_hex_string(std::string s);
+    std::array<unsigned char, HUSH_MEMO_SIZE> get_memo_from_hex_string(std::string s);
     bool main_impl();
     
     void sign_send_raw_transaction(UniValue obj); // throws exception if there was an error
@@ -135,7 +135,7 @@ public:
     
     // Delegated methods
     
-    std::array<unsigned char, ZC_MEMO_SIZE> get_memo_from_hex_string(std::string s)
+    std::array<unsigned char, HUSH_MEMO_SIZE> get_memo_from_hex_string(std::string s)
     {
         return delegate->get_memo_from_hex_string(s);
     }

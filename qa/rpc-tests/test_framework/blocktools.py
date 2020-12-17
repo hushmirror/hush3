@@ -1,9 +1,7 @@
-# blocktools.py - utilities for manipulating blocks and transactions
-#
+# Copyright (c) 2016-2020 The Hush developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-#
-
+# blocktools.py - utilities for manipulating blocks and transactions
 from mininode import CBlock, CTransaction, CTxIn, CTxOut, COutPoint
 from script import CScript, OP_0, OP_EQUAL, OP_HASH160
 

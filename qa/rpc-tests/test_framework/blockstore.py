@@ -1,3 +1,6 @@
+# Copyright (c) 2016-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 # BlockStore: a helper class that keeps a map of blocks and implements
 #             helper functions for responding to getheaders and getdata,
 #             and for constructing a getheaders message

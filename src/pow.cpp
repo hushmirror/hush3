@@ -509,14 +509,12 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 // changes consensus. Have fun -- Duke
 int64_t AveragingWindowTimespan(int32_t height) {
     int64_t AWT = 2550;
-    if (height >= 340000) {
-        //trying to emulate 3.5.0 behavior
-        //AWT = 1275;
+    /*
+    int32_t forkHeight = 0;
+    if (height >= forkHeight) {
+        AWT = 1275;
     }
-    // TODO: 
-    //if (height >= XXX){
-    //    AWT = 1275;
-    //}
+    */
     return AWT;
 }
 
@@ -703,47 +701,9 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
     memset(blocktimes,0,sizeof(blocktimes));
     tiptime = komodo_chainactive_timestamp();
     bnTarget.SetCompact(blkHeader.nBits, &fNegative, &fOverflow);
-    if ( height == 0 )
-    {
+    if ( height == 0 ) {
         height = komodo_currentheight() + 1;
         //fprintf(stderr,"set height to %d\n",height);
-    }
-    if ( height > 34000 && SMART_CHAIN_SYMBOL[0] == 0 ) // 0 -> non-special notary
-    {
-        special = hush_chosennotary(&notaryid,height,pubkey33,tiptime);
-        for (i=0; i<33; i++)
-        {
-            if ( pubkey33[i] != 0 )
-                nonz++;
-        }
-        if ( nonz == 0 )
-        {
-            //fprintf(stderr,"ht.%d null pubkey checkproof return\n",height);
-            return(true); // will come back via different path with pubkey set
-        }
-        flag = komodo_eligiblenotary(pubkeys,mids,blocktimes,&nonzpkeys,height);
-        special2 = komodo_is_special(pubkeys,mids,blocktimes,height,pubkey33,blkHeader.nTime);
-        if ( notaryid >= 0 )
-        {
-            if ( height > 10000 && height < 80000 && (special != 0 || special2 > 0) )
-                flag = 1;
-            else if ( height >= 80000 && height < 108000 && special2 > 0 )
-                flag = 1;
-            else if ( height >= 108000 && special2 > 0 )
-                flag = (height > 1000000 || (height % KOMODO_ELECTION_GAP) > 64 || (height % KOMODO_ELECTION_GAP) == 0);
-            else if ( height == 790833 )
-                flag = 1;
-            else if ( special2 < 0 )
-            {
-                if ( height > 792000 )
-                    flag = 0;
-                else fprintf(stderr,"ht.%d notaryid.%d special.%d flag.%d special2.%d\n",height,notaryid,special,flag,special2);
-            }
-            if ( (flag != 0 || special2 > 0) && special2 != -2 )
-            {
-                bnTarget.SetCompact(HUSH_MINDIFF_NBITS,&fNegative,&fOverflow);
-            }
-        }
     }
     arith_uint256 bnLimit = (height <= 1 || ASSETCHAINS_ALGO == ASSETCHAINS_EQUIHASH) ? UintToArith256(params.powLimit) : UintToArith256(params.powAlternate);
     if (fNegative || bnTarget == 0 || fOverflow || bnTarget > bnLimit)
@@ -760,9 +720,9 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
         if ( HUSH_LOADINGBLOCKS != 0 )
             return true;
 
+        /*
         if ( SMART_CHAIN_SYMBOL[0] != 0 || height > 792000 )
         {
-            //if ( 0 && height > 792000 )
             if ( Params().NetworkIDString() != "regtest" )
             {
                 for (i=31; i>=0; i--)
@@ -780,6 +740,7 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
             }
             return false;
         }
+        */
     }
     /*for (i=31; i>=0; i--)
      fprintf(stderr,"%02x",((uint8_t *)&hash)[i]);

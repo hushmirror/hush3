@@ -333,7 +333,7 @@ bool AsyncRPCOperation_mergetoaddress::main_impl()
         } else {
             std::string zaddr = std::get<0>(recipient_);
             std::string memo = std::get<1>(recipient_);
-            std::array<unsigned char, ZC_MEMO_SIZE> hexMemo = get_memo_from_hex_string(memo);
+            std::array<unsigned char, HUSH_MEMO_SIZE> hexMemo = get_memo_from_hex_string(memo);
             auto saplingPaymentAddress = boost::get<libzcash::SaplingPaymentAddress>(&toPaymentAddress_);
             if (saplingPaymentAddress == nullptr) {
                 // This should never happen as we have already determined that the payment is to sapling
@@ -486,9 +486,9 @@ void AsyncRPCOperation_mergetoaddress::sign_send_raw_transaction(UniValue obj)
     tx_ = tx;
 }
 
-std::array<unsigned char, ZC_MEMO_SIZE> AsyncRPCOperation_mergetoaddress::get_memo_from_hex_string(std::string s)
+std::array<unsigned char, HUSH_MEMO_SIZE> AsyncRPCOperation_mergetoaddress::get_memo_from_hex_string(std::string s)
 {
-    std::array<unsigned char, ZC_MEMO_SIZE> memo = {{0x00}};
+    std::array<unsigned char, HUSH_MEMO_SIZE> memo = {{0x00}};
 
     std::vector<unsigned char> rawMemo = ParseHex(s.c_str());
 
@@ -498,13 +498,13 @@ std::array<unsigned char, ZC_MEMO_SIZE> AsyncRPCOperation_mergetoaddress::get_me
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Memo must be in hexadecimal format");
     }
 
-    if (rawMemo.size() > ZC_MEMO_SIZE) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Memo size of %d is too big, maximum allowed is %d", rawMemo.size(), ZC_MEMO_SIZE));
+    if (rawMemo.size() > HUSH_MEMO_SIZE) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Memo size of %d is too big, maximum allowed is %d", rawMemo.size(), HUSH_MEMO_SIZE));
     }
 
     // copy vector into boost array
     int lenMemo = rawMemo.size();
-    for (int i = 0; i < ZC_MEMO_SIZE && i < lenMemo; i++) {
+    for (int i = 0; i < HUSH_MEMO_SIZE && i < lenMemo; i++) {
         memo[i] = rawMemo[i];
     }
     return memo;

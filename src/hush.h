@@ -359,7 +359,7 @@ void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotarie
     struct hush_state *sp; char fname[512],symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t retval,ht,func; uint8_t num,pubkeys[64][33];
     if ( didinit == 0 )
     {
-        portable_mutex_init(&KOMODO_KV_mutex);
+        portable_mutex_init(&HUSH_KV_mutex);
         portable_mutex_init(&KOMODO_CC_mutex);
         didinit = 1;
     }

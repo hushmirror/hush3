@@ -53,7 +53,7 @@ void TransactionBuilder::AddSaplingOutput(
     uint256 ovk,
     libzcash::SaplingPaymentAddress to,
     CAmount value,
-    std::array<unsigned char, ZC_MEMO_SIZE> memo)
+    std::array<unsigned char, HUSH_MEMO_SIZE> memo)
 {
     auto note = libzcash::SaplingNote(to, value);
     outputs.emplace_back(ovk, note, memo);

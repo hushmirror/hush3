@@ -15,7 +15,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #ifndef CC_INCLUDE_H
 #define CC_INCLUDE_H
 
@@ -32,7 +31,7 @@ Details.
 /// this script's hash is what the p2sh address was.
 /// All of the above are the standard bitcoin vout types and there should be plenty of materials about it.
 ///
-/// What I did with the cryptoconditions (CC) contracts (now rebranded as Antara modules) is created a fourth type of vout, the CC vout. This is using the cryptoconditions standard and it is even a different signature mechanism,
+/// Cryptoconditions (CC) contracts created a fourth type of vout, the CC vout. This is using the cryptoconditions standard and it is even a different signature mechanism,
 /// ed25519 instead of secp256k1. It is basically a big extension to the bitcoin script. There is a special opcode that is added that says it is a CC script.
 ///
 /// But it gets more interesting. Each CC script has an evalcode. 
@@ -49,7 +48,7 @@ Details.
 /// However, it is a CC output, so in addition to the signature, whatever constraints a CC contract implements must also be satistifed. 
 /// This allows funds to be locked and yet anybody is able to spend it, assuming they satisfy the CC's rules.
 ///
-/// One other technical note is that komodod has the insight-explorer extensions built in 
+/// One other technical note is that Hush has the insight-explorer extensions built in 
 /// so it can lookup directly all transactions to any address. 
 /// This is a key performance boosting thing as if it wasnt there, trying to get all the utxo for an address not in the wallet is quite time consuming.
 ///
@@ -101,12 +100,12 @@ Details.
 enum opretid : uint8_t {
     // cc contracts data:
     OPRETID_NONFUNGIBLEDATA = 0x11, //!< NFT data id
-    OPRETID_ASSETSDATA = 0x12,      //!< assets contract data id
-    OPRETID_GATEWAYSDATA = 0x13,    //!< gateways contract data id
-    OPRETID_CHANNELSDATA = 0x14,    //!< channels contract data id
-    OPRETID_HEIRDATA = 0x15,        //!< heir contract data id
-    OPRETID_ROGUEGAMEDATA = 0x16,   //!< rogue contract data id
-    OPRETID_PEGSDATA = 0x17,        //!< pegs contract data id
+    OPRETID_ASSETSDATA      = 0x12,      //!< assets contract data id
+    OPRETID_GATEWAYSDATA    = 0x13,    //!< gateways contract data id
+    OPRETID_CHANNELSDATA    = 0x14,    //!< channels contract data id
+    OPRETID_HEIRDATA        = 0x15,        //!< heir contract data id
+    OPRETID_ROGUEGAMEDATA   = 0x16,   //!< rogue contract data id
+    OPRETID_PEGSDATA        = 0x17,        //!< pegs contract data id
 
     /*! \cond INTERNAL */
     // non cc contract data:
@@ -138,8 +137,6 @@ struct CC_utxo
 /// \endcond
 
 /// \cond INTERNAL
-// these are the parameters stored after Verus crypto-condition vouts. new versions may change
-// the format
 struct CC_meta
 {
     std::vector<unsigned char> version;
@@ -774,7 +771,7 @@ bool Getscriptaddress(char *destaddr,const CScript &scriptPubKey);
 /// @returns true if success
 bool GetCustomscriptaddress(char *destaddr,const CScript &scriptPubKey,uint8_t taddr,uint8_t prefix,uint8_t prefix2);
 
-/// Returns my pubkey, that is set by -pubkey komodod parameter
+/// Returns my pubkey, that is set by -pubkey hushd parameter
 /// @returns public key as byte array
 std::vector<uint8_t> Mypubkey();
 
@@ -825,7 +822,7 @@ std::string FinalizeCCTx(uint64_t skipmask,struct CCcontract_info *cp,CMutableTr
 
 /// FinalizeCCTx is a very useful function that will properly sign both CC and normal inputs, adds normal change and might add an opreturn output.
 /// This allows for Antara module transaction creation rpc functions to create an CMutableTransaction object, add the appropriate vins and vouts to it and use FinalizeCCTx to properly sign the transaction.
-/// By using -addressindex=1 of komodod daemon, it allows tracking of all the CC addresses.
+/// By using -addressindex=1 of hushd daemon, it allows tracking of all the CC addresses.
 ///
 /// For signing the vins the function builds several default probe scriptPubKeys and checks them against the referred previous transactions (vintx) vouts.
 /// For cryptocondition vins the function creates a basic set of probe cryptconditions with mypk and module global pubkey, both for coins and tokens cases.
@@ -893,7 +890,7 @@ int64_t AddNormalinputs(CMutableTransaction &mtx,CPubKey mypk,int64_t total,int3
 int64_t AddNormalinputsLocal(CMutableTransaction &mtx,CPubKey mypk,int64_t total,int32_t maxinputs);
 
 /// AddNormalinputs2 adds normal (not cc) inputs to the transaction object vin array for the specified total amount using utxos on my pubkey's TX_PUBKEY address (my pubkey is set by -pubkey command line parameter), to fund the transaction.
-/// 'My pubkey' is the -pubkey parameter of komodod.
+/// 'My pubkey' is the -pubkey parameter of hushd.
 /// @param mtx mutable transaction object
 /// @param total amount of inputs to add. If total equals to 0 the function does not add inputs but returns amount of all available normal inputs in the wallet
 /// @param maxinputs maximum number of inputs to add
@@ -972,7 +969,7 @@ void CCLogPrintStream(const char *category, int level, const char *functionName,
 }
 /// Macro for logging messages using bitcoin LogAcceptCategory and LogPrintStr functions.
 /// Supports error, info and three levels of debug messages.
-/// Logging category is set by -debug=category komodod param.
+/// Logging category is set by -debug=category hushd param.
 /// To set debug level pass -debug=category-1, -debug=category-2 or -debug=category-3 param. If some level is enabled lower level messages also will be printed.
 /// To print info-level messages pass just -debug=category parameter, with no level.
 /// Error-level messages will always be printed, even if -debug parameter is not set

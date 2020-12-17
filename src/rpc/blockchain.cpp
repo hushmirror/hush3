@@ -859,7 +859,7 @@ UniValue gettxoutsetinfo(const UniValue& params, bool fHelp, const CPubKey& mypk
 
 UniValue kvsearch(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    UniValue ret(UniValue::VOBJ); uint32_t flags; uint8_t value[IGUANA_MAXSCRIPTSIZE*8],key[IGUANA_MAXSCRIPTSIZE*8]; int32_t duration,j,height,valuesize,keylen; uint256 refpubkey; static uint256 zeroes;
+    UniValue ret(UniValue::VOBJ); uint32_t flags; uint8_t value[DRAGON_MAXSCRIPTSIZE*8],key[DRAGON_MAXSCRIPTSIZE*8]; int32_t duration,j,height,valuesize,keylen; uint256 refpubkey; static uint256 zeroes;
     if (fHelp || params.size() != 1 )
         throw runtime_error(
             "kvsearch key\n"
@@ -902,7 +902,7 @@ UniValue kvsearch(const UniValue& params, bool fHelp, const CPubKey& mypk)
                 if ( memcmp(&zeroes,&refpubkey,sizeof(refpubkey)) != 0 )
                     ret.push_back(Pair("owner",refpubkey.GetHex()));
                 ret.push_back(Pair("height",height));
-                duration = ((flags >> 2) + 1) * KOMODO_KVDURATION;
+                duration = ((flags >> 2) + 1) * HUSH_KVDURATION;
                 ret.push_back(Pair("expiration", (int64_t)(height+duration)));
                 ret.push_back(Pair("flags",(int64_t)flags));
                 ret.push_back(Pair("value",val));

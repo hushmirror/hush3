@@ -64,7 +64,7 @@ Restart the daemon with -earlytxid=<txid of opreturn_burn transaction>  eg:
 mine the chain past block 100, preventing anyone else, creating another payments plan on chain before block 100. 
 
 We call the following in Validation and RPC where the address is needed. 
-if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && KOMODO_EARLYTXID_SCRIPTPUB.size() == 0 )
+if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && HUSH_EARLYTXID_SCRIPTPUB.size() == 0 )
     GetKomodoEarlytxidScriptPub();
 
 This will fetch the op_return, calculate the scriptPubKey and save it to the global. 
@@ -244,7 +244,7 @@ static bool ValidateBetTx(struct CCcontract_info *cp, Eval *eval, const CTransac
     std::vector<uint16_t> vec;
 
     // check payment cc config:
-    if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && KOMODO_EARLYTXID_SCRIPTPUB.size() == 0 )
+    if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && HUSH_EARLYTXID_SCRIPTPUB.size() == 0 )
         GetKomodoEarlytxidScriptPub();
 
     if (bettx.vout.size() < 6 || bettx.vout.size() > 7)
@@ -263,7 +263,7 @@ static bool ValidateBetTx(struct CCcontract_info *cp, Eval *eval, const CTransac
     if (MakeCC1vout(cp->evalcode, bettx.vout[2].nValue, pricespk) != bettx.vout[2] )
         return eval->Invalid("cannot validate vout2 in bet tx with pk from opreturn");
     // This should be all you need to verify it, maybe also check amount? 
-    if ( bettx.vout[4].scriptPubKey != KOMODO_EARLYTXID_SCRIPTPUB )
+    if ( bettx.vout[4].scriptPubKey != HUSH_EARLYTXID_SCRIPTPUB )
         return eval->Invalid("the fee was paid to wrong address.");
 
     int64_t betamount = bettx.vout[2].nValue;
@@ -297,7 +297,7 @@ static bool ValidateAddFundingTx(struct CCcontract_info *cp, Eval *eval, const C
     vscript_t vintxOpret;
 
     // check payment cc config:
-    if (ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && KOMODO_EARLYTXID_SCRIPTPUB.size() == 0)
+    if (ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && HUSH_EARLYTXID_SCRIPTPUB.size() == 0)
         GetKomodoEarlytxidScriptPub();
 
     if (addfundingtx.vout.size() < 4 || addfundingtx.vout.size() > 5)
@@ -323,7 +323,7 @@ static bool ValidateAddFundingTx(struct CCcontract_info *cp, Eval *eval, const C
         return eval->Invalid("cannot validate vout1 in add funding tx with global pk");
 
     // This should be all you need to verify it, maybe also check amount? 
-    if (addfundingtx.vout[2].scriptPubKey != KOMODO_EARLYTXID_SCRIPTPUB)
+    if (addfundingtx.vout[2].scriptPubKey != HUSH_EARLYTXID_SCRIPTPUB)
         return eval->Invalid("the fee was paid to wrong address.");
 
     int64_t betamount = addfundingtx.vout[1].nValue;
@@ -1505,14 +1505,14 @@ UniValue PricesBet(int64_t txfee, int64_t amount, int16_t leverage, std::vector<
         mtx.vout.push_back(MakeCC1vout(cp->evalcode, txfee, pricespk));                             // vout1 cc marker (NVOUT_CCMARKER)
         mtx.vout.push_back(MakeCC1vout(cp->evalcode, betamount, pricespk));                         // vout2 betamount
         mtx.vout.push_back(CTxOut(txfee, CScript() << ParseHex(HexStr(pricespk)) << OP_CHECKSIG));  // vout3 normal marker NVOUT_NORMALMARKER - TODO: remove it as we have cc marker now, when move to the new chain
-        if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && KOMODO_EARLYTXID_SCRIPTPUB.size() == 0 )
+        if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && HUSH_EARLYTXID_SCRIPTPUB.size() == 0 )
         {
             // Lock here, as in validation we cannot call lock in the function itself.
             // may not be needed as the validation call to update the global, is called in a LOCK already, and it can only update there and here.
             LOCK(cs_main);
             GetKomodoEarlytxidScriptPub();
         }
-        mtx.vout.push_back(CTxOut(amount-betamount, KOMODO_EARLYTXID_SCRIPTPUB)); 
+        mtx.vout.push_back(CTxOut(amount-betamount, HUSH_EARLYTXID_SCRIPTPUB)); 
         //test: mtx.vout.push_back(CTxOut(amount - betamount, CScript() << ParseHex("037c803ec82d12da939ac04379bbc1130a9065c53d8244a61eece1db942cf0efa7") << OP_CHECKSIG));  // vout4 test revshare fee
 
         rawtx = FinalizeCCTx(0, cp, mtx, mypk, txfee, prices_betopret(mypk, nextheight - 1, amount, leverage, firstprice, vec, zeroid));
@@ -1576,14 +1576,14 @@ UniValue PricesAddFunding(int64_t txfee, uint256 bettxid, int64_t amount)
             mtx.vout.push_back(MakeCC1vout(cp->evalcode, txfee, mypk));         // vout0 baton for total funding
             mtx.vout.push_back(MakeCC1vout(cp->evalcode, betamount, pricespk));    // vout1 added amount
 
-            if (ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && KOMODO_EARLYTXID_SCRIPTPUB.size() == 0)
+            if (ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && HUSH_EARLYTXID_SCRIPTPUB.size() == 0)
             {
                 // Lock here, as in validation we cannot call lock in the function itself.
                 // may not be needed as the validation call to update the global, is called in a LOCK already, and it can only update there and here.
                 LOCK(cs_main);
                 GetKomodoEarlytxidScriptPub();
             }
-            mtx.vout.push_back(CTxOut(amount - betamount, KOMODO_EARLYTXID_SCRIPTPUB));
+            mtx.vout.push_back(CTxOut(amount - betamount, HUSH_EARLYTXID_SCRIPTPUB));
             // test: mtx.vout.push_back(CTxOut(amount - betamount, CScript() << ParseHex("037c803ec82d12da939ac04379bbc1130a9065c53d8244a61eece1db942cf0efa7") << OP_CHECKSIG));  //vout2  test revshare fee
 
             rawtx = FinalizeCCTx(0, cp, mtx, mypk, txfee, prices_addopret(bettxid, mypk, amount));

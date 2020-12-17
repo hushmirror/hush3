@@ -48,15 +48,15 @@ public:
 class BaseNotePlaintext {
 protected:
     uint64_t value_ = 0;
-    std::array<unsigned char, ZC_MEMO_SIZE> memo_;
+    std::array<unsigned char, HUSH_MEMO_SIZE> memo_;
 public:
     BaseNotePlaintext() {}
-    BaseNotePlaintext(const BaseNote& note, std::array<unsigned char, ZC_MEMO_SIZE> memo)
+    BaseNotePlaintext(const BaseNote& note, std::array<unsigned char, HUSH_MEMO_SIZE> memo)
         : value_(note.value()), memo_(memo) {}
     virtual ~BaseNotePlaintext() {}
 
     inline uint64_t value() const { return value_; }
-    inline const std::array<unsigned char, ZC_MEMO_SIZE> & memo() const { return memo_; }
+    inline const std::array<unsigned char, HUSH_MEMO_SIZE> & memo() const { return memo_; }
 };
 
 typedef std::pair<SaplingEncCiphertext, SaplingNoteEncryption> SaplingNotePlaintextEncryptionResult;
@@ -68,7 +68,7 @@ public:
 
     SaplingNotePlaintext() {}
 
-    SaplingNotePlaintext(const SaplingNote& note, std::array<unsigned char, ZC_MEMO_SIZE> memo);
+    SaplingNotePlaintext(const SaplingNote& note, std::array<unsigned char, HUSH_MEMO_SIZE> memo);
 
     static boost::optional<SaplingNotePlaintext> decrypt(
         const SaplingEncCiphertext &ciphertext,

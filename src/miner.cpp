@@ -47,12 +47,9 @@
 #ifdef ENABLE_WALLET
 #include "wallet/wallet.h"
 #endif
-
 #include "zcash/Address.hpp"
 #include "transaction_builder.h"
-
 #include "sodium.h"
-
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #ifdef ENABLE_MINING
@@ -145,7 +142,7 @@ int32_t komodo_baseid(char *origbase);
 int32_t hush_longestchain();
 int64_t komodo_block_unlocktime(uint32_t nHeight);
 uint64_t the_commission(const CBlock *block,int32_t height);
-int32_t komodo_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *ptr);
+int32_t hush_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *ptr);
 int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 int32_t komodo_is_notarytx(const CTransaction& tx);
 uint64_t komodo_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len);
@@ -364,7 +361,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                             scriptlen = (int32_t)tx1.vout[txin.prevout.n].scriptPubKey.size();
                             if ( scriptlen == 35 && script[0] == 33 && script[34] == OP_CHECKSIG && memcmp(script+1,notarypubkeys[i],33) == 0 )
                             {
-                                // We can add the index of each notary to vector, and clear it if this notarisation is not valid later on.
+                                // We can add the index of each notary to vector, and clear it if this notarization is not valid later on.
                                 TMP_NotarizationNotaries.push_back(i);                          
                             }
                         }
@@ -373,11 +370,11 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                 }
                 if ( numSN != 0 && notarypubkeys[0][0] != 0 && TMP_NotarizationNotaries.size() >= numSN / 5 )
                 {
-                    // check a notary didnt sign twice (this would be an invalid notarisation later on and cause problems)
+                    // check a notary didnt sign twice (this would be an invalid notarization later on and cause problems)
                     std::set<int> checkdupes( TMP_NotarizationNotaries.begin(), TMP_NotarizationNotaries.end() );
                     if ( checkdupes.size() != TMP_NotarizationNotaries.size() ) 
                     {
-                        fprintf(stderr, "possible notarisation is signed multiple times by same notary, passed as normal transaction.\n");
+                        fprintf(stderr, "%s: WTFBBQ! possible notarization is signed multiple times by same notary, passed as normal transaction.\n", __func__);
                     } else fNotarization = true;
                 }
                 nTotalIn += tx.GetShieldedValueIn();
@@ -394,12 +391,11 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
 
             CFeeRate feeRate(nTotalIn-tx.GetValueOut(), nTxSize);
 
-            if ( fNotarization ) 
-            {
+            if ( fNotarization ) {
                 // Special miner for notary pay chains. Can only enter this if numSN/notarypubkeys is set higher up.
                 if ( tx.vout.size() == 2 && tx.vout[1].nValue == 0 )
                 {
-                    // Get the OP_RETURN for the notarisation
+                    // Get the OP_RETURN for the notarization
                     uint8_t *script = (uint8_t *)&tx.vout[1].scriptPubKey[0];
                     int32_t scriptlen = (int32_t)tx.vout[1].scriptPubKey.size();
                     if ( script[0] == OP_RETURN )
@@ -422,33 +418,29 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                         }
                     }
                 }
-            }
-            else if ( dPriority == 1e16 )
-            {
+            } else if ( dPriority == 1e16 ) {
                 dPriority -= 10;
-                // make sure notarisation is tx[1] in block. 
+                // make sure notarization is tx[1] in block. 
             }
-            if (porphan)
-            {
+            if (porphan) {
                 porphan->dPriority = dPriority;
                 porphan->feeRate = feeRate;
-            }
-            else
+            } else {
                 vecPriority.push_back(TxPriority(dPriority, feeRate, &(mi->GetTx())));
+            }
         }
 
         // Collect transactions into block
-        uint64_t nBlockSize = 1000;
-        uint64_t nBlockTx = 0;
         int64_t interest;
-        int nBlockSigOps = 100;
-        bool fSortedByFee = (nBlockPrioritySize <= 0);
+        uint64_t nBlockSize = 1000;
+        uint64_t nBlockTx   = 0;
+        int nBlockSigOps    = 100;
+        bool fSortedByFee   = (nBlockPrioritySize <= 0);
 
         TxPriorityCompare comparer(fSortedByFee);
         std::make_heap(vecPriority.begin(), vecPriority.end(), comparer);
 
-        while (!vecPriority.empty())
-        {
+        while (!vecPriority.empty()) {
             // Take highest priority transaction off the priority queue:
             double dPriority = vecPriority.front().get<0>();
             CFeeRate feeRate = vecPriority.front().get<1>();
@@ -625,7 +617,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
             if ( ASSETCHAINS_SCRIPTPUB.size() > 1 )
             {
                 static bool didinit = false;
-                if ( !didinit && nHeight > KOMODO_EARLYTXID_HEIGHT && KOMODO_EARLYTXID != zeroid && komodo_appendACscriptpub() )
+                if ( !didinit && nHeight > HUSH_EARLYTXID_HEIGHT && HUSH_EARLYTXID != zeroid && komodo_appendACscriptpub() )
                 {
                     fprintf(stderr, "appended ccopreturn to ASSETCHAINS_SCRIPTPUB.%s\n", ASSETCHAINS_SCRIPTPUB.c_str());
                     didinit = true;
@@ -637,9 +629,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                 txNew.vout[1].scriptPubKey.resize(len);
                 ptr = (uint8_t *)&txNew.vout[1].scriptPubKey[0];
                 decode_hex(ptr,len,(char *)ASSETCHAINS_SCRIPTPUB.c_str());
-            }
-            else
-            {
+            } else {
                 txNew.vout[1].scriptPubKey.resize(35);
                 ptr = (uint8_t *)&txNew.vout[1].scriptPubKey[0];
                 ptr[0] = 33;
@@ -652,17 +642,13 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                 //fprintf(stderr," set ASSETCHAINS_OVERRIDE_PUBKEY33 into vout[1]\n");
             }
             //printf("autocreate commision vout\n");
-        }
-        else if ( (uint64_t)(txNew.vout[0].nValue) >= ASSETCHAINS_TIMELOCKGTE)
-        {
+        } else if ( (uint64_t)(txNew.vout[0].nValue) >= ASSETCHAINS_TIMELOCKGTE) {
 			fprintf(stderr,"timelocked chains not supported in this code!\n");
 			LEAVE_CRITICAL_SECTION(cs_main);
 			LEAVE_CRITICAL_SECTION(mempool.cs);
 			return(0);
-        } 
-        else if ( fNotarizationBlock && ASSETCHAINS_NOTARY_PAY[0] != 0 && pblock->vtx[1].vout.size() == 2 && pblock->vtx[1].vout[1].nValue == 0 )
-        {
-            // Get the OP_RETURN for the notarisation
+        } else if ( fNotarizationBlock && ASSETCHAINS_NOTARY_PAY[0] != 0 && pblock->vtx[1].vout.size() == 2 && pblock->vtx[1].vout[1].nValue == 0 ) {
+            // Get the OP_RETURN for the notarization
             uint8_t *script = (uint8_t *)&pblock->vtx[1].vout[1].scriptPubKey[0];
             int32_t scriptlen = (int32_t)pblock->vtx[1].vout[1].scriptPubKey.size();
             if ( script[0] == OP_RETURN )
@@ -679,7 +665,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                     return(0);
                 }
                 //fprintf(stderr, "Created notary payment coinbase totalsat.%lu\n",totalsats);    
-            } else fprintf(stderr, "vout 2 of notarisation is not OP_RETURN scriptlen.%i\n", scriptlen);
+            } else fprintf(stderr, "vout 2 of notarization is not OP_RETURN scriptlen.%i\n", scriptlen);
         }
         if ( ASSETCHAINS_CBOPRET != 0 )
         {
@@ -733,7 +719,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                 memcpy(&r,&randvals,sizeof(r));
                 pblock->nTime += (r % (33 - gpucount)*(33 - gpucount));
             }
-            if ( komodo_notaryvin(txNotary,NOTARY_PUBKEY33,ptr) > 0 )
+            if ( hush_notaryvin(txNotary,NOTARY_PUBKEY33,ptr) > 0 )
             {
                 CAmount txfees = 5000;
                 pblock->vtx.push_back(txNotary);

@@ -25,7 +25,7 @@
 
 int32_t komodo_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblocks);
 extern void GetKomodoEarlytxidScriptPub();
-extern CScript KOMODO_EARLYTXID_SCRIPTPUB;
+extern CScript HUSH_EARLYTXID_SCRIPTPUB;
 
 // #define PRICES_DAYWINDOW ((3600*24/ASSETCHAINS_BLOCKTIME) + 1) // defined in hush_defs.h
 #define PRICES_TXFEE 10000

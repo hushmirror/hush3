@@ -20,14 +20,14 @@
 #include "arith_uint256.h"
 #include "chain.h"
 #include "hush_nk.h"
-#define KOMODO_EARLYTXID_HEIGHT 100
+#define HUSH_EARLYTXID_HEIGHT 100
 #define ASSETCHAINS_MINHEIGHT 128
 #define ASSETCHAINS_MAX_ERAS 7
 #define KOMODO_ELECTION_GAP 2000
 #define ROUNDROBIN_DELAY 61
 #define HUSH_SMART_CHAIN_MAXLEN 65
 #define KOMODO_LIMITED_NETWORKSIZE 4
-#define IGUANA_MAXSCRIPTSIZE 10001
+#define DRAGON_MAXSCRIPTSIZE 10001
 #define KOMODO_MAXMEMPOOLTIME 3600 // affects consensus
 #define CRYPTO555_PUBSECPSTR "038a1bd41a08f38edda51042988022933c5775dfce81f7bae0b32a9179650352ac"
 #define CRYPTO555_HUSHADDR   "RFetqf8WUfWnwNeXdknkm8ojk7EXnYFzrv"
@@ -513,7 +513,7 @@ extern std::string NOTARY_PUBKEY,ASSETCHAINS_OVERRIDE_PUBKEY,ASSETCHAINS_SCRIPTP
 extern uint8_t NOTARY_PUBKEY33[33],ASSETCHAINS_OVERRIDE_PUBKEY33[33],ASSETCHAINS_MARMARA;
 extern std::vector<std::string> ASSETCHAINS_PRICES,ASSETCHAINS_STOCKS;
 
-extern uint256 KOMODO_EARLYTXID;
+extern uint256 HUSH_EARLYTXID;
 
 extern int32_t HUSH_CONNECTING,KOMODO_CCACTIVATE,KOMODO_DEALERNODE;
 extern uint32_t ASSETCHAINS_CC;
@@ -529,7 +529,6 @@ extern char NOTARYADDRS[64][64];
 extern char NOTARY_ADDRESSES[NUM_HUSH_SEASONS][64][64];
 extern int32_t HUSH_TESTNODE, HUSH_SNAPSHOT_INTERVAL;
 extern int32_t ASSETCHAINS_EARLYTXIDCONTRACT;
-extern int32_t ASSETCHAINS_STAKED_SPLIT_PERCENTAGE;
 int tx_height( const uint256 &hash );
 extern std::vector<std::string> vWhiteListAddress;
 extern std::map <std::int8_t, int32_t> mapHeightEvalActivate;
@@ -537,9 +536,9 @@ void komodo_netevent(std::vector<uint8_t> payload);
 int32_t getacseason(uint32_t timestamp);
 int32_t gethushseason(int32_t height);
 
-#define IGUANA_MAXSCRIPTSIZE 10001
-#define KOMODO_KVDURATION 1440
-#define KOMODO_KVBINARY 2
+#define DRAGON_MAXSCRIPTSIZE 10001
+#define HUSH_KVDURATION 1440
+#define HUSH_KVBINARY 2
 #define PRICES_SMOOTHWIDTH 1
 #define PRICES_MAXDATAPOINTS 8
 uint64_t komodo_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uint64_t basevolume);
@@ -547,7 +546,7 @@ int32_t komodo_paxprices(int32_t *heights,uint64_t *prices,int32_t max,char *bas
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 char *bitcoin_address(char *coinaddr,uint8_t addrtype,uint8_t *pubkey_or_rmd160,int32_t len);
 int32_t komodo_minerids(uint8_t *minerids,int32_t height,int32_t width);
-int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[IGUANA_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
+int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
 
 uint32_t komodo_blocktime(uint256 hash);
 int32_t hush_longestchain();

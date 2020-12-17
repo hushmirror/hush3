@@ -15,7 +15,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "cc/eval.h"
 #include "crosschain.h"
 #include "importcoin.h"
@@ -23,15 +22,14 @@
 #include "notarizationdb.h"
 #include "merkleblock.h"
 #include "cc/CCinclude.h"
-
 /*
  * The crosschain workflow.
  *
  * 3 chains, A, B, and HUSH. We would like to prove TX on B.
- * There is a notarisation, nA0, which will include TX via an MoM.
- * The notarisation nA0 must fall between 2 notarisations of B,
+ * There is a notarization, nA0, which will include TX via an MoM.
+ * The notarization nA0 must fall between 2 notarizations of B,
  * ie, nB0 and nB1. An MoMoM including this range is propagated to
- * B in notarisation receipt (backnotarisation) bnB2.
+ * B in notarization receipt (backnotarization) bnB2.
  *
  * A:                 TX   bnA0
  *                     \   /
@@ -42,10 +40,8 @@
 
 // XXX: There are potential crashes wherever we access chainActive without a lock,
 // because it might be disconnecting blocks at the same time.
-
-
-// TODO: this assumes a blocktime of 60 seconds and limiting of 1 day of blocks
-int NOTARISATION_SCAN_LIMIT_BLOCKS = 1440;
+// TODO: this assumes a blocktime of 75 seconds for HUSH and 60 seconds for other chains
+int NOTARISATION_SCAN_LIMIT_BLOCKS = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? 1152 : 1440;
 CBlockIndex *komodo_getblockindex(uint256 hash);
 
 /* On HUSH */
@@ -53,12 +49,12 @@ uint256 CalculateProofRoot(const char* symbol, uint32_t targetCCid, int hushHeig
         std::vector<uint256> &moms, uint256 &destNotarizationTxid)
 {
     /*
-     * Notaries don't wait for confirmation on HUSH before performing a backnotarisation,
+     * Notaries don't wait for confirmation on HUSH before performing a backnotarization,
      * but we need a determinable range that will encompass all merkle roots. Include MoMs
-     * including the block height of the last notarisation until the height before the
-     * previous notarisation.
+     * including the block height of the last notarization until the height before the
+     * previous notarization.
      *
-     *    hushHeight      notarisations-0      notarisations-1
+     *    hushHeight      notarizations-0      notarizations-1
      *                         *********************|
      *        > scan backwards >
      */
@@ -76,13 +72,13 @@ uint256 CalculateProofRoot(const char* symbol, uint32_t targetCCid, int hushHeig
 
     for (i=0; i<NOTARISATION_SCAN_LIMIT_BLOCKS; i++) {
         if (i > hushHeight) break;
-        NotarizationsInBlock notarisations;
+        NotarizationsInBlock notarizations;
         uint256 blockHash = *chainActive[hushHeight-i]->phashBlock;
-        if (!GetBlockNotarizations(blockHash, notarisations))
+        if (!GetBlockNotarizations(blockHash, notarizations))
             continue;
 
-        // See if we have an own notarisation in this block
-        BOOST_FOREACH(Notarization& nota, notarisations) {
+        // See if we have an own notarization in this block
+        BOOST_FOREACH(Notarization& nota, notarizations) {
             if (strcmp(nota.second.symbol, symbol) == 0)
             {
                 seenOwnNotarizations++;
@@ -95,7 +91,7 @@ uint256 CalculateProofRoot(const char* symbol, uint32_t targetCCid, int hushHeig
         }
 
         if (seenOwnNotarizations >= 1) {
-            BOOST_FOREACH(Notarization& nota, notarisations) {
+            BOOST_FOREACH(Notarization& nota, notarizations) {
                 if (GetSymbolAuthority(nota.second.symbol) == authority)
                     if (nota.second.ccId == targetCCid) {
                       tmp_moms.insert(nota.second.MoM);
@@ -105,7 +101,7 @@ uint256 CalculateProofRoot(const char* symbol, uint32_t targetCCid, int hushHeig
         }
     }
 
-    // Not enough own notarisations found to return determinate MoMoM
+    // Not enough own notarizations found to return determinate MoMoM
     destNotarizationTxid = uint256();
     moms.clear();
     return uint256();
@@ -120,9 +116,9 @@ end:
 
 
 /*
- * Get a notarisation from a given height
+ * Get a notarization from a given height
  *
- * Will scan notarisations leveldb up to a limit
+ * Will scan notarizations leveldb up to a limit
  */
 template <typename IsTarget>
 int ScanNotarizationsFromHeight(int nHeight, const IsTarget f, Notarization &found)
@@ -131,12 +127,12 @@ int ScanNotarizationsFromHeight(int nHeight, const IsTarget f, Notarization &fou
     int start = std::max(nHeight, 1);
 
     for (int h=start; h<limit; h++) {
-        NotarizationsInBlock notarisations;
+        NotarizationsInBlock notarizations;
 
-        if (!GetBlockNotarizations(*chainActive[h]->phashBlock, notarisations))
+        if (!GetBlockNotarizations(*chainActive[h]->phashBlock, notarizations))
             continue;
 
-        BOOST_FOREACH(found, notarisations) {
+        BOOST_FOREACH(found, notarizations) {
             if (f(found)) {
                 return h;
             }
@@ -152,14 +148,14 @@ TxProof GetCrossChainProof(const uint256 txid, const char* targetSymbol, uint32_
 {
     /*
      * Here we are given a proof generated by an assetchain A which goes from given txid to
-     * an assetchain MoM. We need to go from the notarisationTxid for A to the MoMoM range of the
-     * backnotarisation for B (given by hushHeight of notarisation), find the MoM within the MoMs for
+     * an assetchain MoM. We need to go from the notarizationTxid for A to the MoMoM range of the
+     * backnotarization for B (given by hushHeight of notarization), find the MoM within the MoMs for
      * that range, and finally extend the proof to lead to the MoMoM (proof root).
      */
     EvalRef eval;
     uint256 MoM = assetChainProof.second.Exec(txid);
 
-    // Get a Hush height for given notarisation Txid
+    // Get a Hush height for given notarization Txid
     int hushHeight;
     {
         CTransaction sourceNotarization;
@@ -170,11 +166,11 @@ TxProof GetCrossChainProof(const uint256 txid, const char* targetSymbol, uint32_
         hushHeight = blockIdx.GetHeight();
     }
 
-    // We now have a hushHeight of the notarisation from chain A. So we know that a MoM exists
+    // We now have a hushHeight of the notarization from chain A. So we know that a MoM exists
     // at that height.
     // If we call CalculateProofRoot with that height, it'll scan backwards, until it finds
-    // a notarisation from B, and it might not include our notarisation from A
-    // at all. So, the thing we need to do is scan forwards to find the notarisation for B,
+    // a notarization from B, and it might not include our notarization from A
+    // at all. So, the thing we need to do is scan forwards to find the notarization for B,
     // that is inclusive of A.
     Notarization nota;
     auto isTarget = [&](Notarization &nota) {
@@ -182,7 +178,7 @@ TxProof GetCrossChainProof(const uint256 txid, const char* targetSymbol, uint32_
     };
     hushHeight = ScanNotarizationsFromHeight(hushHeight, isTarget, nota);
     if (!hushHeight)
-        throw std::runtime_error("Cannot find notarisation for target inclusive of source");
+        throw std::runtime_error("Cannot find notarization for target inclusive of source");
         
     if ( offset != 0 )
         hushHeight += offset;
@@ -257,38 +253,36 @@ bool IsSameAssetChain(const Notarization &nota) {
     return strcmp(nota.second.symbol, SMART_CHAIN_SYMBOL) == 0;
 };
 
-
 /* On assetchain */
-bool GetNextBacknotarisation(uint256 hushNotarizationTxid, Notarization &out)
+bool GetNextBacknotarization(uint256 hushNotarizationTxid, Notarization &out)
 {
     /*
      * Here we are given a txid, and a proof.
-     * We go from the HUSH notarisation txid to the backnotarisation,
-     * then jump to the next backnotarisation, which contains the corresponding MoMoM.
+     * We go from the HUSH notarization txid to the backnotarization,
+     * then jump to the next backnotarization, which contains the corresponding MoMoM.
      */
     Notarization bn;
     if (!GetBackNotarization(hushNotarizationTxid, bn))
         return false;
 
-    // Need to get block height of that backnotarisation
+    // Need to get block height of that backnotarization
     EvalRef eval;
     CBlockIndex block;
     CTransaction tx;
     if (!eval->GetTxConfirmed(bn.first, tx, block)){
-        fprintf(stderr, "Can't get height of backnotarisation, this should not happen\n");
+        fprintf(stderr, "Can't get height of backnotarization, this should not happen\n");
         return false;
     }
 
     return (bool) ScanNotarizationsFromHeight(block.GetHeight()+1, &IsSameAssetChain, out);
 }
 
-
 bool CheckMoMoM(uint256 hushNotarizationHash, uint256 momom)
 {
     /*
-     * Given a notarisation hash and an MoMoM. Backnotarisations may arrive out of order
-     * or multiple in the same block. So dereference the notarisation hash to the corresponding
-     * backnotarisation and scan around the hushheight to see if the MoMoM is a match.
+     * Given a notarization hash and an MoMoM. Backnotarizations may arrive out of order
+     * or multiple in the same block. So dereference the notarization hash to the corresponding
+     * backnotarization and scan around the hushheight to see if the MoMoM is a match.
      * This is a sledgehammer approach...
      */
 
@@ -296,12 +290,12 @@ bool CheckMoMoM(uint256 hushNotarizationHash, uint256 momom)
     if (!GetBackNotarization(hushNotarizationHash, bn))
         return false;
 
-    // Need to get block height of that backnotarisation
+    // Need to get block height of that backnotarization
     EvalRef eval;
     CBlockIndex block;
     CTransaction tx;
     if (!eval->GetTxConfirmed(bn.first, tx, block)){
-        fprintf(stderr, "Can't get height of backnotarisation, this should not happen\n");
+        fprintf(stderr, "Can't get height of backnotarization, this should not happen\n");
         return false;
     }
 
@@ -423,7 +417,7 @@ bool CheckNotariesApproval(uint256 burntxid, const std::vector<uint256> & notary
 /*
  * On assetchain
  * in: txid
- * out: pair<notarisationTxHash,merkleBranch>
+ * out: pair<notarizationTxHash,merkleBranch>
  */
 
 TxProof GetAssetchainProof(uint256 hash,CTransaction burnTx)
@@ -443,15 +437,15 @@ TxProof GetAssetchainProof(uint256 hash,CTransaction burnTx)
 
         blockIndex = komodo_getblockindex(blockHash);
         int h = blockIndex->GetHeight();
-        // The assumption here is that the first notarisation for a height GTE than
+        // The assumption here is that the first notarization for a height GTE than
         // the transaction block height will contain the corresponding MoM. If there
-        // are sequence issues with the notarisations this may fail.
+        // are sequence issues with the notarizations this may fail.
         auto isTarget = [&](Notarization &nota) {
             if (!IsSameAssetChain(nota)) return false;
             return nota.second.height >= blockIndex->GetHeight();
         };
         if (!ScanNotarizationsFromHeight(blockIndex->GetHeight(), isTarget, nota))
-            throw std::runtime_error("backnotarisation not yet confirmed");
+            throw std::runtime_error("backnotarization not yet confirmed");
 
         // index of block in MoM leaves
         nIndex = nota.second.height - blockIndex->GetHeight();

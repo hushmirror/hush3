@@ -66,7 +66,7 @@ boost::optional<uint256> SaplingNote::nullifier(const SaplingFullViewingKey& vk,
 // Construct and populate SaplingNotePlaintext for a given note and memo.
 SaplingNotePlaintext::SaplingNotePlaintext(
     const SaplingNote& note,
-    std::array<unsigned char, ZC_MEMO_SIZE> memo) : BaseNotePlaintext(note, memo)
+    std::array<unsigned char, HUSH_MEMO_SIZE> memo) : BaseNotePlaintext(note, memo)
 {
     d = note.d;
     rcm = note.r;

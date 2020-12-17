@@ -1860,7 +1860,7 @@ void hush_args(char *argv0)
     {
         printf("HUSH_REWIND %d\n",HUSH_REWIND);
     }
-    KOMODO_EARLYTXID = Parseuint256(GetArg("-earlytxid","0").c_str());    
+    HUSH_EARLYTXID = Parseuint256(GetArg("-earlytxid","0").c_str());    
     ASSETCHAINS_EARLYTXIDCONTRACT = GetArg("-ac_earlytxidcontract",0);
     if ( name.c_str()[0] != 0 )
     {

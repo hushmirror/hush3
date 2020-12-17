@@ -12,16 +12,15 @@
 NotarizationDB *pnotarizations;
 NotarizationDB::NotarizationDB(size_t nCacheSize, bool fMemory, bool fWipe) : CDBWrapper(GetDataDir() / "notarizations", nCacheSize, fMemory, fWipe, false, 64) { }
 
-NotarizationsInBlock ScanBlockNotarizations(const CBlock &block, int nHeight)
-{
+NotarizationsInBlock ScanBlockNotarizations(const CBlock &block, int nHeight) {
     EvalRef eval;
     NotarizationsInBlock vNotarizations;
     int timestamp = block.nTime;
     bool ishush3  = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 
     // No valid ntz's before this height
-    int minheight = ishush3 ? 360000 : 1;
-    if(ishush3 && (nHeight <= GetArg("-dpow_height",minheight))) {
+    int minheight = ishush3 ? 365420 : 1;
+    if(ishush3 && (nHeight <= GetArg("-dpow-start-height",minheight))) {
         return vNotarizations;
     }
 
@@ -48,28 +47,26 @@ NotarizationsInBlock ScanBlockNotarizations(const CBlock &block, int nHeight)
                 printf("Parsed a notarization for: %s, txid:%s, ccid:%i, momdepth:%i\n", data.symbol, tx.GetHash().GetHex().data(), data.ccId, data.MoMDepth);
                 if (!data.MoMoM.IsNull()) printf("MoMoM:%s\n", data.MoMoM.GetHex().data());
             }
-        } else
+        } else {
             LogPrintf("WARNING: Couldn't parse notarization for tx: %s at height %i\n", tx.GetHash().GetHex().data(), nHeight);
+        }
     }
     return vNotarizations;
 }
 
-bool GetBlockNotarizations(uint256 blockHash, NotarizationsInBlock &nibs)
-{
+bool GetBlockNotarizations(uint256 blockHash, NotarizationsInBlock &nibs) {
     return pnotarizations->Read(blockHash, nibs);
 }
 
 
-bool GetBackNotarization(uint256 notarisationHash, Notarization &n)
-{
-    return pnotarizations->Read(notarisationHash, n);
+bool GetBackNotarization(uint256 notarizationHash, Notarization &n) {
+    return pnotarizations->Read(notarizationHash, n);
 }
 
-// Write an index of HUSH notarisation id -> backnotarisation
-void WriteBackNotarizations(const NotarizationsInBlock notarisations, CDBBatch &batch)
-{
+// Write an index of HUSH notarization id -> backnotarization
+void WriteBackNotarizations(const NotarizationsInBlock notarizations, CDBBatch &batch) {
     int wrote = 0;
-    BOOST_FOREACH(const Notarization &n, notarisations)
+    BOOST_FOREACH(const Notarization &n, notarizations)
     {
         if (!n.second.txHash.IsNull()) {
             batch.Write(n.second.txHash, n);
@@ -78,30 +75,28 @@ void WriteBackNotarizations(const NotarizationsInBlock notarisations, CDBBatch &
     }
 }
 
-void EraseBackNotarizations(const NotarizationsInBlock notarisations, CDBBatch &batch)
-{
-    BOOST_FOREACH(const Notarization &n, notarisations)
+void EraseBackNotarizations(const NotarizationsInBlock notarizations, CDBBatch &batch) {
+    BOOST_FOREACH(const Notarization &n, notarizations)
     {
         if (!n.second.txHash.IsNull())
             batch.Erase(n.second.txHash);
     }
 }
 
-// Scan notarisationsdb backwards for blocks containing a notarisation
-// for given symbol. Return height of matched notarisation or 0.
-int ScanNotarizationsDB(int height, std::string symbol, int scanLimitBlocks, Notarization& out)
-{
+// Scan notarizationsdb backwards for blocks containing a notarization
+// for given symbol. Return height of matched notarization or 0.
+int ScanNotarizationsDB(int height, std::string symbol, int scanLimitBlocks, Notarization& out) {
     if (height < 0 || height > chainActive.Height())
         return false;
 
     for (int i=0; i<scanLimitBlocks; i++) {
         if (i > height) break;
-        NotarizationsInBlock notarisations;
+        NotarizationsInBlock notarizations;
         uint256 blockHash = *chainActive[height-i]->phashBlock;
-        if (!GetBlockNotarizations(blockHash, notarisations))
+        if (!GetBlockNotarizations(blockHash, notarizations))
             continue;
 
-        BOOST_FOREACH(Notarization& nota, notarisations) {
+        BOOST_FOREACH(Notarization& nota, notarizations) {
             if (strcmp(nota.second.symbol, symbol.data()) == 0) {
                 out = nota;
                 return height-i;

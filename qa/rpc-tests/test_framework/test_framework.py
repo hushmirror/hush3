@@ -1,14 +1,12 @@
 #!/usr/bin/env python2
 # Copyright (c) 2014 The Bitcoin Core developers
 # Copyright (c) 2016-2020 The Hush developers
-# Released under the GPLv3
-
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 # Base class for RPC testing
-
 # Add python-bitcoinrpc to module search path:
 import os
 import sys
-
 import shutil
 import tempfile
 import traceback
@@ -18,7 +16,6 @@ from util import assert_equal, check_json_precision, \
     initialize_chain, initialize_chain_clean, \
     start_nodes, connect_nodes_bi, stop_nodes, \
     sync_blocks, sync_mempools, wait_bitcoinds
-
 
 class BitcoinTestFramework(object):
 

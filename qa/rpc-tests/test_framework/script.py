@@ -1,15 +1,11 @@
-#
-# script.py
-#
-# This file is modified from python-bitcoinlib.
-#
+# Copyright (c) 2016-2020 The Hush developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-#
+# This file is modified from python-bitcoinlib.
 
 """Scripts
 
-Functionality to build scripts, as well as SignatureHash().
+Functionality to build Bitcoin style Scripts, as well as SignatureHash().
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -29,13 +25,11 @@ import binascii
 
 from test_framework import bignum
 
-MAX_SCRIPT_SIZE = 10000
+MAX_SCRIPT_SIZE         = 10000
 MAX_SCRIPT_ELEMENT_SIZE = 520
-MAX_SCRIPT_OPCODES = 201
-
-OPCODE_NAMES = {}
-
-_opcode_instances = []
+MAX_SCRIPT_OPCODES      = 201
+OPCODE_NAMES            = {}
+_opcode_instances       = []
 class CScriptOp(int):
     """A single script opcode"""
     __slots__ = []

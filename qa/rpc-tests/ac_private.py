@@ -1,8 +1,6 @@
 #!/usr/bin/env python2
-# Copyright (c) 2018-2020 The Hush developers
+# Copyright (c) 2016-2020 The Hush developers
 # Copyright (c) 2018 SuperNET developers
-# Released under the GPLv3
-
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 

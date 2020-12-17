@@ -837,7 +837,7 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans) EXCLUSIVE_LOCKS_REQUIRE
 bool IsStandardTx(const CTransaction& tx, string& reason, const int nHeight)
 {
     bool overwinterActive = NetworkUpgradeActive(nHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER);
-    bool saplingActive = NetworkUpgradeActive(nHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING);
+    bool saplingActive    = NetworkUpgradeActive(nHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING);
 
     if (saplingActive) {
         // Sapling standard rules apply
@@ -891,7 +891,7 @@ bool IsStandardTx(const CTransaction& tx, string& reason, const int nHeight)
 
         if (whichType == TX_NULL_DATA)
         {
-            if ( txout.scriptPubKey.size() > IGUANA_MAXSCRIPTSIZE )
+            if ( txout.scriptPubKey.size() > DRAGON_MAXSCRIPTSIZE )
             {
                 reason = "opreturn too big";
                 return(false);
@@ -1098,17 +1098,10 @@ unsigned int GetP2SHSigOpCount(const CTransaction& tx, const CCoinsViewCache& in
     return nSigOps;
 }
 
-/**
- * Ensure that a coinbase transaction is structured according to the consensus rules of the
- * chain
- */
+// Ensure that a coinbase transaction is structured according to the consensus rules of the chain
 bool ContextualCheckCoinbaseTransaction(int32_t slowflag,const CBlock *block,CBlockIndex * const previndex,const CTransaction& tx, const int nHeight,int32_t validateprices)
 {
-    if ( ASSETCHAINS_MARMARA != 0 && nHeight > 0 && (nHeight & 1) == 0 )
-    {
-        
-    }
-    else if ( slowflag != 0 && ASSETCHAINS_CBOPRET != 0 && validateprices != 0 && nHeight > 0 && tx.vout.size() > 0 )
+    if ( slowflag != 0 && ASSETCHAINS_CBOPRET != 0 && validateprices != 0 && nHeight > 0 && tx.vout.size() > 0 )
     {
         if ( komodo_opretvalidate(block,previndex,nHeight,tx.vout[tx.vout.size()-1].scriptPubKey) < 0 )
             return(false);
@@ -1133,8 +1126,8 @@ bool ContextualCheckTransaction(int32_t slowflag,const CBlock *block, CBlockInde
         bool (*isInitBlockDownload)(),int32_t validateprices)
 {
     bool overwinterActive = NetworkUpgradeActive(nHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER);
-    bool saplingActive = NetworkUpgradeActive(nHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING);
-    bool isSprout = !overwinterActive;
+    bool saplingActive    = NetworkUpgradeActive(nHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING);
+    bool isSprout         = !overwinterActive;
 
     // If Sprout rules apply, reject transactions which are intended for Overwinter and beyond
     if (isSprout && tx.fOverwintered) {
@@ -1361,21 +1354,19 @@ bool CheckTransaction(uint32_t tiptime,const CTransaction& tx, CValidationState 
     return true;
 }
 
-int32_t komodo_isnotaryvout(char *coinaddr,uint32_t tiptime) // from ac_private chains only
-{
+int32_t hush_isnotaryvout(char *coinaddr,uint32_t tiptime) {
     int32_t season = getacseason(tiptime);
-    if ( NOTARY_ADDRESSES[season-1][0][0] == 0 )
-    {
+    if ( NOTARY_ADDRESSES[season-1][0][0] == 0 ) {
         uint8_t pubkeys[64][33];
         hush_notaries(pubkeys,0,tiptime);
     }
     if ( strcmp(coinaddr,CRYPTO555_HUSHADDR) == 0 )
         return(1);
-    for (int32_t i = 0; i < NUM_HUSH_NOTARIES; i++) 
-    {
-        if ( strcmp(coinaddr,NOTARY_ADDRESSES[season-1][i]) == 0 )
-        {
-            //fprintf(stderr, "coinaddr.%s notaryaddress[%i].%s\n",coinaddr,i,NOTARY_ADDRESSES[season-1][i]);
+    for (int32_t i = 0; i < NUM_HUSH_NOTARIES; i++) {
+        if ( strcmp(coinaddr,NOTARY_ADDRESSES[season-1][i]) == 0 ) {
+            if(fDebug) {
+                fprintf(stderr, "%s: coinaddr.%s notaryaddress[%i].%s\n",__func__, coinaddr,i,NOTARY_ADDRESSES[season-1][i]);
+            }
             return(1);
         }
     }
@@ -1471,14 +1462,14 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
                 //
                 char destaddr[65];
                 Getscriptaddress(destaddr,txout.scriptPubKey);
-                if ( komodo_isnotaryvout(destaddr,tiptime) == 0 )
+                if ( hush_isnotaryvout(destaddr,tiptime) == 0 )
                 {
                     invalid_private_taddr = 1;
                     //return state.DoS(100, error("CheckTransaction(): this is a private chain, no public allowed"),REJECT_INVALID, "bad-txns-acprivacy-chain");
                 }
             }
         }
-        if ( txout.scriptPubKey.size() > IGUANA_MAXSCRIPTSIZE )
+        if ( txout.scriptPubKey.size() > DRAGON_MAXSCRIPTSIZE )
             return state.DoS(100, error("CheckTransaction(): txout.scriptPubKey.size() too big"),REJECT_INVALID, "bad-txns-opret-too-big");
         nValueOut += txout.nValue;
         if (!MoneyRange(nValueOut))
@@ -2886,14 +2877,13 @@ static bool ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& view, const CO
 
 void ConnectNotarizations(const CBlock &block, int height)
 {
-    NotarizationsInBlock notarisations = ScanBlockNotarizations(block, height);
-    if (notarisations.size() > 0) {
+    NotarizationsInBlock notarizations = ScanBlockNotarizations(block, height);
+    if (notarizations.size() > 0) {
         CDBBatch batch = CDBBatch(*pnotarizations);
-        batch.Write(block.GetHash(), notarisations);
-        WriteBackNotarizations(notarisations, batch);
+        batch.Write(block.GetHash(), notarizations);
+        WriteBackNotarizations(notarizations, batch);
         pnotarizations->WriteBatch(batch, true);
-        LogPrintf("ConnectBlock: wrote %i block notarizations in block: %s\n",
-                notarisations.size(), block.GetHash().GetHex().data());
+        LogPrintf("ConnectBlock: wrote %i block notarizations in block: %s\n", notarizations.size(), block.GetHash().GetHex().data());
     }
 }
 
@@ -2905,8 +2895,7 @@ void DisconnectNotarizations(const CBlock &block)
         batch.Erase(block.GetHash());
         EraseBackNotarizations(nibs, batch);
         pnotarizations->WriteBatch(batch, true);
-        LogPrintf("DisconnectTip: deleted %i block notarizations in block: %s\n",
-            nibs.size(), block.GetHash().GetHex().data());
+        LogPrintf("DisconnectTip: deleted %i block notarizations in block: %s\n", nibs.size(), block.GetHash().GetHex().data());
     }
 }
 
@@ -3268,22 +3257,21 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // Do this here before the block is moved to the main block files.
     if ( ASSETCHAINS_NOTARY_PAY[0] != 0 && pindex->GetHeight() > 10 )
     {
-        // do a full block scan to get notarisation position and to enforce a valid notarization is in position 1.
-        // if notarisation in the block, must be position 1 and the coinbase must pay notaries.
-        int32_t notarisationTx = hush_connectblock(true,pindex,*(CBlock *)&block);
+        // do a full block scan to get ntz position and to enforce a valid notarization is in position 1.
+        // if ntz in the block, must be position 1 and the coinbase must pay notaries.
+        int32_t notarizationTx = hush_connectblock(true,pindex,*(CBlock *)&block);
         // -1 means that the valid notarization isnt in position 1 or there are too many notarizations in this block.
-        if ( notarisationTx == -1 )
+        if ( notarizationTx == -1 )
             return state.DoS(100, error("ConnectBlock(): Notarization is not in TX position 1 or block contains more than 1 notarization! Invalid Block!"),
                         REJECT_INVALID, "bad-notarization-position");
-        // 1 means this block contains a valid notarisation and its in position 1.
+        // 1 means this block contains a valid notarization and its in position 1.
         // its no longer possible for any attempted notarization to be in a block with a valid one!
-        // if notaries create a notarisation even if its not in this chain it will need to be mined inside its own block! 
-        if ( notarisationTx == 1 )
+        // if notaries create a notarization even if its not in this chain it will need to be mined inside its own block! 
+        if ( notarizationTx == 1 )
         {
             // Check if the notaries have been paid.
             if ( block.vtx[0].vout.size() == 1 )
-                return state.DoS(100, error("ConnectBlock(): Notaries have not been paid!"),
-                                REJECT_INVALID, "bad-cb-amount");
+                return state.DoS(100, error("ConnectBlock(): Notaries have not been paid!"), REJECT_INVALID, "bad-cb-amount");
             // calculate the notaries compensation and validate the amounts and pubkeys are correct.
             notarypaycheque = komodo_checknotarypay((CBlock *)&block,(int32_t)pindex->GetHeight());
             //fprintf(stderr, "notarypaycheque.%lu\n", notarypaycheque);
@@ -3294,6 +3282,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                                 REJECT_INVALID, "bad-cb-amount");
         }
     }
+
     // Move the block to the main block file, we need this to create the TxIndex in the following loop.
     if ( (pindex->nStatus & BLOCK_IN_TMPFILE) != 0 )
     {
@@ -3626,7 +3615,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         setDirtyBlockIndex.insert(pindex);
     }
 
-    ConnectNotarizations(block, pindex->GetHeight()); // MoMoM notarisation DB.
+    ConnectNotarizations(block, pindex->GetHeight()); // MoMoM notarization DB.
 
     if (fTxIndex)
         if (!pblocktree->WriteTxIndex(vPos))
@@ -7161,12 +7150,14 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             }
         }
 
-        // Relay alerts
+        // Do Not Relay alerts
+        /*
         {
             LOCK(cs_mapAlerts);
             BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
             item.second.RelayTo(pfrom);
         }
+        */
 
         pfrom->fSuccessfullyConnected = true;
 
@@ -7183,17 +7174,11 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         //pfrom->nTimeOffset = nTimeOffset;
         //AddTimeData(pfrom->addr, nTimeOffset);
         pfrom->nTimeOffset = timeWarning.AddTimeData(pfrom->addr, nTime, GetTime());
-    }
-
-
-    else if (pfrom->nVersion == 0)
-    {
+    } else if (pfrom->nVersion == 0) {
         // Must have a version message before anything else
         Misbehaving(pfrom->GetId(), 1);
         return false;
-    }
-    else if ( strCommand == "events" )
-    {
+    } else if ( strCommand == "events" ) {
         if ( ASSETCHAINS_CCLIB != "gamescc" )
         {
             Misbehaving(pfrom->GetId(), 1);
@@ -7203,9 +7188,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         vRecv >> payload;
         komodo_netevent(payload);
         return(true);
-    }
-    else if (strCommand == "verack")
-    {
+    } else if (strCommand == "verack") {
         pfrom->SetRecvVersion(min(pfrom->nVersion, PROTOCOL_VERSION));
 
         if ( HUSH_NSPV_SUPERLITE )
@@ -7224,26 +7207,18 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         }
     }
 
-
     // Disconnect existing peer connection when:
     // 1. The version message has been received
     // 2. Peer version is below the minimum version for the current epoch
-    else if (pfrom->nVersion < chainparams.GetConsensus().vUpgrades[
-        CurrentEpoch(GetHeight(), chainparams.GetConsensus())].nProtocolVersion)
-    {
-        LogPrintf("peer=%d using obsolete version %i vs %d; disconnecting\n", pfrom->id, pfrom->nVersion,(int32_t)chainparams.GetConsensus().vUpgrades[
-                                                                                                                                                       CurrentEpoch(GetHeight(), chainparams.GetConsensus())].nProtocolVersion);
+    else if (pfrom->nVersion < chainparams.GetConsensus().vUpgrades[CurrentEpoch(GetHeight(), chainparams.GetConsensus())].nProtocolVersion) {
+        LogPrintf("peer=%d using obsolete version %i vs %d; disconnecting\n", pfrom->id, pfrom->nVersion,(int32_t)chainparams.GetConsensus().vUpgrades[CurrentEpoch(GetHeight(), chainparams.GetConsensus())].nProtocolVersion);
         pfrom->PushMessage("reject", strCommand, REJECT_OBSOLETE,
                             strprintf("Version must be %d or greater",
                             chainparams.GetConsensus().vUpgrades[
                                 CurrentEpoch(GetHeight(), chainparams.GetConsensus())].nProtocolVersion));
         pfrom->fDisconnect = true;
         return false;
-    }
-
-
-    else if (strCommand == "addr")
-    {
+    } else if (strCommand == "addr") {
         vector<CAddress> vAddr;
         vRecv >> vAddr;
 
@@ -7490,11 +7465,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
         if (!vToFetch.empty())
             pfrom->PushMessage("getdata", vToFetch);
-    }
-
-
-    else if (strCommand == "getdata")
-    {
+    } else if (strCommand == "getdata") {
         vector<CInv> vInv;
         vRecv >> vInv;
         if (vInv.size() > MAX_INV_SZ)
@@ -7511,11 +7482,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
         pfrom->vRecvGetData.insert(pfrom->vRecvGetData.end(), vInv.begin(), vInv.end());
         ProcessGetData(pfrom);
-    }
-
-
-    else if (strCommand == "getblocks")
-    {
+    } else if (strCommand == "getblocks") {
         CBlockLocator locator;
         uint256 hashStop;
         vRecv >> locator >> hashStop;
@@ -7547,11 +7514,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 break;
             }
         }
-    }
-
-
-    else if (strCommand == "getheaders")
-    {
+    } else if (strCommand == "getheaders") {
         CBlockLocator locator;
         uint256 hashStop;
         vRecv >> locator >> hashStop;
@@ -7574,9 +7537,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 return true;
             }
             pindex = (*mi).second;
-        }
-        else
-        {
+        } else {
             // Find the last block the caller has in the main chain
             pindex = FindForkInGlobalIndex(chainActive, locator);
             if (pindex)
@@ -7607,11 +7568,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             if ( counter++ < 3 )
                 fprintf(stderr,"you can ignore redundant getheaders from peer.%d %d prev.%d\n",(int32_t)pfrom->id,(int32_t)(pindex ? pindex->GetHeight() : -1),pfrom->lasthdrsreq);
         }*/
-    }
-
-
-    else if (strCommand == "tx")
-    {
+    } else if (strCommand == "tx") {
         if (IsInitialBlockDownload())
             return true;
 
@@ -7696,7 +7653,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             BOOST_FOREACH(uint256 hash, vEraseQueue)
             EraseOrphanTx(hash);
         }
-        // TODO: currently, prohibit joinsplits and shielded spends/outputs from entering mapOrphans
+        // TODO: currently, prohibit shielded spends/outputs from entering mapOrphans
         else if (fMissingInputs &&
                  tx.vjoinsplit.empty() &&
                  tx.vShieldedSpend.empty() &&
@@ -7707,7 +7664,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
             // DoS prevention: do not allow mapOrphanTransactions to grow unbounded
             unsigned int nMaxOrphanTx = (unsigned int)std::max((int64_t)0, GetArg("-maxorphantx", DEFAULT_MAX_ORPHAN_TRANSACTIONS));
-            unsigned int nEvicted = LimitOrphanTxSize(nMaxOrphanTx);
+            unsigned int nEvicted     = LimitOrphanTxSize(nMaxOrphanTx);
             if (nEvicted > 0)
                 LogPrint("mempool", "mapOrphan overflow, removed %u tx\n", nEvicted);
         } else {
@@ -7744,9 +7701,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             if (nDoS > 0)
                 Misbehaving(pfrom->GetId(), nDoS);
         }
-    }
-
-    else if (strCommand == "headers" && !fImporting && !fReindex) // Ignore headers received while importing
+    } else if (strCommand == "headers" && !fImporting && !fReindex) // Ignore headers received while importing
     {
         std::vector<CBlockHeader> headers;
 
@@ -7809,9 +7764,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         }
 
         CheckBlockIndex();
-    }
-
-    else if (strCommand == "block" && !fImporting && !fReindex) // Ignore blocks received while importing
+    } else if (strCommand == "block" && !fImporting && !fReindex) // Ignore blocks received while importing
     {
         CBlock block;
         vRecv >> block;
@@ -7838,11 +7791,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             }
         }
 
-    }
-
-
-    else if (strCommand == "mempool")
-    {
+    } else if (strCommand == "mempool") {
         LOCK2(cs_main, pfrom->cs_filter);
 
         std::vector<uint256> vtxid;
@@ -7864,17 +7813,14 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         }
         if (vInv.size() > 0)
             pfrom->PushMessage("inv", vInv);
-    }
-    else if (fAlerts && strCommand == "alert")
-    {
+    } else if (fAlerts && strCommand == "alert") {
+        //TODO: probably completely ignore this
         CAlert alert;
         vRecv >> alert;
 
         uint256 alertHash = alert.GetHash();
-        if (pfrom->setKnown.count(alertHash) == 0)
-        {
-            if (alert.ProcessAlert(Params().AlertKey()))
-            {
+        if (pfrom->setKnown.count(alertHash) == 0) {
+            if (alert.ProcessAlert(Params().AlertKey())) {
                 // Relay
                 pfrom->setKnown.insert(alertHash);
                 {
@@ -7882,8 +7828,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                     BOOST_FOREACH(CNode* pnode, vNodes)
                     alert.RelayTo(pnode);
                 }
-            }
-            else {
+            } else {
                 // Small DoS penalty so peers that send us lots of
                 // duplicate/expired/invalid-signature/whatever alerts
                 // eventually get banned.
@@ -7893,12 +7838,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 Misbehaving(pfrom->GetId(), 10);
             }
         }
-    }
-
-    else if (!(nLocalServices & NODE_BLOOM) &&
+    } else if (!(nLocalServices & NODE_BLOOM) &&
               (strCommand == "filterload" ||
-               strCommand == "filteradd"))
-    {
+               strCommand == "filteradd")) {
         if (pfrom->nVersion >= NO_BLOOM_VERSION) {
             Misbehaving(pfrom->GetId(), 100);
             return false;
@@ -7906,11 +7848,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             pfrom->fDisconnect = true;
             return false;
         }
-    }
-
-
-    else if (strCommand == "filterload")
-    {
+    } else if (strCommand == "filterload") {
         CBloomFilter filter;
         vRecv >> filter;
 
@@ -7925,11 +7863,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             pfrom->pfilter->UpdateEmptyFull();
         }
         pfrom->fRelayTxes = true;
-    }
-
-
-    else if (strCommand == "filteradd")
-    {
+    } else if (strCommand == "filteradd") {
         vector<unsigned char> vData;
         vRecv >> vData;
 
@@ -7945,22 +7879,14 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             else
                 Misbehaving(pfrom->GetId(), 100);
         }
-    }
-
-
-    else if (strCommand == "filterclear")
-    {
+    } else if (strCommand == "filterclear") {
         LOCK(pfrom->cs_filter);
         if (nLocalServices & NODE_BLOOM) {
             delete pfrom->pfilter;
             pfrom->pfilter = new CBloomFilter();
         }
         pfrom->fRelayTxes = true;
-    }
-
-
-    else if (strCommand == "reject")
-    {
+    } else if (strCommand == "reject") {
         if (fDebug) {
             try {
                 string strMsg; unsigned char ccode; string strReason;
@@ -7981,18 +7907,13 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 LogPrint("net", "Unparseable reject message received\n");
             }
         }
-    }
-    else if (strCommand == "notfound") {
+    } else if (strCommand == "notfound") {
         // We do not care about the NOTFOUND message, but logging an Unknown Command
         // message would be undesirable as we transmit it ourselves.
-    }
-
-    else {
+    } else {
         // Ignore unknown commands for extensibility
         LogPrint("net", "Unknown command \"%s\" from peer=%d\n", SanitizeString(strCommand), pfrom->id);
     }
-
-
 
     return true;
 }
@@ -8116,7 +8037,6 @@ bool ProcessMessages(CNode* pfrom)
 
     return fOk;
 }
-
 
 bool SendMessages(CNode* pto, bool fSendTrickle)
 {
@@ -8374,8 +8294,6 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
 std::string CBlockFileInfo::ToString() const {
     return strprintf("CBlockFileInfo(blocks=%u, size=%u, heights=%u...%u, time=%s...%s)", nBlocks, nSize, nHeightFirst, nHeightLast, DateTimeStrFormat("%Y-%m-%d", nTimeFirst), DateTimeStrFormat("%Y-%m-%d", nTimeLast));
 }
-
-
 
 static class CMainCleanup
 {
