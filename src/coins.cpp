@@ -526,10 +526,10 @@ unsigned int CCoinsViewCache::GetCacheSize() const {
 const CTxOut &CCoinsViewCache::GetOutputFor(const CTxIn& input) const
 {
     const CCoins* coins = AccessCoins(input.prevout.hash);
-    fprintf(stderr, "GetOutputFor: input=%s", input.ToString().c_str());
-    fprintf(stderr, "GetOutputFor: prevout n=%d,txid=%s\n", input.prevout.n, input.prevout.hash.ToString().c_str());
+    //fprintf(stderr, "GetOutputFor: input=%s", input.ToString().c_str());
+    //fprintf(stderr, "GetOutputFor: prevout n=%d,txid=%s\n", input.prevout.n, input.prevout.hash.ToString().c_str());
     assert(coins && coins->IsAvailable(input.prevout.n));
-    fprintf(stderr, "GetOutputFor: IsAvailable\n");
+    //fprintf(stderr, "GetOutputFor: IsAvailable\n");
     return coins->vout[input.prevout.n];
 }
 

@@ -240,7 +240,7 @@ public:
     bool IsAvailable(unsigned int nPos) const {
         //fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li, vout[%d].IsNull()=%d", nPos, vout.size(), nPos, vout[nPos].IsNull() );
         //fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li, vout[%d]=%d", nPos, vout.size(), nPos, vout[nPos] );
-        fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li", nPos, vout.size() );
+        //fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li", nPos, vout.size() );
         return (nPos < vout.size() && !vout[nPos].IsNull());
     }
 
@@ -569,9 +569,7 @@ private:
     CCoinsMap::iterator FetchCoins(const uint256 &txid);
     CCoinsMap::const_iterator FetchCoins(const uint256 &txid) const;
 
-    /**
-     * By making the copy constructor private, we prevent accidentally using it when one intends to create a cache on top of a base cache.
-     */
+    // By making the copy constructor private, we prevent accidentally using it when one intends to create a cache on top of a base cache.
     CCoinsViewCache(const CCoinsViewCache &);
 
     //! Generalized interface for popping anchors
