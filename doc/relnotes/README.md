@@ -12,6 +12,15 @@ evil organizations.
 
 # 3.6.0
 
+```
+983 files changed, 7736 insertions(+), 17688 deletions(-)
+```
+
+:metal: This release consists of 25454 lines of change, almost 18000 lines of deletions
+and just short of 1000 files changed! This is why Hush code is so fast, we delete
+all that KYC/PoS/Sprout stuff from KMD internals we inherited and improve daily.
+
+
   * Fixes sync issues near block 340k caused by blocktime halving bug
   * New official domain https://hush.is reflected everywhere
   * New Hush DPoW Notaries replace KMD Notaries (who attacked us, lulz)
