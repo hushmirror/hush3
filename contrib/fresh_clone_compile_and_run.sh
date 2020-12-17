@@ -11,7 +11,7 @@ cd hush3
 # You need 2GB of RAM per core, don't use too many
 # (GB of RAM)/2 - 1 is the optimal core count for compiling Hush
 # `nproc` tells you how many cores you have
-JOBS=4
+JOBS=2
 # Want to fix this parrallel-only build system bug we inherited ? you are a new hush dev
 ./build.sh -j$JOBS;make -j$JOBS;make -j$JOBS;make -j$JOBS
 ./src/hushd &> hush.log &
