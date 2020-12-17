@@ -6937,11 +6937,11 @@ void static ProcessGetData(CNode* pfrom)
     }
 }
 
-#include "komodo_nSPV_defs.h"
-#include "komodo_nSPV.h"            // shared defines, structs, serdes, purge functions
-#include "komodo_nSPV_fullnode.h"   // nSPV fullnode handling of the getnSPV request messages
-#include "komodo_nSPV_superlite.h"  // nSPV superlite client, issuing requests and handling nSPV responses
-#include "komodo_nSPV_wallet.h"     // nSPV_send and support functions, really all the rest is to support this
+#include "hush_nSPV_defs.h"
+#include "hush_nSPV.h"            // shared defines, structs, serdes, purge functions
+#include "hush_nSPV_fullnode.h"   // nSPV fullnode handling of the getnSPV request messages
+#include "hush_nSPV_superlite.h"  // nSPV superlite client, issuing requests and handling nSPV responses
+#include "hush_nSPV_wallet.h"     // nSPV_send and support functions, really all the rest is to support this
 
 bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, int64_t nTimeReceived)
 {
