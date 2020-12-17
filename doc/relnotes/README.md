@@ -34,6 +34,8 @@ evil organizations.
     * We now use WolfSSL 4.5.0 instead of OpenSSL, a huge improvement and
       decrease in attack surface as well as allowing use to do TLS
       on low resource devices (like internet-of-shit light bulbs/etc)
+    * Nodes randomly choose between GCM-SHA384 and CHACHA20-POLY1305-SHA256 when
+      making connections to other nodes.
   * Hush Docker scripts are now officially maintained!
   * Faster release binaries with -03
   * Optimized and hardened memory pool code
