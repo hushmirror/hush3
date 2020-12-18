@@ -59,6 +59,18 @@ all that KYC/PoS/Sprout stuff from KMD internals we inherited and improve daily.
   * :surfer: New P2P protocol version. Peers only talk to 3.5.x nodes and newer
 
 
+### 3.6.0 Checksums
+
+```
+33cd82c51eac404796e6c296044b1d8fcc653d60b2bf26eecb5df0e374a35825  hush-3.6.0-linux-ubuntu-18.04-amd64.tar.gz
+9c2f19c50fdc44af2c89494b06cda2c9e176d7ae2f038ca0fb7c0cd083dd71b9  hush-3.6.0-linux-ubuntu-18.04-noparams-amd64.tar.gz
+9799aaea1503770336efc328fcd43c3a46d7bede8c485f77977423f949145d81  hush-3.6.0-amd64.deb
+2f0ebbcbb9bb0bcffe95a397e7eba89c29eb4dde6191c339db88570e3f3fb0e4  sapling-output.params
+8e48ffd23abb3a5fd9c5589204f32d9c31285a04b78096ba40a79b75677efc13  sapling-spend.params
+
+```
+
+
 ## Bounty
 
 Would you like to transcribe old Github releases to this file for a HUSH
