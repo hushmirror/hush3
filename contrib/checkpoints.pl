@@ -5,10 +5,9 @@
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 use warnings;
 use strict;
-# Generate checkpoint data for use in src/main.cpp
 
-# TODO: update when blocktime changes to 75s
-my $perday  = 576;
+# Generate checkpoint data for use in src/chainparams.cpp
+my $perday  = 1152;
 my $hush    = "./src/hush-cli";
 my $gethash = "$hush getblockhash";
 my $stride  = shift || 1000;
