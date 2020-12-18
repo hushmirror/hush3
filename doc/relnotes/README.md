@@ -19,17 +19,18 @@ evil organizations.
 <img src="https://git.hush.is/hush/hush3/raw/branch/master/doc/relnotes/img/hush-3.6.0.png">
 
 :metal: :metal: :metal:
-This release consists of 25454 lines of change, almost 18000 lines of deletions
+This release consists of 25454 lines of changes, almost 18000 lines of deletions
 and just short of 1000 files changed! This is why Hush code is so fast, we delete
 all that KYC/PoS/Sprout stuff from KMD internals we inherited and improve daily.
 :metal: :metal: :metal:
 
   * :100: Fixes sync issues near block 340k caused by blocktime halving bug
   * :sweat_drops: New official domain https://hush.is reflected everywhere
+  * :tada: Hush Docker scripts are now officially maintained!
   * :eggplant: New Hush DPoW Notaries replace KMD Notaries (who attacked us, lulz)
   * :rocket: Increasd in-memory UTXO cache db by 100MB (25%) to increase performance of initial syncing
   * :dragon: Prevent Delayed-Proof-of-Work attack from Komodo Notaries
-    * :shit: KMD notaries provably attacked the HUSH blockchain their pubkeys
+    * :shit: KMD notaries provably attacked the HUSH blockchain via their pubkeys
     * :speak_no_evil: All trust in their service has now been lost, and all Komodo pubkeys
       have been removed from Hush source code
     * :alien: "Malicious Notarized Chainforks" is an attack only Komodo Notaries
@@ -49,7 +50,6 @@ all that KYC/PoS/Sprout stuff from KMD internals we inherited and improve daily.
       on low resource devices (like internet-of-shit light bulbs/etc)
     * :lock: Nodes randomly choose between GCM-SHA384 and CHACHA20-POLY1305-SHA256 when
       making connections to other nodes.
-  * :tada: Hush Docker scripts are now officially maintained!
   * :rabbit2: Faster release binaries with -03
   * :fork_and_knife: Optimized and hardened memory pool code
   * :hammer: getblocktemplate RPC now provides better error reporting about
