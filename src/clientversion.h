@@ -3,7 +3,6 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #ifndef HUSH_CLIENTVERSION_H
 #define HUSH_CLIENTVERSION_H
 
@@ -26,16 +24,13 @@
 #include "config/bitcoin-config.h"
 #else
 
-/**
- * client versioning and copyright year
- */
-
+// client versioning and copyright year
 //! These need to be macros, as clientversion.cpp's and bitcoin*-res.rc's voodoo requires it
 // Must be kept in sync with configure.ac !
 #define CLIENT_VERSION_MAJOR 3
 #define CLIENT_VERSION_MINOR 6
-#define CLIENT_VERSION_REVISION 0
-#define CLIENT_VERSION_BUILD 50
+#define CLIENT_VERSION_REVISION 1
+#define CLIENT_VERSION_BUILD 25
 
 //! Set to true for release, false for prerelease or test build
 #define CLIENT_VERSION_IS_RELEASE true
