@@ -41,6 +41,6 @@ wallet_packages=bdb
 ifeq ($(host_os),linux)
 	packages := boost wolfssl libevent zeromq $(zcash_packages) googletest libcurl #googlemock
 else
-	packages := boost wolfssl libevent zeromq $(zcash_packages) libcurl googletest #googlemock
+	packages := boost wolfssl libevent  $(zcash_packages) libcurl googletest #googlemock
 endif
 
