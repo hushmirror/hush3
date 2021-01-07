@@ -76,7 +76,6 @@ extern uint8_t NOTARY_PUBKEY33[33];
 extern int32_t HUSH_LOADINGBLOCKS,HUSH_LONGESTCHAIN,HUSH_INSYNC,HUSH_CONNECTING,HUSH_EXTRASATOSHI;
 int32_t HUSH_NEWBLOCKS;
 int32_t hush_block2pubkey33(uint8_t *pubkey33,CBlock *block);
-//void komodo_broadcast(CBlock *pblock,int32_t limit);
 bool Getscriptaddress(char *destaddr,const CScript &scriptPubKey);
 void hush_setactivation(int32_t height);
 void hush_changeblocktime();
@@ -4002,10 +4001,7 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *
         HUSH_INSYNC = (int32_t)pindexNew->GetHeight();
     else HUSH_INSYNC = 0;
     //fprintf(stderr,"connect.%d insync.%d ASSETCHAINS_SAPLING.%d\n",(int32_t)pindexNew->GetHeight(),HUSH_INSYNC,ASSETCHAINS_SAPLING);
-    /*if ( HUSH_INSYNC != 0 ) //SMART_CHAIN_SYMBOL[0] == 0 &&
-        komodo_broadcast(pblock,8);
-    else if ( SMART_CHAIN_SYMBOL[0] != 0 )
-        komodo_broadcast(pblock,4);*/
+
     if ( HUSH_NSPV_FULLNODE )
     {
 		//fprintf(stderr,"%s: HUSH_NSPV_FULLNODE\n", __FUNCTION__);

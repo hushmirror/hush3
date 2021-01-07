@@ -25,7 +25,6 @@
 
 #include "main.h"
 #include "net.h"
-
 #include "addrman.h"
 #include "chainparams.h"
 #include "clientversion.h"
@@ -34,16 +33,13 @@
 #include "ui_interface.h"
 #include "crypto/common.h"
 #include "hush/utiltls.h"
-
 #ifdef _WIN32
 #include <string.h>
 #else
 #include <fcntl.h>
 #endif
-
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
-
 #include <wolfssl/options.h>
 #include <wolfssl/ssl.h>
 #include <hush/tlsmanager.cpp>
@@ -79,8 +75,8 @@ using namespace hush;
 using namespace std;
 
 namespace {
-    const int MAX_OUTBOUND_CONNECTIONS = 16;
-    const int MAX_INBOUND_FROMIP = 5;
+    const int MAX_OUTBOUND_CONNECTIONS = 64;
+    const int MAX_INBOUND_FROMIP = 3;
 
     struct ListenSocket {
         SOCKET socket;
@@ -2051,14 +2047,12 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
 
 #ifdef USE_TLS
     
-    if (!tlsmanager.prepareCredentials())
-    {
+    if (!tlsmanager.prepareCredentials()) {
         LogPrintf("TLS: ERROR: %s: %s: Credentials weren't generated. Node can't be started.\n", __FILE__, __func__);
         return;
     }
     
-    if (!tlsmanager.initialize())
-    {
+    if (!tlsmanager.initialize()) {
         LogPrintf("TLS: ERROR: %s: %s: TLS initialization failed. Node can't be started.\n", __FILE__, __func__);
         return;
     }
@@ -2066,10 +2060,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     LogPrintf("TLS is not used!\n");
 #endif
 
-    //
     // Start threads
-    //
-
     if (!GetBoolArg("-dnsseed", true))
         LogPrintf("DNS seeding disabled\n");
     else

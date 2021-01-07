@@ -837,11 +837,8 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
 }
 
 #ifdef ENABLE_WALLET
-//////////////////////////////////////////////////////////////////////////////
-//
-// Internal miner
-//
 
+// Internal miner
 CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, int32_t nHeight, int32_t gpucount, bool isStake)
 {
     CPubKey pubkey; CScript scriptPubKey; uint8_t *script,*ptr; int32_t i,len;
@@ -851,25 +848,18 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, int32_t nHeight, 
         {
             pubkey = ParseHex(ASSETCHAINS_OVERRIDE_PUBKEY);
             scriptPubKey = CScript() << ParseHex(HexStr(pubkey)) << OP_CHECKSIG;
-        }
-        else 
-        {
+        } else {
             len = strlen(ASSETCHAINS_SCRIPTPUB.c_str());
             len >>= 1;
             scriptPubKey.resize(len);
             ptr = (uint8_t *)&scriptPubKey[0];
             decode_hex(ptr,len,(char *)ASSETCHAINS_SCRIPTPUB.c_str());
         }
-    }
-    else if ( USE_EXTERNAL_PUBKEY != 0 )
-    {
+    } else if ( USE_EXTERNAL_PUBKEY != 0 ) {
         //fprintf(stderr,"use notary pubkey\n");
         pubkey = ParseHex(NOTARY_PUBKEY);
         scriptPubKey = CScript() << ParseHex(HexStr(pubkey)) << OP_CHECKSIG;
-    }
-    else
-    {
-        //if ( !isStake || ASSETCHAINS_STAKED != 0 )
+    } else {
         {
             if (!reservekey.GetReservedKey(pubkey))
             {
