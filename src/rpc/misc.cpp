@@ -37,7 +37,9 @@
 #include <boost/assign/list_of.hpp>
 #include <univalue.h>
 #include "zcash/Address.hpp"
-#include "build.h"
+//#ifdef HAVE_BUILD_INFO
+//#include "build.h"
+//#endif
 
 using namespace std;
 
@@ -275,7 +277,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 #endif
         obj.push_back(Pair("sapling", ASSETCHAINS_SAPLING));
     }
-    obj.push_back(Pair("build_date", BUILD_DATE));
+    //obj.push_back(Pair("build_date", BUILD_DATE));
     obj.push_back(Pair("timeoffset",    0));
     obj.push_back(Pair("connections",   (int)vNodes.size()));
     obj.push_back(Pair("tls_connections", (int)std::count_if(vNodes.begin(), vNodes.end(), [](CNode* n) {return n->ssl != NULL;})));
