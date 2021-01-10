@@ -44,7 +44,7 @@
 using namespace hush;
 
 // Dump addresses to peers.dat every 5 minutes (300s)
-// Satoshi originally used 10 seconds(!), did he know something Peter Wuille didn't?
+// Satoshi originally used 10 seconds(!), did they know something Peter Wuille didn't?
 #define DUMP_ADDRESSES_INTERVAL 300
 
 #if !defined(HAVE_MSG_NOSIGNAL) && !defined(MSG_NOSIGNAL)
