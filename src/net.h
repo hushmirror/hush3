@@ -39,11 +39,9 @@
 #ifndef _WIN32
 #include <arpa/inet.h>
 #endif
-
 #include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
 #include <boost/signals2/signal.hpp>
-
 // Enable WolfSSL Support for Hush
 #include <wolfssl/options.h>
 #include <wolfssl/ssl.h>
@@ -671,7 +669,7 @@ public:
     // now but might be valid in a later version is also
     // dangerous, because it can cause a network split
     // between nodes running old code and nodes running
-    // new code.
+    // new code. Fun timez!
     static void ClearBanned(); // needed for unit testing
     static bool IsBanned(CNetAddr ip);
     static bool IsBanned(CSubNet subnet);
@@ -696,7 +694,7 @@ public:
     // resource deallocation on cleanup, called at node shutdown
     static void NetCleanup();
 
-    // returns the value of the tlsfallbacknontls and tlsvalidate flags set at zend startup (see init.cpp)
+    // returns the value of the tlsfallbacknontls and tlsvalidate flags set at startup (see init.cpp)
     static bool GetTlsFallbackNonTls();
     static bool GetTlsValidate();
 };
@@ -707,7 +705,10 @@ class CTransaction;
 void RelayTransaction(const CTransaction& tx);
 void RelayTransaction(const CTransaction& tx, const CDataStream& ss);
 
-/** Access to the (IP) address database (peers.dat) */
+/** Access to the (IP) address database (peers.dat)
+which now has 2 versions and soon a 3rd
+(classic, asmap, bip155+asmap)
+ */
 class CAddrDB
 {
 private:

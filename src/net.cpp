@@ -3,7 +3,6 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
 #endif
@@ -45,8 +43,9 @@
 #include <hush/tlsmanager.cpp>
 using namespace hush;
 
-// Dump addresses to peers.dat every 15 minutes (900s)
-#define DUMP_ADDRESSES_INTERVAL 900
+// Dump addresses to peers.dat every 5 minutes (300s)
+// Satoshi originally used 10 seconds(!), did he know something Peter Wuille didn't?
+#define DUMP_ADDRESSES_INTERVAL 300
 
 #if !defined(HAVE_MSG_NOSIGNAL) && !defined(MSG_NOSIGNAL)
 #define MSG_NOSIGNAL 0
@@ -63,20 +62,20 @@ using namespace hush;
 #endif
 #endif
 
-#define USE_TLS
+#define USE_TLS "encrypted as fuck"
 
 #if defined(USE_TLS) && !defined(TLS1_3_VERSION)
     // minimum secure protocol is 1.3
     // TLS1_3_VERSION is defined in openssl/tls1.h
-    #error "ERROR: Your WolfSSL version does not support TLS v1.3"
+    #error "ERROR: Your WolfSSL version does not support TLS v1.3!!!"
 #endif
-
 
 using namespace std;
 
 namespace {
+    //TODO: Make these CLI args
     const int MAX_OUTBOUND_CONNECTIONS = 64;
-    const int MAX_INBOUND_FROMIP = 3;
+    const int MAX_INBOUND_FROMIP       = 3;
 
     struct ListenSocket {
         SOCKET socket;
@@ -86,9 +85,7 @@ namespace {
     };
 }
 
-//
 // Global state variables
-//
 extern uint16_t ASSETCHAINS_P2PPORT;
 extern char SMART_CHAIN_SYMBOL[65];
 
@@ -140,12 +137,6 @@ static bool operator==(_NODE_ADDR a, _NODE_ADDR b)
 {
     return (a.ipAddr == b.ipAddr);
 }
-
-static std::vector<NODE_ADDR> vNonTLSNodesInbound;
-static CCriticalSection cs_vNonTLSNodesInbound;
-
-static std::vector<NODE_ADDR> vNonTLSNodesOutbound;
-static CCriticalSection cs_vNonTLSNodesOutbound;
 
 void AddOneShot(const std::string& strDest)
 {
@@ -359,7 +350,7 @@ void AddressCurrentlyConnected(const CService& addr)
 }
 
 
-CNode::eTlsOption CNode::tlsFallbackNonTls = CNode::eTlsOption::FALLBACK_UNSET;
+CNode::eTlsOption CNode::tlsFallbackNonTls = CNode::eTlsOption::FALLBACK_FALSE;
 CNode::eTlsOption CNode::tlsValidate       = CNode::eTlsOption::FALLBACK_UNSET;
 
 uint64_t CNode::nTotalBytesRecv = 0;
@@ -418,7 +409,6 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
         }
     }
 
-    /// debug print
     LogPrint("net", "trying connection %s lastseen=%.1fhrs\n",
         pszDest ? pszDest : addrConnect.ToString(),
         pszDest ? 0.0 : (double)(GetTime() - addrConnect.nTime)/3600.0);
@@ -441,67 +431,12 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
         
 #ifdef USE_TLS
         /* TCP connection is ready. Do client side SSL. */
-        if (CNode::GetTlsFallbackNonTls())
-        {
-            {
-                LOCK(cs_vNonTLSNodesOutbound);
-            
-                LogPrint("tls", "%s():%d - handling connection to %s\n", __func__, __LINE__,  addrConnect.ToString());
- 
-                NODE_ADDR nodeAddr(addrConnect.ToStringIP());
-            
-                bool bUseTLS = ((GetBoolArg("-tls", true) || GetArg("-tls", "") == "only")
-                    && find(vNonTLSNodesOutbound.begin(),
-                                     vNonTLSNodesOutbound.end(),
-                                     nodeAddr) == vNonTLSNodesOutbound.end());
-                unsigned long err_code = 0;
-                if (bUseTLS)
-                {
-                    ssl = tlsmanager.connect(hSocket, addrConnect, err_code);
-                    if (!ssl)
-                    {
-                        if (err_code == TLSManager::SELECT_TIMEDOUT)
-                        {
-                            // can fail for timeout in select on fd, that is not a ssl error and we should not
-                            // consider this node as non TLS
-                            LogPrint("tls", "%s():%d - Connection to %s timedout\n",
-                                __func__, __LINE__, addrConnect.ToStringIP());
-                        }
-                        else
-                        {
-                            // Further reconnection will be made in non-TLS (unencrypted) mode
-                            vNonTLSNodesOutbound.push_back(NODE_ADDR(addrConnect.ToStringIP(), GetTimeMillis()));
-                            LogPrint("tls", "%s():%d - err_code %x, adding connection to %s vNonTLSNodesOutbound list (sz=%d)\n",
-                                __func__, __LINE__, err_code, addrConnect.ToStringIP(), vNonTLSNodesOutbound.size());
-                        }
-                        CloseSocket(hSocket);
-                        return NULL;
-                    }
-                }
-                else
-                {
-                    LogPrintf ("Connection to %s will be unencrypted\n", addrConnect.ToString());
-            
-                    vNonTLSNodesOutbound.erase(
-                            remove(
-                                    vNonTLSNodesOutbound.begin(),
-                                    vNonTLSNodesOutbound.end(),
-                                    nodeAddr),
-                            vNonTLSNodesOutbound.end());
-                }
-            }
-        }
-        else
-        {
-            unsigned long err_code = 0;
-            ssl = tlsmanager.connect(hSocket, addrConnect, err_code);
-            if(!ssl)
-            {
-                LogPrint("tls", "%s():%d - err_code %x, connection to %s failed)\n",
-                    __func__, __LINE__, err_code, addrConnect.ToStringIP());
-                CloseSocket(hSocket);
-                return NULL;
-            }
+        unsigned long err_code = 0;
+        ssl = tlsmanager.connect(hSocket, addrConnect, err_code);
+        if(!ssl) {
+            LogPrint("tls", "%s():%d - err_code %x, connection to %s failed)\n", __func__, __LINE__, err_code, addrConnect.ToStringIP());
+            CloseSocket(hSocket);
+            return NULL;
         }
         
 #endif  // USE_TLS
@@ -547,8 +482,7 @@ void CNode::CloseSocketDisconnect()
                 LogPrintf("(node is probably shutting down) disconnecting peer=%d\n", id);
             }
 
-            if (ssl)
-            {
+            if (ssl) {
                 unsigned long err_code = 0;
                 tlsmanager.waitFor(SSL_SHUTDOWN, hSocket, ssl, (DEFAULT_CONNECT_TIMEOUT / 1000), err_code);
                 wolfSSL_free(ssl);
@@ -589,10 +523,6 @@ void CNode::PushVersion()
                 nLocalHostNonce, strSubVersion, nBestHeight, true);
 //fprintf(stderr,"HUSH_NSPV.%d PUSH services.%llx\n",HUSH_NSPV,(long long)nLocalServices);
 }
-
-
-
-
 
 std::map<CSubNet, int64_t> CNode::setBanned;
 CCriticalSection CNode::cs_setBanned;
@@ -718,7 +648,7 @@ void CNode::copyStats(CNodeStats &stats, const std::vector<bool> &m_asmap)
         nPingUsecWait = GetTimeMicros() - nPingUsecStart;
     }
 
-    // Raw ping time is in microseconds, but show it to user as whole seconds (Bitcoin users should be well used to small numbers with many decimal places by now :)
+    // Raw ping time is in microseconds, but show it to user as whole seconds (Hush users should be well used to small numbers with many decimal places by now :)
     stats.dPingTime = (((double)nPingUsecTime) / 1e6);
     stats.dPingWait = (((double)nPingUsecWait) / 1e6);
 
@@ -1174,66 +1104,14 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
     SetSocketNonBlocking(hSocket, true);
     
 #ifdef USE_TLS
-    /* TCP connection is ready. Do server side SSL. */
-    if (CNode::GetTlsFallbackNonTls())
+    /* TCP connection is ready. Do server side TLS */
+    unsigned long err_code = 0;
+    ssl = tlsmanager.accept( hSocket, addr, err_code);
+    if(!ssl)
     {
-        LOCK(cs_vNonTLSNodesInbound);
-    
-        LogPrint("tls", "%s():%d - handling connection from %s\n", __func__, __LINE__,  addr.ToString());
-
-        NODE_ADDR nodeAddr(addr.ToStringIP());
-        
-        bool bUseTLS = ((GetBoolArg("-tls", true) || GetArg("-tls", "") == "only")
-            && find(vNonTLSNodesInbound.begin(),
-                             vNonTLSNodesInbound.end(),
-                             nodeAddr) == vNonTLSNodesInbound.end());
-        unsigned long err_code = 0;
-        if (bUseTLS)
-        {
-            ssl = tlsmanager.accept( hSocket, addr, err_code);
-            if(!ssl)
-            {
-                if (err_code == TLSManager::SELECT_TIMEDOUT)
-                {
-                    // can fail also for timeout in select on fd, that is not a ssl error and we should not
-                    // consider this node as non TLS
-                    LogPrint("tls", "%s():%d - Connection from %s timedout\n", __func__, __LINE__, addr.ToStringIP());
-                }
-                else
-                {
-                    // Further reconnection will be made in non-TLS (unencrypted) mode
-                    vNonTLSNodesInbound.push_back(NODE_ADDR(addr.ToStringIP(), GetTimeMillis()));
-                    LogPrint("tls", "%s():%d - err_code %x, adding connection from %s vNonTLSNodesInbound list (sz=%d)\n",
-                        __func__, __LINE__, err_code, addr.ToStringIP(), vNonTLSNodesInbound.size());
-                }
-                CloseSocket(hSocket);
-                return;
-            }
-        }
-        else
-        {
-            LogPrintf ("TLS: Connection from %s will be unencrypted\n", addr.ToStringIP());
-            
-            vNonTLSNodesInbound.erase(
-                    remove(
-                            vNonTLSNodesInbound.begin(),
-                            vNonTLSNodesInbound.end(),
-                            nodeAddr
-                    ),
-                    vNonTLSNodesInbound.end());
-        }
-    }
-    else
-    {
-        unsigned long err_code = 0;
-        ssl = tlsmanager.accept( hSocket, addr, err_code);
-        if(!ssl)
-        {
-            LogPrint("tls", "%s():%d - err_code %x, failure accepting connection from %s\n",
-                __func__, __LINE__, err_code, addr.ToStringIP());
-            CloseSocket(hSocket);
-            return;
-        }
+        LogPrint("tls", "%s():%d - err_code %x, failure accepting connection from %s\n", __func__, __LINE__, err_code, addr.ToStringIP());
+        CloseSocket(hSocket);
+        return;
     }
 
 #endif // USE_TLS
@@ -1250,28 +1128,12 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
     }
 }
 
-#if defined(USE_TLS)
-void ThreadNonTLSPoolsCleaner()
-{
-    while (true)
-    {
-        tlsmanager.cleanNonTLSPool(vNonTLSNodesInbound,  cs_vNonTLSNodesInbound);
-        tlsmanager.cleanNonTLSPool(vNonTLSNodesOutbound, cs_vNonTLSNodesOutbound);
-        MilliSleep(DEFAULT_CONNECT_TIMEOUT);  // sleep and sleep_for are interruption points, which will throw boost::thread_interrupted
-    }
-}
-
-#endif // USE_TLS 
-
-
 void ThreadSocketHandler()
 {
     unsigned int nPrevNodeCount = 0;
     while (true)
     {
-        //
         // Disconnect nodes
-        //
         {
             LOCK(cs_vNodes);
             // Disconnect unused nodes
@@ -1332,9 +1194,7 @@ void ThreadSocketHandler()
             uiInterface.NotifyNumConnectionsChanged(nPrevNodeCount);
         }
 
-        //
         // Find which sockets have data to receive
-        //
         struct timeval timeout;
         timeout.tv_sec  = 0;
         timeout.tv_usec = 50000; // frequency to poll pnode->vSend
@@ -1418,9 +1278,7 @@ void ThreadSocketHandler()
             MilliSleep(timeout.tv_usec/1000);
         }
 
-        //
         // Accept new connections
-        //
         BOOST_FOREACH(const ListenSocket& hListenSocket, vhListenSocket)
         {
             if (hListenSocket.socket != INVALID_SOCKET && FD_ISSET(hListenSocket.socket, &fdsetRecv))
@@ -1429,9 +1287,7 @@ void ThreadSocketHandler()
             }
         }
 
-        //
         // Service each socket
-        //
         vector<CNode*> vNodesCopy;
         {
             LOCK(cs_vNodes);
@@ -1447,9 +1303,7 @@ void ThreadSocketHandler()
                 continue;
             }
 
-            //
             // Inactivity checking
-            //
             int64_t nTime = GetTime();
             if (nTime - pnode->nTimeConnected > 60)
             {
@@ -1541,8 +1395,7 @@ void DumpAddresses()
     CAddrDB adb;
     adb.Write(addrman);
 
-    LogPrint("net", "Flushed %d addresses to peers.dat  %dms\n",
-           addrman.size(), GetTimeMillis() - nStart);
+    LogPrint("net", "Flushed %d addresses to peers.dat  %dms\n", addrman.size(), GetTimeMillis() - nStart);
 }
 
 void static ProcessOneShot()
@@ -1609,12 +1462,11 @@ void ThreadOpenConnections()
         }
 
 
-        //
         // Choose an address to connect to based on most recently seen
-        //
         CAddress addrConnect;
 
         // Only connect out to one peer per network group (/16 for IPv4).
+        // Use -asmap for ASN bucketing
         // Do this here so we don't have to critsect vNodes inside mapAddresses critsect.
         int nOutbound = 0;
         set<vector<unsigned char> > setConnected;
@@ -1738,16 +1590,14 @@ void ThreadOpenAddedConnections()
             OpenNetworkConnection(CAddress(vserv[i % vserv.size()]), &grant);
             MilliSleep(500);
         }
-        MilliSleep(120000); // Retry every 2 minutes
+        MilliSleep(120000);
     }
 }
 
 // if successful, this moves the passed grant to the constructed node
 bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound, const char *pszDest, bool fOneShot)
 {
-    //
     // Initiate outbound network connection
-    //
     boost::this_thread::interruption_point();
     if (!pszDest) {
         if (IsLocal(addrConnect) ||
@@ -1760,30 +1610,6 @@ bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOu
     CNode* pnode = ConnectNode(addrConnect, pszDest);
     boost::this_thread::interruption_point();
     
-#if defined(USE_TLS)
-    if (CNode::GetTlsFallbackNonTls())
-    {
-        if (!pnode)
-        {
-            string strDest;
-            int port;
-        
-            if (!pszDest)
-                strDest = addrConnect.ToStringIP();
-            else
-                SplitHostPort(string(pszDest), port, strDest);
-        
-            if (tlsmanager.isNonTLSAddr(strDest, vNonTLSNodesOutbound, cs_vNonTLSNodesOutbound))
-            {
-                // Attempt to reconnect in non-TLS mode
-                pnode = ConnectNode(addrConnect, pszDest);
-                boost::this_thread::interruption_point();
-            }
-        }
-    }
-    
-#endif
-
     if (!pnode)
         return false;
     if (grantOutbound)
@@ -2028,7 +1854,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     {
         CAddrDB adb;
         if (!adb.Read(addrman))
-            LogPrintf("Invalid or missing peers.dat; recreating\n");
+            LogPrintf("Invalid or missing peers.dat! This can happen when upgrading. Whatevz, recreating\n");
     }
     LogPrintf("Loaded %i addresses from peers.dat  %dms\n",
            addrman.size(), GetTimeMillis() - nStart);
@@ -2046,7 +1872,6 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     Discover(threadGroup);
 
 #ifdef USE_TLS
-    
     if (!tlsmanager.prepareCredentials()) {
         LogPrintf("TLS: ERROR: %s: %s: Credentials weren't generated. Node can't be started.\n", __FILE__, __func__);
         return;
@@ -2057,7 +1882,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
         return;
     }
 #else
-    LogPrintf("TLS is not used!\n");
+    return;
 #endif
 
     // Start threads
@@ -2078,14 +1903,6 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     // Process messages
     threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "msghand", &ThreadMessageHandler));
 
-#if defined(USE_TLS)
-    if (CNode::GetTlsFallbackNonTls())
-    {
-        // Clean pools of addresses for non-TLS connections
-        threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "poolscleaner", &ThreadNonTLSPoolsCleaner));
-    }
-#endif
-    
     // Dump network addresses
     scheduler.scheduleEvery(&DumpAddresses, DUMP_ADDRESSES_INTERVAL);
 }
@@ -2396,40 +2213,22 @@ CNode::CNode(SOCKET hSocketIn, const CAddress& addrIn, const std::string& addrNa
 
 bool CNode::GetTlsFallbackNonTls()
 {
-    if (tlsFallbackNonTls == eTlsOption::FALLBACK_UNSET)
-    {
-        // one time only setting of static class attribute
-        if ( GetArg("-tls", "") != "only" )
-        {
-            LogPrint("tls", "%s():%d - Non-TLS connections will be used in case of failure of TLS\n",
-                __func__, __LINE__);
-            tlsFallbackNonTls = eTlsOption::FALLBACK_TRUE;
-        }
-        else
-        {
-            LogPrint("tls", "%s():%d - Non-TLS connections will NOT be used in case of failure of TLS\n",
-                __func__, __LINE__);
-            tlsFallbackNonTls = eTlsOption::FALLBACK_FALSE;
-        }
-    }
-    return (tlsFallbackNonTls == eTlsOption::FALLBACK_TRUE);
+    LogPrint("tls", "%s():%d - Non-TLS connections no longer supported\n", __func__, __LINE__);
+    return false;
 }
 
 bool CNode::GetTlsValidate()
 {
     if (tlsValidate == eTlsOption::FALLBACK_UNSET)
     {
-        // one time only setting of static class attribute
-        if ( GetBoolArg("-tlsvalidate", false))
-        {
-            LogPrint("tls", "%s():%d - TLS certificates will be validated\n",
-                __func__, __LINE__);
+        // This is useful for private Hush Smart Chains, that want to exist
+        // on a closed VPN with an internal CA or trusted cert system, or
+        // various other use cases
+        if ( GetBoolArg("-tlsvalidate", false)) {
+            LogPrint("tls", "%s():%d - TLS certificates will be validated\n", __func__, __LINE__);
             tlsValidate = eTlsOption::FALLBACK_TRUE;
-        }
-        else
-        {
-            LogPrint("tls", "%s():%d - TLS certificates will NOT be validated\n",
-                __func__, __LINE__);
+        } else {
+            LogPrint("tls", "%s():%d - TLS certificates will NOT be validated\n", __func__, __LINE__);
             tlsValidate = eTlsOption::FALLBACK_FALSE;
         }
     }
