@@ -49,7 +49,7 @@ class AssetChainPrivateTest (BitcoinTestFramework):
                     '-ac_supply=0',
                     '-ac_reward=25600000000',
                     '-ac_private=1',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '--daemon',
                     '-rpcuser=rt',

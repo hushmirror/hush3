@@ -284,7 +284,7 @@ namespace {
         bool fCurrentlyConnected;
         //! Accumulated misbehaviour score for this peer.
         int nMisbehavior;
-        //! Whether this peer should be disconnected and banned (unless whitelisted).
+        //! Whether this peer should be disconnected and banned (unless allowlisted).
         bool fShouldBan;
         //! String name of this peer (debugging/logging purposes).
         std::string name;
@@ -345,7 +345,7 @@ namespace {
         nPreferredDownload -= state->fPreferredDownload;
 
         // Whether this node should be marked as a preferred download node.
-        state->fPreferredDownload = (!node->fInbound || node->fWhitelisted) && !node->fOneShot && !node->fClient;
+        state->fPreferredDownload = (!node->fInbound || node->fAllowlisted) && !node->fOneShot && !node->fClient;
 
         nPreferredDownload += state->fPreferredDownload;
     }
@@ -7589,8 +7589,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             assert(recentRejects);
             recentRejects->insert(tx.GetHash());
 
-            if (pfrom->fWhitelisted) {
-                // Always relay transactions received from whitelisted peers, even
+            if (pfrom->fAllowlisted) {
+                // Always relay transactions received from allowlisted peers, even
                 // if they were already in the mempool or rejected from it due
                 // to policy, allowing the node to function as a gateway for
                 // nodes hidden behind it.
@@ -7600,10 +7600,10 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 // case.
                 int nDoS = 0;
                 if (!state.IsInvalid(nDoS) || nDoS == 0) {
-                    LogPrintf("Force relaying tx %s from whitelisted peer=%d\n", tx.GetHash().ToString(), pfrom->id);
+                    LogPrintf("Force relaying tx %s from allowlisted peer=%d\n", tx.GetHash().ToString(), pfrom->id);
                     RelayTransaction(tx);
                 } else {
-                    LogPrintf("Not relaying invalid transaction %s from whitelisted peer=%d (%s (code %d))\n",
+                    LogPrintf("Not relaying invalid transaction %s from allowlisted peer=%d (%s (code %d))\n",
                               tx.GetHash().ToString(), pfrom->id, state.GetRejectReason(), state.GetRejectCode());
                 }
             }
@@ -7693,11 +7693,11 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         pfrom->AddInventoryKnown(inv);
 
         CValidationState state;
-        // Process all blocks from whitelisted peers, even if not requested,
+        // Process all blocks from allowlisted peers, even if not requested,
         // unless we're still syncing with the network.
         // Such an unrequested block may still be processed, subject to the
         // conditions in AcceptBlock().
-        bool forceProcessing = pfrom->fWhitelisted && !IsInitialBlockDownload();
+        bool forceProcessing = pfrom->fAllowlisted && !IsInitialBlockDownload();
         ProcessNewBlock(0,0,state, pfrom, &block, forceProcessing, NULL);
         int nDoS;
         if (state.IsInvalid(nDoS)) {
@@ -8039,8 +8039,8 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
 
         CNodeState &state = *State(pto->GetId());
         if (state.fShouldBan) {
-            if (pto->fWhitelisted) {
-                LogPrintf("Warning: not punishing whitelisted peer %s!\n", pto->addr.ToString());
+            if (pto->fAllowlisted) {
+                LogPrintf("Warning: not punishing allowlisted peer %s!\n", pto->addr.ToString());
             } else {
                 pto->fDisconnect = true;
                 if (pto->addr.IsLocal())

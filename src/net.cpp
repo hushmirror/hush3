@@ -79,9 +79,9 @@ namespace {
 
     struct ListenSocket {
         SOCKET socket;
-        bool whitelisted;
+        bool allowlisted;
 
-        ListenSocket(SOCKET socket, bool whitelisted) : socket(socket), whitelisted(whitelisted) {}
+        ListenSocket(SOCKET socket, bool allowlisted) : socket(socket), allowlisted(allowlisted) {}
     };
 }
 
@@ -600,21 +600,21 @@ void CNode::GetBanned(std::map<CSubNet, int64_t> &banMap)
 }
 
 
-std::vector<CSubNet> CNode::vWhitelistedRange;
-CCriticalSection CNode::cs_vWhitelistedRange;
+std::vector<CSubNet> CNode::vAllowlistedRange;
+CCriticalSection CNode::cs_vAllowlistedRange;
 
-bool CNode::IsWhitelistedRange(const CNetAddr &addr) {
-    LOCK(cs_vWhitelistedRange);
-    BOOST_FOREACH(const CSubNet& subnet, vWhitelistedRange) {
+bool CNode::IsAllowlistedRange(const CNetAddr &addr) {
+    LOCK(cs_vAllowlistedRange);
+    BOOST_FOREACH(const CSubNet& subnet, vAllowlistedRange) {
         if (subnet.Match(addr))
             return true;
     }
     return false;
 }
 
-void CNode::AddWhitelistedRange(const CSubNet &subnet) {
-    LOCK(cs_vWhitelistedRange);
-    vWhitelistedRange.push_back(subnet);
+void CNode::AddAllowlistedRange(const CSubNet &subnet) {
+    LOCK(cs_vAllowlistedRange);
+    vAllowlistedRange.push_back(subnet);
 }
 
 void CNode::copyStats(CNodeStats &stats, const std::vector<bool> &m_asmap)
@@ -635,7 +635,7 @@ void CNode::copyStats(CNodeStats &stats, const std::vector<bool> &m_asmap)
     stats.nStartingHeight = nStartingHeight;
     stats.nSendBytes = nSendBytes;
     stats.nRecvBytes = nRecvBytes;
-    stats.fWhitelisted = fWhitelisted;
+    stats.fAllowlisted = fAllowlisted;
 
     // It is common for nodes with good ping times to suddenly become lagged,
     // due to a new block arriving or other large transfer.
@@ -919,7 +919,7 @@ static bool AttemptToEvictConnection(bool fPreferNewConnection) {
         LOCK(cs_vNodes);
 
         BOOST_FOREACH(CNode *node, vNodes) {
-            if (node->fWhitelisted)
+            if (node->fAllowlisted)
                 continue;
             if (!node->fInbound)
                 continue;
@@ -1010,7 +1010,7 @@ static bool AttemptToEvictConnection(bool fPreferNewConnection) {
 
     // Do not disconnect peers if there is only one unprotected connection from their network group.
     if (vEvictionCandidates.size() <= 1)
-        // unless we prefer the new connection (for whitelisted peers)
+        // unless we prefer the new connection (for allowlisted peers)
         if (!fPreferNewConnection)
             return false;
 
@@ -1032,7 +1032,7 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
         if (!addr.SetSockAddr((const struct sockaddr*)&sockaddr))
             LogPrintf("Warning: Unknown socket family\n");
 
-    bool whitelisted = hListenSocket.whitelisted || CNode::IsWhitelistedRange(addr);
+    bool allowlisted = hListenSocket.allowlisted || CNode::IsAllowlistedRange(addr);
     int nInboundThisIP = 0;
 
     {
@@ -1065,7 +1065,7 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
         return;
     }
 
-    if (CNode::IsBanned(addr) && !whitelisted)
+    if (CNode::IsBanned(addr) && !allowlisted)
     {
         LogPrintf("connection from %s dropped (banned)\n", addr.ToString());
         CloseSocket(hSocket);
@@ -1074,7 +1074,7 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
 
     if (nInbound >= nMaxInbound)
     {
-        if (!AttemptToEvictConnection(whitelisted)) {
+        if (!AttemptToEvictConnection(allowlisted)) {
             // No connection to evict, disconnect the new connection
             LogPrint("net", "failed to find an eviction candidate - connection dropped (full)\n");
             CloseSocket(hSocket);
@@ -1118,7 +1118,7 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
 
     CNode* pnode = new CNode(hSocket, addr, "", true, ssl);
     pnode->AddRef();
-    pnode->fWhitelisted = whitelisted;
+    pnode->fAllowlisted = allowlisted;
 
     LogPrint("net", "connection from %s accepted\n", addr.ToString());
 
@@ -1674,7 +1674,7 @@ void ThreadMessageHandler()
             {
                 TRY_LOCK(pnode->cs_vSend, lockSend);
                 if (lockSend)
-                    g_signals.SendMessages(pnode, pnode == pnodeTrickle || pnode->fWhitelisted);
+                    g_signals.SendMessages(pnode, pnode == pnodeTrickle || pnode->fAllowlisted);
             }
             boost::this_thread::interruption_point();
         }
@@ -1691,7 +1691,7 @@ void ThreadMessageHandler()
 }
 
 
-bool BindListenPort(const CService &addrBind, string& strError, bool fWhitelisted)
+bool BindListenPort(const CService &addrBind, string& strError, bool fAllowlisted)
 {
     strError = "";
     int nOne = 1;
@@ -1787,9 +1787,9 @@ bool BindListenPort(const CService &addrBind, string& strError, bool fWhiteliste
         return false;
     }
 
-    vhListenSocket.push_back(ListenSocket(hListenSocket, fWhitelisted));
+    vhListenSocket.push_back(ListenSocket(hListenSocket, fAllowlisted));
 
-    if (addrBind.IsRoutable() && fDiscover && !fWhitelisted)
+    if (addrBind.IsRoutable() && fDiscover && !fAllowlisted)
         AddLocal(addrBind, LOCAL_BIND);
 
     return true;
@@ -2172,7 +2172,7 @@ CNode::CNode(SOCKET hSocketIn, const CAddress& addrIn, const std::string& addrNa
     addrName = addrNameIn == "" ? addr.ToStringIPPort() : addrNameIn;
     nVersion = 0;
     strSubVer = "";
-    fWhitelisted = false;
+    fAllowlisted = false;
     fOneShot = false;
     fClient = false; // set by version message
     fInbound = fInboundIn;

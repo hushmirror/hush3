@@ -638,7 +638,7 @@ vout.n-1: opreturn with oracletxid, prevbatontxid and data in proper format
 
 The oraclesdata transaction is the most complex as it needs to find and spend the baton utxo, use the correct datafee and spend funds from the locked subscription funds. With the above, the oracles CC is complete and allows the creations of massively parallel data streams from multiple vendors that uses free market feedback via payments, ie. poorly performing providers wont get renewals.
 
-I expect that at first, the data providers will just be dapp developers deploying a working system including the required data, but its structure allows open market competition. Of course, specific dapps could restrict themselves to using only publishers from a whitelist of pubkeys. The potential usecases for oracles CC is quite varied and limited only by the imagination.
+I expect that at first, the data providers will just be dapp developers deploying a working system including the required data, but its structure allows open market competition. Of course, specific dapps could restrict themselves to using only publishers from a allowlist of pubkeys. The potential usecases for oracles CC is quite varied and limited only by the imagination.
 
 Chapter 12 - limitless possibilities
 As can be seen, CC contracts can do a wide range of things and since they are Turing complete, we know that this is true. However, what is more important is the added security gained from using a utxo based system. While in some ways it is more complex to have to deal with utxo, as can be seen by the above examples, it is either solved and made invisible at the rpc level, or actually used as part of the solution.

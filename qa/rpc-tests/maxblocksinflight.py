@@ -94,7 +94,7 @@ class MaxBlocksInFlightTest(BitcoinTestFramework):
 
     def setup_network(self):
         self.nodes = start_nodes(1, self.options.tmpdir, 
-                                 extra_args=[['-debug', '-whitelist=127.0.0.1']],
+                                 extra_args=[['-debug', '-allowlist=127.0.0.1']],
                                  binary=[self.options.testbinary])
 
     def run_test(self):

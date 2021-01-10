@@ -1539,34 +1539,31 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pbl
         bool fExisted = mapWallet.count(tx.GetHash()) != 0;
         if (fExisted && !fUpdate) return false;
         auto saplingNoteDataAndAddressesToAdd = FindMySaplingNotes(tx);
-        auto saplingNoteData = saplingNoteDataAndAddressesToAdd.first;
-        auto addressesToAdd = saplingNoteDataAndAddressesToAdd.second;
+        auto saplingNoteData                  = saplingNoteDataAndAddressesToAdd.first;
+        auto addressesToAdd                   = saplingNoteDataAndAddressesToAdd.second;
         for (const auto &addressToAdd : addressesToAdd) {
             if (!AddSaplingIncomingViewingKey(addressToAdd.second, addressToAdd.first)) {
                 return false;
             }
         }
         static std::string NotaryAddress; static bool didinit;
-        if ( !didinit && NotaryAddress.empty() && NOTARY_PUBKEY33[0] != 0 )
-        {
+        if ( !didinit && NotaryAddress.empty() && NOTARY_PUBKEY33[0] != 0 ) {
             didinit = true;
             char Raddress[64]; 
             pubkey2addr((char *)Raddress,(uint8_t *)NOTARY_PUBKEY33);
             NotaryAddress.assign(Raddress);
-            vWhiteListAddress = mapMultiArgs["-whitelistaddress"];
-            if ( !vWhiteListAddress.empty() )
+            vAllowListAddress = mapMultiArgs["-allowlistaddress"];
+            if ( !vAllowListAddress.empty() )
             {
-                fprintf(stderr, "Activated Wallet Filter \n  Notary Address: %s \n  Adding whitelist address's:\n", NotaryAddress.c_str());
-                for ( auto wladdr : vWhiteListAddress )
+                fprintf(stderr, "Activated Wallet Filter \n  Notary Address: %s \n  Adding allowlist address's:\n", NotaryAddress.c_str());
+                for ( auto wladdr : vAllowListAddress )
                     fprintf(stderr, "    %s\n", wladdr.c_str());
             }
         }
-        if (fExisted || IsMine(tx) || IsFromMe(tx) || saplingNoteData.size() > 0)
-        {
-            // wallet filter for notary nodes. Enables by setting -whitelistaddress= as startup param or in conf file (works same as -addnode byut with R-address's)
-            if ( !tx.IsCoinBase() && !vWhiteListAddress.empty() && !NotaryAddress.empty() ) 
-            {
-                int numvinIsOurs = 0, numvinIsWhiteList = 0;  
+        if (fExisted || IsMine(tx) || IsFromMe(tx) || saplingNoteData.size() > 0) {
+            // wallet filter for notary nodes. Enables by setting -allowlistaddress= as startup param or in conf file (works same as -addnode but with taddr)
+            if ( !tx.IsCoinBase() && !vAllowListAddress.empty() && !NotaryAddress.empty() ) {
+                int numvinIsOurs = 0, numvinIsAllowList = 0;
                 for (size_t i = 0; i < tx.vin.size(); i++)
                 {
                     uint256 hash; CTransaction txin; CTxDestination address;
@@ -1574,20 +1571,20 @@ bool CWallet::AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pbl
                     {
                         if ( CBitcoinAddress(address).ToString() == NotaryAddress )
                             numvinIsOurs++;
-                        for ( auto wladdr : vWhiteListAddress )
+                        for ( auto wladdr : vAllowListAddress )
                         {
                             if ( CBitcoinAddress(address).ToString() == wladdr )
                             {
-                                //fprintf(stderr, "We received from whitelisted address.%s\n", wladdr.c_str());
-                                numvinIsWhiteList++;
+                                //fprintf(stderr, "We received from allowlisted address.%s\n", wladdr.c_str());
+                                numvinIsAllowList++;
                             }
                         }
                     }
                 }
-                // Now we know if it was a tx sent to us, by either a whitelisted address, or ourself.
+                // Now we know if it was a tx sent to us, by either a allowlisted address, or ourself.
                 if ( numvinIsOurs != 0 )
                     fprintf(stderr, "We sent from address: %s vins: %d\n",NotaryAddress.c_str(),numvinIsOurs);
-                if ( numvinIsOurs == 0 && numvinIsWhiteList == 0 )
+                if ( numvinIsOurs == 0 && numvinIsAllowList == 0 )
                     return false;
             }
 

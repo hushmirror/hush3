@@ -46,7 +46,7 @@ class DPoWConfsTest(BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     #'-pubkey=' + self.pubkey,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '--daemon',
                     '-rpcuser=rt',

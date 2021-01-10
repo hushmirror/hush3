@@ -174,7 +174,7 @@ class ComparisonTestFramework(BitcoinTestFramework):
 
     def setup_network(self):
         self.nodes = start_nodes(self.num_nodes, self.options.tmpdir,
-                                    extra_args=[['-debug', '-whitelist=127.0.0.1']] * self.num_nodes,
+                                    extra_args=[['-debug', '-allowlist=127.0.0.1']] * self.num_nodes,
                                     binary=[self.options.testbinary] +
                                            [self.options.refbinary]*(self.num_nodes-1))
 
@@ -209,7 +209,7 @@ class HushTestFramework(BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '--daemon',
                     '-rpcuser=rt',
@@ -226,7 +226,7 @@ class HushTestFramework(BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey1,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '-addnode=127.0.0.1:64367',
                     '--daemon',
@@ -270,7 +270,7 @@ class CryptoconditionsTestFramework(BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '--daemon',
                     '-rpcuser=rt',
@@ -287,7 +287,7 @@ class CryptoconditionsTestFramework(BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey1,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '-addnode=127.0.0.1:64367',
                     '--daemon',

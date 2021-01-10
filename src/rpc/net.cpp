@@ -165,7 +165,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             }
             obj.push_back(Pair("inflight", heights));
         }
-        obj.push_back(Pair("whitelisted", stats.fWhitelisted));
+        obj.push_back(Pair("allowlisted", stats.fAllowlisted));
 
         ret.push_back(obj);
     }
