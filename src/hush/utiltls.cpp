@@ -5,7 +5,6 @@
 
 #include <stdio.h>
 #include <vector>
-
 #include <wolfssl/options.h>
 #include <wolfssl/ssl.h>
 #include "../util.h"

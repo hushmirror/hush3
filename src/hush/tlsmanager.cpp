@@ -81,6 +81,7 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
     int retOp = 0;
     err_code  = 0;
     char err_buffer[1024];
+    std::string disconnectedPeer("no info");
 
     while (true)
     {
@@ -117,7 +118,6 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
             case SSL_SHUTDOWN:
             {
                 if (hSocket != INVALID_SOCKET) {
-                    std::string disconnectedPeer("no info");
                     struct sockaddr_in addr;
                     socklen_t serv_len = sizeof(addr);
                     int ret = getpeername(hSocket, (struct sockaddr *)&addr, &serv_len);
@@ -136,21 +136,28 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
 
         if (eRoutine == SSL_SHUTDOWN) {
             if (retOp == 0) {
-                LogPrint("tls", "TLS: WARNING: %s: %s():%d - SSL_SHUTDOWN: The close_notify was sent but the peer did not send it back yet.\n",
+                LogPrint("tls", "TLS: WARNING: %s: %s():%d - SSL_SHUTDOWN: The close_notify was sent but the peer did not send it back yet. Whatevz\n",
                         __FILE__, __func__, __LINE__);
                 // do not call SSL_get_error() because it may misleadingly indicate an error even though no error occurred.
                 break;
             } else if (retOp == 1) {
-                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN completed\n", __FILE__, __func__, __LINE__);
+                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN completed from peer %s\n", __FILE__, __func__, __LINE__, disconnectedPeer.c_str());
                 break;
             } else {
-                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN failed\n", __FILE__, __func__, __LINE__);
+                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN failed to %s\n", __FILE__, __func__, __LINE__, disconnectedPeer.c_str());
                 // the error will be read afterwards
             }
         } else {
             if (retOp == 1) {
-                LogPrint("tls", "TLS: %s: %s():%d - %s completed\n", __FILE__, __func__, __LINE__,
-                    eRoutine == SSL_CONNECT ? "SSL_CONNECT" : "SSL_ACCEPT");
+                std::string goodPeer = "";
+                struct sockaddr_in addr;
+                socklen_t serv_len = sizeof(addr);
+                int ret = getpeername(hSocket, (struct sockaddr *)&addr, &serv_len);
+                if (ret == 0) {
+                    goodPeer = std::string(inet_ntoa(addr.sin_addr)) + ":" + std::to_string(ntohs(addr.sin_port));
+                }
+                LogPrint("tls", "TLS: %s: %s():%d - %s completed to %s\n", __FILE__, __func__, __LINE__,
+                    eRoutine == SSL_CONNECT ? "SSL_CONNECT" : "SSL_ACCEPT", goodPeer);
                 break;
             }
         }
@@ -159,7 +166,10 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
 
         if (sslErr != WOLFSSL_ERROR_WANT_READ && sslErr != WOLFSSL_ERROR_WANT_WRITE) {
             err_code = wolfSSL_ERR_get_error();
-            const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
+            const char* error_str;
+            if(err_code)
+                wolfSSL_ERR_error_string(err_code, err_buffer);
+
             LogPrint("tls", "TLS: WARNING: %s: %s():%d - routine(%d), sslErr[0x%x], retOp[%d], errno[0x%x], lib[0x%x], func[0x%x], reas[0x%x]-> err: %s\n",
                 __FILE__, __func__, __LINE__,
                 eRoutine, sslErr, retOp, errno, wolfSSL_ERR_GET_LIB(err_code), ERR_GET_FUNC(err_code), wolfSSL_ERR_GET_REASON(err_code), err_buffer);
@@ -441,9 +451,10 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
     if ((ssl = wolfSSL_new(tls_ctx_server))) {
         if (wolfSSL_set_fd(ssl, hSocket)) {
             int ret = TLSManager::waitFor(SSL_ACCEPT, hSocket, ssl, (DEFAULT_CONNECT_TIMEOUT / 1000), err_code);
-            if (ret == 1)
-            {
+            if (ret == 1) {
                 bAcceptedTLS = true;
+            } else {
+                err_code = wolfSSL_ERR_get_error();
             }
         }
     } else {
