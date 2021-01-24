@@ -4,11 +4,11 @@
 /*
  simple stub custom cc
  
- Just update the functions in this file, then from ~/komodo/src/cc
+ Just update the functions in this file, then from ~/hush3/src/cc
  
- ../komodo-cli -ac_name=CUSTOM stop
+ ../hush-cli -ac_name=CUSTOM stop
  ./makecustom
- ../komodod -ac_name=CUSTOM -ac_cclib=custom -ac_cc=2 ...
+ ../hush-smart-chain -ac_name=CUSTOM -ac_cclib=custom -ac_cc=2 ...
  
  The above will rebuild komodod and get it running again
  */
