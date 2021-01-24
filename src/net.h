@@ -42,9 +42,13 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
 #include <boost/signals2/signal.hpp>
-// Enable side-channel resistant WolfSSL Support for Hush
-#define ECC_TIMING_RESISTANT 420
+// Enable WolfSSL Support for Hush
 #include <wolfssl/options.h>
+// TODO: these are not set correctly by wolfssl for some reason. Ja bless.
+#undef ECC_TIMING_RESISTANT
+#undef TFM_TIMING_RESISTANT
+#define ECC_TIMING_RESISTANT 420
+#define TFM_TIMING_RESISTANT 420
 #include <wolfssl/ssl.h>
 
 class CAddrMan;

@@ -33,10 +33,7 @@ bool operator==(const _NODE_ADDR b) const
 }
 } NODE_ADDR, *PNODE_ADDR;
 
-/**
- * @brief A class to wrap some of hush specific TLS functionalities used in the net.cpp
- * 
- */
+// A class to wrap some of hush specific TLS functionalities used in the net.cpp
 class TLSManager
 {
 public:

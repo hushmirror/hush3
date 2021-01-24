@@ -5,10 +5,8 @@
 #include <wolfssl/ssl.h>
 #include <wolfssl/openssl/dh.h>
 #include <wolfssl/wolfcrypt/asn.h>
-
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
-
 #include "tlsmanager.h"
 #include "utiltls.h"
 
@@ -70,18 +68,15 @@ static WOLFSSL_DH *get_dh2048(void)
     return dh;
 }
 
-DH *tmp_dh_callback(WOLFSSL *ssl, int is_export, int keylength)
-{
-    LogPrint("tls", "TLS: %s: %s():%d - Using Diffie-Hellman param for PFS: is_export=%d, keylength=%d\n",
-        __FILE__, __func__, __LINE__, is_export, keylength);
+DH *tmp_dh_callback(WOLFSSL *ssl, int is_export, int keylength) {
+    LogPrint("tls", "TLS: %s: %s():%d - Using Diffie-Hellman param for PFS: is_export=%d, keylength=%d\n", __FILE__, __func__, __LINE__, is_export, keylength);
 
     return get_dh2048();
 }
 
-int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* ssl, int timeoutSec, unsigned long& err_code)
-{
+int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* ssl, int timeoutSec, unsigned long& err_code) {
     int retOp = 0;
-    err_code = 0;
+    err_code  = 0;
     char err_buffer[1024];
 
     while (true)
@@ -231,26 +226,23 @@ WOLFSSL* TLSManager::connect(SOCKET hSocket, const CAddress& addrConnect, unsign
     if ((ssl = wolfSSL_new(tls_ctx_client))) {
         if (wolfSSL_set_fd(ssl, hSocket)) {
             int ret = TLSManager::waitFor(SSL_CONNECT, hSocket, ssl, (DEFAULT_CONNECT_TIMEOUT / 1000), err_code);
-            if (ret == 1)
-            {
+            if (ret == 1) {
                 bConnectedTLS = true;
+            } else {
+                LogPrint("tls", "%s: timed out waiting for %s\n", __func__, addrConnect.ToString());
             }
         }
-    }
-    else
-    {
+    } else {
         err_code = wolfSSL_ERR_get_error();
         const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
-        LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n",
-            __FILE__, __func__, __LINE__, err_buffer);
+        LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n", __FILE__, __func__, __LINE__, err_buffer);
     }
 
     if (bConnectedTLS) {
         LogPrintf("TLS: connection to %s has been established (tlsv = %s 0x%04x / ssl = %s 0x%x ). Using cipher: %s\n",
             addrConnect.ToString(), wolfSSL_get_version(ssl), wolfSSL_version(ssl), wolfSSL_OpenSSL_version(), wolfSSL_lib_version_hex(), wolfSSL_get_cipher_name(ssl));
     } else {
-        LogPrintf("TLS: %s: %s():%d - TLS connection to %s failed (err_code 0x%X)\n",
-            __FILE__, __func__, __LINE__, addrConnect.ToString(), err_code);
+        LogPrintf("TLS: %s: %s():%d - TLS connection to %s timed out\n", __FILE__, __func__, __LINE__, addrConnect.ToString(), err_code);
 
         if (ssl) {
             wolfSSL_free(ssl);
@@ -444,13 +436,10 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
                 bAcceptedTLS = true;
             }
         }
-    }
-    else
-    {
+    } else {
         err_code = wolfSSL_ERR_get_error();
         const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
-        LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n",
-            __FILE__, __func__, __LINE__, err_buffer);
+        LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n", __FILE__, __func__, __LINE__, err_buffer);
     }
 
     if (bAcceptedTLS) {
@@ -463,8 +452,7 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
             LogPrint("tls", "TLS: supporting cipher: %s\n", wolfSSL_CIPHER_get_name(c));
         }
     } else {
-        LogPrintf("TLS: %s: %s():%d - TLS connection from %s failed (err_code 0x%X)\n",
-            __FILE__, __func__, __LINE__, addr.ToString(), err_code);
+        LogPrintf("TLS: %s: %s():%d - TLS connection from %s failed (err_code 0x%X)\n", __FILE__, __func__, __LINE__, addr.ToString(), err_code);
 
         if (ssl) {
             SSL_free(ssl);
