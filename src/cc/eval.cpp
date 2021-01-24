@@ -33,14 +33,14 @@ char *CClib_name();
 
 Eval* EVAL_TEST = 0;
 struct CCcontract_info CCinfos[0x100];
-extern pthread_mutex_t KOMODO_CC_mutex;
+extern pthread_mutex_t HUSH_CC_mutex;
 
 bool RunCCEval(const CC *cond, const CTransaction &tx, unsigned int nIn)
 {
     EvalRef eval;
-    pthread_mutex_lock(&KOMODO_CC_mutex);
+    pthread_mutex_lock(&HUSH_CC_mutex);
     bool out = eval->Dispatch(cond, tx, nIn);
-    pthread_mutex_unlock(&KOMODO_CC_mutex);
+    pthread_mutex_unlock(&HUSH_CC_mutex);
     if ( eval->state.IsValid() != out)
         fprintf(stderr,"out %d vs %d isValid\n",(int32_t)out,(int32_t)eval->state.IsValid());
     //assert(eval->state.IsValid() == out);

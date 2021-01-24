@@ -826,7 +826,7 @@ bool ProcessCC(struct CCcontract_info *cp,Eval* eval, std::vector<uint8_t> param
     height = HUSH_CONNECTING;
     if ( HUSH_CONNECTING < 0 ) // always comes back with > 0 for final confirmation
         return(true);
-    if ( ASSETCHAINS_CC == 0 || (height & ~(1<<30)) < KOMODO_CCACTIVATE )
+    if ( ASSETCHAINS_CC == 0 || (height & ~(1<<30)) < HUSH_CCACTIVATE )
         return eval->Invalid("CC are disabled or not active yet");
     if ( (HUSH_CONNECTING & (1<<30)) != 0 )
     {
@@ -836,7 +836,7 @@ bool ProcessCC(struct CCcontract_info *cp,Eval* eval, std::vector<uint8_t> param
     if (cp->validate == NULL)
         return eval->Invalid("validation not supported for eval code");
 
-    //fprintf(stderr,"HUSH_CONNECTING.%d mempool.%d vs CCactive.%d\n",height,from_mempool,KOMODO_CCACTIVATE);
+    //fprintf(stderr,"HUSH_CONNECTING.%d mempool.%d vs CCactive.%d\n",height,from_mempool,HUSH_CCACTIVATE);
     // there is a chance CC tx is valid in mempool, but invalid when in block, so we cant filter duplicate requests. if any of the vins are spent, for example
     //txid = ctx.GetHash();
     //if ( txid == cp->prevtxid )
@@ -872,7 +872,7 @@ bool CClib_Dispatch(const CC *cond,Eval *eval,std::vector<uint8_t> paramsNull,co
     height = HUSH_CONNECTING;
     if ( HUSH_CONNECTING < 0 ) // always comes back with > 0 for final confirmation
         return(true);
-    if ( ASSETCHAINS_CC == 0 || (height & ~(1<<30)) < KOMODO_CCACTIVATE )
+    if ( ASSETCHAINS_CC == 0 || (height & ~(1<<30)) < HUSH_CCACTIVATE )
         return eval->Invalid("CC are disabled or not active yet");
     if ( (HUSH_CONNECTING & (1<<30)) != 0 )
     {

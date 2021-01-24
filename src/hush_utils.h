@@ -1825,7 +1825,7 @@ void hush_args(char *argv0)
     MAX_REORG_LENGTH         = GetArg("-maxreorg",MAX_REORG_LENGTH);
     WITNESS_CACHE_SIZE       = MAX_REORG_LENGTH+10;
     ASSETCHAINS_CC           = GetArg("-ac_cc",0);
-    KOMODO_CCACTIVATE        = GetArg("-ac_ccactivate",0);
+    HUSH_CCACTIVATE          = GetArg("-ac_ccactivate",0);
     ASSETCHAINS_BLOCKTIME    = GetArg("-ac_blocktime",60);
     ASSETCHAINS_PUBLIC       = GetArg("-ac_public",0);
     ASSETCHAINS_PRIVATE      = GetArg("-ac_private",0);
@@ -2387,10 +2387,10 @@ void hush_args(char *argv0)
 #endif
         if ( ASSETCHAINS_CC < 2 )
         {
-            if ( KOMODO_CCACTIVATE != 0 )
+            if ( HUSH_CCACTIVATE != 0 )
             {
                 ASSETCHAINS_CC = 2;
-                fprintf(stderr,"smart utxo CC contracts will activate at height.%d\n",KOMODO_CCACTIVATE);
+                fprintf(stderr,"smart utxo CC contracts will activate at height.%d\n",HUSH_CCACTIVATE);
             } else if ( ccEnablesHeight[0] != 0 ) {
                 ASSETCHAINS_CC = 2;
                 fprintf(stderr,"smart utxo CC contract %d will activate at height.%d\n",(int32_t)ccEnablesHeight[0],(int32_t)ccEnablesHeight[1]);

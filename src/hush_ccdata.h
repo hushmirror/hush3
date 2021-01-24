@@ -46,7 +46,7 @@ struct komodo_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t
     struct komodo_ccdata_entry *allMoMs=0; struct komodo_ccdata *ccdata,*tmpptr; int32_t i,num,max;
     bool fMutated; std::vector<uint256> tree, leaves;
     num = max = 0;
-    portable_mutex_lock(&KOMODO_CC_mutex);
+    portable_mutex_lock(&HUSH_CC_mutex);
     DL_FOREACH_SAFE(CC_data,ccdata,tmpptr)
     {
         if ( ccdata->MoMdata.height <= kmdendi && ccdata->MoMdata.height >= kmdstarti )
@@ -66,7 +66,7 @@ struct komodo_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t
         if ( ccdata->MoMdata.height < kmdstarti )
             break;
     }
-    portable_mutex_unlock(&KOMODO_CC_mutex);
+    portable_mutex_unlock(&HUSH_CC_mutex);
     if ( (*nump= num) > 0 )
     {
         for (i=0; i<num; i++)
@@ -111,7 +111,7 @@ int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct komodo_ccdataMoMoM *m
         return(-1);
     }
     memset(mdata,0,sizeof(*mdata));
-    portable_mutex_lock(&KOMODO_CC_mutex);
+    portable_mutex_lock(&HUSH_CC_mutex);
     DL_FOREACH_SAFE(CC_data,ccdata,tmpptr)
     {
         if ( ccdata->MoMdata.height < kmdheight )
@@ -135,7 +135,7 @@ int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct komodo_ccdataMoMoM *m
             starti = ccdata->MoMdata.height;
         }
     }
-    portable_mutex_unlock(&KOMODO_CC_mutex);
+    portable_mutex_unlock(&HUSH_CC_mutex);
     mdata->kmdstarti = starti;
     mdata->kmdendi = endi;
     if ( starti != 0 && endi != 0 && endi >= starti )
@@ -184,7 +184,7 @@ void komodo_purge_ccdata(int32_t height)
     struct komodo_ccdata *ccdata,*tmpptr;
     if ( SMART_CHAIN_SYMBOL[0] == 0 )
     {
-        portable_mutex_lock(&KOMODO_CC_mutex);
+        portable_mutex_lock(&HUSH_CC_mutex);
         DL_FOREACH_SAFE(CC_data,ccdata,tmpptr)
         {
             if ( ccdata->MoMdata.height >= height )
@@ -194,7 +194,7 @@ void komodo_purge_ccdata(int32_t height)
                 free(ccdata);
             } else break;
         }
-        portable_mutex_unlock(&KOMODO_CC_mutex);
+        portable_mutex_unlock(&HUSH_CC_mutex);
     }
     else
     {
@@ -236,9 +236,9 @@ int32_t komodo_rwccdata(char *thischain,int32_t rwflag,struct komodo_ccdata *ccd
         {
             ptr = (struct komodo_ccdata *)calloc(1,sizeof(*ptr));
             *ptr = *ccdata;
-            portable_mutex_lock(&KOMODO_CC_mutex);
+            portable_mutex_lock(&HUSH_CC_mutex);
             DL_PREPEND(CC_data,ptr);
-            portable_mutex_unlock(&KOMODO_CC_mutex);
+            portable_mutex_unlock(&HUSH_CC_mutex);
         }
     }
     else

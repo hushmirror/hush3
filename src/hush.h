@@ -360,7 +360,7 @@ void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotarie
     if ( didinit == 0 )
     {
         portable_mutex_init(&HUSH_KV_mutex);
-        portable_mutex_init(&KOMODO_CC_mutex);
+        portable_mutex_init(&HUSH_CC_mutex);
         didinit = 1;
     }
     if ( (sp= hush_stateptr(symbol,dest)) == 0 )
