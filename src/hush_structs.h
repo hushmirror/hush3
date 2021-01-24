@@ -15,7 +15,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "hush_defs.h"
 #include "uthash.h"
 #include "utlist.h"
@@ -28,12 +27,10 @@
 
 #ifndef KOMODO_STRUCTS_H
 #define KOMODO_STRUCTS_H
-
 #define GENESIS_NBITS 0x1f00ffff
 #define KOMODO_MINRATIFY ((height < 90000) ? 7 : 11)
 #define KOMODO_NOTARIES_HARDCODED 180000 // DONT CHANGE
-#define KOMODO_MAXBLOCKS 250000 // DONT CHANGE
-
+#define HUSH_MAXBLOCKS 250000 // DONT CHANGE
 #define KOMODO_EVENT_RATIFY 'P'
 #define KOMODO_EVENT_NOTARIZED 'N'
 #define KOMODO_EVENT_KMDHEIGHT 'K'

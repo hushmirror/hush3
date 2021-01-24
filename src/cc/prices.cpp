@@ -657,7 +657,7 @@ static std::string prices_getsourceexpression(const std::vector<uint16_t> &vec) 
         char name[65];
         std::string operand;
         uint16_t opcode = vec[i];
-        int32_t value = (opcode & (KOMODO_MAXPRICES - 1));   // index or weight 
+        int32_t value = (opcode & (HUSH_MAXPRICES - 1));   // index or weight 
 
         switch (opcode & KOMODO_PRICEMASK)
         {
@@ -934,7 +934,7 @@ int32_t prices_syntheticvec(std::vector<uint16_t> &vec, std::vector<std::string>
             opcode = PRICES_DDD, need = 3;
         else if (!is_weight_str(opstr) && (ind = komodo_priceind(opstr.c_str())) >= 0)
             opcode = ind, need = 0;
-        else if ((weight = atoi(opstr.c_str())) > 0 && weight < KOMODO_MAXPRICES)
+        else if ((weight = atoi(opstr.c_str())) > 0 && weight < HUSH_MAXPRICES)
         {
             opcode = PRICES_WEIGHT | weight;
             need = 1;
@@ -993,7 +993,7 @@ int64_t prices_syntheticprice(std::vector<uint16_t> vec, int32_t height, int32_t
     for (i = 0; i < vec.size(); i++)
     {
         opcode = vec[i];
-        value = (opcode & (KOMODO_MAXPRICES - 1));   // index or weight 
+        value = (opcode & (HUSH_MAXPRICES - 1));   // index or weight 
 
         mpz_set_ui(mpzResult, 0);  // clear result to test overflow (see below)
 
@@ -2228,7 +2228,7 @@ static bool prices_ispositionup(const std::vector<uint16_t> &vecparsed, int16_t 
     if (vecparsed.size() > 1 && vecparsed.size() <= 3) {
         uint16_t opcode = vecparsed[0];
 
-        int32_t value = (opcode & (KOMODO_MAXPRICES - 1));   // filter index or weight = opcode & (2048-1)
+        int32_t value = (opcode & (HUSH_MAXPRICES - 1));   // filter index or weight = opcode & (2048-1)
 
         if ((opcode & KOMODO_PRICEMASK) == 0) {
             char name[65];
@@ -2277,8 +2277,8 @@ static bool prices_isopposite(BetInfo p1, BetInfo p2) {
         uint16_t opcode1 = p1.vecparsed[0];
         uint16_t opcode2 = p2.vecparsed[0];
 
-        int32_t value1 = (opcode1 & (KOMODO_MAXPRICES - 1));   // index or weight 
-        int32_t value2 = (opcode2 & (KOMODO_MAXPRICES - 1));   // index or weight 
+        int32_t value1 = (opcode1 & (HUSH_MAXPRICES - 1));   // index or weight 
+        int32_t value2 = (opcode2 & (HUSH_MAXPRICES - 1));   // index or weight 
 
         if ( (opcode1 & KOMODO_PRICEMASK) == 0 && (opcode2 & KOMODO_PRICEMASK) == 0 ) {
             char name1[65];
@@ -2311,7 +2311,7 @@ static std::string findMatchedBook(const std::vector<uint16_t> &vecparsed, const
     if (vecparsed.size() > 1 && vecparsed.size() <= 3) {
         uint16_t opcode = vecparsed[0];
 
-        int32_t value = (opcode & (KOMODO_MAXPRICES - 1));   // filter index or weight = opcode & (2048-1)
+        int32_t value = (opcode & (HUSH_MAXPRICES - 1));   // filter index or weight = opcode & (2048-1)
 
         if ((opcode & KOMODO_PRICEMASK) == 0) {
             char name[65];
@@ -2370,7 +2370,7 @@ void prices_getorderbook(std::map<std::string, std::vector<BetInfo> > & bookmatc
 
             if (book[0].vecparsed.size() <= 3) {   // only short expr check for match: "BTC_USD,1" or "BTC_USD,!,1"
                 char name[65];
-                komodo_pricename(name, (book[0].vecparsed[0] & (KOMODO_MAXPRICES - 1)));
+                komodo_pricename(name, (book[0].vecparsed[0] & (HUSH_MAXPRICES - 1)));
                 std::string sname = name;
                 bookmatched[sname].push_back(book[0]);
 

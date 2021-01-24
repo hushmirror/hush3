@@ -1569,7 +1569,7 @@ extern std::vector<uint8_t> Mineropret; // opreturn data set by the data gatheri
 #define PRICES_ERRORRATE (COIN / 100)	  // maximum acceptable change, set at 1%
 #define PRICES_SIZEBIT0 (sizeof(uint32_t) * 4) // 4 uint32_t unixtimestamp, BTCUSD, BTCGBP and BTCEUR
 #define KOMODO_LOCALPRICE_CACHESIZE 13
-#define KOMODO_MAXPRICES 2048
+#define HUSH_MAXPRICES 2048
 #define PRICES_SMOOTHWIDTH 1
 
 #define issue_curl(cmdstr) bitcoind_RPC(0,(char *)"CBCOINBASE",cmdstr,0,0,0)
@@ -1592,10 +1592,10 @@ struct komodo_priceinfo
 {
     FILE *fp;
     char symbol[64];
-} PRICES[KOMODO_MAXPRICES];
+} PRICES[HUSH_MAXPRICES];
 
-uint32_t PriceCache[KOMODO_LOCALPRICE_CACHESIZE][KOMODO_MAXPRICES];//4+sizeof(Cryptos)/sizeof(*Cryptos)+sizeof(Forex)/sizeof(*Forex)];
-int64_t PriceMult[KOMODO_MAXPRICES];
+uint32_t PriceCache[KOMODO_LOCALPRICE_CACHESIZE][HUSH_MAXPRICES];//4+sizeof(Cryptos)/sizeof(*Cryptos)+sizeof(Forex)/sizeof(*Forex)];
+int64_t PriceMult[HUSH_MAXPRICES];
 int32_t komodo_cbopretsize(uint64_t flags);
 
 void komodo_PriceCache_shift()
@@ -1694,7 +1694,7 @@ int32_t komodo_pricecmp(int32_t nHeight,int32_t n,char *maxflags,uint32_t *price
 // komodo_priceclamp() clamps any price that is beyond tolerance
 int32_t komodo_priceclamp(int32_t n,uint32_t *pricebits,uint32_t *refprices,int64_t tolerance)
 {
-    int32_t i; uint32_t newprice; char maxflags[KOMODO_MAXPRICES];
+    int32_t i; uint32_t newprice; char maxflags[HUSH_MAXPRICES];
     memset(maxflags,0,sizeof(maxflags));
     for (i=1; i<n; i++)
     {
@@ -1710,7 +1710,7 @@ int32_t komodo_priceclamp(int32_t n,uint32_t *pricebits,uint32_t *refprices,int6
 // komodo_mineropret() returns a valid pricedata to add to the coinbase opreturn for nHeight
 CScript komodo_mineropret(int32_t nHeight)
 {
-    CScript opret; char maxflags[KOMODO_MAXPRICES]; uint32_t pricebits[KOMODO_MAXPRICES],prevbits[KOMODO_MAXPRICES]; int32_t maxflag,i,n,numzero=0;
+    CScript opret; char maxflags[HUSH_MAXPRICES]; uint32_t pricebits[HUSH_MAXPRICES],prevbits[HUSH_MAXPRICES]; int32_t maxflag,i,n,numzero=0;
     if ( Mineropret.size() >= PRICES_SIZEBIT0 )
     {
         n = (int32_t)(Mineropret.size() / sizeof(uint32_t));
@@ -1775,7 +1775,7 @@ void komodo_queuelocalprice(int32_t dir,int32_t height,uint32_t timestamp,uint25
 int32_t komodo_opretvalidate(const CBlock *block,CBlockIndex * const previndex,int32_t nHeight,CScript scriptPubKey)
 {
     int32_t testchain_exemption = 0;
-    std::vector<uint8_t> vopret; char maxflags[KOMODO_MAXPRICES]; uint256 bhash; double btcusd,btcgbp,btceur; uint32_t localbits[KOMODO_MAXPRICES],pricebits[KOMODO_MAXPRICES],prevbits[KOMODO_MAXPRICES],newprice; int32_t i,j,prevtime,maxflag,lag,lag2,lag3,n,errflag,iter; uint32_t now;
+    std::vector<uint8_t> vopret; char maxflags[HUSH_MAXPRICES]; uint256 bhash; double btcusd,btcgbp,btceur; uint32_t localbits[HUSH_MAXPRICES],pricebits[HUSH_MAXPRICES],prevbits[HUSH_MAXPRICES],newprice; int32_t i,j,prevtime,maxflag,lag,lag2,lag3,n,errflag,iter; uint32_t now;
     now = (uint32_t)time(NULL);
     if ( ASSETCHAINS_CBOPRET != 0 && nHeight > 0 )
     {
@@ -2223,7 +2223,7 @@ extern uint256 Queued_reconsiderblock;
 void komodo_cbopretupdate(int32_t forceflag)
 {
     static uint32_t lasttime,lastbtc,pending;
-    static uint32_t pricebits[4],pricebuf[KOMODO_MAXPRICES],forexprices[sizeof(Forex)/sizeof(*Forex)];
+    static uint32_t pricebits[4],pricebuf[HUSH_MAXPRICES],forexprices[sizeof(Forex)/sizeof(*Forex)];
     int32_t size; uint32_t flags=0,now; CBlockIndex *pindex;
     if ( Queued_reconsiderblock != zeroid )
     {
@@ -2325,7 +2325,7 @@ void komodo_cbopretupdate(int32_t forceflag)
 int64_t komodo_pricemult(int32_t ind)
 {
     int32_t i,j;
-    if ( (ASSETCHAINS_CBOPRET & 1) != 0 && ind < KOMODO_MAXPRICES )
+    if ( (ASSETCHAINS_CBOPRET & 1) != 0 && ind < HUSH_MAXPRICES )
     {
         if ( PriceMult[0] == 0 )
         {
@@ -2355,7 +2355,7 @@ int64_t komodo_pricemult(int32_t ind)
 char *komodo_pricename(char *name,int32_t ind)
 {
     strcpy(name,"error");
-    if ( (ASSETCHAINS_CBOPRET & 1) != 0 && ind < KOMODO_MAXPRICES )
+    if ( (ASSETCHAINS_CBOPRET & 1) != 0 && ind < HUSH_MAXPRICES )
     {
         if ( ind < 4 )
         {
@@ -2431,7 +2431,7 @@ int32_t komodo_priceind(const char *symbol)
 int64_t komodo_pricecorrelated(uint64_t seed,int32_t ind,uint32_t *rawprices,int32_t rawskip,uint32_t *nonzprices,int32_t smoothwidth)
 {
     int32_t i,j,k,n,iter,correlation,maxcorrelation=0; int64_t firstprice,price,sum,den,mult,refprice,lowprice,highprice;
-    if ( PRICES_DAYWINDOW < 2 || ind >= KOMODO_MAXPRICES )
+    if ( PRICES_DAYWINDOW < 2 || ind >= HUSH_MAXPRICES )
         return(-1);
     mult = komodo_pricemult(ind);
     if ( nonzprices != 0 )
@@ -2683,7 +2683,7 @@ int32_t komodo_pricesinit()
     fprintf(stderr,"pricesinit (%s)\n",pricesdir.string().c_str());
     if (!boost::filesystem::exists(pricesdir))
         boost::filesystem::create_directories(pricesdir), createflag = 1;
-    for (i=0; i<KOMODO_MAXPRICES; i++)
+    for (i=0; i<HUSH_MAXPRICES; i++)
     {
         if ( komodo_pricename(PRICES[i].symbol,i) == 0 )
             break;
@@ -2732,7 +2732,7 @@ pthread_mutex_t pricemutex;
 void komodo_pricesupdate(int32_t height,CBlock *pblock)
 {
     static int numprices; static uint32_t *ptr32; static int64_t *ptr64,*tmpbuf;
-    int32_t ind,offset,width; int64_t correlated,smoothed; uint64_t seed,rngval; uint32_t rawprices[KOMODO_MAXPRICES],buf[PRICES_MAXDATAPOINTS*2];
+    int32_t ind,offset,width; int64_t correlated,smoothed; uint64_t seed,rngval; uint32_t rawprices[HUSH_MAXPRICES],buf[PRICES_MAXDATAPOINTS*2];
     width = PRICES_DAYWINDOW;//(2*PRICES_DAYWINDOW + PRICES_SMOOTHWIDTH);
     if ( numprices == 0 )
     {
@@ -2807,7 +2807,7 @@ int32_t komodo_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblo
 {
     FILE *fp; int32_t retval = PRICES_MAXDATAPOINTS;
     pthread_mutex_lock(&pricemutex);
-    if ( ind < KOMODO_MAXPRICES && (fp= PRICES[ind].fp) != 0 )
+    if ( ind < HUSH_MAXPRICES && (fp= PRICES[ind].fp) != 0 )
     {
         fseek(fp,height * PRICES_MAXDATAPOINTS * sizeof(int64_t),SEEK_SET);
         if ( fread(buf64,sizeof(int64_t),numblocks*PRICES_MAXDATAPOINTS,fp) != numblocks*PRICES_MAXDATAPOINTS )
