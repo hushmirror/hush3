@@ -127,11 +127,6 @@ bool CTxMemPool::addUnchecked(const uint256& hash, const CTxMemPoolEntry &entry,
             mapNextTx[tx.vin[i].prevout] = CInPoint(&tx, i);
         }
     }
-    BOOST_FOREACH(const JSDescription &joinsplit, tx.vjoinsplit) {
-        BOOST_FOREACH(const uint256 &nf, joinsplit.nullifiers) {
-            mapSproutNullifiers[nf] = &tx;
-        }
-    }
     for (const SpendDescription &spendDescription : tx.vShieldedSpend) {
         mapSaplingNullifiers[spendDescription.nullifier] = &tx;
     }
@@ -332,9 +327,8 @@ bool CTxMemPool::removeSpentIndex(const uint256 txhash)
     return true;
 }
 
-void CTxMemPool::remove(const CTransaction &origTx, std::list<CTransaction>& removed, bool fRecursive)
-{
-    // Remove transaction from memory pool
+// Remove transaction from memory pool
+void CTxMemPool::remove(const CTransaction &origTx, std::list<CTransaction>& removed, bool fRecursive) {
     {
         LOCK(cs);
         std::deque<uint256> txToRemove;
@@ -369,11 +363,8 @@ void CTxMemPool::remove(const CTransaction &origTx, std::list<CTransaction>& rem
             mapRecentlyAddedTx.erase(hash);
             BOOST_FOREACH(const CTxIn& txin, tx.vin)
                 mapNextTx.erase(txin.prevout);
-            BOOST_FOREACH(const JSDescription& joinsplit, tx.vjoinsplit) {
-                BOOST_FOREACH(const uint256& nf, joinsplit.nullifiers) {
-                    mapSproutNullifiers.erase(nf);
-                }
-            }
+
+            // remove each Sapling nullifier associated with this shielded spend
             for (const SpendDescription &spendDescription : tx.vShieldedSpend) {
                 mapSaplingNullifiers.erase(spendDescription.nullifier);
             }
@@ -440,14 +431,6 @@ void CTxMemPool::removeWithAnchor(const uint256 &invalidRoot, ShieldedType type)
     for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {
         const CTransaction& tx = it->GetTx();
         switch (type) {
-            case SPROUT:
-                BOOST_FOREACH(const JSDescription& joinsplit, tx.vjoinsplit) {
-                    if (joinsplit.anchor == invalidRoot) {
-                        transactionsToRemove.push_back(tx);
-                        break;
-                    }
-                }
-            break;
             case SAPLING:
                 BOOST_FOREACH(const SpendDescription& spendDescription, tx.vShieldedSpend) {
                     if (spendDescription.anchor == invalidRoot) {
@@ -484,17 +467,7 @@ void CTxMemPool::removeConflicts(const CTransaction &tx, std::list<CTransaction>
         }
     }
 
-    BOOST_FOREACH(const JSDescription &joinsplit, tx.vjoinsplit) {
-        BOOST_FOREACH(const uint256 &nf, joinsplit.nullifiers) {
-            std::map<uint256, const CTransaction*>::iterator it = mapSproutNullifiers.find(nf);
-            if (it != mapSproutNullifiers.end()) {
-                const CTransaction &txConflict = *it->second;
-                if (txConflict != tx) {
-                    remove(txConflict, removed, true);
-                }
-            }
-        }
-    }
+    // remove conflicting Sapling z2z tx's
     for (const SpendDescription &spendDescription : tx.vShieldedSpend) {
         std::map<uint256, const CTransaction*>::iterator it = mapSaplingNullifiers.find(spendDescription.nullifier);
         if (it != mapSaplingNullifiers.end()) {
@@ -639,30 +612,6 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
             i++;
         }
 
-
-        /*
-        boost::unordered_map<uint256, SproutMerkleTree, CCoinsKeyHasher> intermediates;
-        BOOST_FOREACH(const JSDescription &joinsplit, tx.vjoinsplit) {
-            BOOST_FOREACH(const uint256 &nf, joinsplit.nullifiers) {
-                assert(!pcoins->GetNullifier(nf, SPROUT));
-            }
-
-            SproutMerkleTree tree;
-            auto it = intermediates.find(joinsplit.anchor);
-            if (it != intermediates.end()) {
-                tree = it->second;
-            } else {
-                assert(pcoins->GetSproutAnchorAt(joinsplit.anchor, tree));
-            }
-
-            BOOST_FOREACH(const uint256& commitment, joinsplit.commitments)
-            {
-                tree.append(commitment);
-            }
-
-            intermediates.insert(std::make_pair(tree.root(), tree));
-        }
-        */
         for (const SpendDescription &spendDescription : tx.vShieldedSpend) {
             SaplingMerkleTree tree;
 
@@ -706,7 +655,6 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
         assert(it->first == it->second.ptx->vin[it->second.n].prevout);
     }
 
-    checkNullifiers(SPROUT);
     checkNullifiers(SAPLING);
 
     assert(totalTxSize == checkTotal);
@@ -717,9 +665,6 @@ void CTxMemPool::checkNullifiers(ShieldedType type) const
 {
     const std::map<uint256, const CTransaction*>* mapToUse;
     switch (type) {
-        case SPROUT:
-            mapToUse = &mapSproutNullifiers;
-            break;
         case SAPLING:
             mapToUse = &mapSaplingNullifiers;
             break;
@@ -839,8 +784,6 @@ bool CTxMemPool::HasNoInputsOf(const CTransaction &tx) const
 bool CTxMemPool::nullifierExists(const uint256& nullifier, ShieldedType type) const
 {
     switch (type) {
-        case SPROUT:
-            return mapSproutNullifiers.count(nullifier);
         case SAPLING:
             return mapSaplingNullifiers.count(nullifier);
         default:
