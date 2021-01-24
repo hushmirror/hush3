@@ -16,8 +16,8 @@ HUSHVER="v3.6.1"
 #HUSHVER=$(./src/hushd --version|head -n2|tail -n1|cut -d' ' -f4|cut -d- -f1)
 
 # Create a footer file with copyright content.
-# This gets autodetected fine for komodod if --version-string is not set,
-# but has different outcomes for komodo-cli.
+# This gets autodetected fine for hushd if --version-string is not set,
+# but has different outcomes for hush-cli.
 echo "[COPYRIGHT]" > footer.h2m
 $HUSHD --version | sed -n '1!p' >> footer.h2m
 
