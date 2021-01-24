@@ -208,6 +208,7 @@ public:
     uint64_t nServices;
     bool fTLSEstablished;
     bool fTLSVerified;
+    std::string tls_cipher;
     int64_t nLastSend;
     int64_t nLastRecv;
     int64_t nTimeConnected;
@@ -279,8 +280,9 @@ public:
 class CNode
 {
 public:
-    // OpenSSL
+    // TLS via WolfSSL
     SSL *ssl;
+    std::string tls_cipher;
 
     // socket
     uint64_t nServices;

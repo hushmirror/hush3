@@ -394,8 +394,7 @@ CNode* FindNode(const CService& addr)
     return NULL;
 }
 
-CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
-{
+CNode* ConnectNode(CAddress addrConnect, const char *pszDest) {
     if (pszDest == NULL) {
         if (IsLocal(addrConnect))
             return NULL;
@@ -429,7 +428,6 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
 
         WOLFSSL *ssl = NULL;
         
-#ifdef USE_TLS
         /* TCP connection is ready. Do client side SSL. */
         unsigned long err_code = 0;
         ssl = tlsmanager.connect(hSocket, addrConnect, err_code);
@@ -438,11 +436,10 @@ CNode* ConnectNode(CAddress addrConnect, const char *pszDest)
             CloseSocket(hSocket);
             return NULL;
         }
-        
-#endif  // USE_TLS
 
         // Add node
-        CNode* pnode = new CNode(hSocket, addrConnect, pszDest ? pszDest : "", false, ssl);
+        CNode* pnode      = new CNode(hSocket, addrConnect, pszDest ? pszDest : "", false, ssl);
+        pnode->tls_cipher = wolfSSL_get_cipher_name(ssl);
         pnode->AddRef();
 
         {
@@ -619,23 +616,24 @@ void CNode::AddAllowlistedRange(const CSubNet &subnet) {
 
 void CNode::copyStats(CNodeStats &stats, const std::vector<bool> &m_asmap)
 {
-    stats.nodeid = this->GetId();
-    stats.nServices = nServices;
-    stats.addr = addr;
-    // stats.addrBind = addrBind;
-    stats.m_mapped_as = addr.GetMappedAS(m_asmap);
-    stats.nLastSend = nLastSend;
-    stats.nLastRecv = nLastRecv;
-    stats.nTimeConnected = nTimeConnected;
-    stats.nTimeOffset = nTimeOffset;
-    stats.addrName = addrName;
-    stats.nVersion = nVersion;
-    stats.cleanSubVer = cleanSubVer;
-    stats.fInbound = fInbound;
+    stats.nodeid          = this->GetId();
+    stats.nServices       = nServices;
+    stats.addr            = addr;
+    // stats.addrBind     = addrBind;
+    stats.m_mapped_as     = addr.GetMappedAS(m_asmap);
+    stats.nLastSend       = nLastSend;
+    stats.nLastRecv       = nLastRecv;
+    stats.nTimeConnected  = nTimeConnected;
+    stats.nTimeOffset     = nTimeOffset;
+    stats.addrName        = addrName;
+    stats.nVersion        = nVersion;
+    stats.cleanSubVer     = cleanSubVer;
+    stats.fInbound        = fInbound;
     stats.nStartingHeight = nStartingHeight;
-    stats.nSendBytes = nSendBytes;
-    stats.nRecvBytes = nRecvBytes;
-    stats.fAllowlisted = fAllowlisted;
+    stats.nSendBytes      = nSendBytes;
+    stats.nRecvBytes      = nRecvBytes;
+    stats.fAllowlisted    = fAllowlisted;
+    stats.tls_cipher      = tls_cipher;
 
     // It is common for nodes with good ping times to suddenly become lagged,
     // due to a new block arriving or other large transfer.
@@ -1103,7 +1101,6 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
     
     SetSocketNonBlocking(hSocket, true);
     
-#ifdef USE_TLS
     /* TCP connection is ready. Do server side TLS */
     unsigned long err_code = 0;
     ssl = tlsmanager.accept( hSocket, addr, err_code);
@@ -1114,13 +1111,12 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
         return;
     }
 
-#endif // USE_TLS
-
     CNode* pnode = new CNode(hSocket, addr, "", true, ssl);
     pnode->AddRef();
     pnode->fAllowlisted = allowlisted;
+    pnode->tls_cipher   = wolfSSL_get_cipher_name(ssl);
 
-    LogPrint("net", "connection from %s accepted\n", addr.ToString());
+    LogPrint("net", "connection from %s accepted using cipher %s\n", addr.ToString(), pnode->tls_cipher);
 
     {
         LOCK(cs_vNodes);

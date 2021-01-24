@@ -90,6 +90,8 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "    \"addrlocal\":\"ip:port\",   (string) local address\n"
             "    \"services\":\"xxxxxxxxxxxxxxxx\",   (string) The services offered\n"
             "    \"tls_established\": true:false,     (boolean) Status of TLS connection\n"
+            "    \"tls_verified\": true:false,     (boolean) Status of TLS verification\n"
+            "    \"tls_cipher\": \"XXX\",     (string) TLS cipher used for this connection\n"
             "    \"lastsend\": ttt,           (numeric) The time in seconds since epoch (Jan 1 1970 GMT) of the last send\n"
             "    \"lastrecv\": ttt,           (numeric) The time in seconds since epoch (Jan 1 1970 GMT) of the last receive\n"
             "    \"bytessent\": n,            (numeric) The total bytes sent\n"
@@ -139,6 +141,8 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
         }
         obj.push_back(Pair("services", strprintf("%016x", stats.nServices)));
         obj.push_back(Pair("tls_established", stats.fTLSEstablished));
+        obj.push_back(Pair("tls_verified", stats.fTLSVerified));
+        obj.push_back(Pair("tls_cipher", stats.tls_cipher));
         obj.push_back(Pair("lastsend", stats.nLastSend));
         obj.push_back(Pair("lastrecv", stats.nLastRecv));
         obj.push_back(Pair("bytessent", stats.nSendBytes));
