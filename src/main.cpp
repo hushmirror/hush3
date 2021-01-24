@@ -3484,7 +3484,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
     if ( block.vtx[0].GetValueOut() > blockReward+HUSH_EXTRASATOSHI )
     {
-        if ( SMART_CHAIN_SYMBOL[0] != 0 || pindex->GetHeight() >= KOMODO_NOTARIES_HEIGHT1 || block.vtx[0].vout[0].nValue > blockReward )
+        if ( SMART_CHAIN_SYMBOL[0] != 0 || pindex->GetHeight() >= HUSH_NOTARIES_HEIGHT1 || block.vtx[0].vout[0].nValue > blockReward )
         {
             //fprintf(stderr, "coinbase pays too much\n");
             //sleepflag = true;
@@ -3851,7 +3851,7 @@ int32_t komodo_activate_sapling(CBlockIndex *pindex)
     }
     height = pindex->GetHeight();
     blocktime = (uint32_t)pindex->nTime;
-    //fprintf(stderr,"komodo_activate_sapling.%d starting blocktime %u cmp.%d\n",height,blocktime,blocktime > KOMODO_SAPLING_ACTIVATION);
+    //fprintf(stderr,"komodo_activate_sapling.%d starting blocktime %u cmp.%d\n",height,blocktime,blocktime > HUSH_SAPING_ACTIVATION);
 
     // avoid trying unless we have at least 30 blocks
     if (height < 30)
@@ -3870,25 +3870,25 @@ int32_t komodo_activate_sapling(CBlockIndex *pindex)
     }
     height = pindex->GetHeight();
     blocktime = (uint32_t)pindex->nTime;
-    //fprintf(stderr,"starting blocktime %u cmp.%d\n",blocktime,blocktime > KOMODO_SAPLING_ACTIVATION);
-    if ( blocktime > KOMODO_SAPLING_ACTIVATION ) // find the earliest transition
+    //fprintf(stderr,"starting blocktime %u cmp.%d\n",blocktime,blocktime > HUSH_SAPING_ACTIVATION);
+    if ( blocktime > HUSH_SAPING_ACTIVATION ) // find the earliest transition
     {
         while ( (prev= pindex->pprev) != 0 )
         {
             prevht = prev->GetHeight();
             prevtime = (uint32_t)prev->nTime;
-            //fprintf(stderr,"(%d, %u).%d -> (%d, %u).%d\n",prevht,prevtime,prevtime > KOMODO_SAPLING_ACTIVATION,height,blocktime,blocktime > KOMODO_SAPLING_ACTIVATION);
+            //fprintf(stderr,"(%d, %u).%d -> (%d, %u).%d\n",prevht,prevtime,prevtime > HUSH_SAPING_ACTIVATION,height,blocktime,blocktime > HUSH_SAPING_ACTIVATION);
             if ( prevht+1 != height )
             {
                 fprintf(stderr,"komodo_activate_sapling: unexpected non-contiguous ht %d vs %d\n",prevht,height);
                 return(0);
             }
-            if ( prevtime <= KOMODO_SAPLING_ACTIVATION && blocktime > KOMODO_SAPLING_ACTIVATION )
+            if ( prevtime <= HUSH_SAPING_ACTIVATION && blocktime > HUSH_SAPING_ACTIVATION )
             {
                 activation = height + 60;
                 fprintf(stderr,"%s transition at %d (%d, %u) -> (%d, %u)\n",SMART_CHAIN_SYMBOL,height,prevht,prevtime,height,blocktime);
             }
-            if ( prevtime < KOMODO_SAPLING_ACTIVATION-3600*24 )
+            if ( prevtime < HUSH_SAPING_ACTIVATION-3600*24 )
                 break;
             pindex = prev;
             height = prevht;
@@ -4007,7 +4007,7 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *
 		//fprintf(stderr,"%s: HUSH_NSPV_FULLNODE\n", __FUNCTION__);
         if ( ASSETCHAINS_CBOPRET != 0 )
             komodo_pricesupdate(pindexNew->GetHeight(),pblock);
-        if ( ASSETCHAINS_SAPLING <= 0 && pindexNew->nTime > KOMODO_SAPLING_ACTIVATION - 24*3600 )
+        if ( ASSETCHAINS_SAPLING <= 0 && pindexNew->nTime > HUSH_SAPING_ACTIVATION - 24*3600 )
             komodo_activate_sapling(pindexNew);
         if ( ASSETCHAINS_CC != 0 && HUSH_SNAPSHOT_INTERVAL != 0 && (pindexNew->GetHeight() % HUSH_SNAPSHOT_INTERVAL) == 0 && pindexNew->GetHeight() >= HUSH_SNAPSHOT_INTERVAL )
         {

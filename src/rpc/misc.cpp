@@ -62,7 +62,6 @@ int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *tx
 bool komodo_txnotarizedconfirmed(uint256 txid);
 uint32_t hush_chainactive_timestamp();
 int32_t hush_whoami(char *pubkeystr,int32_t height,uint32_t timestamp);
-extern uint64_t KOMODO_INTERESTSUM,KOMODO_WALLETBALANCE;
 extern int32_t KOMODO_LASTMINED,JUMBLR_PAUSE,HUSH_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 uint32_t komodo_segid32(char *coinaddr);
@@ -246,15 +245,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 #ifdef ENABLE_WALLET
         if (pwalletMain) {
             obj.push_back(Pair("walletversion", pwalletMain->GetVersion()));
-            if ( SMART_CHAIN_SYMBOL[0] == 0 )
-            {
-                obj.push_back(Pair("interest",       ValueFromAmount(KOMODO_INTERESTSUM)));
-                obj.push_back(Pair("balance",       ValueFromAmount(KOMODO_WALLETBALANCE))); //pwalletMain->GetBalance()
-            }
-            else
-            {
-                obj.push_back(Pair("balance",       ValueFromAmount(pwalletMain->GetBalance()))); //
-            }
+            obj.push_back(Pair("balance",       ValueFromAmount(pwalletMain->GetBalance())));
         }
 #endif
         //fprintf(stderr,"after wallet %u\n",(uint32_t)time(NULL));
@@ -1201,8 +1192,8 @@ UniValue getnotarypayinfo(const UniValue& params, bool fHelp, const CPubKey& myp
     balance = checkburnaddress(received, TotalNotaryPay, height, "REDVp3ox1pbcWYCzySadfHhk8UU3HM4k5x");
     
     notarycount = hush_notaries(notarypubkeys, height, chainActive[height]->GetBlockTime());
-    NotaryPay = komodo_notarypayamount(height, notarycount)*notarycount;
-    bool spent = (received != balance);
+    NotaryPay   = komodo_notarypayamount(height, notarycount)*notarycount;
+    bool spent  = (received != balance);
     if ( !spent )
     {
         notaleft = ((int64_t)balance - TotalNotaryPay) / NotaryPay;

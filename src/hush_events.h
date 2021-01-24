@@ -20,29 +20,29 @@
 #define H_HUSHEVENTS_H
 #include "hush_defs.h"
 
-struct komodo_event *komodo_eventadd(struct hush_state *sp,int32_t height,char *symbol,uint8_t type,uint8_t *data,uint16_t datalen)
+struct hush_event *hush_eventadd(struct hush_state *sp,int32_t height,char *symbol,uint8_t type,uint8_t *data,uint16_t datalen)
 {
-    struct komodo_event *ep=0; uint16_t len = (uint16_t)(sizeof(*ep) + datalen);
+    struct hush_event *ep=0; uint16_t len = (uint16_t)(sizeof(*ep) + datalen);
     if ( sp != 0 && SMART_CHAIN_SYMBOL[0] != 0 )
     {
         portable_mutex_lock(&komodo_mutex);
-        ep = (struct komodo_event *)calloc(1,len);
+        ep = (struct hush_event *)calloc(1,len);
         ep->len = len;
         ep->height = height;
         ep->type = type;
         strcpy(ep->symbol,symbol);
         if ( datalen != 0 )
             memcpy(ep->space,data,datalen);
-        sp->Komodo_events = (struct komodo_event **)realloc(sp->Komodo_events,(1 + sp->Komodo_numevents) * sizeof(*sp->Komodo_events));
-        sp->Komodo_events[sp->Komodo_numevents++] = ep;
+        sp->Hush_events = (struct hush_event **)realloc(sp->Hush_events,(1 + sp->Komodo_numevents) * sizeof(*sp->Hush_events));
+        sp->Hush_events[sp->Komodo_numevents++] = ep;
         portable_mutex_unlock(&komodo_mutex);
     }
     return(ep);
 }
 
-void komodo_eventadd_notarized(struct hush_state *sp,char *symbol,int32_t height,char *dest,uint256 notarized_hash,uint256 notarized_desttxid,int32_t notarizedheight,uint256 MoM,int32_t MoMdepth)
+void hush_eventadd_notarized(struct hush_state *sp,char *symbol,int32_t height,char *dest,uint256 notarized_hash,uint256 notarized_desttxid,int32_t notarizedheight,uint256 MoM,int32_t MoMdepth)
 {
-    static uint32_t counter; int32_t verified=0; char *coin; struct komodo_event_notarized N;
+    static uint32_t counter; int32_t verified=0; char *coin; struct hush_event_notarized N;
     coin = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"KMD" : SMART_CHAIN_SYMBOL;
     if ( IS_HUSH_NOTARY != 0 && (verified= komodo_verifynotarization(symbol,dest,height,notarizedheight,notarized_hash,notarized_desttxid)) < 0 )
     {
@@ -60,41 +60,41 @@ void komodo_eventadd_notarized(struct hush_state *sp,char *symbol,int32_t height
         N.MoM = MoM;
         N.MoMdepth = MoMdepth;
         strncpy(N.dest,dest,sizeof(N.dest)-1);
-        komodo_eventadd(sp,height,symbol,KOMODO_EVENT_NOTARIZED,(uint8_t *)&N,sizeof(N));
+        hush_eventadd(sp,height,symbol,HUSH_EVENT_NOTARIZED,(uint8_t *)&N,sizeof(N));
         if ( sp != 0 )
             komodo_notarized_update(sp,height,notarizedheight,notarized_hash,notarized_desttxid,MoM,MoMdepth);
     }
 }
 
-void komodo_eventadd_pubkeys(struct hush_state *sp,char *symbol,int32_t height,uint8_t num,uint8_t pubkeys[64][33])
+void hush_eventadd_pubkeys(struct hush_state *sp,char *symbol,int32_t height,uint8_t num,uint8_t pubkeys[64][33])
 {
-    struct komodo_event_pubkeys P;
+    struct hush_event_pubkeys P;
     //printf("eventadd pubkeys ht.%d\n",height);
     memset(&P,0,sizeof(P));
     P.num = num;
     memcpy(P.pubkeys,pubkeys,33 * num);
-    komodo_eventadd(sp,height,symbol,KOMODO_EVENT_RATIFY,(uint8_t *)&P,(int32_t)(sizeof(P.num) + 33 * num));
+    hush_eventadd(sp,height,symbol,HUSH_EVENT_RATIFY,(uint8_t *)&P,(int32_t)(sizeof(P.num) + 33 * num));
     if ( sp != 0 )
         komodo_notarysinit(height,pubkeys,num);
 }
 
-void komodo_eventadd_pricefeed(struct hush_state *sp,char *symbol,int32_t height,uint32_t *prices,uint8_t num)
+void hush_eventadd_pricefeed(struct hush_state *sp,char *symbol,int32_t height,uint32_t *prices,uint8_t num)
 {
-    struct komodo_event_pricefeed F;
+    struct hush_event_pricefeed F;
     if ( num == sizeof(F.prices)/sizeof(*F.prices) )
     {
         memset(&F,0,sizeof(F));
         F.num = num;
         memcpy(F.prices,prices,sizeof(*F.prices) * num);
-        komodo_eventadd(sp,height,symbol,KOMODO_EVENT_PRICEFEED,(uint8_t *)&F,(int32_t)(sizeof(F.num) + sizeof(*F.prices) * num));
+        hush_eventadd(sp,height,symbol,HUSH_EVENT_PRICEFEED,(uint8_t *)&F,(int32_t)(sizeof(F.num) + sizeof(*F.prices) * num));
         if ( sp != 0 )
             komodo_pvals(height,prices,num);
     } //else fprintf(stderr,"skip pricefeed[%d]\n",num);
 }
 
-void komodo_eventadd_opreturn(struct hush_state *sp,char *symbol,int32_t height,uint256 txid,uint64_t value,uint16_t vout,uint8_t *buf,uint16_t opretlen)
+void hush_eventadd_opreturn(struct hush_state *sp,char *symbol,int32_t height,uint256 txid,uint64_t value,uint16_t vout,uint8_t *buf,uint16_t opretlen)
 {
-    struct komodo_event_opreturn O; uint8_t *opret;
+    struct hush_event_opreturn O; uint8_t *opret;
     if ( SMART_CHAIN_SYMBOL[0] != 0 )
     {
         opret = (uint8_t *)calloc(1,sizeof(O) + opretlen + 16);
@@ -104,35 +104,35 @@ void komodo_eventadd_opreturn(struct hush_state *sp,char *symbol,int32_t height,
         memcpy(opret,&O,sizeof(O));
         memcpy(&opret[sizeof(O)],buf,opretlen);
         O.oplen = (int32_t)(opretlen + sizeof(O));
-        komodo_eventadd(sp,height,symbol,KOMODO_EVENT_OPRETURN,opret,O.oplen);
+        hush_eventadd(sp,height,symbol,HUSH_EVENT_OPRETURN,opret,O.oplen);
         free(opret);
         if ( sp != 0 )
             komodo_opreturn(height,value,buf,opretlen,txid,vout,symbol);
     }
 }
 
-void komodo_event_undo(struct hush_state *sp,struct komodo_event *ep)
+void hush_event_undo(struct hush_state *sp,struct hush_event *ep)
 {
     switch ( ep->type )
     {
-        case KOMODO_EVENT_RATIFY: printf("rewind of ratify, needs to be coded.%d\n",ep->height); break;
-        case KOMODO_EVENT_NOTARIZED: break;
-        case KOMODO_EVENT_KMDHEIGHT:
+        case HUSH_EVENT_RATIFY: printf("rewind of ratify, needs to be coded.%d\n",ep->height); break;
+        case HUSH_EVENT_NOTARIZED: break;
+        case HUSH_EVENT_KMDHEIGHT:
             if ( ep->height <= sp->SAVEDHEIGHT )
                 sp->SAVEDHEIGHT = ep->height;
             break;
-        case KOMODO_EVENT_PRICEFEED:
+        case HUSH_EVENT_PRICEFEED:
             // backtrack prices;
             break;
-        case KOMODO_EVENT_OPRETURN:
+        case HUSH_EVENT_OPRETURN:
             // backtrack opreturns
             break;
     }
 }
 
-void komodo_event_rewind(struct hush_state *sp,char *symbol,int32_t height)
+void hush_event_rewind(struct hush_state *sp,char *symbol,int32_t height)
 {
-    struct komodo_event *ep;
+    struct hush_event *ep;
     if ( sp != 0 )
     {
         if ( SMART_CHAIN_SYMBOL[0] == 0 && height <= KOMODO_LASTMINED && prevKOMODO_LASTMINED != 0 )
@@ -141,14 +141,14 @@ void komodo_event_rewind(struct hush_state *sp,char *symbol,int32_t height)
             KOMODO_LASTMINED = prevKOMODO_LASTMINED;
             prevKOMODO_LASTMINED = 0;
         }
-        while ( sp->Komodo_events != 0 && sp->Komodo_numevents > 0 )
+        while ( sp->Hush_events != 0 && sp->Komodo_numevents > 0 )
         {
-            if ( (ep= sp->Komodo_events[sp->Komodo_numevents-1]) != 0 )
+            if ( (ep= sp->Hush_events[sp->Komodo_numevents-1]) != 0 )
             {
                 if ( ep->height < height )
                     break;
                 //printf("[%s] undo %s event.%c ht.%d for rewind.%d\n",SMART_CHAIN_SYMBOL,symbol,ep->type,ep->height,height);
-                komodo_event_undo(sp,ep);
+                hush_event_undo(sp,ep);
                 sp->Komodo_numevents--;
             }
         }
@@ -169,21 +169,21 @@ void komodo_setkmdheight(struct hush_state *sp,int32_t kmdheight,uint32_t timest
     }
 }
 
-void komodo_eventadd_kmdheight(struct hush_state *sp,char *symbol,int32_t height,int32_t kmdheight,uint32_t timestamp)
+void hush_eventadd_kmdheight(struct hush_state *sp,char *symbol,int32_t height,int32_t kmdheight,uint32_t timestamp)
 {
     uint32_t buf[2];
     if ( kmdheight > 0 ) {
         buf[0] = (uint32_t)kmdheight;
         buf[1] = timestamp;
-        komodo_eventadd(sp,height,symbol,KOMODO_EVENT_KMDHEIGHT,(uint8_t *)buf,sizeof(buf));
+        hush_eventadd(sp,height,symbol,HUSH_EVENT_KMDHEIGHT,(uint8_t *)buf,sizeof(buf));
         if ( sp != 0 )
             komodo_setkmdheight(sp,kmdheight,timestamp);
     } else {
         //fprintf(stderr,"REWIND kmdheight.%d\n",kmdheight);
         kmdheight = -kmdheight;
-        komodo_eventadd(sp,height,symbol,KOMODO_EVENT_REWIND,(uint8_t *)&height,sizeof(height));
+        hush_eventadd(sp,height,symbol,HUSH_EVENT_REWIND,(uint8_t *)&height,sizeof(height));
         if ( sp != 0 )
-            komodo_event_rewind(sp,symbol,height);
+            hush_event_rewind(sp,symbol,height);
     }
 }
 

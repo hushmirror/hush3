@@ -1107,8 +1107,7 @@ void static BitcoinMiner()
             fprintf(stderr,"try %s Mining with %s\n",SMART_CHAIN_SYMBOL,solver.c_str());
         while (true)
         {
-            if (chainparams.MiningRequiresPeers()) //chainActive.LastTip()->GetHeight() != 235300 &&
-            {
+            if (chainparams.MiningRequiresPeers()) {
                 //if ( ASSETCHAINS_SEED != 0 && chainActive.LastTip()->GetHeight() < 100 )
                 //    break;
                 // Busy-wait for the network to come online so we don't waste time mining
@@ -1196,9 +1195,8 @@ void static BitcoinMiner()
             IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
             //fprintf(stderr,"Running HushMiner.%s with %u transactions in block\n",solver.c_str(),(int32_t)pblock->vtx.size());
             LogPrintf("Running HushMiner.%s with %u transactions in block (%u bytes)\n",solver.c_str(),pblock->vtx.size(),::GetSerializeSize(*pblock,SER_NETWORK,PROTOCOL_VERSION));
-            //
+
             // Search
-            //
             uint8_t pubkeys[66][33]; arith_uint256 bnMaxPoSdiff; uint32_t blocktimes[66]; int mids[256],nonzpkeys,i,j,externalflag; uint32_t savebits; int64_t nStart = GetTime();
             pblock->nBits         = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
             savebits = pblock->nBits;
@@ -1260,14 +1258,6 @@ void static BitcoinMiner()
                 } else Mining_start = 0;
             } else Mining_start = 0;
 
-            if ( ASSETCHAINS_STAKED > 0 )
-            {
-                int32_t percPoS,z; bool fNegative,fOverflow;
-                HASHTarget_POW = komodo_PoWtarget(&percPoS,HASHTarget,Mining_height,ASSETCHAINS_STAKED);
-                HASHTarget.SetCompact(HUSH_MINDIFF_NBITS,&fNegative,&fOverflow);
-                if ( ASSETCHAINS_STAKED < 100 )
-                    LogPrintf("Block %d : PoS %d%% vs target %d%% \n",Mining_height,percPoS,(int32_t)ASSETCHAINS_STAKED);
-            }
             //else if ( ASSETCHAINS_ADAPTIVEPOW > 0 )
             //    HASHTarget_POW = komodo_adaptivepow_target(Mining_height,HASHTarget,pblock->nTime);
             gotinvalid = 0;
@@ -1278,7 +1268,7 @@ void static BitcoinMiner()
                     break;
                 hush_longestchain();
                 // Hash state
-                KOMODO_CHOSEN_ONE = 0;
+                HUSH_CHOSEN_ONE = 0;
 
                 crypto_generichash_blake2b_state state;
                 EhInitialiseState(n, k, state);
@@ -1368,7 +1358,7 @@ void static BitcoinMiner()
                         gotinvalid = 1;
                         return(false);
                     }
-                    KOMODO_CHOSEN_ONE = 1;
+                    HUSH_CHOSEN_ONE = 1;
                     // Found a solution
                     SetThreadPriority(THREAD_PRIORITY_NORMAL);
                     LogPrintf("HushMiner:\n");
@@ -1382,7 +1372,7 @@ void static BitcoinMiner()
                             std::lock_guard<std::mutex> lock{m_cs};
                             cancelSolver = false;
                         }
-                        KOMODO_CHOSEN_ONE = 0;
+                        HUSH_CHOSEN_ONE = 0;
                         SetThreadPriority(THREAD_PRIORITY_LOWEST);
                         // In regression test mode, stop mining after a block is found.
                         if (chainparams.MineBlocksOnDemand()) {

@@ -240,7 +240,7 @@ bool NSPV_SignTx(CMutableTransaction &mtx,int32_t vini,int64_t utxovalue,const C
         return false;
     }
     keystore.AddKey(NSPV_key);
-    if ( nTime != 0 && nTime < KOMODO_SAPLING_ACTIVATION )
+    if ( nTime != 0 && nTime < HUSH_SAPING_ACTIVATION )
     {
         fprintf(stderr,"use legacy sig validation\n");
         branchid = 0;

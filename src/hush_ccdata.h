@@ -19,7 +19,7 @@
 #ifndef H_HUSHCCDATA_H
 #define H_HUSHCCDATA_H
 
-struct komodo_ccdata *CC_data;
+struct hush_ccdata *CC_data;
 int32_t CC_firstheight;
 
 uint256 BuildMerkleTree(bool* fMutated, const std::vector<uint256> leaves, std::vector<uint256> &vMerkleTree);
@@ -41,9 +41,9 @@ uint256 komodo_calcMoM(int32_t height,int32_t MoMdepth)
     return BuildMerkleTree(&fMutated, leaves, tree);
 }
 
-struct komodo_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi)
+struct hush_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi)
 {
-    struct komodo_ccdata_entry *allMoMs=0; struct komodo_ccdata *ccdata,*tmpptr; int32_t i,num,max;
+    struct hush_ccdata_entry *allMoMs=0; struct hush_ccdata *ccdata,*tmpptr; int32_t i,num,max;
     bool fMutated; std::vector<uint256> tree, leaves;
     num = max = 0;
     portable_mutex_lock(&HUSH_CC_mutex);
@@ -54,7 +54,7 @@ struct komodo_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t
             if ( num >= max )
             {
                 max += 100;
-                allMoMs = (struct komodo_ccdata_entry *)realloc(allMoMs,max * sizeof(*allMoMs));
+                allMoMs = (struct hush_ccdata_entry *)realloc(allMoMs,max * sizeof(*allMoMs));
             }
             allMoMs[num].MoM = ccdata->MoMdata.MoM;
             allMoMs[num].notarized_height = ccdata->MoMdata.notarized_height;
@@ -81,13 +81,13 @@ struct komodo_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t
     return(allMoMs);
 }
 
-int32_t komodo_addpair(struct komodo_ccdataMoMoM *mdata,int32_t notarized_height,int32_t offset,int32_t maxpairs)
+int32_t komodo_addpair(struct hush_ccdataMoMoM *mdata,int32_t notarized_height,int32_t offset,int32_t maxpairs)
 {
     if ( maxpairs >= 0) {
         if ( mdata->numpairs >= maxpairs )
         {
             maxpairs += 100;
-            mdata->pairs = (struct komodo_ccdatapair *)realloc(mdata->pairs,sizeof(*mdata->pairs)*maxpairs);
+            mdata->pairs = (struct hush_ccdatapair *)realloc(mdata->pairs,sizeof(*mdata->pairs)*maxpairs);
             //fprintf(stderr,"pairs reallocated to %p num.%d\n",mdata->pairs,mdata->numpairs);
         }
     } else {
@@ -100,9 +100,9 @@ int32_t komodo_addpair(struct komodo_ccdataMoMoM *mdata,int32_t notarized_height
     return(maxpairs);
 }
 
-int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct komodo_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height)
+int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height)
 {
-    uint8_t hexdata[8192]; struct komodo_ccdata *ccdata,*tmpptr; int32_t len,maxpairs,i,retval=-1,depth,starti,endi,CCid=0; struct komodo_ccdata_entry *allMoMs;
+    uint8_t hexdata[8192]; struct hush_ccdata *ccdata,*tmpptr; int32_t len,maxpairs,i,retval=-1,depth,starti,endi,CCid=0; struct hush_ccdata_entry *allMoMs;
     starti = endi = depth = len = maxpairs = 0;
     hexstr[0] = 0;
     if ( sizeof(hexdata)*2+1 > hexsize )
@@ -181,7 +181,7 @@ int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct komodo_ccdataMoMoM *m
 
 void komodo_purge_ccdata(int32_t height)
 {
-    struct komodo_ccdata *ccdata,*tmpptr;
+    struct hush_ccdata *ccdata,*tmpptr;
     if ( SMART_CHAIN_SYMBOL[0] == 0 )
     {
         portable_mutex_lock(&HUSH_CC_mutex);
@@ -203,9 +203,9 @@ void komodo_purge_ccdata(int32_t height)
 }
 
 // this is just a demo of ccdata processing to create example data for the MoMoM and allMoMs calls
-int32_t komodo_rwccdata(char *thischain,int32_t rwflag,struct komodo_ccdata *ccdata,struct komodo_ccdataMoMoM *MoMoMdata)
+int32_t komodo_rwccdata(char *thischain,int32_t rwflag,struct hush_ccdata *ccdata,struct hush_ccdataMoMoM *MoMoMdata)
 {
-    uint256 hash,zero; bits256 tmp; int32_t i,nonz; struct komodo_ccdata *ptr; struct notarized_checkpoint *np;
+    uint256 hash,zero; bits256 tmp; int32_t i,nonz; struct hush_ccdata *ptr; struct notarized_checkpoint *np;
     return(0); // disable this path as libscott method is much better
     if ( rwflag == 0 )
     {
@@ -234,7 +234,7 @@ int32_t komodo_rwccdata(char *thischain,int32_t rwflag,struct komodo_ccdata *ccd
         }
         else
         {
-            ptr = (struct komodo_ccdata *)calloc(1,sizeof(*ptr));
+            ptr = (struct hush_ccdata *)calloc(1,sizeof(*ptr));
             *ptr = *ccdata;
             portable_mutex_lock(&HUSH_CC_mutex);
             DL_PREPEND(CC_data,ptr);

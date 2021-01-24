@@ -20,7 +20,7 @@
 #include "hush_cJSON.h"
 
 #define KOMODO_MAINNET_START 178999
-#define KOMODO_NOTARIES_HEIGHT1 814000
+#define HUSH_NOTARIES_HEIGHT1 814000
 
 const char *Notaries_genesis[][2] =
 {
@@ -206,7 +206,7 @@ int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,ui
         printf("hush_chosennotary ht.%d illegal\n",height);
         return(-1);
     }
-    if ( height >= KOMODO_NOTARIES_HARDCODED || SMART_CHAIN_SYMBOL[0] != 0 )
+    if ( height >= HUSH_NOTARIES_HARDCODED || SMART_CHAIN_SYMBOL[0] != 0 )
     {
         if ( (*notaryidp= komodo_electednotary(&numnotaries,pubkey33,height,timestamp)) >= 0 && numnotaries != 0 )
         {

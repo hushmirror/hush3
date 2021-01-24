@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef KOMODO_FS_H
-#define KOMODO_FS_H
+#ifndef HUSH_FS_H
+#define HUSH_FS_H
 
 #include <stdio.h>
 #include <string>
@@ -22,4 +22,4 @@ namespace fsbridge {
     FILE *freopen(const fs::path& p, const char *mode, FILE *stream);
 };
 
-#endif // KOMODO_FS_H
+#endif // HUSH_FS_H

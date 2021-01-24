@@ -612,7 +612,7 @@ char *curl_post(CURL **cHandlep,char *url,char *userpass,char *postfields,char *
     return(chunk.memory);
 }
 
-uint16_t _komodo_userpass(char *username, char *password, FILE *fp)
+uint16_t _hush_userpass(char *username, char *password, FILE *fp)
 {
     char *rpcuser,*rpcpassword,*str,*ipaddress,line[8192]; uint16_t port = 0;
     rpcuser = rpcpassword = 0;
@@ -650,23 +650,15 @@ uint16_t _komodo_userpass(char *username, char *password, FILE *fp)
     return(port);
 }
 
-uint16_t komodo_userpass(char *userpass,char *symbol)
+uint16_t hush_userpass(char *userpass,char *symbol)
 {
     FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[HUSH_SMART_CHAIN_MAXLEN];
     userpass[0] = 0;
-    if ( strcmp("KMD",symbol) == 0 )
-    {
-#ifdef __APPLE__
-        sprintf(confname,"Komodo.conf");
-#else
-        sprintf(confname,"komodo.conf");
-#endif
-    }
-    else sprintf(confname,"%s.conf",symbol);
+    sprintf(confname,"%s.conf",symbol);
     //hush_statefname(fname,symbol,confname);
     if ( (fp= fopen(confname,"rb")) != 0 )
     {
-        port = _komodo_userpass(username,password,fp);
+        port = _hush_userpass(username,password,fp);
         sprintf(userpass,"%s:%s",username,password);
         if ( strcmp(symbol,ASSETCHAINS_SYMBOL) == 0 )
             strcpy(USERPASS,userpass);
@@ -1085,7 +1077,7 @@ int main(int argc, char **argv)
 #endif
     strcpy(ASSETCHAINS_SYMBOL,CHAINNAME);
     
-    GAMES_PORT = komodo_userpass(userpass,ASSETCHAINS_SYMBOL);
+    GAMES_PORT = hush_userpass(userpass,ASSETCHAINS_SYMBOL);
     if ( IPADDRESS[0] == 0 )
         strcpy(IPADDRESS,"127.0.0.1");
     printf("ASSETCHAINS_SYMBOL.(%s) port.%u (%s) IPADDRESS.%s \n",ASSETCHAINS_SYMBOL,GAMES_PORT,USERPASS,IPADDRESS); sleep(1);
