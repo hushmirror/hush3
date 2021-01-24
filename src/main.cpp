@@ -5004,68 +5004,6 @@ bool CheckBlock(int32_t *futureblockp,int32_t height,CBlockIndex *pindex,const C
     if ( ASSETCHAINS_CC != 0 && !fCheckPOW )
         return true;
 
-    /*
-    bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
-    if (ASSETCHAINS_CC != 0 ) // CC contracts might refer to transactions in the current block, from a CC spend within the same block and out of order
-    {
-        int32_t i,j,rejects=0,lastrejects=0;
-        //fprintf(stderr,"put block's tx into mempool\n");
-        // Copy all non Z-txs in mempool to temporary mempool because there can be tx in local mempool that make the block invalid.
-        LOCK2(cs_main,mempool.cs);
-        //fprintf(stderr, "starting... mempoolsize.%ld\n",mempool.size());
-        list<CTransaction> transactionsToRemove;
-        BOOST_FOREACH(const CTxMemPoolEntry& e, mempool.mapTx) {
-            const CTransaction &tx = e.GetTx();
-            const uint256 &hash = tx.GetHash();
-            if ( tx.vjoinsplit.empty() && tx.vShieldedSpend.empty()) {
-                transactionsToRemove.push_back(tx);
-                tmpmempool.addUnchecked(hash,e,true);
-            }
-        }
-        BOOST_FOREACH(const CTransaction& tx, transactionsToRemove) {
-            list<CTransaction> removed;
-            mempool.remove(tx, removed, false);
-        }
-        // add all the txs in the block to the empty mempool.
-        // CC validation shouldnt (cant) depend on the state of mempool!
-        while ( 1 )
-        {
-            list<CTransaction> removed;
-            for (i=0; i<block.vtx.size(); i++)
-            {
-                CValidationState state; CTransaction Tx; 
-                const CTransaction &tx = (CTransaction)block.vtx[i];
-                if ( tx.IsCoinBase() || !tx.vjoinsplit.empty() || !tx.vShieldedSpend.empty() || (i == block.vtx.size()-1 && komodo_isPoS((CBlock *)&block,height,0) != 0) )
-                    continue;
-                Tx = tx;
-                if ( myAddtomempool(Tx, &state, true) == false ) // happens with out of order tx in block on resync
-                {
-                    //LogPrintf("Rejected by mempool, reason: .%s.\n", state.GetRejectReason().c_str());
-                    // take advantage of other checks, but if we were only rejected because it is a valid staking
-                    // transaction, sync with wallets and don't mark as a reject
-                    if (i == (block.vtx.size() - 1) && ASSETCHAINS_LWMAPOS && state.GetRejectReason() == "staking")
-                    {
-                        sTx = Tx;
-                        ptx = &sTx;
-                    } else rejects++;
-                }
-                // here we remove any txs in the temp mempool that were included in the block.
-                tmpmempool.remove(tx, removed, false);
-            }
-            //fprintf(stderr, "removed.%ld\n",removed.size());
-            if ( rejects == 0 || rejects == lastrejects )
-            {
-                if ( 0 && lastrejects != 0 )
-                    fprintf(stderr,"lastrejects.%d -> all tx in mempool\n",lastrejects);
-                break;
-            }
-            //fprintf(stderr,"addtomempool ht.%d for CC checking: n.%d rejects.%d last.%d\n",height,(int32_t)block.vtx.size(),rejects,lastrejects);
-            lastrejects = rejects;
-            rejects = 0;
-        }
-        //fprintf(stderr,"done putting block's tx into mempool\n");
-    }
-    */
 
     for (uint32_t i = 0; i < block.vtx.size(); i++)
     {
@@ -5082,31 +5020,6 @@ bool CheckBlock(int32_t *futureblockp,int32_t height,CBlockIndex *pindex,const C
     if (nSigOps > MAX_BLOCK_SIGOPS)
         return state.DoS(100, error("CheckBlock: out-of-bounds SigOpCount"),
                          REJECT_INVALID, "bad-blk-sigops", true);
-    /*
-    if ( fCheckPOW && komodo_check_deposit(height,block,(pindex==0||pindex->pprev==0)?0:pindex->pprev->nTime) < 0 )
-    {
-        //static uint32_t counter;
-        //if ( counter++ < 100 && ASSETCHAINS_STAKED == 0 )
-        //    fprintf(stderr,"check deposit rejection\n");
-        LogPrintf("CheckBlockHeader komodo_check_deposit error");
-        return(false);
-    }
-
-    if ( ASSETCHAINS_CC != 0 )
-    {
-        LOCK2(cs_main,mempool.cs);
-        // here we add back all txs from the temp mempool to the main mempool.
-        BOOST_FOREACH(const CTxMemPoolEntry& e, tmpmempool.mapTx)
-        {
-            const CTransaction &tx = e.GetTx();
-            const uint256 &hash = tx.GetHash();
-            mempool.addUnchecked(hash,e,true);
-        }
-        //fprintf(stderr, "finished adding back. mempoolsize.%ld\n",mempool.size());
-        // empty the temp mempool for next time.
-        tmpmempool.clear();
-    }
-    */
     return true;
 }
 
@@ -5130,16 +5043,13 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         unsigned int nNextWork = GetNextWorkRequired(pindexPrev, &block, consensusParams);
         //if ((nHeight < 340000 || nHeight > 342500) && block.nBits != nNextWork) {
         if (block.nBits != nNextWork) {
-            cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
-                " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
-                " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
-                // Don't use this CLI option unless you know what you are doing -- Duke
-                //if(!GetArg("-dev-ignore-bad-nbits",false))  {
+            //cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
+            //    " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
+            //    " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
                 if (nHeight < 340000) {
                    return state.DoS(100, error("%s: Incorrect diffbits at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
                 } else {
-                    LogPrintf("%s: Ignoring nbits calc : %lu\n",__func__, nNextWork   );
-                    LogPrintf("%s: Ignoring nbits block: %lu\n",__func__, block.nBits );
+                    LogPrintf("%s: Ignoring nbits calc : %lu vs block %lu\n",__func__, nNextWork, block.nBits   );
                     cout << "Ignoring nbits for height=" << nHeight << endl;
                 }
         }
