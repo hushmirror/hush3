@@ -2371,6 +2371,7 @@ void hush_args(char *argv0)
             sprintf(&magicstr[i<<1],"%02x",magic[i]);
         magicstr[8] = 0;
 #ifndef FROM_CLI
+        /*
         sprintf(fname,"%s_7776",SMART_CHAIN_SYMBOL);
         // TODO: why are we doing this again? Most users do not need this
         if ( (fp= fopen(fname,"wb")) != 0 )
@@ -2382,6 +2383,7 @@ void hush_args(char *argv0)
             fclose(fp);
             //printf("created (%s)\n",fname);
         } else printf("error creating (%s)\n",fname);
+        */
 #endif
         if ( ASSETCHAINS_CC < 2 )
         {
@@ -2389,9 +2391,7 @@ void hush_args(char *argv0)
             {
                 ASSETCHAINS_CC = 2;
                 fprintf(stderr,"smart utxo CC contracts will activate at height.%d\n",KOMODO_CCACTIVATE);
-            }
-            else if ( ccEnablesHeight[0] != 0 )
-            {
+            } else if ( ccEnablesHeight[0] != 0 ) {
                 ASSETCHAINS_CC = 2;
                 fprintf(stderr,"smart utxo CC contract %d will activate at height.%d\n",(int32_t)ccEnablesHeight[0],(int32_t)ccEnablesHeight[1]);
             }
