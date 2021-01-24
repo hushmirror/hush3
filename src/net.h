@@ -42,7 +42,8 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
 #include <boost/signals2/signal.hpp>
-// Enable WolfSSL Support for Hush
+// Enable side-channel resistant WolfSSL Support for Hush
+#define ECC_TIMING_RESISTANT 420
 #include <wolfssl/options.h>
 #include <wolfssl/ssl.h>
 

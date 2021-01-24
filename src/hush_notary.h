@@ -91,7 +91,7 @@ int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp)
     static uint8_t kmd_pubkeys[NUM_HUSH_SEASONS][64][33],didinit[NUM_HUSH_SEASONS];
     
     if ( timestamp == 0 && SMART_CHAIN_SYMBOL[0] != 0 ) {
-        timestamp = komodo_heightstamp(height);
+        timestamp = hush_heightstamp(height);
     } else if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
         timestamp = 0;
     }

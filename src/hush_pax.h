@@ -426,7 +426,7 @@ uint64_t komodo_paxcorrelation(uint64_t *votes,int32_t numvotes,uint64_t seed)
 uint64_t komodo_paxcalc(int32_t height,uint32_t *pvals,int32_t baseid,int32_t relid,uint64_t basevolume,uint64_t refkmdbtc,uint64_t refbtcusd)
 {
     uint32_t pvalb,pvalr; double BTCUSD; uint64_t price,kmdbtc,btcusd,usdvol,baseusd,usdkmd,baserel,ranked[32];
-    if ( basevolume > KOMODO_PAXMAX )
+    if ( basevolume > HUSH_PAXMAX )
     {
         printf("paxcalc overflow %.8f\n",dstr(basevolume));
         return(0);
@@ -559,7 +559,7 @@ int32_t komodo_kmdbtcusd(int32_t rwflag,uint64_t *kmdbtcp,uint64_t *btcusdp,int3
 uint64_t _komodo_paxpriceB(uint64_t seed,int32_t height,char *base,char *rel,uint64_t basevolume)
 {
     int32_t i,j,k,ind,zeroes,numvotes,wt,nonz; int64_t delta; uint64_t lastprice,tolerance,den,densum,sum=0,votes[sizeof(Peggy_inds)/sizeof(*Peggy_inds)],btcusds[sizeof(Peggy_inds)/sizeof(*Peggy_inds)],kmdbtcs[sizeof(Peggy_inds)/sizeof(*Peggy_inds)],kmdbtc,btcusd;
-    if ( basevolume > KOMODO_PAXMAX )
+    if ( basevolume > HUSH_PAXMAX )
     {
         printf("komodo_paxprice overflow %.8f\n",dstr(basevolume));
         return(0);

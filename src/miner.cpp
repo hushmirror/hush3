@@ -980,7 +980,7 @@ int32_t komodo_baseid(char *origbase);
 int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t *blocktimes,int32_t *nonzpkeysp,int32_t height);
 arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
 int32_t FOUND_BLOCK,KOMODO_MAYBEMINED;
-extern int32_t KOMODO_LASTMINED,HUSH_INSYNC;
+extern int32_t HUSH_LASTMINED,HUSH_INSYNC;
 int32_t roundrobin_delay;
 arith_uint256 HASHTarget,HASHTarget_POW;
 
@@ -1248,9 +1248,9 @@ void static BitcoinMiner()
                             if ( mids[j] == notaryid )
                                 break;
                         if ( j == 65 )
-                            KOMODO_LASTMINED = 0;
+                            HUSH_LASTMINED = 0;
                     } else fprintf(stderr,"no nonz pubkeys\n");
-                    if ( (Mining_height >= 235300 && Mining_height < 236000) || (j == 65 && Mining_height > KOMODO_MAYBEMINED+1 && Mining_height > KOMODO_LASTMINED+64) )
+                    if ( (Mining_height >= 235300 && Mining_height < 236000) || (j == 65 && Mining_height > KOMODO_MAYBEMINED+1 && Mining_height > HUSH_LASTMINED+64) )
                     {
                         HASHTarget = arith_uint256().SetCompact(HUSH_MINDIFF_NBITS);
                         fprintf(stderr,"I am the chosen one for %s ht.%d\n",SMART_CHAIN_SYMBOL,pindexPrev->GetHeight()+1);

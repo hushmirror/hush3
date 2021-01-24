@@ -135,11 +135,11 @@ void hush_event_rewind(struct hush_state *sp,char *symbol,int32_t height)
     struct hush_event *ep;
     if ( sp != 0 )
     {
-        if ( SMART_CHAIN_SYMBOL[0] == 0 && height <= KOMODO_LASTMINED && prevKOMODO_LASTMINED != 0 )
+        if ( SMART_CHAIN_SYMBOL[0] == 0 && height <= HUSH_LASTMINED && prevHUSH_LASTMINED != 0 )
         {
-            printf("undo KOMODO_LASTMINED %d <- %d\n",KOMODO_LASTMINED,prevKOMODO_LASTMINED);
-            KOMODO_LASTMINED = prevKOMODO_LASTMINED;
-            prevKOMODO_LASTMINED = 0;
+            printf("undo HUSH_LASTMINED %d <- %d\n",HUSH_LASTMINED,prevHUSH_LASTMINED);
+            HUSH_LASTMINED = prevHUSH_LASTMINED;
+            prevHUSH_LASTMINED = 0;
         }
         while ( sp->Hush_events != 0 && sp->Hush_numeventss > 0 )
         {

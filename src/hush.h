@@ -25,7 +25,7 @@
 
 // Todo: verify: reorgs, lollerskates
 #define HUSH_SMART_CHAINS_WAITNOTARIZE
-#define KOMODO_PAXMAX (10000 * COIN)
+#define HUSH_PAXMAX (10000 * COIN)
 extern int32_t NOTARIZED_HEIGHT;
 uint256 NOTARIZED_HASH,NOTARIZED_DESTTXID;
 
@@ -545,9 +545,9 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
     {
         if ( i == 0 && j == 0 && memcmp(NOTARY_PUBKEY33,scriptbuf+1,33) == 0 && IS_HUSH_NOTARY != 0 )
         {
-            printf("%s KOMODO_LASTMINED.%d -> %d\n",SMART_CHAIN_SYMBOL,KOMODO_LASTMINED,height);
-            prevKOMODO_LASTMINED = KOMODO_LASTMINED;
-            KOMODO_LASTMINED = height;
+            printf("%s HUSH_LASTMINED.%d -> %d\n",SMART_CHAIN_SYMBOL,HUSH_LASTMINED,height);
+            prevHUSH_LASTMINED = HUSH_LASTMINED;
+            HUSH_LASTMINED = height;
         }
         decode_hex(crypto555,33,(char *)CRYPTO555_PUBSECPSTR);
         /*for (k=0; k<33; k++)
@@ -620,7 +620,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
         if ( j == 1 && opretlen >= len+offset-opoffset )
         {
             memset(&MoMoMdata,0,sizeof(MoMoMdata));
-            if ( matched == 0 && signedmask != 0 && bitweight(signedmask) >= KOMODO_MINRATIFY )
+            if ( matched == 0 && signedmask != 0 && bitweight(signedmask) >= HUSH_MINRATIFY )
                 notarized = 1;
             if ( strcmp("PIZZA",ccdata.symbol) == 0 || strncmp("TXSCL",ccdata.symbol,5) == 0 || strcmp("BEER",ccdata.symbol) == 0)
                 notarized = 1;
@@ -777,13 +777,13 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
 
 /*int32_t komodo_isratify(int32_t isspecial,int32_t numvalid)
 {
-    if ( isspecial != 0 && numvalid >= KOMODO_MINRATIFY )
+    if ( isspecial != 0 && numvalid >= HUSH_MINRATIFY )
         return(1);
     else return(0);
 }*/
 
 // Special tx have vout[0] -> CRYPTO555 address
-// with more than KOMODO_MINRATIFY pay2pubkey outputs -> ratify
+// with more than HUSH_MINRATIFY pay2pubkey outputs -> ratify
 // if all outputs to notary -> notary utxo
 // if txi == 0 && 2 outputs and 2nd OP_RETURN, len == 32*2+4 -> notarized, 1st byte 'P' -> pricefeed
 // OP_RETURN: 'D' -> deposit, 'W' -> withdraw
@@ -880,8 +880,8 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                 } //else printf("cant get scriptPubKey for ht.%d txi.%d vin.%d\n",height,i,j);
             }
             numvalid = bitweight(signedmask);
-            if ( ((height < 90000 || (signedmask & 1) != 0) && numvalid >= KOMODO_MINRATIFY) ||
-                (numvalid >= KOMODO_MINRATIFY && SMART_CHAIN_SYMBOL[0] != 0) ||
+            if ( ((height < 90000 || (signedmask & 1) != 0) && numvalid >= HUSH_MINRATIFY) ||
+                (numvalid >= HUSH_MINRATIFY && SMART_CHAIN_SYMBOL[0] != 0) ||
                 numvalid > (numnotaries/5) )
             {
                 if ( !fJustCheck && SMART_CHAIN_SYMBOL[0] != 0)
@@ -984,7 +984,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                     }
                     if ( SMART_CHAIN_SYMBOL[0] != 0 || height < 100000 )
                     {
-                        if ( ((signedmask & 1) != 0 && numvalid >= KOMODO_MINRATIFY) || bitweight(signedmask) > (numnotaries/3) )
+                        if ( ((signedmask & 1) != 0 && numvalid >= HUSH_MINRATIFY) || bitweight(signedmask) > (numnotaries/3) )
                         {
                             memset(&txhash,0,sizeof(txhash));
                             hush_stateupdate(height,pubkeys,numvalid,0,txhash,0,0,0,0,0,0,0,0,0,0,zero,0);

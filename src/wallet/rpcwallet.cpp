@@ -62,7 +62,7 @@ extern std::string ASSETCHAINS_OVERRIDE_PUBKEY;
 const std::string ADDR_TYPE_SAPLING = "sapling";
 const std::string ADDR_TYPE_AMNESIA = "amnesia";
 extern int32_t HUSH_INSYNC;
-uint32_t komodo_segid32(char *coinaddr);
+uint32_t hush_segid32(char *coinaddr);
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int32_t hush_isnotaryvout(char *coinaddr,uint32_t tiptime); // from ac_private chains only
 CBlockIndex *komodo_getblockindex(uint256 hash);
@@ -569,7 +569,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 #define DRAGON_MAXSCRIPTSIZE 10001
 uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pubkey37[37],char *coinaddr,int32_t height,char *base,int64_t fiatoshis);
 int32_t komodo_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen);
-extern int32_t KOMODO_PAX;
+extern int32_t HUSH_PAX;
 int32_t komodo_is_issuer();
 int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 int32_t komodo_isrealtime(int32_t *kmdheightp);
@@ -728,7 +728,7 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     uint64_t available,deposited,issued,withdrawn,approved,redeemed,seed,komodoshis = 0; int32_t height; char destaddr[64]; uint8_t i,pubkey37[33];
     bool fSubtractFeeFromAmount = false;
-    if ( KOMODO_PAX == 0 )
+    if ( HUSH_PAX == 0 )
     {
         throw runtime_error("paxdeposit disabled without -pax");
     }
@@ -2842,7 +2842,7 @@ UniValue resendwallettransactions(const UniValue& params, bool fHelp, const CPub
     return result;
 }
 
-extern uint32_t komodo_segid32(char *coinaddr);
+extern uint32_t hush_segid32(char *coinaddr);
 
 UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
@@ -2946,7 +2946,7 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
         if (fValidAddress) {
             entry.push_back(Pair("address", EncodeDestination(address)));
-            entry.push_back(Pair("segid", (int)komodo_segid32((char*)EncodeDestination(address).c_str()) & 0x3f ));
+            entry.push_back(Pair("segid", (int)hush_segid32((char*)EncodeDestination(address).c_str()) & 0x3f ));
 
             if (pwalletMain->mapAddressBook.count(address))
                 entry.push_back(Pair("account", pwalletMain->mapAddressBook[address].name));
@@ -7756,7 +7756,7 @@ UniValue getbalance64(const UniValue& params, bool fHelp, const CPubKey& mypk)
         nValue = out.tx->vout[out.i].nValue;
         if ( ExtractDestination(out.tx->vout[out.i].scriptPubKey, address) )
         {
-            segid = (komodo_segid32((char *)CBitcoinAddress(address).ToString().c_str()) & 0x3f);
+            segid = (hush_segid32((char *)CBitcoinAddress(address).ToString().c_str()) & 0x3f);
             if ( out.nDepth < 100 )
                 nValues2[segid] += nValue, total2 += nValue;
             else nValues[segid] += nValue, total += nValue;

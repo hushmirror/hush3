@@ -31,8 +31,7 @@ bool EnsureWalletIsAvailable(bool avoidException);
 extern bool fRequestShutdown;
 extern CScript HUSH_EARLYTXID_SCRIPTPUB;
 
-uint8_t DecodeMaramaraCoinbaseOpRet(const CScript scriptPubKey,CPubKey &pk,int32_t &height,int32_t &unlockht);
-uint32_t komodo_heightstamp(int32_t height);
+uint32_t hush_heightstamp(int32_t height);
 
 //#define issue_curl(cmdstr) bitcoind_RPC(0,(char *)"curl",(char *)"http://127.0.0.1:7776",0,0,(char *)(cmdstr))
 
@@ -672,28 +671,6 @@ uint32_t komodo_txtime2(uint64_t *valuep,uint256 hash,int32_t n,char *destaddr)
     return(txtime);
 }
 
-int32_t komodo_WhoStaked(CBlock *pblock, CTxDestination &addressout)
-{
-    int32_t n,vout; uint32_t txtime; uint64_t value; char voutaddr[64],destaddr[64]; CTxDestination voutaddress; uint256 txid; CScript opret;
-    if ( (n= pblock->vtx.size()) > 1 && pblock->vtx[n-1].vin.size() == 1 && pblock->vtx[n-1].vout.size() == 1 )
-    {
-        txid = pblock->vtx[n-1].vin[0].prevout.hash;
-        vout = pblock->vtx[n-1].vin[0].prevout.n;
-        txtime = komodo_txtime(opret,&value,txid,vout,destaddr);
-        if ( ExtractDestination(pblock->vtx[n-1].vout[0].scriptPubKey,voutaddress) )
-        {
-            strcpy(voutaddr,CBitcoinAddress(voutaddress).ToString().c_str());
-            if ( strcmp(destaddr,voutaddr) == 0 && pblock->vtx[n-1].vout[0].nValue == value )
-            {
-                //fprintf(stderr,"is PoS block!\n");
-                addressout = voutaddress;
-                return(1);
-            }
-        }
-    }
-    return(0);
-}
-
 bool komodo_checkopret(CBlock *pblock, CScript &merkleroot)
 {
     merkleroot = pblock->vtx.back().vout.back().scriptPubKey;
@@ -728,7 +705,7 @@ void komodo_disconnect(CBlockIndex *pindex,CBlock& block)
     {
         //sp->rewinding = pindex->GetHeight();
         //fprintf(stderr,"-%d ",pindex->GetHeight());
-    } else printf("komodo_disconnect: ht.%d cant get hush_state.(%s)\n",pindex->GetHeight(),SMART_CHAIN_SYMBOL);
+    } else printf("hush_disconnect: ht.%d cant get hush_state.(%s)\n",pindex->GetHeight(),SMART_CHAIN_SYMBOL);
 }
 
 int32_t hush_is_notarytx(const CTransaction& tx)
@@ -851,12 +828,12 @@ CBlockIndex *hush_chainactive(int32_t height)
     return(0);
 }
 
-uint32_t komodo_heightstamp(int32_t height)
+uint32_t hush_heightstamp(int32_t height)
 {
     CBlockIndex *ptr;
     if ( height > 0 && (ptr= hush_chainactive(height)) != 0 )
         return(ptr->nTime);
-    //else fprintf(stderr,"komodo_heightstamp null ptr for block.%d\n",height);
+    //else fprintf(stderr,"hush_heightstamp null ptr for block.%d\n",height);
     return(0);
 }
 
@@ -1285,14 +1262,14 @@ uint64_t the_commission(const CBlock *pblock,int32_t height)
     return(commission);
 }
 
-uint32_t komodo_segid32(char *coinaddr)
+uint32_t hush_segid32(char *coinaddr)
 {
     bits256 addrhash;
     vcalc_sha256(0,(uint8_t *)&addrhash,(uint8_t *)coinaddr,(int32_t)strlen(coinaddr));
     return(addrhash.uints[0]);
 }
 
-int8_t komodo_segid(int32_t nocache,int32_t height)
+int8_t hush_segid(int32_t nocache,int32_t height)
 {
     CTxDestination voutaddress; CBlock block; CBlockIndex *pindex; uint64_t value; uint32_t txtime; char voutaddr[64],destaddr[64]; int32_t txn_count,vout; uint256 txid; CScript opret; int8_t segid = -1;
     if ( height > 0 && (pindex= hush_chainactive(height)) != 0 )
@@ -1312,18 +1289,18 @@ int8_t komodo_segid(int32_t nocache,int32_t height)
                     strcpy(voutaddr,CBitcoinAddress(voutaddress).ToString().c_str());
                     if ( strcmp(destaddr,voutaddr) == 0 && block.vtx[txn_count-1].vout[0].nValue == value )
                     {
-                        segid = komodo_segid32(voutaddr) & 0x3f;
+                        segid = hush_segid32(voutaddr) & 0x3f;
                         pindex->segid = segid;
-                        //fprintf(stderr,"komodo_segid.(%d) -> %d\n",height,pindex->segid);
+                        //fprintf(stderr,"hush_segid.(%d) -> %d\n",height,pindex->segid);
                     }
-                } else fprintf(stderr,"komodo_segid ht.%d couldnt extract voutaddress\n",height);
+                } else fprintf(stderr,"hush_segid ht.%d couldnt extract voutaddress\n",height);
             }
         }
     }
     return(segid);
 }
 
-void komodo_segids(uint8_t *hashbuf,int32_t height,int32_t n)
+void hush_segids(uint8_t *hashbuf,int32_t height,int32_t n)
 {
     static uint8_t prevhashbuf[100]; static int32_t prevheight;
     int32_t i;
@@ -1334,7 +1311,7 @@ void komodo_segids(uint8_t *hashbuf,int32_t height,int32_t n)
         memset(hashbuf,0xff,n);
         for (i=0; i<n; i++)
         {
-            hashbuf[i] = (uint8_t)komodo_segid(1,height+i);
+            hashbuf[i] = (uint8_t)hush_segid(1,height+i);
             //fprintf(stderr,"%02x ",hashbuf[i]);
         }
         if ( n == 100 )
@@ -1344,17 +1321,6 @@ void komodo_segids(uint8_t *hashbuf,int32_t height,int32_t n)
             //fprintf(stderr,"prevsegids.%d\n",height+n);
         }
     }
-}
-
-uint32_t komodo_stakehash(uint256 *hashp,char *address,uint8_t *hashbuf,uint256 txid,int32_t vout)
-{
-    bits256 addrhash;
-    vcalc_sha256(0,(uint8_t *)&addrhash,(uint8_t *)address,(int32_t)strlen(address));
-    memcpy(&hashbuf[100],&addrhash,sizeof(addrhash));
-    memcpy(&hashbuf[100+sizeof(addrhash)],&txid,sizeof(txid));
-    memcpy(&hashbuf[100+sizeof(addrhash)+sizeof(txid)],&vout,sizeof(vout));
-    vcalc_sha256(0,(uint8_t *)hashp,hashbuf,100 + (int32_t)sizeof(uint256)*2 + sizeof(vout));
-    return(addrhash.uints[0]);
 }
 
 arith_uint256 komodo_adaptivepow_target(int32_t height,arith_uint256 bnTarget,uint32_t nTime)
@@ -1402,7 +1368,7 @@ arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t he
             continue;
         if ( (pindex= hush_chainactive(ht)) != 0 )
         {
-            if ( komodo_segid(0,ht) >= 0 )
+            if ( hush_segid(0,ht) >= 0 )
             {
                 n++;
                 percPoS++;
@@ -1487,93 +1453,8 @@ arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t he
     return(bnTarget);
 }
 
-uint32_t komodo_stake(int32_t validateflag,arith_uint256 bnTarget,int32_t nHeight,uint256 txid,int32_t vout,uint32_t blocktime,uint32_t prevtime,char *destaddr,int32_t PoSperc)
-{
-    bool fNegative,fOverflow; uint8_t hashbuf[256]; char address[64]; bits256 addrhash; arith_uint256 hashval,mindiff,ratio,coinage256; uint256 hash,pasthash; int32_t segid,minage,i,iter=0; int64_t diff=0; uint32_t txtime,segid32,winner = 0 ; uint64_t value,coinage;
-    txtime = komodo_txtime2(&value,txid,vout,address);
-    if ( validateflag == 0 )
-    {
-        //fprintf(stderr,"blocktime.%u -> ",blocktime);
-        if ( blocktime < prevtime+3 )
-            blocktime = prevtime+3;
-        if ( blocktime < GetTime()-60 )
-            blocktime = GetTime()+30;
-        //fprintf(stderr,"blocktime.%u txtime.%u\n",blocktime,txtime);
-    }
-    if ( value == 0 || txtime == 0 || blocktime == 0 || prevtime == 0 )
-    {
-        //fprintf(stderr,"komodo_stake null %.8f %u %u %u\n",dstr(value),txtime,blocktime,prevtime);
-        return(0);
-    }
-    if ( value < SATOSHIDEN )
-        return(0);
-    value /= SATOSHIDEN;
-    mindiff.SetCompact(STAKING_MIN_DIFF,&fNegative,&fOverflow);
-    ratio = (mindiff / bnTarget);
-    if ( (minage= nHeight*3) > 6000 ) // about 100 blocks
-        minage = 6000;
-    komodo_segids(hashbuf,nHeight-101,100);
-    segid32 = komodo_stakehash(&hash,address,hashbuf,txid,vout);
-    segid = ((nHeight + segid32) & 0x3f);
-    for (iter=0; iter<600; iter++)
-    {
-        if ( blocktime+iter+segid*2 < txtime+minage )
-            continue;
-        diff = (iter + blocktime - txtime - minage);
-        if ( diff < 0 )
-            diff = 60;
-        else if ( diff > 3600*24*30 )
-        {
-            //printf("diff.%d (iter.%d blocktime.%u txtime.%u minage.%d)\n",(int32_t)diff,iter,blocktime,txtime,(int32_t)minage);
-            diff = 3600*24*30;
-        }
-        if ( iter > 0 )
-            diff += segid*2;
-        coinage = (value * diff);
-        if ( blocktime+iter+segid*2 > prevtime+480 )
-            coinage *= ((blocktime+iter+segid*2) - (prevtime+400));
-        coinage256 = arith_uint256(coinage+1);
-        hashval = ratio * (UintToArith256(hash) / coinage256);
-        if ( hashval <= bnTarget )
-        {
-            winner = 1;
-            if ( validateflag == 0 )
-            {
-                //fprintf(stderr,"winner blocktime.%u iter.%d segid.%d\n",blocktime,iter,segid);
-                blocktime += iter;
-                blocktime += segid * 2;
-            }
-            break;
-        }
-        if ( validateflag != 0 )
-        {
-            /*for (i=31; i>=24; i--)
-                fprintf(stderr,"%02x",((uint8_t *)&hashval)[i]);
-            fprintf(stderr," vs ");
-            for (i=31; i>=24; i--)
-                fprintf(stderr,"%02x",((uint8_t *)&bnTarget)[i]);
-            fprintf(stderr," segid.%d iter.%d winner.%d coinage.%llu %d ht.%d t.%u v%d diff.%d\n",segid,iter,winner,(long long)coinage,(int32_t)(blocktime - txtime),nHeight,blocktime,(int32_t)value,(int32_t)diff); */
-            break;
-        }
-    }
-    //fprintf(stderr,"iterated until i.%d winner.%d\n",i,winner);
-    if ( 0 && validateflag != 0 )
-    {
-        for (i=31; i>=24; i--)
-            fprintf(stderr,"%02x",((uint8_t *)&hashval)[i]);
-        fprintf(stderr," vs ");
-        for (i=31; i>=24; i--)
-            fprintf(stderr,"%02x",((uint8_t *)&bnTarget)[i]);
-        fprintf(stderr," segid.%d iter.%d winner.%d coinage.%llu %d ht.%d t.%u v%d diff.%d ht.%d\n",segid,iter,winner,(long long)coinage,(int32_t)(blocktime - txtime),nHeight,blocktime,(int32_t)value,(int32_t)diff,nHeight);
-    }
-    if ( nHeight < 10 )
-        return(blocktime);
-    return(blocktime * winner);
-}
-
+// lulz
 int32_t komodo_is_PeiceOfShit() { return(1); }
-bool GetStakeParams(const CTransaction &stakeTx, CStakeParams &stakeParams);
-bool ValidateMatchingStake(const CTransaction &ccTx, uint32_t voutNum, const CTransaction &stakeTx, bool &cheating);
 
 uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount)
 {
@@ -1908,13 +1789,13 @@ int64_t komodo_checkcommission(CBlock *pblock,int32_t height)
     return(checktoshis);
 }
 
-bool KOMODO_TEST_ASSETCHAIN_SKIP_POW = 0;
+bool HUSH_TEST_ASSETCHAIN_SKIP_POW = 0;
 
 int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
 {
     uint256 hash,merkleroot; arith_uint256 bnTarget,bhash; bool fNegative,fOverflow; uint8_t *script,pubkey33[33],pubkeys[64][33]; int32_t i,scriptlen,possible,PoSperc,is_PoSblock=0,n,failed = 0,notaryid = -1; int64_t checktoshis,value; CBlockIndex *pprev;
-    if ( KOMODO_TEST_ASSETCHAIN_SKIP_POW == 0 && Params().NetworkIDString() == "regtest" )
-        KOMODO_TEST_ASSETCHAIN_SKIP_POW = 1;
+    if ( HUSH_TEST_ASSETCHAIN_SKIP_POW == 0 && Params().NetworkIDString() == "regtest" )
+        HUSH_TEST_ASSETCHAIN_SKIP_POW = 1;
     if ( !CheckEquihashSolution(pblock, Params()) )
     {
         fprintf(stderr,"komodo_checkPOW slowflag.%d ht.%d CheckEquihashSolution failed\n",slowflag,height);
@@ -1950,7 +1831,7 @@ int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
                     }
             }
         } else if ( possible == 0 || SMART_CHAIN_SYMBOL[0] != 0 ) {
-            if ( KOMODO_TEST_ASSETCHAIN_SKIP_POW )
+            if ( HUSH_TEST_ASSETCHAIN_SKIP_POW )
                 return(0);
             if ( ASSETCHAINS_STAKED == 0 )
                 return(-1);

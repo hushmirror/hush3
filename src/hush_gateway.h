@@ -119,7 +119,7 @@ void komodo_paxdelete(struct pax_transaction *pax)
 void komodo_gateway_deposit(char *coinaddr,uint64_t value,char *symbol,uint64_t fiatoshis,uint8_t *rmd160,uint256 txid,uint16_t vout,uint8_t type,int32_t height,int32_t otherheight,char *source,int32_t approved) // assetchain context
 {
     struct pax_transaction *pax; uint8_t buf[35]; int32_t addflag = 0; struct hush_state *sp; char str[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN],*s;
-    //if ( KOMODO_PAX == 0 )
+    //if ( HUSH_PAX == 0 )
     //    return;
     //if ( strcmp(symbol,SMART_CHAIN_SYMBOL) != 0 )
     //    return;
@@ -211,7 +211,7 @@ int32_t komodo_rwapproval(int32_t rwflag,uint8_t *opretbuf,struct pax_transactio
 int32_t komodo_issued_opreturn(char *base,uint256 *txids,uint16_t *vouts,int64_t *values,int64_t *srcvalues,int32_t *kmdheights,int32_t *otherheights,int8_t *baseids,uint8_t *rmd160s,uint8_t *opretbuf,int32_t opretlen,int32_t iskomodo)
 {
     struct pax_transaction p,*pax; int32_t i,n=0,j,len=0,incr,height,otherheight; uint8_t type,rmd160[20]; uint64_t fiatoshis; char symbol[HUSH_SMART_CHAIN_MAXLEN];
-    //if ( KOMODO_PAX == 0 )
+    //if ( HUSH_PAX == 0 )
     //    return(0);
     incr = 34 + (iskomodo * (2*sizeof(fiatoshis) + 2*sizeof(height) + 20 + 4));
     //41e77b91cb68dc2aa02fa88550eae6b6d44db676a7e935337b6d1392d9718f03cb0200305c90660400000000fbcbeb1f000000bde801006201000058e7945ad08ddba1eac9c9b6c8e1e97e8016a2d152
@@ -304,7 +304,7 @@ int32_t komodo_paxcmp(char *symbol,int32_t kmdheight,uint64_t value,uint64_t che
 uint64_t komodo_paxtotal()
 {
     struct pax_transaction *pax,*pax2,*tmp,*tmp2; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN],*str; int32_t i,ht; int64_t checktoshis; uint64_t seed,total = 0; struct hush_state *basesp;
-    if ( HUSH_PASSPORT_INITDONE == 0 ) //KOMODO_PAX == 0 ||
+    if ( HUSH_PASSPORT_INITDONE == 0 ) //HUSH_PAX == 0 ||
         return(0);
     if ( komodo_isrealtime(&ht) == 0 )
         return(0);
@@ -429,7 +429,7 @@ static int _paxorder(const void *a,const void *b)
 int32_t komodo_pending_withdraws(char *opretstr) // todo: enforce deterministic order
 {
     struct pax_transaction *pax,*pax2,*tmp,*paxes[64]; uint8_t opretbuf[16384*4]; int32_t i,n,ht,len=0; uint64_t total = 0;
-    if ( KOMODO_PAX == 0 || HUSH_PASSPORT_INITDONE == 0 )
+    if ( HUSH_PAX == 0 || HUSH_PASSPORT_INITDONE == 0 )
         return(0);
     if ( komodo_isrealtime(&ht) == 0 || SMART_CHAIN_SYMBOL[0] != 0 )
         return(0);
@@ -478,7 +478,7 @@ int32_t komodo_pending_withdraws(char *opretstr) // todo: enforce deterministic 
 int32_t komodo_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t tokomodo)
 {
     struct pax_transaction *pax,*tmp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; uint8_t *script,opcode,opret[16384*4],data[16384*4]; int32_t i,baseid,ht,len=0,opretlen=0,numvouts=1; struct hush_state *sp; uint64_t available,deposited,issued,withdrawn,approved,redeemed,mask,sum = 0;
-    if ( HUSH_PASSPORT_INITDONE == 0 )//KOMODO_PAX == 0 ||
+    if ( HUSH_PASSPORT_INITDONE == 0 )//HUSH_PAX == 0 ||
         return(0);
     struct hush_state *kmdsp = hush_stateptrget((char *)"KMD");
     sp = hush_stateptr(symbol,dest);
@@ -849,7 +849,7 @@ const char *komodo_opreturn(int32_t height,uint64_t value,uint8_t *opretbuf,int3
         komodo_kvupdate(opretbuf,opretlen,value);
         return("kv");
     }
-    else if ( SMART_CHAIN_SYMBOL[0] == 0 && KOMODO_PAX == 0 )
+    else if ( SMART_CHAIN_SYMBOL[0] == 0 && HUSH_PAX == 0 )
         return("nopax");
     if ( opretbuf[0] == 'D' )
     {
@@ -1223,7 +1223,7 @@ void hush_stateind_set(struct hush_state *sp,uint32_t *inds,int32_t n,uint8_t *f
                     }
                     else if ( func == 'V' )
                     {
-                        if ( KOMODO_PAX != 0 && numv > numV-1440 )
+                        if ( HUSH_PAX != 0 && numv > numV-1440 )
                             doissue = 1;
                         numv++;
                     }
@@ -1524,7 +1524,7 @@ void hush_passport_iteration()
                             RTmask |= (1LL << baseid);
                             memcpy(refsp->RTbufs[baseid+1],buf,sizeof(refsp->RTbufs[baseid+1]));
                         }
-                        else if ( KOMODO_PAX != 0 && (time(NULL)-buf[2]) > 60 && SMART_CHAIN_SYMBOL[0] != 0 )
+                        else if ( HUSH_PAX != 0 && (time(NULL)-buf[2]) > 60 && SMART_CHAIN_SYMBOL[0] != 0 )
                             fprintf(stderr,"[%s]: %s not RT %u %u %d\n",SMART_CHAIN_SYMBOL,base,buf[0],buf[1],(int32_t)(time(NULL)-buf[2]));
                     } //else fprintf(stderr,"%s size error RT\n",base);
                     fclose(fp);
@@ -1606,7 +1606,7 @@ void komodo_PriceCache_shift()
     memcpy(PriceCache[0],Mineropret.data(),Mineropret.size());
 }
 
-int32_t _komodo_heightpricebits(uint64_t *seedp,uint32_t *heightbits,CBlock *block)
+int32_t _hush_heightpricebits(uint64_t *seedp,uint32_t *heightbits,CBlock *block)
 {
     CTransaction tx; int32_t numvouts; std::vector<uint8_t> vopret;
     tx = block->vtx[0];
@@ -1622,8 +1622,8 @@ int32_t _komodo_heightpricebits(uint64_t *seedp,uint32_t *heightbits,CBlock *blo
     return(-1);
 }
 
-// komodo_heightpricebits() extracts the price data in the coinbase for nHeight
-int32_t komodo_heightpricebits(uint64_t *seedp,uint32_t *heightbits,int32_t nHeight)
+// hush_heightpricebits() extracts the price data in the coinbase for nHeight
+int32_t hush_heightpricebits(uint64_t *seedp,uint32_t *heightbits,int32_t nHeight)
 {
     CBlockIndex *pindex; CBlock block;
     if ( seedp != 0 )
@@ -1632,7 +1632,7 @@ int32_t komodo_heightpricebits(uint64_t *seedp,uint32_t *heightbits,int32_t nHei
     {
         if ( komodo_blockload(block,pindex) == 0 )
         {
-            return(_komodo_heightpricebits(seedp,heightbits,&block));
+            return(_hush_heightpricebits(seedp,heightbits,&block));
         }
     }
     fprintf(stderr,"couldnt get pricebits for %d\n",nHeight);
@@ -1731,7 +1731,7 @@ CScript komodo_mineropret(int32_t nHeight)
                 sleep(61);
             }
         }
-        if ( komodo_heightpricebits(0,prevbits,nHeight-1) > 0 )
+        if ( hush_heightpricebits(0,prevbits,nHeight-1) > 0 )
         {
             memcpy(pricebits,Mineropret.data(),Mineropret.size());
             memset(maxflags,0,sizeof(maxflags));
@@ -1813,7 +1813,7 @@ int32_t komodo_opretvalidate(const CBlock *block,CBlockIndex * const previndex,i
                 btcgbp = (double)pricebits[2]/10000;
                 btceur = (double)pricebits[3]/10000;
                 fprintf(stderr,"ht.%d: lag.%d %.4f USD, %.4f GBP, %.4f EUR, GBPUSD %.6f, EURUSD %.6f, EURGBP %.6f [%d]\n",nHeight,lag,btcusd,btcgbp,btceur,btcusd/btcgbp,btcusd/btceur,btcgbp/btceur,lag2);
-                if ( komodo_heightpricebits(0,prevbits,nHeight-1) > 0 )
+                if ( hush_heightpricebits(0,prevbits,nHeight-1) > 0 )
                 {
                     if ( nHeight < testchain_exemption )
                     {
@@ -2743,7 +2743,7 @@ void komodo_pricesupdate(int32_t height,CBlock *pblock)
         tmpbuf = (int64_t *)calloc(sizeof(int64_t),2*PRICES_DAYWINDOW);
         fprintf(stderr,"prices update: numprices.%d %p %p\n",numprices,ptr32,ptr64);
     }
-    if ( _komodo_heightpricebits(&seed,rawprices,pblock) == numprices )
+    if ( _hush_heightpricebits(&seed,rawprices,pblock) == numprices )
     {
         //for (ind=0; ind<numprices; ind++)
         //    fprintf(stderr,"%u ",rawprices[ind]);

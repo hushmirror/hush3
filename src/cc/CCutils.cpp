@@ -173,7 +173,7 @@ bool CheckTxFee(const CTransaction &tx, uint64_t txfee, uint32_t height, uint64_
 uint32_t GetLatestTimestamp(int32_t height)
 {
     if ( HUSH_NSPV_SUPERLITE ) return ((uint32_t)NSPV_blocktime(height));
-    return(komodo_heightstamp(height));
+    return(hush_heightstamp(height));
 } // :P
 
 void CCaddr2set(struct CCcontract_info *cp,uint8_t evalcode,CPubKey pk,uint8_t *priv,char *coinaddr)

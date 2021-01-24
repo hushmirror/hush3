@@ -32,7 +32,7 @@ extern CScript HUSH_EARLYTXID_SCRIPTPUB;
 #define PRICES_MAXLEVERAGE 777
 #define PRICES_SMOOTHWIDTH 1
 #define HUSH_MAXPRICES 2048 // must be power of 2 and less than 8192
-#define KOMODO_PRICEMASK (~(HUSH_MAXPRICES -  1))     // actually 1111 1000 0000 0000
+#define HUSH_PRICEMASK (~(HUSH_MAXPRICES -  1))     // actually 1111 1000 0000 0000
 #define PRICES_WEIGHT (HUSH_MAXPRICES * 1)            //          0000 1000 0000 0000
 #define PRICES_MULT (HUSH_MAXPRICES * 2)              //          0001 0000 0000 0000
 #define PRICES_DIV (HUSH_MAXPRICES * 3)               //          0001 1000 0000 0000

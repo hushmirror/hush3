@@ -497,13 +497,9 @@ extern uint16_t ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT;
 extern uint32_t ASSETCHAIN_INIT, ASSETCHAINS_MAGIC;
 extern int32_t ASSETCHAINS_LWMAPOS, ASSETCHAINS_SAPLING, ASSETCHAINS_OVERWINTER,ASSETCHAINS_BLOCKTIME;
 extern uint64_t ASSETCHAINS_SUPPLY, ASSETCHAINS_FOUNDERS_REWARD;
-
 extern int32_t ASSETCHAINS_LWMAPOS, ASSETCHAINS_SAPLING, ASSETCHAINS_OVERWINTER,ASSETCHAINS_BLOCKTIME;
-extern int32_t KOMODO_BLOCK_POSUNITS, KOMODO_CONSECUTIVE_POS_THRESHOLD, KOMODO_NOPOS_THRESHHOLD;
-
 extern uint64_t ASSETCHAINS_TIMELOCKGTE;
 extern uint32_t ASSETCHAINS_ALGO,ASSETCHAINS_EQUIHASH,HUSH_INITDONE;
-
 extern int32_t HUSH_MININGTHREADS,HUSH_LONGESTCHAIN,ASSETCHAINS_SEED,IS_HUSH_NOTARY,USE_EXTERNAL_PUBKEY,HUSH_CHOSEN_ONE,KOMODO_ON_DEMAND,HUSH_PASSPORT_INITDONE,ASSETCHAINS_STAKED,HUSH_NSPV;
 extern uint64_t ASSETCHAINS_COMMISSION, ASSETCHAINS_LASTERA,ASSETCHAINS_CBOPRET;
 extern uint64_t ASSETCHAINS_REWARD[ASSETCHAINS_MAX_ERAS+1], ASSETCHAINS_NOTARY_PAY[ASSETCHAINS_MAX_ERAS+1], ASSETCHAINS_TIMELOCKGTE, ASSETCHAINS_NONCEMASK[],ASSETCHAINS_NK[2];
@@ -512,14 +508,11 @@ extern uint32_t ASSETCHAINS_NONCESHIFT[], ASSETCHAINS_HASHESPERROUND[];
 extern std::string NOTARY_PUBKEY,ASSETCHAINS_OVERRIDE_PUBKEY,ASSETCHAINS_SCRIPTPUB;
 extern uint8_t NOTARY_PUBKEY33[33],ASSETCHAINS_OVERRIDE_PUBKEY33[33],ASSETCHAINS_MARMARA;
 extern std::vector<std::string> ASSETCHAINS_PRICES,ASSETCHAINS_STOCKS;
-
 extern uint256 HUSH_EARLYTXID;
-
 extern int32_t HUSH_CONNECTING,HUSH_CCACTIVATE,KOMODO_DEALERNODE;
 extern uint32_t ASSETCHAINS_CC;
 extern std::string CCerror,ASSETCHAINS_CCLIB;
 extern uint8_t ASSETCHAINS_CCDISABLES[256];
-
 extern int32_t USE_EXTERNAL_PUBKEY;
 extern std::string NOTARY_PUBKEY,NOTARY_ADDRESS;
 extern std::string DONATION_PUBKEY;
@@ -551,15 +544,15 @@ int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *fla
 uint32_t hush_blocktime(uint256 hash);
 int32_t hush_longestchain();
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
-int8_t komodo_segid(int32_t nocache,int32_t height);
-int32_t komodo_heightpricebits(uint64_t *seedp,uint32_t *heightbits,int32_t nHeight);
+int8_t hush_segid(int32_t nocache,int32_t height);
+int32_t hush_heightpricebits(uint64_t *seedp,uint32_t *heightbits,int32_t nHeight);
 char *komodo_pricename(char *name,int32_t ind);
 int32_t komodo_priceind(const char *symbol);
 int32_t komodo_pricesinit();
 int64_t komodo_priceave(int64_t *tmpbuf,int64_t *correlated,int32_t cskip);
 int64_t komodo_pricecorrelated(uint64_t seed,int32_t ind,uint32_t *rawprices,int32_t rawskip,uint32_t *nonzprices,int32_t smoothwidth);
 int32_t hush_nextheight();
-uint32_t komodo_heightstamp(int32_t height);
+uint32_t hush_heightstamp(int32_t height);
 int64_t komodo_pricemult(int32_t ind);
 int32_t komodo_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblocks);
 int32_t hush_currentheight();

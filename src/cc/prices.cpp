@@ -659,7 +659,7 @@ static std::string prices_getsourceexpression(const std::vector<uint16_t> &vec) 
         uint16_t opcode = vec[i];
         int32_t value = (opcode & (HUSH_MAXPRICES - 1));   // index or weight 
 
-        switch (opcode & KOMODO_PRICEMASK)
+        switch (opcode & HUSH_PRICEMASK)
         {
         case 0: // indices 
             komodo_pricename(name, value);
@@ -949,7 +949,7 @@ int32_t prices_syntheticvec(std::vector<uint16_t> &vec, std::vector<std::string>
         }
         depth -= need;
         ///std::cerr << "prices_syntheticvec() opcode=" << opcode << " opstr=" << opstr << " need=" << need << " depth=" << depth << std::endl;
-        if ((opcode & KOMODO_PRICEMASK) != PRICES_WEIGHT) { // skip weight
+        if ((opcode & HUSH_PRICEMASK) != PRICES_WEIGHT) { // skip weight
             depth++;                                          // increase operands count
             ///std::cerr << "depth++=" << depth << std::endl;
         }
@@ -997,8 +997,8 @@ int64_t prices_syntheticprice(std::vector<uint16_t> vec, int32_t height, int32_t
 
         mpz_set_ui(mpzResult, 0);  // clear result to test overflow (see below)
 
-        //std::cerr << "prices_syntheticprice" << " i=" << i << " mpzTotalPrice=" << mpz_get_si(mpzTotalPrice) << " value=" << value << " depth=" << depth <<  " opcode&KOMODO_PRICEMASK=" << (opcode & KOMODO_PRICEMASK) <<std::endl;
-        switch (opcode & KOMODO_PRICEMASK)
+        //std::cerr << "prices_syntheticprice" << " i=" << i << " mpzTotalPrice=" << mpz_get_si(mpzTotalPrice) << " value=" << value << " depth=" << depth <<  " opcode&HUSH_PRICEMASK=" << (opcode & HUSH_PRICEMASK) <<std::endl;
+        switch (opcode & HUSH_PRICEMASK)
         {
         case 0: // indices 
             pricestack[depth] = 0;
@@ -2230,16 +2230,16 @@ static bool prices_ispositionup(const std::vector<uint16_t> &vecparsed, int16_t 
 
         int32_t value = (opcode & (HUSH_MAXPRICES - 1));   // filter index or weight = opcode & (2048-1)
 
-        if ((opcode & KOMODO_PRICEMASK) == 0) {
+        if ((opcode & HUSH_PRICEMASK) == 0) {
             char name[65];
             if (komodo_pricename(name, value)) {
                 std::string upperquote, bottomquote;
                 prices_splitpair(std::string(name), upperquote, bottomquote);
                 
                 uint16_t opcode1 = vecparsed[1];
-                bool isInverted = ((opcode1 & KOMODO_PRICEMASK) == PRICES_INV);
+                bool isInverted = ((opcode1 & HUSH_PRICEMASK) == PRICES_INV);
 
-                //std::cerr << "prices_ispositionup upperquote=" << upperquote << " bottomquote=" << bottomquote << " opcode1=" << opcode1 << " (opcode1 & KOMODO_PRICEMASK)=" << (opcode1 & KOMODO_PRICEMASK) << std::endl;
+                //std::cerr << "prices_ispositionup upperquote=" << upperquote << " bottomquote=" << bottomquote << " opcode1=" << opcode1 << " (opcode1 & HUSH_PRICEMASK)=" << (opcode1 & HUSH_PRICEMASK) << std::endl;
 
                 if (upperquote == "BTC" || bottomquote == "BTC") { // it is relatively btc
                     if (upperquote == "BTC" && (leverage > 0 && !isInverted || leverage < 0 && isInverted) ||
@@ -2280,7 +2280,7 @@ static bool prices_isopposite(BetInfo p1, BetInfo p2) {
         int32_t value1 = (opcode1 & (HUSH_MAXPRICES - 1));   // index or weight 
         int32_t value2 = (opcode2 & (HUSH_MAXPRICES - 1));   // index or weight 
 
-        if ( (opcode1 & KOMODO_PRICEMASK) == 0 && (opcode2 & KOMODO_PRICEMASK) == 0 ) {
+        if ( (opcode1 & HUSH_PRICEMASK) == 0 && (opcode2 & HUSH_PRICEMASK) == 0 ) {
             char name1[65];
             char name2[65];
             if (komodo_pricename(name1, value1) && komodo_pricename(name2, value2)) {
@@ -2292,10 +2292,10 @@ static bool prices_isopposite(BetInfo p1, BetInfo p2) {
                 prices_splitpair(std::string(name1), upperquote1, bottomquote1);
                 prices_splitpair(std::string(name2), upperquote2, bottomquote2);
 
-                bool isInverted1 = ((opcode1 & KOMODO_PRICEMASK) != PRICES_INV);
-                bool isInverted2 = ((opcode2 & KOMODO_PRICEMASK) != PRICES_INV);
+                bool isInverted1 = ((opcode1 & HUSH_PRICEMASK) != PRICES_INV);
+                bool isInverted2 = ((opcode2 & HUSH_PRICEMASK) != PRICES_INV);
 
-                if (/*upperquote1 == bottomquote2 && bottomquote1 == upperquote2 && (p1.leverage > 0 == p2.leverage > 0 || (opcode1 & KOMODO_PRICEMASK) == PRICES_INV == (opcode2 & KOMODO_PRICEMASK) == PRICES_INV) ||*/
+                if (/*upperquote1 == bottomquote2 && bottomquote1 == upperquote2 && (p1.leverage > 0 == p2.leverage > 0 || (opcode1 & HUSH_PRICEMASK) == PRICES_INV == (opcode2 & HUSH_PRICEMASK) == PRICES_INV) ||*/
                     upperquote1 == upperquote2 && bottomquote1 == bottomquote2 && ((p1.leverage > 0) != (p2.leverage > 0) || isInverted1 != isInverted2) )
                     return true;
             }
@@ -2313,7 +2313,7 @@ static std::string findMatchedBook(const std::vector<uint16_t> &vecparsed, const
 
         int32_t value = (opcode & (HUSH_MAXPRICES - 1));   // filter index or weight = opcode & (2048-1)
 
-        if ((opcode & KOMODO_PRICEMASK) == 0) {
+        if ((opcode & HUSH_PRICEMASK) == 0) {
             char name[65];
             if (komodo_pricename(name, value)) {
                 auto it = bookmatched.find(std::string(name));

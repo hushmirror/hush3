@@ -645,7 +645,7 @@ bool OraclesDataValidate(struct CCcontract_info *cp,Eval* eval,const CTransactio
 /*nt32_t GetLatestTimestamp(int32_t height)
 {
     if ( HUSH_NSPV_SUPERLITE ) return (NSPV_blocktime(height));
-    return(komodo_heightstamp(height));
+    return(hush_heightstamp(height));
 } */
 
 bool OraclesValidate(struct CCcontract_info *cp,Eval* eval,const CTransaction &tx, uint32_t nIn)

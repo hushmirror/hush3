@@ -151,7 +151,7 @@ UniValue blockheaderToJSON(const CBlockIndex* blockindex)
     result.push_back(Pair("bits", strprintf("%08x", blockindex->nBits)));
     result.push_back(Pair("difficulty", GetDifficulty(blockindex)));
     result.push_back(Pair("chainwork", blockindex->chainPower.chainWork.GetHex()));
-    result.push_back(Pair("segid", (int)komodo_segid(0,blockindex->GetHeight())));
+    result.push_back(Pair("segid", (int)hush_segid(0,blockindex->GetHeight())));
 
     if (blockindex->pprev)
         result.push_back(Pair("previousblockhash", blockindex->pprev->GetBlockHash().GetHex()));
@@ -178,7 +178,7 @@ UniValue blockToDeltasJSON(const CBlock& block, const CBlockIndex* blockindex)
     result.push_back(Pair("height", blockindex->GetHeight()));
     result.push_back(Pair("version", block.nVersion));
     result.push_back(Pair("merkleroot", block.hashMerkleRoot.GetHex()));
-    result.push_back(Pair("segid", (int)komodo_segid(0,blockindex->GetHeight())));
+    result.push_back(Pair("segid", (int)hush_segid(0,blockindex->GetHeight())));
 
     UniValue deltas(UniValue::VARR);
 
@@ -299,7 +299,7 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     result.push_back(Pair("height", blockindex->GetHeight()));
     result.push_back(Pair("version", block.nVersion));
     result.push_back(Pair("merkleroot", block.hashMerkleRoot.GetHex()));
-    result.push_back(Pair("segid", (int)komodo_segid(0,blockindex->GetHeight())));
+    result.push_back(Pair("segid", (int)hush_segid(0,blockindex->GetHeight())));
     result.push_back(Pair("finalsaplingroot", block.hashFinalSaplingRoot.GetHex()));
     UniValue txs(UniValue::VARR);
     BOOST_FOREACH(const CTransaction&tx, block.vtx)
@@ -1105,12 +1105,12 @@ UniValue paxprice(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     int32_t height,i,n,width,numpricefeeds = -1; uint64_t seed,ignore,rngval; uint32_t rawprices[1440*6],*ptr; int64_t *tmpbuf;
     width = numblocks+PRICES_DAYWINDOW*2+PRICES_SMOOTHWIDTH;    // need 2*PRICES_DAYWINDOW previous raw price points to calc PRICES_DAYWINDOW correlated points to calc, in turn, smoothed point
-    komodo_heightpricebits(&seed,rawprices,firstheight + numblocks - 1);
+    hush_heightpricebits(&seed,rawprices,firstheight + numblocks - 1);
     if ( firstheight < width )
         return(-1);
     for (i=0; i<width; i++)
     {
-        if ( (n= komodo_heightpricebits(&ignore,rawprices,firstheight + numblocks - 1 - i)) < 0 )  // stores raw prices in backward order 
+        if ( (n= hush_heightpricebits(&ignore,rawprices,firstheight + numblocks - 1 - i)) < 0 )  // stores raw prices in backward order 
             return(-1);
         if ( numpricefeeds < 0 )
             numpricefeeds = n;
@@ -1154,7 +1154,7 @@ UniValue prices(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( PRICES_DAYWINDOW < 7 )
         throw JSONRPCError(RPC_INVALID_PARAMETER, "daywindow is too small");
     width = maxsamples+2*PRICES_DAYWINDOW+PRICES_SMOOTHWIDTH;
-    numpricefeeds = komodo_heightpricebits(&seed,rawprices,nextheight-1);
+    numpricefeeds = hush_heightpricebits(&seed,rawprices,nextheight-1);
     if ( numpricefeeds <= 0 )
         throw JSONRPCError(RPC_INVALID_PARAMETER, "illegal numpricefeeds");
     prices = (uint32_t *)calloc(sizeof(*prices),width*numpricefeeds);
@@ -1166,7 +1166,7 @@ UniValue prices(const UniValue& params, bool fHelp, const CPubKey& mypk)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Block height out of range");
         else
         {
-            if ( (n= komodo_heightpricebits(0,rawprices,ht)) > 0 )
+            if ( (n= hush_heightpricebits(0,rawprices,ht)) > 0 )
             {
                 if ( n != numpricefeeds )
                     throw JSONRPCError(RPC_INVALID_PARAMETER, "numprices != first numprices");

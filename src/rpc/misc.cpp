@@ -62,17 +62,14 @@ int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *tx
 bool komodo_txnotarizedconfirmed(uint256 txid);
 uint32_t hush_chainactive_timestamp();
 int32_t hush_whoami(char *pubkeystr,int32_t height,uint32_t timestamp);
-extern int32_t KOMODO_LASTMINED,HUSH_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
+extern int32_t HUSH_LASTMINED,HUSH_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
-uint32_t komodo_segid32(char *coinaddr);
+uint32_t hush_segid32(char *coinaddr);
 int64_t hush_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
 int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_heightp);
 uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 
-// This is the last version of upstream that was merged in
-// We only cherry-pick since then
-#define KOMODO_VERSION "0.5.0"
 extern uint16_t ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT;
 extern uint32_t ASSETCHAINS_CC;
 extern uint32_t ASSETCHAINS_MAGIC,ASSETCHAINS_ALGO;
@@ -280,8 +277,8 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
         char pubkeystr[65]; int32_t notaryid; std::string notaryname;
         if( (notaryid= hush_whoami(pubkeystr,(int32_t)chainActive.LastTip()->GetHeight(),hush_chainactive_timestamp())) >= 0 )  {
             obj.push_back(Pair("notaryid",        notaryid));
-            if ( KOMODO_LASTMINED != 0 )
-                obj.push_back(Pair("lastmined", KOMODO_LASTMINED));
+            if ( HUSH_LASTMINED != 0 )
+                obj.push_back(Pair("lastmined", HUSH_LASTMINED));
         }
         obj.push_back(Pair("pubkey", NOTARY_PUBKEY));
     }
@@ -496,7 +493,7 @@ UniValue validateaddress(const UniValue& params, bool fHelp, const CPubKey& mypk
 
         CScript scriptPubKey = GetScriptForDestination(dest);
         ret.push_back(Pair("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
-        ret.push_back(Pair("segid", (int32_t)komodo_segid32((char *)params[0].get_str().c_str()) & 0x3f));
+        ret.push_back(Pair("segid", (int32_t)hush_segid32((char *)params[0].get_str().c_str()) & 0x3f));
 #ifdef ENABLE_WALLET
         isminetype mine = pwalletMain ? IsMine(*pwalletMain, dest) : ISMINE_NO;
         ret.push_back(Pair("ismine", (mine & ISMINE_SPENDABLE) ? true : false));
