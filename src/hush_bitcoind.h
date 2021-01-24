@@ -1803,7 +1803,7 @@ bool komodo_appendACscriptpub()
     return false;
 }
 
-void GetKomodoEarlytxidScriptPub()
+void GetHushEarlytxidScriptPub()
 {
     if ( HUSH_EARLYTXID == zeroid )
     {

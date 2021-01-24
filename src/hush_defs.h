@@ -481,7 +481,7 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
 
 #define HUSH_MAXNVALUE (((uint64_t)1 << 63) - 1)
 #define KOMODO_BIT63SET(x) ((x) & ((uint64_t)1 << 63))
-#define KOMODO_VALUETOOBIG(x) ((x) > (uint64_t)10000000001*COIN)
+#define HUSH_VALUETOOBIG(x) ((x) > (uint64_t)10000000001*COIN)
 
 //#ifndef TESTMODE
 #define PRICES_DAYWINDOW ((3600*24/ASSETCHAINS_BLOCKTIME) + 1)

@@ -122,7 +122,7 @@ struct hush_state
     uint32_t SAVEDTIMESTAMP;
     uint64_t deposited,issued,withdrawn,approved,redeemed,shorted;
     struct notarized_checkpoint *NPOINTS; int32_t NUM_NPOINTS,last_NPOINTSi;
-    struct hush_event **Hush_events; int32_t Komodo_numevents;
+    struct hush_event **Hush_events; int32_t Hush_numeventss;
     uint32_t RTbufs[64][3]; uint64_t RTmask;
 };
 

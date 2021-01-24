@@ -23,7 +23,7 @@ Tell us what should happen
 
 Tell us what happens instead including any noticable error output (any messages displayed on-screen when e.g. a crash occurred)
 
-### The version of Komodo you were using:
+### The version of Hush you were using:
 
 Run `hushd --version` to find out
 
@@ -41,5 +41,4 @@ Run `hushd --version` to find out
 This includes the relevant contents of `~/.komodo/HUSH3/debug.log`. You can paste raw text, attach the file directly in the issue or link to the text via a pastebin type site.
 Please also include any non-standard things you did during compilation (extra flags, dependency version changes etc.) if applicable.
 
-Beware that usernames and IP addresses and other metadata may be in this log file.
-
+Beware that usernames and IP addresses and other metadata is definitely in this log file!

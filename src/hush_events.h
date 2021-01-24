@@ -33,8 +33,8 @@ struct hush_event *hush_eventadd(struct hush_state *sp,int32_t height,char *symb
         strcpy(ep->symbol,symbol);
         if ( datalen != 0 )
             memcpy(ep->space,data,datalen);
-        sp->Hush_events = (struct hush_event **)realloc(sp->Hush_events,(1 + sp->Komodo_numevents) * sizeof(*sp->Hush_events));
-        sp->Hush_events[sp->Komodo_numevents++] = ep;
+        sp->Hush_events = (struct hush_event **)realloc(sp->Hush_events,(1 + sp->Hush_numeventss) * sizeof(*sp->Hush_events));
+        sp->Hush_events[sp->Hush_numeventss++] = ep;
         portable_mutex_unlock(&komodo_mutex);
     }
     return(ep);
@@ -141,15 +141,15 @@ void hush_event_rewind(struct hush_state *sp,char *symbol,int32_t height)
             KOMODO_LASTMINED = prevKOMODO_LASTMINED;
             prevKOMODO_LASTMINED = 0;
         }
-        while ( sp->Hush_events != 0 && sp->Komodo_numevents > 0 )
+        while ( sp->Hush_events != 0 && sp->Hush_numeventss > 0 )
         {
-            if ( (ep= sp->Hush_events[sp->Komodo_numevents-1]) != 0 )
+            if ( (ep= sp->Hush_events[sp->Hush_numeventss-1]) != 0 )
             {
                 if ( ep->height < height )
                     break;
                 //printf("[%s] undo %s event.%c ht.%d for rewind.%d\n",SMART_CHAIN_SYMBOL,symbol,ep->type,ep->height,height);
                 hush_event_undo(sp,ep);
-                sp->Komodo_numevents--;
+                sp->Hush_numeventss--;
             }
         }
     }

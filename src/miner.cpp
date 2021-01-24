@@ -174,7 +174,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
     //fprintf(stderr,"create new block\n");
     // Create new block
     if ( gpucount < 0 )
-        gpucount = KOMODO_MAXGPUCOUNT;
+        gpucount = HUSH_MAXGPUCOUNT;
     std::unique_ptr<CBlockTemplate> pblocktemplate(new CBlockTemplate());
     if(!pblocktemplate.get())
     {
@@ -286,7 +286,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                 continue;
             }
             txvalue = tx.GetValueOut();
-            if ( KOMODO_VALUETOOBIG(txvalue) != 0 )
+            if ( HUSH_VALUETOOBIG(txvalue) != 0 )
                 continue;
 
             COrphan* porphan = NULL;
@@ -1072,7 +1072,7 @@ void static BitcoinMiner()
 
     unsigned int n = chainparams.EquihashN();
     unsigned int k = chainparams.EquihashK();
-    uint8_t *script; uint64_t total; int32_t i,j,gpucount=KOMODO_MAXGPUCOUNT,notaryid = -1;
+    uint8_t *script; uint64_t total; int32_t i,j,gpucount=HUSH_MAXGPUCOUNT,notaryid = -1;
     while ( (ASSETCHAIN_INIT == 0 || HUSH_INITDONE == 0) )
     {
         sleep(1);

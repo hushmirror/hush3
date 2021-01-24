@@ -255,7 +255,7 @@ UniValue generate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         lastTime = GetTime();
 
 #ifdef ENABLE_WALLET
-        std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey,nHeight,KOMODO_MAXGPUCOUNT));
+        std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey,nHeight,HUSH_MAXGPUCOUNT));
 #else
         std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey());
 #endif
@@ -753,7 +753,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp, const CPubKey& myp
 #ifdef ENABLE_WALLET
         CReserveKey reservekey(pwalletMain);
         LEAVE_CRITICAL_SECTION(cs_main);
-        pblocktemplate = CreateNewBlockWithKey(reservekey,pindexPrevNew->GetHeight()+1,KOMODO_MAXGPUCOUNT,false);
+        pblocktemplate = CreateNewBlockWithKey(reservekey,pindexPrevNew->GetHeight()+1,HUSH_MAXGPUCOUNT,false);
 #else
         pblocktemplate = CreateNewBlockWithKey();
 #endif

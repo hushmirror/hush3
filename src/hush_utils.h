@@ -2467,10 +2467,10 @@ struct hush_state *hush_stateptrget(char *base)
 {
     int32_t baseid;
     if ( base == 0 || base[0] == 0 || strcmp(base,(char *)"KYCSELLOUTS") == 0 )
-        return(&KOMODO_STATES[33]);
+        return(&HUSH_STATES[33]);
     else if ( (baseid= komodo_baseid(base)) >= 0 )
-        return(&KOMODO_STATES[baseid+1]);
-    else return(&KOMODO_STATES[0]);
+        return(&HUSH_STATES[baseid+1]);
+    else return(&HUSH_STATES[0]);
 }
 
 struct hush_state *hush_stateptr(char *symbol,char *dest)

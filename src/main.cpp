@@ -1817,7 +1817,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
         CAmount nValueOut = tx.GetValueOut();
         CAmount nFees = nValueIn-nValueOut;
         double dPriority = view.GetPriority(tx, chainActive.Height());
-        if ( nValueOut > 777777*COIN && KOMODO_VALUETOOBIG(nValueOut - 777777*COIN) != 0 ) // some room for blockreward and txfees
+        if ( nValueOut > 777777*COIN && HUSH_VALUETOOBIG(nValueOut - 777777*COIN) != 0 ) // some room for blockreward and txfees
             return state.DoS(100, error("AcceptToMemoryPool: GetValueOut too big"),REJECT_INVALID,"tx valueout is too big");
   
         // Keep track of transactions that spend a coinbase, which we re-scan
@@ -3380,14 +3380,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         txdata.emplace_back(tx);
 
         valueout = tx.GetValueOut();
-        if ( KOMODO_VALUETOOBIG(valueout) != 0 )
+        if ( HUSH_VALUETOOBIG(valueout) != 0 )
         {
             fprintf(stderr,"valueout %.8f too big\n",(double)valueout/COIN);
             return state.DoS(100, error("ConnectBlock(): GetValueOut too big"),REJECT_INVALID,"tx valueout is too big");
         }
         //prevsum = voutsum;
         //voutsum += valueout;
-        /*if ( KOMODO_VALUETOOBIG(voutsum) != 0 )
+        /*if ( HUSH_VALUETOOBIG(voutsum) != 0 )
         {
             fprintf(stderr,"voutsum %.8f too big\n",(double)voutsum/COIN);
             return state.DoS(100, error("ConnectBlock(): voutsum too big"),REJECT_INVALID,"tx valueout is too big");

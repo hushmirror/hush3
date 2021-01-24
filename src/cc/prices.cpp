@@ -65,7 +65,7 @@ mine the chain past block 100, preventing anyone else, creating another payments
 
 We call the following in Validation and RPC where the address is needed. 
 if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && HUSH_EARLYTXID_SCRIPTPUB.size() == 0 )
-    GetKomodoEarlytxidScriptPub();
+    GetHushEarlytxidScriptPub();
 
 This will fetch the op_return, calculate the scriptPubKey and save it to the global. 
 On daemon restart as soon as validation for BETTX happens the global will be filled, after this the transaction never needs to be looked up again. 
@@ -245,7 +245,7 @@ static bool ValidateBetTx(struct CCcontract_info *cp, Eval *eval, const CTransac
 
     // check payment cc config:
     if ( ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && HUSH_EARLYTXID_SCRIPTPUB.size() == 0 )
-        GetKomodoEarlytxidScriptPub();
+        GetHushEarlytxidScriptPub();
 
     if (bettx.vout.size() < 6 || bettx.vout.size() > 7)
         return eval->Invalid("incorrect vout number for bet tx");
@@ -298,7 +298,7 @@ static bool ValidateAddFundingTx(struct CCcontract_info *cp, Eval *eval, const C
 
     // check payment cc config:
     if (ASSETCHAINS_EARLYTXIDCONTRACT == EVAL_PRICES && HUSH_EARLYTXID_SCRIPTPUB.size() == 0)
-        GetKomodoEarlytxidScriptPub();
+        GetHushEarlytxidScriptPub();
 
     if (addfundingtx.vout.size() < 4 || addfundingtx.vout.size() > 5)
         return eval->Invalid("incorrect vout number for add funding tx");
@@ -1510,7 +1510,7 @@ UniValue PricesBet(int64_t txfee, int64_t amount, int16_t leverage, std::vector<
             // Lock here, as in validation we cannot call lock in the function itself.
             // may not be needed as the validation call to update the global, is called in a LOCK already, and it can only update there and here.
             LOCK(cs_main);
-            GetKomodoEarlytxidScriptPub();
+            GetHushEarlytxidScriptPub();
         }
         mtx.vout.push_back(CTxOut(amount-betamount, HUSH_EARLYTXID_SCRIPTPUB)); 
         //test: mtx.vout.push_back(CTxOut(amount - betamount, CScript() << ParseHex("037c803ec82d12da939ac04379bbc1130a9065c53d8244a61eece1db942cf0efa7") << OP_CHECKSIG));  // vout4 test revshare fee
@@ -1581,7 +1581,7 @@ UniValue PricesAddFunding(int64_t txfee, uint256 bettxid, int64_t amount)
                 // Lock here, as in validation we cannot call lock in the function itself.
                 // may not be needed as the validation call to update the global, is called in a LOCK already, and it can only update there and here.
                 LOCK(cs_main);
-                GetKomodoEarlytxidScriptPub();
+                GetHushEarlytxidScriptPub();
             }
             mtx.vout.push_back(CTxOut(amount - betamount, HUSH_EARLYTXID_SCRIPTPUB));
             // test: mtx.vout.push_back(CTxOut(amount - betamount, CScript() << ParseHex("037c803ec82d12da939ac04379bbc1130a9065c53d8244a61eece1db942cf0efa7") << OP_CHECKSIG));  //vout2  test revshare fee

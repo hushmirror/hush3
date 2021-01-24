@@ -62,7 +62,7 @@ int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *tx
 bool komodo_txnotarizedconfirmed(uint256 txid);
 uint32_t hush_chainactive_timestamp();
 int32_t hush_whoami(char *pubkeystr,int32_t height,uint32_t timestamp);
-extern int32_t KOMODO_LASTMINED,JUMBLR_PAUSE,HUSH_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
+extern int32_t KOMODO_LASTMINED,HUSH_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 uint32_t komodo_segid32(char *coinaddr);
 int64_t hush_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
