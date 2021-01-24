@@ -2,7 +2,6 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,10 +16,8 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #ifndef ASYNCRPCOPERATION_SHIELDCOINBASE_H
 #define ASYNCRPCOPERATION_SHIELDCOINBASE_H
-
 #include "asyncrpcoperation.h"
 #include "amount.h"
 #include "primitives/transaction.h"
@@ -28,10 +25,8 @@
 #include "zcash/JoinSplit.hpp"
 #include "zcash/Address.hpp"
 #include "wallet.h"
-
 #include <unordered_map>
 #include <tuple>
-
 #include <univalue.h>
 
 // Default transaction fee if caller does not specify one.
@@ -44,15 +39,6 @@ struct ShieldCoinbaseUTXO {
     int vout;
     CScript scriptPubKey;
     CAmount amount;
-};
-
-// Package of info which is passed to perform_joinsplit methods.
-struct ShieldCoinbaseJSInfo
-{
-    std::vector<JSInput> vjsin;
-    std::vector<JSOutput> vjsout;
-    CAmount vpub_old = 0;
-    CAmount vpub_new = 0;
 };
 
 class AsyncRPCOperation_shieldcoinbase : public AsyncRPCOperation {
@@ -98,9 +84,6 @@ private:
 
     bool main_impl();
 
-    // JoinSplit without any input notes to spend
-    UniValue perform_joinsplit(ShieldCoinbaseJSInfo &);
-
     void sign_send_raw_transaction(UniValue obj);     // throws exception if there was an error
 
     void lock_utxos();
@@ -141,10 +124,6 @@ public:
 
     bool main_impl() {
         return delegate->main_impl();
-    }
-
-    UniValue perform_joinsplit(ShieldCoinbaseJSInfo &info) {
-        return delegate->perform_joinsplit(info);
     }
 
     void sign_send_raw_transaction(UniValue obj) {

@@ -28,7 +28,7 @@ Wallet encryption is disabled, for several reasons:
   deducting the spent amount.
 
 - While encrypted wallets prevent spending of funds, they do not maintain the
-  shielding properties of JoinSplits (due to the need to detect spends). That
+  shielding properties of ShieldedOutputs (due to the need to detect spends). That
   is, someone with access to an encrypted wallet.dat has full visibility of
   your entire transaction graph (other than newly-detected spends, which suffer
   from the earlier issue).
@@ -51,7 +51,7 @@ are physically near the hardware, that your `hushd` process is running on will
 be able to:
 
 - Determine the values of your secret spending keys, as well as which notes you
-  are spending, by observing cache side-channels as you perform a JoinSplit
+  are spending, by observing cache side-channels as you perform a SheildedSpend
   operation. This is due to probable side-channel leakage in C++.
 
 - Determine which notes you own by observing cache side-channel information

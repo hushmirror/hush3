@@ -2,7 +2,6 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,7 +16,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "asyncrpcqueue.h"
 #include "amount.h"
 #include "consensus/upgrades.h"
@@ -39,13 +37,11 @@
 #include "zcash/IncrementalMerkleTree.hpp"
 #include "sodium.h"
 #include "miner.h"
-
 #include <array>
 #include <iostream>
 #include <chrono>
 #include <thread>
 #include <string>
-
 #include "asyncrpcoperation_shieldcoinbase.h"
 
 using namespace libzcash;
