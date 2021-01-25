@@ -15,7 +15,10 @@ $(package)_config_opts+=--enable-debug
 $(package)_config_opts+=--enable-sha3
 $(package)_config_opts+=--enable-sha512
 $(package)_config_opts+=--enable-tls13
-$(package)_config_opts+=--enable-xchacha # New in 4.6.0
+
+# TODO: enable this in a future version
+#$(package)_config_opts+=--enable-xchacha # New in 4.6.0
+
 # TODO: these caused problems
 #$(package)_config_opts+=--disable-tlsv12
 #$(package)_config_opts+=--disable-oldtls
@@ -30,7 +33,7 @@ $(package)_config_opts+=--enable-enckeys
 # TODO: can we reduce down to only the normal openssl compat, without these options?
 $(package)_config_opts+=--enable-opensslall
 $(package)_config_opts+=--enable-opensslextra
-#$(package)_config_opts+=C_EXTRA_FLAGS="-DSPEAK_AND_TRANSACT_FREELY"
+$(package)_config_opts+=C_EXTRA_FLAGS="-DSPEAK_AND_TRANSACT_FREELY"
 
 endef
 

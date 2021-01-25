@@ -1106,7 +1106,7 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
     ssl = tlsmanager.accept( hSocket, addr, err_code);
     if(!ssl)
     {
-        LogPrint("tls", "%s():%d - err_code %x, failure accepting connection from %s\n", __func__, __LINE__, err_code, addr.ToStringIP());
+        LogPrint("tls", "TLS: %s():%d - err_code %x, failure accepting connection from %s\n", __func__, __LINE__, err_code, addr.ToStringIP());
         CloseSocket(hSocket);
         return;
     }

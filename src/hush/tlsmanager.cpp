@@ -118,6 +118,7 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
             case SSL_SHUTDOWN:
             {
                 if (hSocket != INVALID_SOCKET) {
+                    disconnectedPeer = "no info";
                     struct sockaddr_in addr;
                     socklen_t serv_len = sizeof(addr);
                     int ret = getpeername(hSocket, (struct sockaddr *)&addr, &serv_len);
@@ -144,8 +145,7 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
                 LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN completed from peer %s\n", __FILE__, __func__, __LINE__, disconnectedPeer.c_str());
                 break;
             } else {
-                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN failed to %s\n", __FILE__, __func__, __LINE__, disconnectedPeer.c_str());
-                // the error will be read afterwards
+                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN failed to %s with ret=%d\n", __FILE__, __func__, __LINE__, disconnectedPeer.c_str(), retOp);
             }
         } else {
             if (retOp == 1) {
@@ -166,13 +166,15 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
 
         if (sslErr != WOLFSSL_ERROR_WANT_READ && sslErr != WOLFSSL_ERROR_WANT_WRITE) {
             err_code = wolfSSL_ERR_get_error();
-            const char* error_str;
-            if(err_code)
-                wolfSSL_ERR_error_string(err_code, err_buffer);
+            const char* error_str = NULL;
+            // calling this with err_code=0 generates more warnings, lulz
+            if(err_code) {
+                error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
+            }
 
             LogPrint("tls", "TLS: WARNING: %s: %s():%d - routine(%d), sslErr[0x%x], retOp[%d], errno[0x%x], lib[0x%x], func[0x%x], reas[0x%x]-> err: %s\n",
                 __FILE__, __func__, __LINE__,
-                eRoutine, sslErr, retOp, errno, wolfSSL_ERR_GET_LIB(err_code), ERR_GET_FUNC(err_code), wolfSSL_ERR_GET_REASON(err_code), err_buffer);
+                eRoutine, sslErr, retOp, errno, wolfSSL_ERR_GET_LIB(err_code), ERR_GET_FUNC(err_code), wolfSSL_ERR_GET_REASON(err_code), error_str);
             retOp = -1;
             break;
         }
@@ -245,6 +247,8 @@ WOLFSSL* TLSManager::connect(SOCKET hSocket, const CAddress& addrConnect, unsign
                 err_code = wolfSSL_ERR_get_error();
                 LogPrint("tls", "%s: timed out waiting for %s\n", __func__, addrConnect.ToString());
             }
+        } else {
+            LogPrint("tls", "TLS: %s: failed to set file descriptor for socket!\n", __func__, addrConnect.ToString());
         }
     } else {
         err_code = wolfSSL_ERR_get_error();
@@ -443,9 +447,9 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
 {
     LogPrint("tls", "TLS: accepting connection from %s (tid = %X)\n", addr.ToString(), pthread_self());
 
-    err_code = 0; 
     char err_buffer[1024];
-    WOLFSSL* ssl = NULL;
+    err_code          = 0;
+    WOLFSSL* ssl      = NULL;
     bool bAcceptedTLS = false;
 
     if ((ssl = wolfSSL_new(tls_ctx_server))) {
@@ -456,6 +460,8 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
             } else {
                 err_code = wolfSSL_ERR_get_error();
             }
+        } else {
+            LogPrint("tls", "TLS: %s: failed to set file descriptor for socket!\n", __func__, addr.ToString());
         }
     } else {
         err_code = wolfSSL_ERR_get_error();
