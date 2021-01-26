@@ -529,7 +529,7 @@ int64_t CCduration(int32_t &numblocks,uint256 txid)
         //fprintf(stderr,"CCduration no hashBlock for txid %s\n",uint256_str(str,txid));
         return(0);
     }
-    else if ( (pindex= komodo_getblockindex(hashBlock)) == 0 || (txtime= pindex->nTime) == 0 || (txheight= pindex->GetHeight()) <= 0 )
+    else if ( (pindex= hush_getblockindex(hashBlock)) == 0 || (txtime= pindex->nTime) == 0 || (txheight= pindex->GetHeight()) <= 0 )
     {
         fprintf(stderr,"CCduration no txtime %u or txheight.%d %p for txid %s\n",txtime,txheight,pindex,uint256_str(str,txid));
         return(0);
@@ -666,7 +666,7 @@ uint256 BitcoinGetProofMerkleRoot(const std::vector<uint8_t> &proofData, std::ve
 }
 
 extern struct NSPV_inforesp NSPV_inforesult;
-int32_t komodo_get_current_height()
+int32_t hush_get_current_height()
 {
     if ( HUSH_NSPV_SUPERLITE )
     {

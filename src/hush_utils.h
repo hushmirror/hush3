@@ -49,7 +49,7 @@ typedef struct queue
 #define CRYPTO555_HUSHADDR   "RFetqf8WUfWnwNeXdknkm8ojk7EXnYFzrv"
 #define CRYPTO555_RMD160STR  "deadbeefbadcaca748c4986b240ff7d7bc3fffb0"
 
-#define KOMODO_PUBTYPE 60
+#define HUSH_PUBTYPE 60
 
 struct sha256_vstate { uint64_t length; uint32_t state[8],curlen; uint8_t buf[64]; };
 struct rmd160_vstate { uint64_t length; uint8_t buf[64]; uint32_t curlen, state[5]; };
@@ -1025,7 +1025,7 @@ int32_t komodo_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_
 
 // get a pseudo random number that is the same for each block individually at all times and different
 // from all other blocks. the sequence is extremely likely, but not guaranteed to be unique for each block chain
-uint64_t komodo_block_prg(uint32_t nHeight)
+uint64_t hush_block_prg(uint32_t nHeight)
 {
     int i;
     uint8_t hashSrc[8];
@@ -1050,7 +1050,7 @@ uint64_t komodo_block_prg(uint32_t nHeight)
 // given a block height, this returns the unlock time for that block height, derived from
 // the ASSETCHAINS_MAGIC number as well as the block height, providing different random numbers
 // for corresponding blocks across chains, but the same sequence in each chain
-int64_t komodo_block_unlocktime(uint32_t nHeight)
+int64_t hush_block_unlocktime(uint32_t nHeight)
 {
     uint64_t fromTime, toTime, unlocktime;
 
@@ -1058,7 +1058,7 @@ int64_t komodo_block_unlocktime(uint32_t nHeight)
         unlocktime = ASSETCHAINS_TIMEUNLOCKTO;
     else
     {
-        unlocktime = komodo_block_prg(nHeight) / (0xffffffffffffffff / ((ASSETCHAINS_TIMEUNLOCKTO - ASSETCHAINS_TIMEUNLOCKFROM) + 1));
+        unlocktime = hush_block_prg(nHeight) / (0xffffffffffffffff / ((ASSETCHAINS_TIMEUNLOCKTO - ASSETCHAINS_TIMEUNLOCKFROM) + 1));
         // boundary and power of 2 can make it exceed to time by 1
         unlocktime = unlocktime + ASSETCHAINS_TIMEUNLOCKFROM;
         if (unlocktime > ASSETCHAINS_TIMEUNLOCKTO)
@@ -1320,7 +1320,7 @@ uint16_t _komodo_userpass(char *username,char *password,FILE *fp)
         strcpy(username,rpcuser);
         strcpy(password,rpcpassword);
     }
-    //printf("rpcuser.(%s) rpcpassword.(%s) KMDUSERPASS.(%s) %u\n",rpcuser,rpcpassword,KMDUSERPASS,port);
+    //printf("rpcuser.(%s) rpcpassword.(%s) HUSHUSERPASS.(%s) %u\n",rpcuser,rpcpassword,HUSHUSERPASS,port);
     if ( rpcuser != 0 )
         free(rpcuser);
     if ( rpcpassword != 0 )
@@ -1403,9 +1403,7 @@ void komodo_configfile(char *symbol,uint16_t rpcport)
                 printf("Created (%s)\n",fname);
             } else printf("Couldnt create (%s)\n",fname);
 #endif
-        }
-        else
-        {
+        } else {
             _komodo_userpass(myusername,mypassword,fp);
             mapArgs["-rpcpassword"] = mypassword;
             mapArgs["-rpcusername"] = myusername;
@@ -1430,10 +1428,10 @@ void komodo_configfile(char *symbol,uint16_t rpcport)
     if ( (fp= fopen(fname,"rb")) != 0 )
     {
         if ( (kmdport= _komodo_userpass(username,password,fp)) != 0 )
-            KMD_PORT = kmdport;
-        sprintf(KMDUSERPASS,"%s:%s",username,password);
+            HUSH3_PORT = kmdport;
+        sprintf(HUSHUSERPASS,"%s:%s",username,password);
         fclose(fp);
-//printf("KOMODO.(%s) -> userpass.(%s)\n",fname,KMDUSERPASS);
+        //printf("HUSH.(%s) -> userpass.(%s)\n",fname,HUSHUSERPASS);
     } //else printf("couldnt open.(%s)\n",fname);
 }
 
@@ -1492,9 +1490,6 @@ uint16_t hush_smartport(uint32_t magic,int32_t extralen)
     else return(16000 + (magic % 49500));
 }
 
-// DUKE: extralen is sometimes wrong which causes wrong diffbits?
-// This function is only called on startup, blocktime changing code does not modify magic
-// Hush 3.5.x and Hush 3.6.x have same history and p2p ports, but different magic??? Seems not.
 uint16_t hush_port(char *symbol,uint64_t supply,uint32_t *magicp,uint8_t *extraptr,int32_t extralen)
 {
     if(fDebug)
@@ -1629,7 +1624,7 @@ uint64_t hush_block_subsidy(int height)
 }
 
 // wrapper for more general supply curves of Hush Smart Chains
-uint64_t komodo_ac_block_subsidy(int nHeight)
+uint64_t hush_sc_block_subsidy(int nHeight)
 {
     //fprintf(stderr,"%s: ht.%d\n", __func__, nHeight);
     // Find current era, start from beginning reward, and determine current subsidy
@@ -1730,7 +1725,7 @@ uint64_t komodo_ac_block_subsidy(int nHeight)
 }
 
 extern int64_t MAX_MONEY;
-void komodo_cbopretupdate(int32_t forceflag);
+void hush_cbopretupdate(int32_t forceflag);
 void SplitStr(const std::string& strVal, std::vector<std::string> &outVals);
 
 int8_t equihash_params_possible(uint64_t n, uint64_t k)
@@ -1780,7 +1775,7 @@ void hush_args(char *argv0)
     }
     DONATION_PUBKEY   = GetArg("-donation", "");
     NOTARY_PUBKEY     = GetArg("-pubkey", "");
-    KOMODO_DEALERNODE = GetArg("-dealer",0);
+    HUSH_DEALERNODE = GetArg("-dealer",0);
     HUSH_TESTNODE     = GetArg("-testnode",0);
 
     if ( strlen(NOTARY_PUBKEY.c_str()) == 66 )
@@ -1827,12 +1822,12 @@ void hush_args(char *argv0)
     ASSETCHAINS_CC           = GetArg("-ac_cc",0);
     HUSH_CCACTIVATE          = GetArg("-ac_ccactivate",0);
     ASSETCHAINS_BLOCKTIME    = GetArg("-ac_blocktime",60);
-    ASSETCHAINS_PUBLIC       = GetArg("-ac_public",0);
+    ASSETCHAINS_PUBLIC       = 0;
     ASSETCHAINS_PRIVATE      = GetArg("-ac_private",0);
-    HUSH_SNAPSHOT_INTERVAL = GetArg("-ac_snapshot",0);
+    HUSH_SNAPSHOT_INTERVAL   = GetArg("-ac_snapshot",0);
     Split(GetArg("-ac_nk",""), sizeof(ASSETCHAINS_NK)/sizeof(*ASSETCHAINS_NK), ASSETCHAINS_NK, 0);
 
-    fprintf(stderr,".oO Starting HUSH Full Node with genproc=%d notary=%d\n",HUSH_MININGTHREADS, IS_HUSH_NOTARY);
+    fprintf(stderr,".oO Starting HUSH Full Node (Extreme Privacy!) with genproc=%d notary=%d\n",HUSH_MININGTHREADS, IS_HUSH_NOTARY);
     
     // -ac_ccactivateht=evalcode,height,evalcode,height,evalcode,height....
     Split(GetArg("-ac_ccactivateht",""), sizeof(ccEnablesHeight)/sizeof(*ccEnablesHeight), ccEnablesHeight, 0);
@@ -2242,7 +2237,7 @@ void hush_args(char *argv0)
                 }
                 fprintf(stderr," <- CCLIB name\n");
             }
-            // is this not being run correctly?
+
             if ( ASSETCHAINS_BLOCKTIME != 60 ) {
                 extralen += dragon_rwnum(1,&extraptr[extralen],sizeof(ASSETCHAINS_BLOCKTIME),(void *)&ASSETCHAINS_BLOCKTIME);
                 fprintf(stderr,"%s: ASSETCHAINS_BLOCKTIME=%d, extralen=%d\n", __func__, ASSETCHAINS_BLOCKTIME, extralen);
@@ -2275,7 +2270,7 @@ void hush_args(char *argv0)
                     }
                 }
                 //komodo_pricesinit();
-                komodo_cbopretupdate(1); // will set Mineropret
+                hush_cbopretupdate(1); // will set Mineropret
                 fprintf(stderr,"This blockchain uses data produced from CoinDesk Bitcoin Price Index\n");
             }
             if ( ASSETCHAINS_NK[0] != 0 && ASSETCHAINS_NK[1] != 0 )
@@ -2316,7 +2311,7 @@ void hush_args(char *argv0)
 
         if ( ASSETCHAINS_CC >= HUSH_FIRSTFUNGIBLEID && MAX_MONEY < 1000000LL*SATOSHIDEN )
             MAX_MONEY = 1000000LL*SATOSHIDEN;
-        if ( KOMODO_BIT63SET(MAX_MONEY) != 0 )
+        if ( HUSH_BIT63SET(MAX_MONEY) != 0 )
             MAX_MONEY = HUSH_MAXNVALUE;
         if(fDebug)
             fprintf(stderr,"MAX_MONEY %llu %.8f\n",(long long)MAX_MONEY,(double)MAX_MONEY/SATOSHIDEN);
@@ -2425,9 +2420,9 @@ void hush_args(char *argv0)
             if ( (fp= fopen(fname,"rb")) != 0 )
             {
                 _komodo_userpass(username,password,fp);
-                sprintf(iter == 0 ? KMDUSERPASS : BTCUSERPASS,"%s:%s",username,password);
+                sprintf(iter == 0 ? HUSHUSERPASS : BTCUSERPASS,"%s:%s",username,password);
                 fclose(fp);
-                //printf("KOMODO.(%s) -> userpass.(%s)\n",fname,KMDUSERPASS);
+                //printf("HUSH.(%s) -> userpass.(%s)\n",fname,HUSHUSERPASS);
             } //else printf("couldnt open.(%s)\n",fname);
             if ( IS_HUSH_NOTARY == 0 )
                 break;

@@ -140,14 +140,14 @@ int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,ui
 int32_t komodo_pax_opreturn(int32_t height,uint8_t *opret,int32_t maxsize);
 int32_t komodo_baseid(char *origbase);
 int32_t hush_longestchain();
-int64_t komodo_block_unlocktime(uint32_t nHeight);
+int64_t hush_block_unlocktime(uint32_t nHeight);
 uint64_t the_commission(const CBlock *block,int32_t height);
 int32_t hush_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *ptr);
 int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 int32_t hush_is_notarytx(const CTransaction& tx);
 uint64_t komodo_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
-int32_t komodo_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *script, int32_t len);
+int32_t hush_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *script, int32_t len);
 CScript komodo_mineropret(int32_t nHeight);
 bool komodo_appendACscriptpub();
 
@@ -407,7 +407,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
                             // Any attempted notarization needs to be in its own block!
                             continue;
                         }
-                        int32_t notarizedheight = komodo_getnotarizedheight(pblock->nTime, nHeight, script, scriptlen);
+                        int32_t notarizedheight = hush_getnotarizedheight(pblock->nTime, nHeight, script, scriptlen);
                         if ( notarizedheight != 0 )
                         {
                             // this is the first one we see, add it to the block as TX1 
@@ -979,7 +979,7 @@ static bool ProcessBlockFound(CBlock* pblock)
 int32_t komodo_baseid(char *origbase);
 int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t *blocktimes,int32_t *nonzpkeysp,int32_t height);
 arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
-int32_t FOUND_BLOCK,KOMODO_MAYBEMINED;
+int32_t FOUND_BLOCK,HUSH_MAYBEMINED;
 extern int32_t HUSH_LASTMINED,HUSH_INSYNC;
 int32_t roundrobin_delay;
 arith_uint256 HASHTarget,HASHTarget_POW;
@@ -1250,7 +1250,7 @@ void static BitcoinMiner()
                         if ( j == 65 )
                             HUSH_LASTMINED = 0;
                     } else fprintf(stderr,"no nonz pubkeys\n");
-                    if ( (Mining_height >= 235300 && Mining_height < 236000) || (j == 65 && Mining_height > KOMODO_MAYBEMINED+1 && Mining_height > HUSH_LASTMINED+64) )
+                    if ( (Mining_height >= 235300 && Mining_height < 236000) || (j == 65 && Mining_height > HUSH_MAYBEMINED+1 && Mining_height > HUSH_LASTMINED+64) )
                     {
                         HASHTarget = arith_uint256().SetCompact(HUSH_MINDIFF_NBITS);
                         fprintf(stderr,"I am the chosen one for %s ht.%d\n",SMART_CHAIN_SYMBOL,pindexPrev->GetHeight()+1);
@@ -1430,7 +1430,7 @@ void static BitcoinMiner()
                                 //    fprintf(stderr,"%02x",((uint8_t *)&hash)[i]);
                                 //fprintf(stderr," <- %s Block found %d\n",SMART_CHAIN_SYMBOL,Mining_height);
                                 //FOUND_BLOCK = 1;
-                                //KOMODO_MAYBEMINED = Mining_height;
+                                //HUSH_MAYBEMINED = Mining_height;
                                 break;
                             }
                         } catch (EhSolverCancelledException&) {

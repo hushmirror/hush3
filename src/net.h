@@ -701,8 +701,6 @@ public:
     // resource deallocation on cleanup, called at node shutdown
     static void NetCleanup();
 
-    // returns the value of the tlsfallbacknontls and tlsvalidate flags set at startup (see init.cpp)
-    static bool GetTlsFallbackNonTls();
     static bool GetTlsValidate();
 };
 

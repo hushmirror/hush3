@@ -2207,12 +2207,6 @@ CNode::CNode(SOCKET hSocketIn, const CAddress& addrIn, const std::string& addrNa
     GetNodeSignals().InitializeNode(GetId(), this);
 }
 
-bool CNode::GetTlsFallbackNonTls()
-{
-    LogPrint("tls", "%s():%d - Non-TLS connections no longer supported\n", __func__, __LINE__);
-    return false;
-}
-
 bool CNode::GetTlsValidate()
 {
     if (tlsValidate == eTlsOption::FALLBACK_UNSET)

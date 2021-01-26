@@ -485,7 +485,7 @@ int32_t komodo_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t to
     strcpy(symbol,base);
     if ( SMART_CHAIN_SYMBOL[0] != 0 && komodo_baseid(SMART_CHAIN_SYMBOL) < 0 )
         return(0);
-    PENDING_KOMODO_TX = 0;
+    PENDING_HUSH_TX = 0;
     for (i=0; i<3; i++)
     {
         if ( komodo_isrealtime(&ht) != 0 )
@@ -589,13 +589,13 @@ int32_t komodo_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t to
                 data[len++] = ((uint8_t *)&pax->txid)[i];
             data[len++] = pax->vout & 0xff;
             data[len++] = (pax->vout >> 8) & 0xff;
-            PENDING_KOMODO_TX += pax->fiatoshis;
+            PENDING_HUSH_TX += pax->fiatoshis;
         }
         else
         {
             len += komodo_rwapproval(1,&data[len],pax);
-            PENDING_KOMODO_TX += pax->komodoshis;
-            printf(" len.%d vout.%u DEPOSIT %.8f <- pax.%s pending ht %d %d %.8f | ",len,pax->vout,(double)txNew->vout[numvouts].nValue/COIN,symbol,pax->height,pax->otherheight,dstr(PENDING_KOMODO_TX));
+            PENDING_HUSH_TX += pax->komodoshis;
+            printf(" len.%d vout.%u DEPOSIT %.8f <- pax.%s pending ht %d %d %.8f | ",len,pax->vout,(double)txNew->vout[numvouts].nValue/COIN,symbol,pax->height,pax->otherheight,dstr(PENDING_HUSH_TX));
         }
         if ( numvouts++ >= 64 || sum > COIN )
             break;
@@ -618,7 +618,7 @@ int32_t komodo_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t to
         memcpy(script,opret,opretlen);
         for (i=0; i<8; i++)
             printf("%02x",opret[i]);
-        printf(" <- opret, MINER deposits.%d (%s) vouts.%d %.8f opretlen.%d\n",tokomodo,SMART_CHAIN_SYMBOL,numvouts,dstr(PENDING_KOMODO_TX),opretlen);
+        printf(" <- opret, MINER deposits.%d (%s) vouts.%d %.8f opretlen.%d\n",tokomodo,SMART_CHAIN_SYMBOL,numvouts,dstr(PENDING_HUSH_TX),opretlen);
         return(1);
     }
     return(0);
@@ -656,7 +656,7 @@ const char *banned_txids[] =
     //"ce567928b5490a17244167af161b1d8dd6ff753fef222fe6855d95b2278a35b3", // missed
 };
 
-int32_t komodo_checkvout(int32_t vout,int32_t k,int32_t indallvouts)
+int32_t hush_checkvout(int32_t vout,int32_t k,int32_t indallvouts)
 {
     if ( k < indallvouts )
         return(vout == 1);
@@ -681,7 +681,7 @@ int32_t komodo_bannedset(int32_t *indallvoutsp,uint256 *array,int32_t max)
 
 void hush_passport_iteration();
 
-int32_t komodo_check_deposit(int32_t height,const CBlock& block,uint32_t prevtime) // verify above block is valid pax pricing
+int32_t hush_check_deposit(int32_t height,const CBlock& block,uint32_t prevtime) // verify above block is valid pax pricing
 {
     static uint256 array[64]; static int32_t numbanned,indallvouts;
     int32_t i,j,k,n,ht,baseid,txn_count,activation,num,opretlen,offset=1,errs=0,notmatched=0,matched=0,kmdheights[256],otherheights[256]; uint256 hash,txids[256]; char symbol[HUSH_SMART_CHAIN_MAXLEN],base[HUSH_SMART_CHAIN_MAXLEN]; uint16_t vouts[256]; int8_t baseids[256]; uint8_t *script,opcode,rmd160s[256*20]; uint64_t total,subsidy,available,deposited,issued,withdrawn,approved,redeemed,seed; int64_t checktoshis,values[256],srcvalues[256]; struct pax_transaction *pax; struct hush_state *sp; CTransaction tx;
@@ -730,7 +730,7 @@ int32_t komodo_check_deposit(int32_t height,const CBlock& block,uint32_t prevtim
             {
                 for (k=0; k<numbanned; k++)
                 {
-                    if ( block.vtx[i].vin[j].prevout.hash == array[k] && komodo_checkvout(block.vtx[i].vin[j].prevout.n,k,indallvouts) != 0 ) //(block.vtx[i].vin[j].prevout.n == 1 || k >= indallvouts)  )
+                    if ( block.vtx[i].vin[j].prevout.hash == array[k] && hush_checkvout(block.vtx[i].vin[j].prevout.n,k,indallvouts) != 0 ) //(block.vtx[i].vin[j].prevout.n == 1 || k >= indallvouts)  )
                     {
                         printf("banned tx.%d being used at ht.%d txi.%d vini.%d\n",k,height,i,j);
                         return(-1);
@@ -804,7 +804,7 @@ int32_t komodo_check_deposit(int32_t height,const CBlock& block,uint32_t prevtim
             checktoshis = 0;
             if ( (ASSETCHAINS_COMMISSION != 0 || ASSETCHAINS_FOUNDERS_REWARD) && height > 1 )
             {
-                if ( (checktoshis= komodo_checkcommission((CBlock *)&block,height)) < 0 )
+                if ( (checktoshis= hush_checkcommission((CBlock *)&block,height)) < 0 )
                 {
                     fprintf(stderr,"ht.%d checktoshis %.8f overflow.%d total %.8f strangeout.%d\n",height,dstr(checktoshis),overflow,dstr(total),strangeout);
                     return(-1);
@@ -1568,7 +1568,7 @@ void hush_passport_iteration()
 extern std::vector<uint8_t> Mineropret; // opreturn data set by the data gathering code
 #define PRICES_ERRORRATE (COIN / 100)	  // maximum acceptable change, set at 1%
 #define PRICES_SIZEBIT0 (sizeof(uint32_t) * 4) // 4 uint32_t unixtimestamp, BTCUSD, BTCGBP and BTCEUR
-#define KOMODO_LOCALPRICE_CACHESIZE 13
+#define HUSH_LOCALPRICE_CACHESIZE 13
 #define HUSH_MAXPRICES 2048
 #define PRICES_SMOOTHWIDTH 1
 
@@ -1594,14 +1594,14 @@ struct komodo_priceinfo
     char symbol[64];
 } PRICES[HUSH_MAXPRICES];
 
-uint32_t PriceCache[KOMODO_LOCALPRICE_CACHESIZE][HUSH_MAXPRICES];//4+sizeof(Cryptos)/sizeof(*Cryptos)+sizeof(Forex)/sizeof(*Forex)];
+uint32_t PriceCache[HUSH_LOCALPRICE_CACHESIZE][HUSH_MAXPRICES];//4+sizeof(Cryptos)/sizeof(*Cryptos)+sizeof(Forex)/sizeof(*Forex)];
 int64_t PriceMult[HUSH_MAXPRICES];
-int32_t komodo_cbopretsize(uint64_t flags);
+int32_t hush_cbopretsize(uint64_t flags);
 
 void komodo_PriceCache_shift()
 {
     int32_t i;
-    for (i=KOMODO_LOCALPRICE_CACHESIZE-1; i>0; i--)
+    for (i=HUSH_LOCALPRICE_CACHESIZE-1; i>0; i--)
         memcpy(PriceCache[i],PriceCache[i-1],sizeof(PriceCache[i]));
     memcpy(PriceCache[0],Mineropret.data(),Mineropret.size());
 }
@@ -1630,7 +1630,7 @@ int32_t hush_heightpricebits(uint64_t *seedp,uint32_t *heightbits,int32_t nHeigh
         *seedp = 0;
     if ( (pindex= hush_chainactive(nHeight)) != 0 )
     {
-        if ( komodo_blockload(block,pindex) == 0 )
+        if ( hush_blockload(block,pindex) == 0 )
         {
             return(_hush_heightpricebits(seedp,heightbits,&block));
         }
@@ -1727,7 +1727,7 @@ CScript komodo_mineropret(int32_t nHeight)
             if ( numzero != 0 )
             {
                 fprintf(stderr," komodo_mineropret numzero.%d vs n.%d\n",numzero,n);
-                komodo_cbopretupdate(1);
+                hush_cbopretupdate(1);
                 sleep(61);
             }
         }
@@ -1856,13 +1856,13 @@ int32_t komodo_opretvalidate(const CBlock *block,CBlockIndex * const previndex,i
                                     if ( iter == 0 )
                                         break;
                                     // second iteration checks recent prices to see if within local volatility
-                                    for (j=0; j<KOMODO_LOCALPRICE_CACHESIZE; j++)
+                                    for (j=0; j<HUSH_LOCALPRICE_CACHESIZE; j++)
                                         if ( PriceCache[j][i] >= prevbits[i] )
                                         {
                                             fprintf(stderr,"i.%d within recent localprices[%d] %u >= %u\n",i,j,PriceCache[j][i],prevbits[i]);
                                             break;
                                         }
-                                    if ( j == KOMODO_LOCALPRICE_CACHESIZE )
+                                    if ( j == HUSH_LOCALPRICE_CACHESIZE )
                                     {
                                         komodo_queuelocalprice(1,nHeight,block->nTime,bhash,i,prevbits[i]);
                                         break;
@@ -1872,13 +1872,13 @@ int32_t komodo_opretvalidate(const CBlock *block,CBlockIndex * const previndex,i
                                 {
                                     if ( iter == 0 )
                                         break;
-                                    for (j=0; j<KOMODO_LOCALPRICE_CACHESIZE; j++)
+                                    for (j=0; j<HUSH_LOCALPRICE_CACHESIZE; j++)
                                         if ( PriceCache[j][i] <= prevbits[i] )
                                         {
                                             fprintf(stderr,"i.%d within recent localprices[%d] %u <= prev %u\n",i,j,PriceCache[j][i],prevbits[i]);
                                             break;
                                         }
-                                    if ( j == KOMODO_LOCALPRICE_CACHESIZE )
+                                    if ( j == HUSH_LOCALPRICE_CACHESIZE )
                                     {
                                         komodo_queuelocalprice(-1,nHeight,block->nTime,bhash,i,prevbits[i]);
                                         break;
@@ -1891,7 +1891,7 @@ int32_t komodo_opretvalidate(const CBlock *block,CBlockIndex * const previndex,i
                             if ( iter == 0 )
                             {
                                 fprintf(stderr,"force update prices\n");
-                                komodo_cbopretupdate(1);
+                                hush_cbopretupdate(1);
                                 memcpy(localbits,Mineropret.data(),Mineropret.size());
                             } else return(-1);
                         }
@@ -2199,10 +2199,10 @@ int32_t get_btcusd(uint32_t pricebits[4])
     return(-1);
 }
 
-// komodo_cbopretupdate() obtains the external price data and encodes it into Mineropret, which will then be used by the miner and validation
+// hush_cbopretupdate() obtains the external price data and encodes it into Mineropret, which will then be used by the miner and validation
 // save history, use new data to approve past rejection, where is the auto-reconsiderblock?
 
-int32_t komodo_cbopretsize(uint64_t flags)
+int32_t hush_cbopretsize(uint64_t flags)
 {
     int32_t size = 0;
     if ( (ASSETCHAINS_CBOPRET & 1) != 0 )
@@ -2220,7 +2220,7 @@ int32_t komodo_cbopretsize(uint64_t flags)
 
 extern uint256 Queued_reconsiderblock;
 
-void komodo_cbopretupdate(int32_t forceflag)
+void hush_cbopretupdate(int32_t forceflag)
 {
     static uint32_t lasttime,lastbtc,pending;
     static uint32_t pricebits[4],pricebuf[HUSH_MAXPRICES],forexprices[sizeof(Forex)/sizeof(*Forex)];
@@ -2243,7 +2243,7 @@ void komodo_cbopretupdate(int32_t forceflag)
     {
 //if ( hush_nextheight() > 333 ) // for debug only!
 //    ASSETCHAINS_CBOPRET = 7;
-        size = komodo_cbopretsize(ASSETCHAINS_CBOPRET);
+        size = hush_cbopretsize(ASSETCHAINS_CBOPRET);
         if ( Mineropret.size() < size )
             Mineropret.resize(size);
         size = PRICES_SIZEBIT0;
@@ -2418,7 +2418,7 @@ char *komodo_pricename(char *name,int32_t ind)
 // finds index for its symbol name
 int32_t komodo_priceind(const char *symbol)
 {
-    char name[65]; int32_t i,n = (int32_t)(komodo_cbopretsize(ASSETCHAINS_CBOPRET) / sizeof(uint32_t));
+    char name[65]; int32_t i,n = (int32_t)(hush_cbopretsize(ASSETCHAINS_CBOPRET) / sizeof(uint32_t));
     for (i=1; i<n; i++)
     {
         komodo_pricename(name,i);
@@ -2712,8 +2712,8 @@ int32_t komodo_pricesinit()
         fputc(0,PRICES[0].fp);
         fflush(PRICES[0].fp);
     }
-    fprintf(stderr,"pricesinit done i.%d num.%d numprices.%d\n",i,num,(int32_t)(komodo_cbopretsize(ASSETCHAINS_CBOPRET)/sizeof(uint32_t)));
-    if ( i != num || i != komodo_cbopretsize(ASSETCHAINS_CBOPRET)/sizeof(uint32_t) )
+    fprintf(stderr,"pricesinit done i.%d num.%d numprices.%d\n",i,num,(int32_t)(hush_cbopretsize(ASSETCHAINS_CBOPRET)/sizeof(uint32_t)));
+    if ( i != num || i != hush_cbopretsize(ASSETCHAINS_CBOPRET)/sizeof(uint32_t) )
     {
         fprintf(stderr,"fatal error opening prices files, start shutdown\n");
         StartShutdown();
@@ -2737,7 +2737,7 @@ void komodo_pricesupdate(int32_t height,CBlock *pblock)
     if ( numprices == 0 )
     {
         pthread_mutex_init(&pricemutex,0);
-        numprices = (int32_t)(komodo_cbopretsize(ASSETCHAINS_CBOPRET) / sizeof(uint32_t));
+        numprices = (int32_t)(hush_cbopretsize(ASSETCHAINS_CBOPRET) / sizeof(uint32_t));
         ptr32 = (uint32_t *)calloc(sizeof(uint32_t),numprices * width);
         ptr64 = (int64_t *)calloc(sizeof(int64_t),PRICES_DAYWINDOW*PRICES_MAXDATAPOINTS);
         tmpbuf = (int64_t *)calloc(sizeof(int64_t),2*PRICES_DAYWINDOW);

@@ -377,7 +377,7 @@ char *komodo_issuemethod(char *userpass,char *method,char *params,uint16_t port)
     {
         sprintf(url,(char *)"http://127.0.0.1:%u",port);
         sprintf(postdata,"{\"method\":\"%s\",\"params\":%s}",method,params);
- //printf("[%s] (%s) postdata.(%s) params.(%s) USERPASS.(%s)\n",SMART_CHAIN_SYMBOL,url,postdata,params,KMDUSERPASS);
+ //printf("[%s] (%s) postdata.(%s) params.(%s) USERPASS.(%s)\n",SMART_CHAIN_SYMBOL,url,postdata,params,HUSHUSERPASS);
         retstr2 = bitcoind_RPC(&retstr,(char *)"debug",url,userpass,method,params);
         //retstr = curl_post(&cHandle,url,USERPASS,postdata,0,0,0,0);
     }
@@ -389,17 +389,16 @@ int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *kmdnotarized_heig
     char *jsonstr,params[256],*userpass; uint16_t port; cJSON *json,*item; int32_t height = 0,txid_height = 0,txid_confirmations = 0;
     params[0] = 0;
     *kmdnotarized_heightp = 0;
-    if ( strcmp(dest,"KMD") == 0 )
+    if ( strcmp(dest,"HUSH3") == 0 ) {
+        port     = HUSH3_PORT;
+        userpass = HUSHUSERPASS;
+    } else if ( strcmp(dest,"BTC") == 0 )
     {
-        port = KMD_PORT;
-        userpass = KMDUSERPASS;
-    }
-    else if ( strcmp(dest,"BTC") == 0 )
-    {
-        port = 8332;
+        port     = 8332;
         userpass = BTCUSERPASS;
+    } else {
+        return(0);
     }
-    else return(0);
     if ( userpass[0] != 0 )
     {
         if ( (jsonstr= komodo_issuemethod(userpass,(char *)"getinfo",params,port)) != 0 )
@@ -482,12 +481,12 @@ int32_t komodo_verifynotarization(char *symbol,char *dest,int32_t height,int32_t
         printf("[%s] src.%s dest.%s params.[%s] ht.%d notarized.%d\n",SMART_CHAIN_SYMBOL,symbol,dest,params,height,NOTARIZED_HEIGHT);
     if ( strcmp(dest,"KMD") == 0 )
     {
-        if ( KMDUSERPASS[0] != 0 )
+        if ( HUSHUSERPASS[0] != 0 )
         {
             if ( SMART_CHAIN_SYMBOL[0] != 0 )
             {
-                jsonstr = komodo_issuemethod(KMDUSERPASS,(char *)"getrawtransaction",params,KMD_PORT);
-                //printf("userpass.(%s) got (%s)\n",KMDUSERPASS,jsonstr);
+                jsonstr = komodo_issuemethod(HUSHUSERPASS,(char *)"getrawtransaction",params,HUSH3_PORT);
+                //printf("userpass.(%s) got (%s)\n",HUSHUSERPASS,jsonstr);
             }
         }//else jsonstr = _dex_getrawtransaction();
         else return(0); // need universal way to issue DEX* API, since notaries mine most blocks, this ok
@@ -556,12 +555,12 @@ CScript komodo_makeopret(CBlock *pblock, bool fNew)
     return(opret);
 }
 
-/*uint256 komodo_getblockhash(int32_t height)
+/*uint256 hush_getblockhash(int32_t height)
  {
  uint256 hash; char params[128],*hexstr,*jsonstr; cJSON *result; int32_t i; uint8_t revbuf[32];
  memset(&hash,0,sizeof(hash));
  sprintf(params,"[%d]",height);
- if ( (jsonstr= komodo_issuemethod(KMDUSERPASS,(char *)"getblockhash",params,BITCOIND_RPCPORT)) != 0 )
+ if ( (jsonstr= komodo_issuemethod(HUSHUSERPASS,(char *)"getblockhash",params,BITCOIND_RPCPORT)) != 0 )
  {
  if ( (result= cJSON_Parse(jsonstr)) != 0 )
  {
@@ -582,7 +581,7 @@ CScript komodo_makeopret(CBlock *pblock, bool fNew)
  return(hash);
  }
 
- uint256 _komodo_getblockhash(int32_t height);*/
+ uint256 _hush_getblockhash(int32_t height);*/
 
 uint64_t komodo_seed(int32_t height)
 {
@@ -595,9 +594,9 @@ uint64_t komodo_seed(int32_t height)
      if ( height > 10 )
      height -= 10;
      if ( SMART_CHAIN_SYMBOL[0] == 0 )
-     hash = _komodo_getblockhash(height);
+     hash = _hush_getblockhash(height);
      if ( memcmp(&hash,&zero,sizeof(hash)) == 0 )
-     hash = komodo_getblockhash(height);
+     hash = hush_getblockhash(height);
      int32_t i;
      for (i=0; i<32; i++)
      printf("%02x",((uint8_t *)&hash)[i]);
@@ -639,7 +638,7 @@ uint32_t komodo_txtime(CScript &opret,uint64_t *valuep,uint256 hash, int32_t n, 
     return(tx.nLockTime);
 }
 
-CBlockIndex *komodo_getblockindex(uint256 hash)
+CBlockIndex *hush_getblockindex(uint256 hash)
 {
     BlockMap::const_iterator it = mapBlockIndex.find(hash);
     return((it != mapBlockIndex.end()) ? it->second : NULL);
@@ -658,7 +657,7 @@ uint32_t komodo_txtime2(uint64_t *valuep,uint256 hash,int32_t n,char *destaddr)
         //fprintf(stderr,"ERROR: %s/v%d locktime.%u\n",hash.ToString().c_str(),n,(uint32_t)tx.nLockTime);
         return(0);
     }
-    if ( (pindex= komodo_getblockindex(hashBlock)) != 0 )
+    if ( (pindex= hush_getblockindex(hashBlock)) != 0 )
         txtime = pindex->nTime;
     else txtime = tx.nLockTime;
     //fprintf(stderr,"%s/v%d locktime.%u\n",hash.ToString().c_str(),n,(uint32_t)tx.nLockTime);
@@ -671,7 +670,7 @@ uint32_t komodo_txtime2(uint64_t *valuep,uint256 hash,int32_t n,char *destaddr)
     return(txtime);
 }
 
-bool komodo_checkopret(CBlock *pblock, CScript &merkleroot)
+bool hush_checkopret(CBlock *pblock, CScript &merkleroot)
 {
     merkleroot = pblock->vtx.back().vout.back().scriptPubKey;
     return(merkleroot.IsOpReturn() && merkleroot == komodo_makeopret(pblock, false));
@@ -792,7 +791,7 @@ int32_t hush_block2pubkey33(uint8_t *pubkey33,CBlock *block)
     return(0);
 }
 
-int32_t komodo_blockload(CBlock& block,CBlockIndex *pindex)
+int32_t hush_blockload(CBlock& block,CBlockIndex *pindex)
 {
     block.SetNull();
     // Open history file to read
@@ -849,7 +848,7 @@ uint32_t hush_heightstamp(int32_t height)
         if ( HUSH_LOADINGBLOCKS == 0 )
             memset(pindex->pubkey33,0xff,33);
         else memset(pindex->pubkey33,0,33);
-        if ( komodo_blockload(block,pindex) == 0 )
+        if ( hush_blockload(block,pindex) == 0 )
         {
             hush_block2pubkey33(pindex->pubkey33,&block);
             //for (i=0; i<33; i++)
@@ -884,7 +883,7 @@ void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height)
     memset(pubkey33,0,33);
     if ( pindex != 0 )
     {
-        if ( komodo_blockload(block,pindex) == 0 )
+        if ( hush_blockload(block,pindex) == 0 )
             hush_block2pubkey33(pubkey33,&block);
     }
 }
@@ -928,7 +927,7 @@ int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blo
         if ( (pindex= hush_chainactive(height-i)) != 0 )
         {
             blocktimes[i] = pindex->nTime;
-            if ( komodo_blockload(block,pindex) == 0 )
+            if ( hush_blockload(block,pindex) == 0 )
             {
                 hush_block2pubkey33(pubkeys[i],&block);
                 for (j=0; j<n; j++)
@@ -960,7 +959,7 @@ int32_t komodo_minerids(uint8_t *minerids,int32_t height,int32_t width)
             continue;
         if ( (pindex= hush_chainactive(height-width+i+1)) != 0 )
         {
-            if ( komodo_blockload(block,pindex) == 0 )
+            if ( hush_blockload(block,pindex) == 0 )
             {
                 hush_block2pubkey33(pubkey33,&block);
                 for (j=0; j<numnotaries; j++)
@@ -1073,9 +1072,9 @@ int32_t komodo_isrealtime(int32_t *kmdheightp)
 }
 
 /*
- komodo_checkPOW (fast) is called early in the process and should only refer to data immediately available. it is a filter to prevent bad blocks from going into the local DB. The more blocks we can filter out at this stage, the less junk in the local DB that will just get purged later on.
+ hush_checkPOW (fast) is called early in the process and should only refer to data immediately available. it is a filter to prevent bad blocks from going into the local DB. The more blocks we can filter out at this stage, the less junk in the local DB that will just get purged later on.
 
- komodo_checkPOW (slow) is called right before connecting blocks so all prior blocks can be assumed to be there and all checks must pass
+ hush_checkPOW (slow) is called right before connecting blocks so all prior blocks can be assumed to be there and all checks must pass
 
  commission must be in coinbase.vout[1] and must be >= 10000 sats
  */
@@ -1276,7 +1275,7 @@ int8_t hush_segid(int32_t nocache,int32_t height)
     {
         if ( nocache == 0 && pindex->segid >= -1 )
             return(pindex->segid);
-        if ( komodo_blockload(block,pindex) == 0 )
+        if ( hush_blockload(block,pindex) == 0 )
         {
             txn_count = block.vtx.size();
             if ( txn_count > 1 && block.vtx[txn_count-1].vin.size() == 1 && block.vtx[txn_count-1].vout.size() == 1 )
@@ -1484,7 +1483,7 @@ uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount)
     return(ret);
 }
 
-int32_t komodo_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *script, int32_t len)
+int32_t hush_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *script, int32_t len)
 {
     // Check the notarisation is valid, and extract notarised height. 
     uint64_t voutmask;
@@ -1515,7 +1514,7 @@ uint64_t komodo_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &Notar
         return(0);
     
     // Check the notarisation is valid.
-    int32_t notarizedheight = komodo_getnotarizedheight(timestamp, height, script, len);
+    int32_t notarizedheight = hush_getnotarizedheight(timestamp, height, script, len);
     if ( notarizedheight == 0 )
         return(0);
 
@@ -1570,7 +1569,7 @@ bool GetNotarizationNotaries(uint8_t notarypubkeys[64][33], int8_t &numNN, const
     return true;
 }
 
-uint64_t komodo_checknotarypay(CBlock *pblock,int32_t height)
+uint64_t hush_checknotarypay(CBlock *pblock,int32_t height)
 {
     std::vector<int8_t> NotarizationNotaries; uint8_t *script; int32_t scriptlen;
     uint64_t timestamp = pblock->nTime;
@@ -1722,7 +1721,7 @@ void GetHushEarlytxidScriptPub()
     StartShutdown();
 }
 
-int64_t komodo_checkcommission(CBlock *pblock,int32_t height)
+int64_t hush_checkcommission(CBlock *pblock,int32_t height)
 {
     if(fDebug)
         fprintf(stderr,"%s at height=%d\n",__func__,height);
@@ -1732,7 +1731,7 @@ int64_t komodo_checkcommission(CBlock *pblock,int32_t height)
         checktoshis = the_commission(pblock,height);
         if ( checktoshis >= 10000 && pblock->vtx[0].vout.size() < 2 )
         {
-            fprintf(stderr,"ERROR: komodo_checkcommission vsize.%d height.%d commission %.8f has checktoshis=%lu <10000 or less than 2 vouts (vouts=%lu)\n",(int32_t)pblock->vtx[0].vout.size(),height,(double)checktoshis/COIN, checktoshis, pblock->vtx[0].vout.size() );
+            fprintf(stderr,"ERROR: hush_checkcommission vsize.%d height.%d commission %.8f has checktoshis=%lu <10000 or less than 2 vouts (vouts=%lu)\n",(int32_t)pblock->vtx[0].vout.size(),height,(double)checktoshis/COIN, checktoshis, pblock->vtx[0].vout.size() );
             return(-1);
         }
         else if ( checktoshis != 0 )
@@ -1791,14 +1790,14 @@ int64_t komodo_checkcommission(CBlock *pblock,int32_t height)
 
 bool HUSH_TEST_ASSETCHAIN_SKIP_POW = 0;
 
-int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
+int32_t hush_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
 {
     uint256 hash,merkleroot; arith_uint256 bnTarget,bhash; bool fNegative,fOverflow; uint8_t *script,pubkey33[33],pubkeys[64][33]; int32_t i,scriptlen,possible,PoSperc,is_PoSblock=0,n,failed = 0,notaryid = -1; int64_t checktoshis,value; CBlockIndex *pprev;
     if ( HUSH_TEST_ASSETCHAIN_SKIP_POW == 0 && Params().NetworkIDString() == "regtest" )
         HUSH_TEST_ASSETCHAIN_SKIP_POW = 1;
     if ( !CheckEquihashSolution(pblock, Params()) )
     {
-        fprintf(stderr,"komodo_checkPOW slowflag.%d ht.%d CheckEquihashSolution failed\n",slowflag,height);
+        fprintf(stderr,"hush_checkPOW slowflag.%d ht.%d CheckEquihashSolution failed\n",slowflag,height);
         return(-1);
     }
     hash = pblock->GetHash();
@@ -1855,7 +1854,7 @@ int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
                     return(-1);
             }
         } else {
-            if ( komodo_checkcommission(pblock,height) < 0 )
+            if ( hush_checkcommission(pblock,height) < 0 )
                 return(-1);
         }
     }
@@ -1886,7 +1885,7 @@ int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
     }
 
     if(fDebug) {
-        fprintf(stderr,"komodo_checkPOW possible.%d slowflag.%d ht.%d notaryid.%d failed.%d\n",possible,slowflag,height,notaryid,failed);
+        fprintf(stderr,"hush_checkPOW possible.%d slowflag.%d ht.%d notaryid.%d failed.%d\n",possible,slowflag,height,notaryid,failed);
     }
     if ( failed != 0 && possible == 0 && notaryid < 0 ) {
         return(-1);
@@ -1895,10 +1894,10 @@ int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
     }
 }
 
-int32_t komodo_acpublic(uint32_t tiptime)
+int32_t hush_scpublic(uint32_t tiptime)
 {
-    int32_t acpublic = ASSETCHAINS_PUBLIC; CBlockIndex *pindex;
-    return(acpublic);
+    // HUSH does not support public blockchains, go use something else if you want no privacy
+    return 0;
 }
 
 int64_t hush_newcoins(int64_t *zfundsp,int64_t *sproutfundsp,int32_t nHeight,CBlock *pblock)
@@ -1962,7 +1961,7 @@ int64_t hush_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height)
         {
             if ( pindex->newcoins == 0 && pindex->zfunds == 0 )
             {
-                if ( komodo_blockload(block,pindex) == 0 ) {
+                if ( hush_blockload(block,pindex) == 0 ) {
                     pindex->newcoins = hush_newcoins(&pindex->zfunds,&pindex->sproutfunds,pindex->GetHeight(),&block);
                 } else {
                     fprintf(stderr,"error loading block.%d\n",pindex->GetHeight());

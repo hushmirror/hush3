@@ -88,7 +88,7 @@ using namespace std;
 
 #include "hush_defs.h"
 extern void ThreadSendAlert();
-extern bool komodo_dailysnapshot(int32_t height);
+extern bool hush_dailysnapshot(int32_t height);
 extern int32_t HUSH_LOADINGBLOCKS;
 extern char SMART_CHAIN_SYMBOL[];
 extern int32_t HUSH_SNAPSHOT_INTERVAL;
@@ -431,15 +431,14 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-peerbloomfilters", strprintf(_("Support filtering of blocks and transaction with Bloom filters (default: %u)"), 1));
     if (showDebug)
         strUsage += HelpMessageOpt("-enforcenodebloom", strprintf("Enforce minimum protocol version to limit use of Bloom filters (default: %u)", 0));
-    strUsage += HelpMessageOpt("-port=<port>", strprintf(_("Listen for connections on <port> (default: %u or testnet: %u)"), 7770, 17770));
+    strUsage += HelpMessageOpt("-port=<port>", strprintf(_("Listen for connections on <port> (default: %u or testnet: %u)"), 55555, 55420));
     strUsage += HelpMessageOpt("-proxy=<ip:port>", _("Connect through SOCKS5 proxy"));
     strUsage += HelpMessageOpt("-proxyrandomize", strprintf(_("Randomize credentials for every proxy connection. This enables Tor stream isolation (default: %u)"), 1));
     strUsage += HelpMessageOpt("-seednode=<ip>", _("Connect to a node to retrieve peer addresses, and disconnect"));
     strUsage += HelpMessageOpt("-timeout=<n>", strprintf(_("Specify connection timeout in milliseconds (minimum: 1, default: %d)"), DEFAULT_CONNECT_TIMEOUT));
     strUsage += HelpMessageOpt("-torcontrol=<ip>:<port>", strprintf(_("Tor control port to use if onion listening enabled (default: %s)"), DEFAULT_TOR_CONTROL));
     strUsage += HelpMessageOpt("-torpassword=<pass>", _("Tor control port password (default: empty)"));
-    strUsage += HelpMessageOpt("-tls=<option>", _("Specify TLS usage (default: 1 => enabled and preferred, yet compatible); other options are -tls=0 to disable TLS and -tls=only to enforce it"));
-    strUsage += HelpMessageOpt("-tlsfallbacknontls=<0 or 1>", _("If a TLS connection fails, the next connection attempt of the same peer (based on IP address) takes place without TLS (default: 1)"));
+    strUsage += HelpMessageOpt("-tls=<option>", _("Specify TLS usage (default: 1 => enabled and required); Cannot be turned off."));
     strUsage += HelpMessageOpt("-tlsvalidate=<0 or 1>", _("Connect to peers only with valid certificates (default: 0)"));
     strUsage += HelpMessageOpt("-tlskeypath=<path>", _("Full path to a private key"));
     strUsage += HelpMessageOpt("-tlskeypwd=<password>", _("Password for a private key encryption (default: not set, i.e. private key will be stored unencrypted)"));
@@ -1815,7 +1814,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 
                 if ( ASSETCHAINS_CC != 0 && HUSH_SNAPSHOT_INTERVAL != 0 && chainActive.Height() >= HUSH_SNAPSHOT_INTERVAL )
                 {
-                    if ( !komodo_dailysnapshot(chainActive.Height()) )
+                    if ( !hush_dailysnapshot(chainActive.Height()) )
                     {
                         strLoadError = _("daily snapshot failed, please reindex your chain.");
                         break;

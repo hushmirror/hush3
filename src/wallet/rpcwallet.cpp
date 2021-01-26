@@ -65,7 +65,7 @@ extern int32_t HUSH_INSYNC;
 uint32_t hush_segid32(char *coinaddr);
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int32_t hush_isnotaryvout(char *coinaddr,uint32_t tiptime); // from ac_private chains only
-CBlockIndex *komodo_getblockindex(uint256 hash);
+CBlockIndex *hush_getblockindex(uint256 hash);
 extern string randomSietchZaddr();
 extern CAmount fConsolidationTxFee;
 extern bool fZindex;
@@ -2537,7 +2537,7 @@ UniValue walletlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return NullUniValue;
 }
 
-int32_t komodo_acpublic(uint32_t tiptime);
+int32_t hush_scpublic(uint32_t tiptime);
 
 UniValue encryptwallet(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
@@ -2545,7 +2545,7 @@ UniValue encryptwallet(const UniValue& params, bool fHelp, const CPubKey& mypk)
         return NullUniValue;
 
     string enableArg = "developerencryptwallet";
-    int32_t flag = (komodo_acpublic(0) || SMART_CHAIN_SYMBOL[0] == 0);
+    int32_t flag = (hush_scpublic(0) || SMART_CHAIN_SYMBOL[0] == 0);
     auto fEnableWalletEncryption = fExperimentalMode && GetBoolArg("-" + enableArg, flag);
 
     std::string strWalletEncryptionDisabledMsg = "";

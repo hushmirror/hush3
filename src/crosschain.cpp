@@ -42,7 +42,7 @@
 // because it might be disconnecting blocks at the same time.
 // TODO: this assumes a blocktime of 75 seconds for HUSH and 60 seconds for other chains
 int NOTARISATION_SCAN_LIMIT_BLOCKS = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? 1152 : 1440;
-CBlockIndex *komodo_getblockindex(uint256 hash);
+CBlockIndex *hush_getblockindex(uint256 hash);
 
 /* On HUSH */
 uint256 CalculateProofRoot(const char* symbol, uint32_t targetCCid, int hushHeight,
@@ -435,7 +435,7 @@ TxProof GetAssetchainProof(uint256 hash,CTransaction burnTx)
         if (blockHash.IsNull())
             throw std::runtime_error("tx still in mempool");
 
-        blockIndex = komodo_getblockindex(blockHash);
+        blockIndex = hush_getblockindex(blockHash);
         int h = blockIndex->GetHeight();
         // The assumption here is that the first notarization for a height GTE than
         // the transaction block height will contain the corresponding MoM. If there

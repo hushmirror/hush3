@@ -19,9 +19,10 @@
 #define CC_INCLUDE_H
 
 /*! \file CCinclude.h
-\brief A Documented file.
+\brief Cryptoconditions
 
-Details.
+CCs for teh lulz
+
 */
 
 /// \mainpage Brief introduction into cryptocondition contracts
@@ -240,8 +241,6 @@ extern CWallet* pwalletMain;  //!< global wallet object pointer to access wallet
 
 /// @private seems old-style
 bool GetAddressUnspent(uint160 addressHash, int type,std::vector<std::pair<CAddressUnspentKey,CAddressUnspentValue> > &unspentOutputs);
-//CBlockIndex *komodo_getblockindex(uint256 hash);  //moved to komodo_def.h
-//int32_t hush_nextheight();  //moved to komodo_def.h
 
 /// CCgetspenttxid finds the txid of the transaction which spends a transaction output. The function does this without loading transactions from the chain, by using spent index
 /// @param[out] spenttxid transaction id of the spending transaction
@@ -256,11 +255,6 @@ int32_t CCgetspenttxid(uint256 &spenttxid,int32_t &vini,int32_t &height,uint256 
 void CCclearvars(struct CCcontract_info *cp);
 UniValue CClib(struct CCcontract_info *cp,char *method,char *jsonstr);
 UniValue CClib_info(struct CCcontract_info *cp);
-
-//CBlockIndex *hush_blockindex(uint256 hash); //moved to komodo_def.h
-//CBlockIndex *hush_chainactive(int32_t height); //moved to komodo_def.h
-//int32_t hush_blockheight(uint256 hash); //moved to komodo_def.h
-//void StartShutdown();
 
 static const uint256 zeroid;  //!< null uint256 constant
 
@@ -380,11 +374,8 @@ int64_t IsTokensvout(bool goDeeper, bool checkPubkeys, struct CCcontract_info *c
 /// returns true if success
 bool DecodeHexTx(CTransaction& tx, const std::string& strHexTx);
 
-//void komodo_sendmessage(int32_t minpeers,int32_t maxpeers,const char *message,std::vector<uint8_t> payload); // moved to hush_defs.h
-
 /// @private
 int32_t payments_parsehexdata(std::vector<uint8_t> &hexdata,cJSON *item,int32_t len);
-// int32_t komodo_blockload(CBlock& block,CBlockIndex *pindex); // this def in hush_defs.h
 
 /// Makes opreturn scriptPubKey for token creation transaction. Normally this function is called internally by the tokencreate rpc. You might need to call this function to create a customized token.
 /// The total opreturn length should not exceed 10001 byte
@@ -701,7 +692,6 @@ uint64_t stringbits(char *str);
 uint256 revuint256(uint256 txid);
 char *uint256_str(char *dest,uint256 txid);
 char *pubkey33_str(char *dest,uint8_t *pubkey33);
-//uint256 Parseuint256(const char *hexstr); // located in komodo_defs
 /// \endcond
 
 /// converts public key as array of uint8_t to normal address
@@ -794,8 +784,6 @@ int32_t CCCointxidExists(char const *logcategory,uint256 cointxid);
 
 /// @private
 uint256 BitcoinGetProofMerkleRoot(const std::vector<uint8_t> &proofData, std::vector<uint256> &txids);
-
-// bool komodo_txnotarizedconfirmed(uint256 txid); //moved to hush_defs.h
 
 /// @private
 CPubKey check_signing_pubkey(CScript scriptSig);

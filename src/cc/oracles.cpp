@@ -95,7 +95,7 @@
  vout.n-1: opreturn with oracletxid, prevbatontxid and data in proper format
 
 */
-extern int32_t komodo_get_current_height();
+extern int32_t hush_get_current_height();
 #define PUBKEY_SPOOFING_FIX_ACTIVATION 1563148800
 #define CC_MARKER_VALUE 10000
 
@@ -946,7 +946,7 @@ UniValue OracleRegister(const CPubKey& pk, int64_t txfee,uint256 oracletxid,int6
             CCERR_RESULT("oraclescc",CCLOG_INFO, stream << "error adding inputs from your Oracles CC address, please fund it first with oraclesfund rpc!");
         mtx.vout.push_back(CTxOut(txfee,CScript() << ParseHex(HexStr(markerpubkey)) << OP_CHECKSIG));
         mtx.vout.push_back(MakeCC1vout(cp->evalcode,txfee,batonpk));
-        if (GetLatestTimestamp(komodo_get_current_height())>PUBKEY_SPOOFING_FIX_ACTIVATION) mtx.vout.push_back(CTxOut(txfee,CScript() << ParseHex(HexStr(mypk)) << OP_CHECKSIG));
+        if (GetLatestTimestamp(hush_get_current_height())>PUBKEY_SPOOFING_FIX_ACTIVATION) mtx.vout.push_back(CTxOut(txfee,CScript() << ParseHex(HexStr(mypk)) << OP_CHECKSIG));
         return(FinalizeCCTxExt(pk.IsValid(),0,cp,mtx,mypk,txfee,EncodeOraclesOpRet('R',oracletxid,mypk,datafee)));
     }
     CCERR_RESULT("oraclescc",CCLOG_INFO, stream << "error adding normal inputs");

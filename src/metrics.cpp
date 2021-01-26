@@ -36,7 +36,7 @@
 #endif
 #include <unistd.h>
 #include "hush_defs.h"
-int64_t komodo_block_unlocktime(uint32_t nHeight);
+int64_t hush_block_unlocktime(uint32_t nHeight);
 
 void AtomicTimer::start()
 {
@@ -361,7 +361,7 @@ int printMetrics(size_t cols, bool mining)
                     CAmount subsidy = GetBlockSubsidy(height, consensusParams);
 
                     if ((std::max(0, COINBASE_MATURITY - (tipHeight - height)) > 0) ||
-                        (tipHeight < komodo_block_unlocktime(height) && subsidy >= ASSETCHAINS_TIMELOCKGTE)) {
+                        (tipHeight < hush_block_unlocktime(height) && subsidy >= ASSETCHAINS_TIMELOCKGTE)) {
                         immature += subsidy;
                     } else {
                         mature += subsidy;

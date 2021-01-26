@@ -60,7 +60,7 @@ extern int32_t ASSETCHAINS_BLOCKTIME;
 extern uint64_t ASSETCHAINS_CBOPRET;
 void hush_passport_iteration();
 int32_t hush_longestchain();
-void komodo_cbopretupdate(int32_t forceflag);
+void hush_cbopretupdate(int32_t forceflag);
 CBlockIndex *hush_chainactive(int32_t height);
 
 void WaitForShutdown(boost::thread_group* threadGroup)
@@ -89,7 +89,7 @@ void WaitForShutdown(boost::thread_group* threadGroup)
         } else {
             //hush_longestchain();
             if ( ASSETCHAINS_CBOPRET != 0 )
-                komodo_cbopretupdate(0);
+                hush_cbopretupdate(0);
             for (i=0; i<=ASSETCHAINS_BLOCKTIME/5; i++)
             {
                 fShutdown = ShutdownRequested();

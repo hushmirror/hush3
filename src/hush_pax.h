@@ -742,7 +742,7 @@ uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pu
     if ( bitcoin_addr2rmd160(&addrtype,rmd160,coinaddr) == 20 )
     {
         PAX_pubkey(1,pubkey33,&addrtype,rmd160,base,&shortflag,tokomodo != 0 ? &komodoshis : &fiatoshis);
-        bitcoin_address(destaddr,KOMODO_PUBTYPE,pubkey33,33);
+        bitcoin_address(destaddr,HUSH_PUBTYPE,pubkey33,33);
     }
     return(komodoshis);
 }

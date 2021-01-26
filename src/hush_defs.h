@@ -26,7 +26,7 @@
 #define KOMODO_ELECTION_GAP 2000
 #define ROUNDROBIN_DELAY 61
 #define HUSH_SMART_CHAIN_MAXLEN 65
-#define KOMODO_LIMITED_NETWORKSIZE 4
+#define HUSH_LIMITED_NETWORKSIZE 4
 #define DRAGON_MAXSCRIPTSIZE 10001
 #define HUSH_MAXMEMPOOLTIME 3600 // affects consensus
 #define CRYPTO555_PUBSECPSTR "038a1bd41a08f38edda51042988022933c5775dfce81f7bae0b32a9179650352ac"
@@ -480,7 +480,7 @@ static const char *notaries_elected[NUM_HUSH_SEASONS][NUM_HUSH_NOTARIES][2] =
 #define CLEARBIT(bits,bitoffset) (((uint8_t *)bits)[(bitoffset) >> 3] &= ~(1 << ((bitoffset) & 7)))
 
 #define HUSH_MAXNVALUE (((uint64_t)1 << 63) - 1)
-#define KOMODO_BIT63SET(x) ((x) & ((uint64_t)1 << 63))
+#define HUSH_BIT63SET(x) ((x) & ((uint64_t)1 << 63))
 #define HUSH_VALUETOOBIG(x) ((x) > (uint64_t)10000000001*COIN)
 
 //#ifndef TESTMODE
@@ -500,7 +500,7 @@ extern uint64_t ASSETCHAINS_SUPPLY, ASSETCHAINS_FOUNDERS_REWARD;
 extern int32_t ASSETCHAINS_LWMAPOS, ASSETCHAINS_SAPLING, ASSETCHAINS_OVERWINTER,ASSETCHAINS_BLOCKTIME;
 extern uint64_t ASSETCHAINS_TIMELOCKGTE;
 extern uint32_t ASSETCHAINS_ALGO,ASSETCHAINS_EQUIHASH,HUSH_INITDONE;
-extern int32_t HUSH_MININGTHREADS,HUSH_LONGESTCHAIN,ASSETCHAINS_SEED,IS_HUSH_NOTARY,USE_EXTERNAL_PUBKEY,HUSH_CHOSEN_ONE,KOMODO_ON_DEMAND,HUSH_PASSPORT_INITDONE,ASSETCHAINS_STAKED,HUSH_NSPV;
+extern int32_t HUSH_MININGTHREADS,HUSH_LONGESTCHAIN,ASSETCHAINS_SEED,IS_HUSH_NOTARY,USE_EXTERNAL_PUBKEY,HUSH_CHOSEN_ONE,HUSH_ON_DEMAND,HUSH_PASSPORT_INITDONE,ASSETCHAINS_STAKED,HUSH_NSPV;
 extern uint64_t ASSETCHAINS_COMMISSION, ASSETCHAINS_LASTERA,ASSETCHAINS_CBOPRET;
 extern uint64_t ASSETCHAINS_REWARD[ASSETCHAINS_MAX_ERAS+1], ASSETCHAINS_NOTARY_PAY[ASSETCHAINS_MAX_ERAS+1], ASSETCHAINS_TIMELOCKGTE, ASSETCHAINS_NONCEMASK[],ASSETCHAINS_NK[2];
 extern const char *ASSETCHAINS_ALGORITHMS[];
@@ -509,7 +509,7 @@ extern std::string NOTARY_PUBKEY,ASSETCHAINS_OVERRIDE_PUBKEY,ASSETCHAINS_SCRIPTP
 extern uint8_t NOTARY_PUBKEY33[33],ASSETCHAINS_OVERRIDE_PUBKEY33[33],ASSETCHAINS_MARMARA;
 extern std::vector<std::string> ASSETCHAINS_PRICES,ASSETCHAINS_STOCKS;
 extern uint256 HUSH_EARLYTXID;
-extern int32_t HUSH_CONNECTING,HUSH_CCACTIVATE,KOMODO_DEALERNODE;
+extern int32_t HUSH_CONNECTING,HUSH_CCACTIVATE,HUSH_DEALERNODE;
 extern uint32_t ASSETCHAINS_CC;
 extern std::string CCerror,ASSETCHAINS_CCLIB;
 extern uint8_t ASSETCHAINS_CCDISABLES[256];
@@ -562,13 +562,13 @@ bool hush_hardfork_active(uint32_t time);
 
 uint256 Parseuint256(const char *hexstr);
 void komodo_sendmessage(int32_t minpeers, int32_t maxpeers, const char *message, std::vector<uint8_t> payload);
-CBlockIndex *komodo_getblockindex(uint256 hash);
+CBlockIndex *hush_getblockindex(uint256 hash);
 int32_t hush_nextheight();
 CBlockIndex *hush_blockindex(uint256 hash);
 CBlockIndex *hush_chainactive(int32_t height);
 int32_t hush_blockheight(uint256 hash);
 bool komodo_txnotarizedconfirmed(uint256 txid);
-int32_t komodo_blockload(CBlock& block, CBlockIndex *pindex);
+int32_t hush_blockload(CBlock& block, CBlockIndex *pindex);
 uint32_t hush_chainactive_timestamp();
 uint32_t GetLatestTimestamp(int32_t height);
 

@@ -660,7 +660,7 @@ bool komodo_snapshot2(std::map <std::string, CAmount> &addressAmounts)
 int32_t lastSnapShotHeight = 0;
 std::vector <std::pair<CAmount, CTxDestination>> vAddressSnapshot;
 
-bool komodo_dailysnapshot(int32_t height)
+bool hush_dailysnapshot(int32_t height)
 {
     int reorglimit = 100; 
     uint256 notarized_hash,notarized_desttxid; int32_t prevMoMheight,notarized_height,undo_height,extraoffset;
@@ -698,7 +698,7 @@ bool komodo_dailysnapshot(int32_t height)
     {
         //fprintf(stderr, "undoing block.%i\n",n);
         CBlockIndex *pindex; CBlock block;
-        if ( (pindex= hush_chainactive(n)) == 0 || komodo_blockload(block, pindex) != 0 ) 
+        if ( (pindex= hush_chainactive(n)) == 0 || hush_blockload(block, pindex) != 0 ) 
             return false;
         // undo transactions in reverse order
         for (int32_t i = block.vtx.size() - 1; i >= 0; i--) 
@@ -1334,7 +1334,7 @@ bool CheckTransaction(uint32_t tiptime,const CTransaction& tx, CValidationState 
         {
             for (k=0; k<numbanned; k++)
             {
-                if ( tx.vin[j].prevout.hash == array[k] && komodo_checkvout(tx.vin[j].prevout.n,k,indallvouts) != 0 ) //(tx.vin[j].prevout.n == 1 || k >= indallvouts) )
+                if ( tx.vin[j].prevout.hash == array[k] && hush_checkvout(tx.vin[j].prevout.n,k,indallvouts) != 0 ) //(tx.vin[j].prevout.n == 1 || k >= indallvouts) )
                 {
                     static uint32_t counter;
                     if ( counter++ < 100 )
@@ -1374,12 +1374,12 @@ int32_t hush_isnotaryvout(char *coinaddr,uint32_t tiptime) {
     return(0);
 }
 
-int32_t komodo_acpublic(uint32_t tiptime);
+int32_t hush_scpublic(uint32_t tiptime);
 
 bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransaction& tx, CValidationState &state)
 {
     // Basic checks that don't depend on any context
-    int32_t invalid_private_taddr=0,z_z=0,z_t=0,t_z=0,acpublic = komodo_acpublic(tiptime);
+    int32_t invalid_private_taddr=0,z_z=0,z_t=0,t_z=0,acpublic = hush_scpublic(tiptime);
     /**
      * Previously:
      * 1. The consensus rule below was:
@@ -2260,7 +2260,7 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex,bool checkPOW)
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
 {
-    return komodo_ac_block_subsidy(nHeight);
+    return hush_sc_block_subsidy(nHeight);
 }
 
 bool IsInitialBlockDownload()
@@ -2565,7 +2565,7 @@ namespace Consensus {
                 // ensure that output of coinbases are not still time locked
                 if (coins->TotalTxValue() >= ASSETCHAINS_TIMELOCKGTE)
                 {
-                    uint64_t unlockTime = komodo_block_unlocktime(coins->nHeight);
+                    uint64_t unlockTime = hush_block_unlocktime(coins->nHeight);
                     if (nSpendHeight < unlockTime) {
                         return state.DoS(10,
                                         error("CheckInputs(): tried to spend coinbase that is timelocked until block %d", unlockTime),
@@ -3196,7 +3196,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             if ( block.vtx[0].vout.size() == 1 )
                 return state.DoS(100, error("ConnectBlock(): Notaries have not been paid!"), REJECT_INVALID, "bad-cb-amount");
             // calculate the notaries compensation and validate the amounts and pubkeys are correct.
-            notarypaycheque = komodo_checknotarypay((CBlock *)&block,(int32_t)pindex->GetHeight());
+            notarypaycheque = hush_checknotarypay((CBlock *)&block,(int32_t)pindex->GetHeight());
             //fprintf(stderr, "notarypaycheque.%lu\n", notarypaycheque);
             if ( notarypaycheque > 0 )
                 blockReward += notarypaycheque;
@@ -3840,18 +3840,18 @@ bool static DisconnectTip(CValidationState &state, bool fBare = false) {
     return true;
 }
 
-int32_t komodo_activate_sapling(CBlockIndex *pindex)
+int32_t hush_activate_sapling(CBlockIndex *pindex)
 {
     uint32_t blocktime,prevtime; CBlockIndex *prev; int32_t i,transition=0,height,prevht;
     int32_t activation = 0;
     if ( pindex == 0 )
     {
-        fprintf(stderr,"komodo_activate_sapling null pindex\n");
+        fprintf(stderr,"hush_activate_sapling null pindex\n");
         return(0);
     }
     height = pindex->GetHeight();
     blocktime = (uint32_t)pindex->nTime;
-    //fprintf(stderr,"komodo_activate_sapling.%d starting blocktime %u cmp.%d\n",height,blocktime,blocktime > HUSH_SAPING_ACTIVATION);
+    //fprintf(stderr,"hush_activate_sapling.%d starting blocktime %u cmp.%d\n",height,blocktime,blocktime > HUSH_SAPING_ACTIVATION);
 
     // avoid trying unless we have at least 30 blocks
     if (height < 30)
@@ -3880,7 +3880,7 @@ int32_t komodo_activate_sapling(CBlockIndex *pindex)
             //fprintf(stderr,"(%d, %u).%d -> (%d, %u).%d\n",prevht,prevtime,prevtime > HUSH_SAPING_ACTIVATION,height,blocktime,blocktime > HUSH_SAPING_ACTIVATION);
             if ( prevht+1 != height )
             {
-                fprintf(stderr,"komodo_activate_sapling: unexpected non-contiguous ht %d vs %d\n",prevht,height);
+                fprintf(stderr,"hush_activate_sapling: unexpected non-contiguous ht %d vs %d\n",prevht,height);
                 return(0);
             }
             if ( prevtime <= HUSH_SAPING_ACTIVATION && blocktime > HUSH_SAPING_ACTIVATION )
@@ -4008,11 +4008,11 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *
         if ( ASSETCHAINS_CBOPRET != 0 )
             komodo_pricesupdate(pindexNew->GetHeight(),pblock);
         if ( ASSETCHAINS_SAPLING <= 0 && pindexNew->nTime > HUSH_SAPING_ACTIVATION - 24*3600 )
-            komodo_activate_sapling(pindexNew);
+            hush_activate_sapling(pindexNew);
         if ( ASSETCHAINS_CC != 0 && HUSH_SNAPSHOT_INTERVAL != 0 && (pindexNew->GetHeight() % HUSH_SNAPSHOT_INTERVAL) == 0 && pindexNew->GetHeight() >= HUSH_SNAPSHOT_INTERVAL )
         {
             uint64_t start = time(NULL);
-            if ( !komodo_dailysnapshot(pindexNew->GetHeight()) )
+            if ( !hush_dailysnapshot(pindexNew->GetHeight()) )
             {
                 fprintf(stderr, "daily snapshot failed, please reindex your chain\n");
                 StartShutdown();
@@ -4439,7 +4439,7 @@ CBlockIndex* AddToBlockIndex(const CBlockHeader& block)
 
     if (it != mapBlockIndex.end())
     {
-        if ( it->second != 0 ) // vNodes.size() >= KOMODO_LIMITED_NETWORKSIZE, change behavior to allow komodo_ensure to work
+        if ( it->second != 0 ) // vNodes.size() >= HUSH_LIMITED_NETWORKSIZE, change behavior to allow komodo_ensure to work
         {
             // this is the strange case where somehow the hash is in the mapBlockIndex via as yet undetermined process, but the pindex for the hash is not there. Theoretically it is due to processing the block headers, but I have seen it get this case without having received it from the block headers or anywhere else... jl777
             //fprintf(stderr,"addtoblockindex already there %p\n",it->second);
@@ -4928,8 +4928,8 @@ bool CheckBlockHeader(int32_t *futureblockp,int32_t height,CBlockIndex *pindex, 
     return true;
 }
 
-int32_t komodo_check_deposit(int32_t height,const CBlock& block,uint32_t prevtime);
-int32_t komodo_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height);
+int32_t hush_check_deposit(int32_t height,const CBlock& block,uint32_t prevtime);
+int32_t hush_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height);
 
 bool CheckBlock(int32_t *futureblockp,int32_t height,CBlockIndex *pindex,const CBlock& block, CValidationState& state,
                 libzcash::ProofVerifier& verifier,
@@ -4961,7 +4961,7 @@ bool CheckBlock(int32_t *futureblockp,int32_t height,CBlockIndex *pindex,const C
             fprintf(stderr," failed hash ht.%d\n",height);
             return state.DoS(50, error("CheckBlock: proof of work failed"),REJECT_INVALID, "high-hash");
         }
-        if ( ASSETCHAINS_STAKED == 0 && komodo_checkPOW(1,(CBlock *)&block,height) < 0 ) // checks Equihash
+        if ( ASSETCHAINS_STAKED == 0 && hush_checkPOW(1,(CBlock *)&block,height) < 0 ) // checks Equihash
             return state.DoS(100, error("CheckBlock: failed slow_checkPOW"),REJECT_INVALID, "failed-slow_checkPOW");
     }
 	
@@ -5430,7 +5430,7 @@ bool ProcessNewBlock(bool from_miner,int32_t height,CValidationState &state, CNo
             }
         }
         fRequested |= fForceProcessing;
-        if ( checked != 0 && komodo_checkPOW(0,pblock,height) < 0 ) {
+        if ( checked != 0 && hush_checkPOW(0,pblock,height) < 0 ) {
             checked = 0;
             //fprintf(stderr,"passed checkblock but failed checkPOW.%d\n",from_miner);
         }
@@ -5948,7 +5948,7 @@ bool static LoadBlockIndexDB()
         if ( ASSETCHAINS_SAPLING <= 0 )
         {
             fprintf(stderr,"set sapling height, if possible from ht.%d %u\n",(int32_t)pindex->GetHeight(),(uint32_t)pindex->nTime);
-            komodo_activate_sapling(pindex);
+            hush_activate_sapling(pindex);
         }
     }
     return true;

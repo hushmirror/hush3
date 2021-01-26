@@ -381,7 +381,7 @@ void CTxMemPool::remove(const CTransaction &origTx, std::list<CTransaction>& rem
 }
 
 extern uint64_t ASSETCHAINS_TIMELOCKGTE;
-int64_t komodo_block_unlocktime(uint32_t nHeight);
+int64_t hush_block_unlocktime(uint32_t nHeight);
 
 void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMemPoolHeight, int flags)
 {
@@ -404,7 +404,7 @@ void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMem
                 const CCoins *coins = pcoins->AccessCoins(txin.prevout.hash);
 		        if (nCheckFrequency != 0) assert(coins);
                 if (!coins || (coins->IsCoinBase() && (((signed long)nMemPoolHeight) - coins->nHeight < COINBASE_MATURITY) && 
-                                                       ((signed long)nMemPoolHeight < komodo_block_unlocktime(coins->nHeight) && 
+                                                       ((signed long)nMemPoolHeight < hush_block_unlocktime(coins->nHeight) && 
                                                          coins->IsAvailable(0) && coins->vout[0].nValue >= ASSETCHAINS_TIMELOCKGTE))) {
                     transactionsToRemove.push_back(tx);
                     break;
