@@ -10,6 +10,23 @@ and no longer on Github, since they banned Duke Leto and
 also because they censor many people around the world and work with
 evil organizations.
 
+# Hush 3.6.1
+
+:fire: This is an OPTIONAL release, but upgrading is ENCOURAGED. :fire:
+
+```
+ 101 files changed, 1158 insertions(+), 5793 deletions(-)
+```
+
+  * WolfSSL upgraded to 4.6.0
+  * Hush full nodes will now exclusively communivate via P2P messages with TLS1.3,
+    the option -tls=only has become default and cannot be turned off
+  * Improved error-handling and logging of TLS connections
+  * getpeerinfo now shows 3 new keys for each peer:
+    * `tls_established` - if a TLS connection has been established to this peer
+    * `tls_cipher`      - which TLS cipher is being used with this peer
+    * `tls_verified`    - if the TLS certificate was validated
+
 # Hush 3.6.0 "Decentralized Dominatrix"
 
 ```
