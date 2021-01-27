@@ -986,12 +986,12 @@ std::string PrivacyInfo()
 std::string LicenseInfo()
 {
     return "\n" +
-           FormatParagraph(strprintf(_("Copyright (C) 2009-%i The Bitcoin Core Developers"), COPYRIGHT_YEAR)) + "\n" +
-           FormatParagraph(strprintf(_("Copyright (C) 2015-%i The Zcash Developers"), COPYRIGHT_YEAR)) + "\n" +
-           FormatParagraph(strprintf(_("Copyright (C) 2015-%i jl777 and SuperNET developers"), COPYRIGHT_YEAR)) + "\n" +
-           FormatParagraph(strprintf(_("Copyright (C) 2018-%i Duke Leto and The Hush developers"), COPYRIGHT_YEAR)) + "\n" +
+           FormatParagraph(strprintf(_("Copyright (C) 2016-%i Duke Leto and The Hush Developers"), COPYRIGHT_YEAR)) + "\n" +
+           FormatParagraph(strprintf(_("Copyright (C) 2016-2020 jl777 and SuperNET developers"))) + "\n" +
+           FormatParagraph(strprintf(_("Copyright (C) 2016-2018 The Zcash developers"))) + "\n" +
+           FormatParagraph(strprintf(_("Copyright (C) 2009-2014 The Bitcoin Core developers"))) + "\n" +
            "\n" +
-           FormatParagraph(_("This is experimental Free Software! Fuck Yeah!!")) + "\n" +
+           FormatParagraph(_("This is experimental Free Software! Fuck Yeah!!!!!")) + "\n" +
            "\n" +
            FormatParagraph(_("Distributed under the GPLv3 software license, see the accompanying file COPYING or <https://www.gnu.org/licenses/gpl-3.0.en.html>.")) + "\n" +
            "\n";

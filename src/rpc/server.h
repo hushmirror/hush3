@@ -25,15 +25,12 @@
 #include "amount.h"
 #include "rpc/protocol.h"
 #include "uint256.h"
-
 #include <list>
 #include <map>
 #include <stdint.h>
 #include <string>
 #include <memory>
-
 #include <boost/function.hpp>
-
 #include <univalue.h>
 #include <pubkey.h>
 
@@ -275,10 +272,6 @@ extern UniValue oraclessubscribe(const UniValue& params, bool fHelp, const CPubK
 extern UniValue oraclesdata(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue oraclessample(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue oraclessamples(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesaddress(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue priceslist(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue mypriceslist(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesinfo(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue pegsaddress(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue paymentsaddress(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue payments_release(const UniValue& params, bool fHelp, const CPubKey& mypk);
@@ -515,16 +508,5 @@ extern UniValue paxpending(const UniValue& params, bool fHelp, const CPubKey& my
 extern UniValue paxprices(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk);
-
-extern UniValue prices(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesbet(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricessetcostbasis(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricescashout(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesrekt(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesaddfunding(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesgetorderbook(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesrefillfund(const UniValue& params, bool fHelp, const CPubKey& mypk);
-
-
 
 #endif // HUSH_RPCSERVER_H

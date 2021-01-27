@@ -3,7 +3,7 @@
 .SH NAME
 hushd \- manual page for hushd v3.6.1
 .SH DESCRIPTION
-Hush Daemon version v3.6.0\-e05a4e473\-dirty
+Hush Daemon version v3.6.1\-cf5736569\-dirty
 .PP
 In order to ensure you are adequately protecting your privacy when using Hush,
 please see <https://hush.is/security/>.
@@ -41,7 +41,7 @@ Full node client name, default 'MagicBean'
 .HP
 \fB\-conf=\fR<file>
 .IP
-Specify configuration file (default: komodo.conf)
+Specify configuration file (default: HUSH3.conf)
 .HP
 \fB\-daemon\fR
 .IP
@@ -226,7 +226,7 @@ Support filtering of blocks and transaction with Bloom filters (default:
 .HP
 \fB\-port=\fR<port>
 .IP
-Listen for connections on <port> (default: 7770 or testnet: 17770)
+Listen for connections on <port> (default: 55555 or testnet: 55420)
 .HP
 \fB\-proxy=\fR<ip:port>
 .IP
@@ -256,13 +256,8 @@ Tor control port password (default: empty)
 .HP
 \fB\-tls=\fR<option>
 .IP
-Specify TLS usage (default: 1 => enabled and preferred, yet compatible);
-other options are \fB\-tls\fR=\fI\,0\/\fR to disable TLS and \fB\-tls\fR=\fI\,only\/\fR to enforce it
-.HP
-\fB\-tlsfallbacknontls=\fR<0 or 1>
-.IP
-If a TLS connection fails, the next connection attempt of the same peer
-(based on IP address) takes place without TLS (default: 1)
+Specify TLS usage (default: 1 => enabled and required); Cannot be turned
+off.
 .HP
 \fB\-tlsvalidate=\fR<0 or 1>
 .IP
@@ -285,15 +280,15 @@ Full path to a certificate
 .IP
 Full path to a trusted certificates directory
 .HP
-\fB\-whitebind=\fR<addr>
+\fB\-allowbind=\fR<addr>
 .IP
-Bind to given address and whitelist peers connecting to it. Use
+Bind to given address and allowlist peers connecting to it. Use
 [host]:port notation for IPv6
 .HP
-\fB\-whitelist=\fR<netmask>
+\fB\-allowlist=\fR<netmask>
 .IP
-Whitelist peers connecting from the given netmask or IP address. Can be
-specified multiple times. Whitelisted peers cannot be DoS banned and
+Allowlist peers connecting from the given netmask or IP address. Can be
+specified multiple times. Allowlisted peers cannot be DoS banned and
 their transactions are always relayed, even if they are already in the
 mempool, useful e.g. for a gateway
 .PP
@@ -395,15 +390,15 @@ Make the wallet broadcast transactions (default: 1)
 Execute command when a wallet transaction changes (%s in cmd is replaced
 by TxID)
 .HP
-\fB\-whitelistaddress=\fR<Raddress>
+\fB\-allowlistaddress=\fR<Raddress>
 .IP
 Enable the wallet filter for notary nodes and add one Raddress to the
-whitelist of the wallet filter. If \fB\-whitelistaddress=\fR is used, then the
+allowlist of the wallet filter. If \fB\-allowlistaddress=\fR is used, then the
 wallet filter is automatically activated. Several Raddresses can be
-defined using several \fB\-whitelistaddress=\fR (similar to \fB\-addnode\fR). The
+defined using several \fB\-allowlistaddress=\fR (similar to \fB\-addnode\fR). The
 wallet filter will filter the utxo to only ones coming from my own
 Raddress (derived from pubkey) and each Raddress defined using
-\fB\-whitelistaddress=\fR this option is mostly for Notary Nodes).
+\fB\-allowlistaddress=\fR this option is mostly for Notary Nodes).
 .HP
 \fB\-zapwallettxes=\fR<mode>
 .IP
@@ -681,12 +676,12 @@ Enforce transaction\-rate limit, default 0
 In order to ensure you are adequately protecting your privacy when using Hush,
 please see <https://hush.is/security/>.
 
-Copyright (C) 2009-2020 The Bitcoin Core Developers
-Copyright (C) 2015-2020 The Zcash Developers
-Copyright (C) 2015-2020 jl777 and SuperNET developers
-Copyright (C) 2018-2020 Duke Leto and The Hush developers
+Copyright (C) 2016-2021 Duke Leto and The Hush Developers
+Copyright (C) 2016-2020 jl777 and SuperNET developers
+Copyright (C) 2016-2018 The Zcash developers
+Copyright (C) 2009-2014 The Bitcoin Core developers
 
-This is experimental Free Software! Fuck Yeah!!
+This is experimental Free Software! Fuck Yeah!!!!!
 
 Distributed under the GPLv3 software license, see the accompanying file COPYING
 or <https://www.gnu.org/licenses/gpl-3.0.en.html>.

@@ -6886,7 +6886,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         if (nVersion < minVersion)
         {
             // disconnect from peers older than this proto version
-            LogPrintf("Disconnecting peer=%d using obsolete version %i < %i\n", pfrom->id, nVersion, minVersion);
+            LogPrintf("Disconnecting peer=%d at %s using obsolete version %i < %i\n", pfrom->id, pfrom->addr.ToString().c_str(), nVersion, minVersion);
             pfrom->PushMessage("reject", strCommand, REJECT_OBSOLETE, strprintf("Version must be %d or greater", minVersion));
             pfrom->fDisconnect = true;
             return false;
@@ -6897,7 +6897,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         auto currentEpoch = CurrentEpoch(GetHeight(), params);
         if (nVersion < params.vUpgrades[currentEpoch].nProtocolVersion)
         {
-            LogPrintf("Disconnecting peer=%d using obsolete epoch version %i; disconnecting\n", pfrom->id, nVersion);
+            LogPrintf("Disconnecting peer=%d at %s using obsolete epoch version %i\n", pfrom->id, pfrom->addr.ToString().c_str(), nVersion);
             pfrom->PushMessage("reject", strCommand, REJECT_OBSOLETE,
                             strprintf("Version must be %d or greater",
                             params.vUpgrades[currentEpoch].nProtocolVersion));
@@ -7039,7 +7039,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     // 1. The version message has been received
     // 2. Peer version is below the minimum version for the current epoch
     else if (pfrom->nVersion < chainparams.GetConsensus().vUpgrades[CurrentEpoch(GetHeight(), chainparams.GetConsensus())].nProtocolVersion) {
-        LogPrintf("peer=%d using obsolete version %i vs %d; disconnecting\n", pfrom->id, pfrom->nVersion,(int32_t)chainparams.GetConsensus().vUpgrades[CurrentEpoch(GetHeight(), chainparams.GetConsensus())].nProtocolVersion);
+        LogPrintf("Disconnecting peer=%d at %s using obsolete version %i vs %d\n", pfrom->id, pfrom->addr.ToString().c_str(), pfrom->nVersion,(int32_t)chainparams.GetConsensus().vUpgrades[CurrentEpoch(GetHeight(), chainparams.GetConsensus())].nProtocolVersion);
         pfrom->PushMessage("reject", strCommand, REJECT_OBSOLETE,
                             strprintf("Version must be %d or greater",
                             chainparams.GetConsensus().vUpgrades[
@@ -7208,9 +7208,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         vector<CAddress> vAddr = addrman.GetAddr();
         BOOST_FOREACH(const CAddress &addr, vAddr)
         pfrom->PushAddress(addr);
-    }
-    else if (strCommand == "getnSPV")
-    {
+    } else if (strCommand == "getnSPV") {
         if ( HUSH_NSPV == 0 )//&& HUSH_INSYNC != 0 )
         {
             std::vector<uint8_t> payload;
@@ -7218,9 +7216,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             komodo_nSPVreq(pfrom,payload);
         }
         return(true);
-    }
-    else if (strCommand == "nSPV")
-    {
+    } else if (strCommand == "nSPV") {
         if ( HUSH_NSPV_SUPERLITE )
         {
             std::vector<uint8_t> payload;
@@ -7231,8 +7227,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     }
     else if ( HUSH_NSPV_SUPERLITE )
         return(true);
-    else if (strCommand == "inv")
-    {
+    else if (strCommand == "inv") {
         vector<CInv> vInv;
         vRecv >> vInv;
         if (vInv.size() > MAX_INV_SZ)

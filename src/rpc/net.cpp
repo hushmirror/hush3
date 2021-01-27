@@ -101,7 +101,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "    \"pingtime\": n,             (numeric) ping time\n"
             "    \"pingwait\": n,             (numeric) ping wait\n"
             "    \"version\": v,              (numeric) The peer version, such as 170002\n"
-            "    \"subver\": \"/MagicBean:x.y.z[-v]/\",  (string) The string version\n"
+            "    \"subver\": \"/GoldenSandtrout:x.y.z[-v]/\",  (string) The string version\n"
             "    \"inbound\": true|false,     (boolean) Inbound (true) or Outbound (false)\n"
             "    \"startingheight\": n,       (numeric) The starting height (block) of the peer\n"
             "    \"banscore\": n,             (numeric) The ban score\n"
@@ -470,7 +470,7 @@ UniValue getdeprecationinfo(const UniValue& params, bool fHelp, const CPubKey& m
             "\nResult:\n"
             "{\n"
             "  \"version\": xxxxx,                      (numeric) the server version\n"
-            "  \"subversion\": \"/MagicBean:x.y.z[-v]/\",     (string) the server subversion string\n"
+            "  \"subversion\": \"/GoldenSandtrout:x.y.z[-v]/\",     (string) the server subversion string\n"
             "  \"deprecationheight\": xxxxx,            (numeric) the block height at which this version will deprecate and shut down\n"
             "}\n"
             "\nExamples:\n"
@@ -481,7 +481,7 @@ UniValue getdeprecationinfo(const UniValue& params, bool fHelp, const CPubKey& m
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("version", CLIENT_VERSION));
     obj.push_back(Pair("subversion",
-        FormatSubVersion(GetArg("-clientname","MagicBean"), CLIENT_VERSION, std::vector<string>())));
+        FormatSubVersion(GetArg("-clientname","GoldenSandtrout"), CLIENT_VERSION, std::vector<string>())));
     obj.push_back(Pair("deprecationheight", DEPRECATION_HEIGHT));
 
     return obj;
@@ -496,7 +496,7 @@ UniValue getnetworkinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nResult:\n"
             "{\n"
             "  \"version\": xxxxx,                      (numeric) the server version\n"
-            "  \"subversion\": \"/MagicBean:x.y.z[-v]/\",     (string) the server subversion string\n"
+            "  \"subversion\": \"/GoldenSandtrout:x.y.z[-v]/\",     (string) the server subversion string\n"
             "  \"protocolversion\": xxxxx,              (numeric) the protocol version\n"
             "  \"localservices\": \"xxxxxxxxxxxxxxxx\", (string) the services we offer to the network\n"
             "  \"timeoffset\": xxxxx,                   (numeric) the time offset (deprecated, always 0)\n"
