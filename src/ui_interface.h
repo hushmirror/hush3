@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_UI_INTERFACE_H
-#define BITCOIN_UI_INTERFACE_H
+#ifndef HUSH_UI_INTERFACE_H
+#define HUSH_UI_INTERFACE_H
 
 #include <stdint.h>
 #include <string>
@@ -105,4 +105,4 @@ public:
 
 extern CClientUIInterface uiInterface;
 
-#endif // BITCOIN_UI_INTERFACE_H
+#endif // HUSH_UI_INTERFACE_H

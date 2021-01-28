@@ -1,14 +1,12 @@
 #!/usr/bin/env python2
 # Copyright (c) 2014 The Bitcoin Core developers
-# Copyright (c) 2019-2020 The Hush developers
-# Released under the GPLv3
-
+# Copyright (c) 2016-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 # Base class for RPC testing
-
 # Add python-bitcoinrpc to module search path:
 import os
 import sys
-
 import shutil
 import tempfile
 import traceback
@@ -18,7 +16,6 @@ from util import assert_equal, check_json_precision, \
     initialize_chain, initialize_chain_clean, \
     start_nodes, connect_nodes_bi, stop_nodes, \
     sync_blocks, sync_mempools, wait_bitcoinds
-
 
 class BitcoinTestFramework(object):
 
@@ -90,11 +87,11 @@ class BitcoinTestFramework(object):
 
         parser = optparse.OptionParser(usage="%prog [options]")
         parser.add_option("--nocleanup", dest="nocleanup", default=False, action="store_true",
-                          help="Leave komodods and test.* datadir on exit or error")
+                          help="Leave binaries and test.* datadir on exit or error")
         parser.add_option("--noshutdown", dest="noshutdown", default=False, action="store_true",
-                          help="Don't stop komodods after the test execution")
+                          help="Don't stop nodes after the test execution")
         parser.add_option("--srcdir", dest="srcdir", default="../../src",
-                          help="Source directory containing komodod/komodo-cli (default: %default)")
+                          help="Source directory containing hushd/hush-cli (default: %default)")
         parser.add_option("--tmpdir", dest="tmpdir", default=tempfile.mkdtemp(prefix="test"),
                           help="Root directory for datadirs")
         parser.add_option("--tracerpc", dest="trace_rpc", default=False, action="store_true",
@@ -137,7 +134,7 @@ class BitcoinTestFramework(object):
             stop_nodes(self.nodes)
             wait_bitcoinds()
         else:
-            print("Note: komodods were not stopped and may still be running")
+            print("Note: hushds were not stopped and may still be running")
 
         if not self.options.nocleanup and not self.options.noshutdown:
             print("Cleaning up")
@@ -151,7 +148,7 @@ class BitcoinTestFramework(object):
             sys.exit(1)
 
 
-# Test framework for doing p2p comparison testing, which sets up some komodod
+# Test framework for doing p2p comparison testing, which sets up some hushd
 # binaries:
 # 1 binary: test binary
 # 2 binaries: 1 test binary, 1 ref binary
@@ -165,10 +162,10 @@ class ComparisonTestFramework(BitcoinTestFramework):
 
     def add_options(self, parser):
         parser.add_option("--testbinary", dest="testbinary",
-                          default=os.getenv("BITCOIND", "komodod"),
+                          default=os.getenv("BITCOIND", "hush-smart-chain"),
                           help="bitcoind binary to test")
         parser.add_option("--refbinary", dest="refbinary",
-                          default=os.getenv("BITCOIND", "komodod"),
+                          default=os.getenv("BITCOIND", "hush-smart-chain"),
                           help="bitcoind binary to use for reference nodes (if any)")
 
     def setup_chain(self):
@@ -177,7 +174,7 @@ class ComparisonTestFramework(BitcoinTestFramework):
 
     def setup_network(self):
         self.nodes = start_nodes(self.num_nodes, self.options.tmpdir,
-                                    extra_args=[['-debug', '-whitelist=127.0.0.1']] * self.num_nodes,
+                                    extra_args=[['-debug', '-allowlist=127.0.0.1']] * self.num_nodes,
                                     binary=[self.options.testbinary] +
                                            [self.options.refbinary]*(self.num_nodes-1))
 
@@ -212,7 +209,7 @@ class HushTestFramework(BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '--daemon',
                     '-rpcuser=rt',
@@ -229,7 +226,7 @@ class HushTestFramework(BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey1,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '-addnode=127.0.0.1:64367',
                     '--daemon',
@@ -273,7 +270,7 @@ class CryptoconditionsTestFramework(BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '--daemon',
                     '-rpcuser=rt',
@@ -290,7 +287,7 @@ class CryptoconditionsTestFramework(BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey1,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '-addnode=127.0.0.1:64367',
                     '--daemon',

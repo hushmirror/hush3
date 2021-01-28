@@ -2,7 +2,6 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,9 +16,8 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-#ifndef BITCOIN_CONSENSUS_CONSENSUS_H
-#define BITCOIN_CONSENSUS_CONSENSUS_H
+#ifndef HUSH_CONSENSUS_CONSENSUS_H
+#define HUSH_CONSENSUS_CONSENSUS_H
 
 /** The minimum allowed block version (network rule) */
 static const int32_t MIN_BLOCK_VERSION = 4;
@@ -54,4 +52,4 @@ enum {
 /** Used as the flags parameter to CheckFinalTx() in non-consensus code */
 static const unsigned int STANDARD_LOCKTIME_VERIFY_FLAGS = LOCKTIME_MEDIAN_TIME_PAST;
 
-#endif // BITCOIN_CONSENSUS_CONSENSUS_H
+#endif // HUSH_CONSENSUS_CONSENSUS_H

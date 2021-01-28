@@ -1,26 +1,21 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Copyright (c) 2012-2013 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include "rpc/server.h"
 #include "rpc/client.h"
-
 #include "key_io.h"
 #include "netbase.h"
 #include "utilstrencodings.h"
-
 #include "test/test_bitcoin.h"
-
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
-
 #include <univalue.h>
 
 using namespace std;
 
-UniValue
-createArgs(int nRequired, const char* address1=NULL, const char* address2=NULL)
+UniValue createArgs(int nRequired, const char* address1=NULL, const char* address2=NULL)
 {
     UniValue result(UniValue::VARR);
     result.push_back(nRequired);

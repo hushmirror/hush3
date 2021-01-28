@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# Copyright (c) 2016-2020 The Hush developers
 # Copyright (c) 2014-2015 The Bitcoin Core developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -151,7 +152,7 @@ class EstimateFeeTest(BitcoinTestFramework):
         self.nodes = []
         # Use node0 to mine blocks for input splitting
         self.nodes.append(start_node(0, self.options.tmpdir, ["-maxorphantx=1000",
-                                                              "-relaypriority=0", "-whitelist=127.0.0.1"]))
+                                                              "-relaypriority=0", "-allowlist=127.0.0.1"]))
 
         print("This test is time consuming, please be patient")
         print("Splitting inputs to small size so we can generate low priority tx's")

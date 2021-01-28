@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -79,8 +82,8 @@ bool Eval::ImportPayout(const std::vector<uint8_t> params, const CTransaction &i
 
     // Check disputeTx solves momproof from vout[0]
     {
-        NotarisationData data;
-        if (!GetNotarisationData(proof.notarisationHash, data))
+        NotarizationData data;
+        if (!GetNotarizationData(proof.notarisationHash, data))
             return Invalid("coudnt-load-mom");
 
         if (data.MoM != proof.Exec(disputeTx.GetHash()))

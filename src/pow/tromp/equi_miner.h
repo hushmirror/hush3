@@ -1,5 +1,8 @@
-// Equihash solver
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 // Copyright (c) 2016 John Tromp, The Zcash developers
+// Equihash solver
 
 // Fix N, K, such that n = N/(k+1) is integer
 // Fix M = 2^{n+1} hashes each of length N bits,

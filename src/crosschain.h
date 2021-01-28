@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -15,9 +15,8 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-#ifndef CROSSCHAIN_H
-#define CROSSCHAIN_H
+#ifndef HUSH_CROSSCHAIN_H
+#define HUSH_CROSSCHAIN_H
 #include "cc/eval.h"
 
 const int CROSSCHAIN_HUSH = 1;
@@ -35,14 +34,14 @@ bool CheckTxAuthority(const CTransaction &tx, CrosschainAuthority auth);
 TxProof GetAssetchainProof(uint256 hash,CTransaction burnTx);
 
 /* On HUSH */
-uint256 CalculateProofRoot(const char* symbol, uint32_t targetCCid, int kmdHeight,
-        std::vector<uint256> &moms, uint256 &destNotarisationTxid);
+uint256 CalculateProofRoot(const char* symbol, uint32_t targetCCid, int hushHeight,
+        std::vector<uint256> &moms, uint256 &destNotarizationTxid);
 TxProof GetCrossChainProof(const uint256 txid, const char* targetSymbol, uint32_t targetCCid,
         const TxProof assetChainProof,int32_t offset);
 void CompleteImportTransaction(CTransaction &importTx,int32_t offset);
 
 /* On assetchain */
-bool CheckMoMoM(uint256 kmdNotarisationHash, uint256 momom);
+bool CheckMoMoM(uint256 hushNotarizationHash, uint256 momom);
 bool CheckNotariesApproval(uint256 burntxid, const std::vector<uint256> & notaryTxids);
 
-#endif /* CROSSCHAIN_H */
+#endif /* HUSH_CROSSCHAIN_H */

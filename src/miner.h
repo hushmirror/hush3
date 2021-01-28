@@ -1,9 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2013 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -19,11 +18,10 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_MINER_H
-#define BITCOIN_MINER_H
+#ifndef HUSH_MINER_H
+#define HUSH_MINER_H
 
 #include "primitives/block.h"
-
 #include <boost/optional.hpp>
 #include <stdint.h>
 
@@ -41,7 +39,7 @@ struct CBlockTemplate
     std::vector<CAmount> vTxFees;
     std::vector<int64_t> vTxSigOps;
 };
-#define KOMODO_MAXGPUCOUNT 65
+#define HUSH_MAXGPUCOUNT 65
 
 /** Generate a new block, without valid proof-of-work */
 CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& scriptPubKeyIn, int32_t gpucount, bool isStake = false);
@@ -66,4 +64,4 @@ void GenerateBitcoins(bool fGenerate, int nThreads);
 
 void UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev);
 
-#endif // BITCOIN_MINER_H
+#endif // HUSH_MINER_H

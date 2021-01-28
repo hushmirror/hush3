@@ -1,12 +1,9 @@
+# Copyright (c) 2018-2020 The Hush developers
 # Copyright (c) 2014 The Bitcoin Core developers
 # Copyright (c) 2018-2019 The SuperNET developers
-# Copyright (c) 2018-2020 The Hush developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-#
 # Helpful routines for regression testing
-#
-
 # Add python-bitcoinrpc to module search path:
 import os
 import sys

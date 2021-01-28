@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -17,9 +17,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "rpc/server.h"
-
 #include "clientversion.h"
 #include "main.h"
 #include "net.h"
@@ -31,9 +29,7 @@
 #include "version.h"
 #include "deprecation.h"
 #include "hush/utiltls.h"
-
 #include <boost/foreach.hpp>
-
 #include <univalue.h>
 
 using namespace std;
@@ -94,6 +90,8 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "    \"addrlocal\":\"ip:port\",   (string) local address\n"
             "    \"services\":\"xxxxxxxxxxxxxxxx\",   (string) The services offered\n"
             "    \"tls_established\": true:false,     (boolean) Status of TLS connection\n"
+            "    \"tls_verified\": true:false,     (boolean) Status of TLS verification\n"
+            "    \"tls_cipher\": \"XXX\",     (string) TLS cipher used for this connection\n"
             "    \"lastsend\": ttt,           (numeric) The time in seconds since epoch (Jan 1 1970 GMT) of the last send\n"
             "    \"lastrecv\": ttt,           (numeric) The time in seconds since epoch (Jan 1 1970 GMT) of the last receive\n"
             "    \"bytessent\": n,            (numeric) The total bytes sent\n"
@@ -103,7 +101,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "    \"pingtime\": n,             (numeric) ping time\n"
             "    \"pingwait\": n,             (numeric) ping wait\n"
             "    \"version\": v,              (numeric) The peer version, such as 170002\n"
-            "    \"subver\": \"/MagicBean:x.y.z[-v]/\",  (string) The string version\n"
+            "    \"subver\": \"/GoldenSandtrout:x.y.z[-v]/\",  (string) The string version\n"
             "    \"inbound\": true|false,     (boolean) Inbound (true) or Outbound (false)\n"
             "    \"startingheight\": n,       (numeric) The starting height (block) of the peer\n"
             "    \"banscore\": n,             (numeric) The ban score\n"
@@ -143,6 +141,8 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
         }
         obj.push_back(Pair("services", strprintf("%016x", stats.nServices)));
         obj.push_back(Pair("tls_established", stats.fTLSEstablished));
+        obj.push_back(Pair("tls_verified", stats.fTLSVerified));
+        obj.push_back(Pair("tls_cipher", stats.tls_cipher));
         obj.push_back(Pair("lastsend", stats.nLastSend));
         obj.push_back(Pair("lastrecv", stats.nLastRecv));
         obj.push_back(Pair("bytessent", stats.nSendBytes));
@@ -169,7 +169,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             }
             obj.push_back(Pair("inflight", heights));
         }
-        obj.push_back(Pair("whitelisted", stats.fWhitelisted));
+        obj.push_back(Pair("allowlisted", stats.fAllowlisted));
 
         ret.push_back(obj);
     }
@@ -177,8 +177,8 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return ret;
 }
 
-int32_t KOMODO_LONGESTCHAIN;
-int32_t komodo_longestchain()
+int32_t HUSH_LONGESTCHAIN;
+int32_t hush_longestchain()
 {
     static int32_t depth;
     int32_t ht,n=0,num=0,maxheight=0,height = 0;
@@ -194,7 +194,7 @@ int32_t komodo_longestchain()
         }
         BOOST_FOREACH(const CNodeStats& stats, vstats)
         {
-            //fprintf(stderr,"komodo_longestchain iter.%d\n",n);
+            //fprintf(stderr,"hush_longestchain iter.%d\n",n);
             CNodeStateStats statestats;
             bool fStateStats = GetNodeStateStats(stats.nodeid,statestats);
             if ( statestats.nSyncHeight < 0 )
@@ -216,14 +216,14 @@ int32_t komodo_longestchain()
         depth--;
         if ( num > (n >> 1) )
         {
-            if ( 0 && height != KOMODO_LONGESTCHAIN )
-                fprintf(stderr,"set %s KOMODO_LONGESTCHAIN <- %d\n",SMART_CHAIN_SYMBOL,height);
-            KOMODO_LONGESTCHAIN = height;
+            if ( 0 && height != HUSH_LONGESTCHAIN )
+                fprintf(stderr,"set %s HUSH_LONGESTCHAIN <- %d\n",SMART_CHAIN_SYMBOL,height);
+            HUSH_LONGESTCHAIN = height;
             return(height);
         }
-        KOMODO_LONGESTCHAIN = 0;
+        HUSH_LONGESTCHAIN = 0;
     }
-    return(KOMODO_LONGESTCHAIN);
+    return(HUSH_LONGESTCHAIN);
 }
 
 UniValue addnode(const UniValue& params, bool fHelp, const CPubKey& mypk)
@@ -470,7 +470,7 @@ UniValue getdeprecationinfo(const UniValue& params, bool fHelp, const CPubKey& m
             "\nResult:\n"
             "{\n"
             "  \"version\": xxxxx,                      (numeric) the server version\n"
-            "  \"subversion\": \"/MagicBean:x.y.z[-v]/\",     (string) the server subversion string\n"
+            "  \"subversion\": \"/GoldenSandtrout:x.y.z[-v]/\",     (string) the server subversion string\n"
             "  \"deprecationheight\": xxxxx,            (numeric) the block height at which this version will deprecate and shut down\n"
             "}\n"
             "\nExamples:\n"
@@ -481,7 +481,7 @@ UniValue getdeprecationinfo(const UniValue& params, bool fHelp, const CPubKey& m
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("version", CLIENT_VERSION));
     obj.push_back(Pair("subversion",
-        FormatSubVersion(GetArg("-clientname","MagicBean"), CLIENT_VERSION, std::vector<string>())));
+        FormatSubVersion(GetArg("-clientname","GoldenSandtrout"), CLIENT_VERSION, std::vector<string>())));
     obj.push_back(Pair("deprecationheight", DEPRECATION_HEIGHT));
 
     return obj;
@@ -496,7 +496,7 @@ UniValue getnetworkinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nResult:\n"
             "{\n"
             "  \"version\": xxxxx,                      (numeric) the server version\n"
-            "  \"subversion\": \"/MagicBean:x.y.z[-v]/\",     (string) the server subversion string\n"
+            "  \"subversion\": \"/GoldenSandtrout:x.y.z[-v]/\",     (string) the server subversion string\n"
             "  \"protocolversion\": xxxxx,              (numeric) the protocol version\n"
             "  \"localservices\": \"xxxxxxxxxxxxxxxx\", (string) the services we offer to the network\n"
             "  \"timeoffset\": xxxxx,                   (numeric) the time offset (deprecated, always 0)\n"

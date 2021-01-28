@@ -1,3 +1,5 @@
+# Hush Packages
+
 Each recipe consists of 3 main parts: defining identifiers, setting build
 variables, and defining build commands.
 

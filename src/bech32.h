@@ -1,5 +1,5 @@
 // Copyright (c) 2017 Pieter Wuille
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -10,8 +10,8 @@
 //
 // For more information, see BIP 173.
 
-#ifndef BITCOIN_BECH32_H
-#define BITCOIN_BECH32_H
+#ifndef HUSH_BECH32_H
+#define HUSH_BECH32_H
 
 #include <stdint.h>
 #include <string>
@@ -28,4 +28,4 @@ std::pair<std::string, std::vector<uint8_t>> Decode(const std::string& str);
 
 } // namespace bech32
 
-#endif // BITCOIN_BECH32_H
+#endif // HUSH_BECH32_H

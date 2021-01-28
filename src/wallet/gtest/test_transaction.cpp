@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <gtest/gtest.h>
@@ -34,16 +34,16 @@ TEST(Transaction, JSDescriptionRandomized) {
 
     // create JSDescription
     uint256 pubKeyHash;
-    boost::array<libzcash::JSInput, ZC_NUM_JS_INPUTS> inputs = {
+    boost::array<libzcash::JSInput, HUSH_NUM_JS_INPUTS> inputs = {
         libzcash::JSInput(witness, note, k),
         libzcash::JSInput() // dummy input of zero value
     };
-    boost::array<libzcash::JSOutput, ZC_NUM_JS_OUTPUTS> outputs = {
+    boost::array<libzcash::JSOutput, HUSH_NUM_JS_OUTPUTS> outputs = {
         libzcash::JSOutput(addr, 50),
         libzcash::JSOutput(addr, 50)
     };
-    std::array<size_t, ZC_NUM_JS_INPUTS> inputMap;
-    std::array<size_t, ZC_NUM_JS_OUTPUTS> outputMap;
+    std::array<size_t, HUSH_NUM_JS_INPUTS> inputMap;
+    std::array<size_t, HUSH_NUM_JS_OUTPUTS> outputMap;
 
     {
         auto jsdesc = JSDescription::Randomized(
@@ -73,8 +73,8 @@ TEST(Transaction, JSDescriptionRandomized) {
             inputMap, outputMap,
             0, 0, false, GenZero);
 
-        std::array<size_t, ZC_NUM_JS_INPUTS> expectedInputMap {1, 0};
-        std::array<size_t, ZC_NUM_JS_OUTPUTS> expectedOutputMap {1, 0};
+        std::array<size_t, HUSH_NUM_JS_INPUTS> expectedInputMap {1, 0};
+        std::array<size_t, HUSH_NUM_JS_OUTPUTS> expectedOutputMap {1, 0};
         EXPECT_EQ(expectedInputMap, inputMap);
         EXPECT_EQ(expectedOutputMap, outputMap);
     }
@@ -86,8 +86,8 @@ TEST(Transaction, JSDescriptionRandomized) {
             inputMap, outputMap,
             0, 0, false, GenMax);
 
-        boost::array<size_t, ZC_NUM_JS_INPUTS> expectedInputMap {0, 1};
-        boost::array<size_t, ZC_NUM_JS_OUTPUTS> expectedOutputMap {0, 1};
+        boost::array<size_t, HUSH_NUM_JS_INPUTS> expectedInputMap {0, 1};
+        boost::array<size_t, HUSH_NUM_JS_OUTPUTS> expectedOutputMap {0, 1};
         EXPECT_EQ(expectedInputMap, inputMap);
         EXPECT_EQ(expectedOutputMap, outputMap);
     }

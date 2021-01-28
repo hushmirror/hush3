@@ -1,16 +1,13 @@
 #!/usr/bin/bash
-# Copyright (c) 2019-2020 The Hush developers
+# Copyright (c) 2016-2020 The Hush developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 # This script makes the neccesary transactions to migrate
 # coin between 2 assetchains on the same -ac_cc id
-
 set -e
-
-source=TXSCL
-target=TXSCL000
-address="RFw7byY4xZpZCrtkMk3nFuuG1NTs9rSGgQ"
+source=DERPZ
+target=DERPZ000
+address="Rxxx"
 amount=1
 
 # Alias for running cli on source chain
@@ -36,7 +33,7 @@ exportSignedTx=`echo $exportSignedData | jq -r .hex`
 echo "Sending export tx"
 $cli_source sendrawtransaction $exportSignedTx
 
-read -p "Wait for a notarisation to KMD, and then two more notarisations from the target chain, and then press enter to continue"
+read -p "Wait for a notarization to HUSH, and then two more notarizations from the target chain, and then press enter to continue"
 
 # Create import
 importTx=`$cli_source migrate_createimporttransaction $exportSignedTx $payouts`

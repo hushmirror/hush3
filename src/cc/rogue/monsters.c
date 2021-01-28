@@ -1,5 +1,8 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /*
- * File with various monster functions in it
+ * File with various monster functions in it, none as evil as KYC
  *
  * @(#)monsters.c	4.46 (Berkeley) 02/05/99
  *

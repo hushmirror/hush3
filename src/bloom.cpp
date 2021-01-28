@@ -1,7 +1,7 @@
+// Copyright (c) 2016-2020 The Hush developers
 // Copyright (c) 2012-2014 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -16,21 +16,16 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "bloom.h"
-
 #include "primitives/transaction.h"
 #include "hash.h"
 #include "script/script.h"
 #include "script/standard.h"
 #include "random.h"
 #include "streams.h"
-
 #include <math.h>
 #include <stdlib.h>
-
 #include <boost/foreach.hpp>
-
 #define LN2SQUARED 0.4804530139182014246671025263266649717305529515945455
 #define LN2 0.6931471805599453094172321214581765680755001343602552
 

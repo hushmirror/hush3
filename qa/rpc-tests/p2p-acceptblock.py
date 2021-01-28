@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# Copyright (c) 2016-2020 The Hush developers
 #
 # Distributed under the GPLv3/X11 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -18,12 +19,12 @@ import time
 '''
 AcceptBlockTest -- test processing of unrequested blocks.
 
-Since behavior differs when receiving unrequested blocks from whitelisted peers
-versus non-whitelisted peers, this tests the behavior of both (effectively two
+Since behavior differs when receiving unrequested blocks from allowlisted peers
+versus non-allowlisted peers, this tests the behavior of both (effectively two
 separate tests running in parallel).
 
 Setup: two nodes, node0 and node1, not connected to each other.  Node0 does not
-whitelist localhost, but node1 does. They will each be on their own chain for
+allowlist localhost, but node1 does. They will each be on their own chain for
 this test.
 
 We have one NodeConn connection to each, test_node and white_node respectively.
@@ -38,7 +39,7 @@ The test:
    corresponding peer.
    Node0 should not process this block (just accept the header), because it is
    unrequested and doesn't have more work than the tip.
-   Node1 should process because this is coming from a whitelisted peer.
+   Node1 should process because this is coming from a allowlisted peer.
 
 4. Send another block that builds on the forking block.
    Node0 should process this block but be stuck on the shorter chain, because
@@ -48,7 +49,7 @@ The test:
 4b.Send 288 more blocks on the longer chain.
    Node0 should process all but the last block (too far ahead in height).
    Send all headers to Node1, and then send the last block in that chain.
-   Node1 should accept the block because it's coming from a whitelisted peer.
+   Node1 should accept the block because it's coming from a allowlisted peer.
 
 5. Send a duplicate of the block in #3 to Node0.
    Node0 should not process the block because it is unrequested, and stay on
@@ -123,19 +124,19 @@ class AcceptBlockTest(BitcoinTestFramework):
 
     def setup_network(self):
         # Node0 will be used to test behavior of processing unrequested blocks
-        # from peers which are not whitelisted, while Node1 will be used for
-        # the whitelisted case.
+        # from peers which are not allowlisted, while Node1 will be used for
+        # the allowlisted case.
         self.nodes = []
         self.nodes.append(start_node(0, self.options.tmpdir, ["-debug"],
                                      binary=self.options.testbinary))
         self.nodes.append(start_node(1, self.options.tmpdir,
-                                     ["-debug", "-whitelist=127.0.0.1"],
+                                     ["-debug", "-allowlist=127.0.0.1"],
                                      binary=self.options.testbinary))
 
     def run_test(self):
         # Setup the p2p connections and start up the network thread.
-        test_node = TestNode()   # connects to node0 (not whitelisted)
-        white_node = TestNode()  # connects to node1 (whitelisted)
+        test_node = TestNode()   # connects to node0 (not allowlisted)
+        white_node = TestNode()  # connects to node1 (allowlisted)
 
         connections = []
         connections.append(NodeConn('127.0.0.1', p2p_port(0), self.nodes[0], test_node))
@@ -186,7 +187,7 @@ class AcceptBlockTest(BitcoinTestFramework):
             if x['hash'] == blocks_h2f[1].hash:
                 assert_equal(x['status'], "valid-headers")
 
-        print "Second height 2 block accepted only from whitelisted peer"
+        print "Second height 2 block accepted only from allowlisted peer"
 
         # 4. Now send another block that builds on the forking chain.
         blocks_h3 = []
@@ -206,13 +207,13 @@ class AcceptBlockTest(BitcoinTestFramework):
         # But this block should be accepted by node0 since it has more work.
         try:
             self.nodes[0].getblock(blocks_h3[0].hash)
-            print "Unrequested more-work block accepted from non-whitelisted peer"
+            print "Unrequested more-work block accepted from non-allowlisted peer"
         except:
             raise AssertionError("Unrequested more work block was not processed")
 
         # Node1 should have accepted and reorged.
         assert_equal(self.nodes[1].getblockcount(), 3)
-        print "Successfully reorged to length 3 chain from whitelisted peer"
+        print "Successfully reorged to length 3 chain from allowlisted peer"
 
         # 4b. Now mine 288 more blocks and deliver; all should be processed but
         # the last (height-too-high) on node0.  Node1 should process the tip if
@@ -249,9 +250,9 @@ class AcceptBlockTest(BitcoinTestFramework):
         try:
             white_node.sync_with_ping()
             self.nodes[1].getblock(tips[1].hash)
-            print "Unrequested block far ahead of tip accepted from whitelisted peer"
+            print "Unrequested block far ahead of tip accepted from allowlisted peer"
         except:
-            raise AssertionError("Unrequested block from whitelisted peer not accepted")
+            raise AssertionError("Unrequested block from allowlisted peer not accepted")
 
         # 5. Test handling of unrequested block on the node that didn't process
         # Should still not be processed (even though it has a child that has more
@@ -288,7 +289,7 @@ class AcceptBlockTest(BitcoinTestFramework):
 
         test_node.sync_with_ping()
         assert_equal(self.nodes[0].getblockcount(), 290)
-        print "Successfully reorged to longer chain from non-whitelisted peer"
+        print "Successfully reorged to longer chain from non-allowlisted peer"
 
         [ c.disconnect_node() for c in connections ]
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <gtest/gtest.h>
@@ -31,8 +31,8 @@ TEST(noteencryption, NotePlaintext)
     auto ivk = fvk.in_viewing_key();
     SaplingPaymentAddress addr = *ivk.address({0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
 
-    std::array<unsigned char, ZC_MEMO_SIZE> memo;
-    for (size_t i = 0; i < ZC_MEMO_SIZE; i++) {
+    std::array<unsigned char, HUSH_MEMO_SIZE> memo;
+    for (size_t i = 0; i < HUSH_MEMO_SIZE; i++) {
         // Fill the message with dummy data
         memo[i] = (unsigned char) i;
     }

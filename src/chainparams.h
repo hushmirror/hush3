@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -19,15 +19,15 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_CHAINPARAMS_H
-#define BITCOIN_CHAINPARAMS_H
+#ifndef HUSH_CHAINPARAMS_H
+#define HUSH_CHAINPARAMS_H
 
 #include "chainparamsbase.h"
 #include "consensus/params.h"
 #include "primitives/block.h"
 #include "protocol.h"
 
-#define KOMODO_MINDIFF_NBITS 0x200f0f0f
+#define HUSH_MINDIFF_NBITS 0x200f0f0f
 
 #include <vector>
 
@@ -182,4 +182,4 @@ bool SelectParamsFromCommandLine();
  */
 void UpdateNetworkUpgradeParameters(Consensus::UpgradeIndex idx, int nActivationHeight);
 
-#endif // BITCOIN_CHAINPARAMS_H
+#endif // HUSH_CHAINPARAMS_H

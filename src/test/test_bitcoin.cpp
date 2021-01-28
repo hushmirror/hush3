@@ -1,14 +1,12 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Copyright (c) 2011-2013 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#define BOOST_TEST_MODULE Bitcoin Test Suite
+#define BOOST_TEST_MODULE Hush Test Suite
 
 #include "test_bitcoin.h"
-
 #include "crypto/common.h"
-
 #include "key.h"
 #include "main.h"
 #include "random.h"
@@ -27,29 +25,24 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread.hpp>
-
 #include "librustzcash.h"
 
 CClientUIInterface uiInterface; // Declared but not defined in ui_interface.h
 CWallet* pwalletMain;
-ZCJoinSplit *pzcashParams;
 
 extern bool fPrintToConsole;
 extern void noui_connect();
 
 JoinSplitTestingSetup::JoinSplitTestingSetup()
 {
-    boost::filesystem::path pk_path = ZC_GetParamsDir() / "sprout-proving.key";
-    boost::filesystem::path vk_path = ZC_GetParamsDir() / "sprout-verifying.key";
-    pzcashParams = ZCJoinSplit::Prepared(vk_path.string(), pk_path.string());
 
-    boost::filesystem::path sapling_spend = ZC_GetParamsDir() / "sapling-spend.params";
+    boost::filesystem::path sapling_spend  = ZC_GetParamsDir() / "sapling-spend.params";
     boost::filesystem::path sapling_output = ZC_GetParamsDir() / "sapling-output.params";
 
     static_assert(
         sizeof(boost::filesystem::path::value_type) == sizeof(codeunit),
         "librustzcash not configured correctly");
-    auto sapling_spend_str = sapling_spend.native();
+    auto sapling_spend_str  = sapling_spend.native();
     auto sapling_output_str = sapling_output.native();
 
     librustzcash_init_zksnark_params(
@@ -67,7 +60,6 @@ JoinSplitTestingSetup::JoinSplitTestingSetup()
 
 JoinSplitTestingSetup::~JoinSplitTestingSetup()
 {
-    delete pzcashParams;
 }
 
 BasicTestingSetup::BasicTestingSetup()
@@ -94,12 +86,12 @@ TestingSetup::TestingSetup()
         RegisterWalletRPCCommands(tableRPC);
 #endif
         ClearDatadirCache();
-        pathTemp = GetTempPath() / strprintf("test_bitcoin_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
+        pathTemp = GetTempPath() / strprintf("test_hush_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
         boost::filesystem::create_directories(pathTemp);
         mapArgs["-datadir"] = pathTemp.string();
-        pblocktree = new CBlockTreeDB(1 << 20, true);
-        pcoinsdbview = new CCoinsViewDB(1 << 23, true);
-        pcoinsTip = new CCoinsViewCache(pcoinsdbview);
+        pblocktree          = new CBlockTreeDB(1 << 20, true);
+        pcoinsdbview        = new CCoinsViewDB(1 << 23, true);
+        pcoinsTip           = new CCoinsViewCache(pcoinsdbview);
         InitBlockIndex();
 #ifdef ENABLE_WALLET
         bool fFirstRun;
@@ -133,7 +125,6 @@ TestingSetup::~TestingSetup()
 #endif
         boost::filesystem::remove_all(pathTemp);
 }
-
 
 CTxMemPoolEntry TestMemPoolEntryHelper::FromTx(CMutableTransaction &tx, CTxMemPool *pool) {
     return CTxMemPoolEntry(tx, nFee, nTime, dPriority, nHeight,

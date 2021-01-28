@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -25,7 +28,7 @@
 #define KMD_TADDR 0
 #define CC_MARKER_VALUE 10000
 
-extern uint256 KOMODO_EARLYTXID;
+extern uint256 HUSH_EARLYTXID;
 
 CScript EncodeImportGatewayBindOpRet(uint8_t funcid,std::string coin,uint256 oracletxid,uint8_t M,uint8_t N,std::vector<CPubKey> importgatewaypubkeys,uint8_t taddr,uint8_t prefix,uint8_t prefix2,uint8_t wiftype)
 {
@@ -471,7 +474,7 @@ bool ImportGatewayValidate(struct CCcontract_info *cp,Eval *eval,const CTransact
 
 std::string ImportGatewayBind(uint64_t txfee,std::string coin,uint256 oracletxid,uint8_t M,uint8_t N,std::vector<CPubKey> pubkeys,uint8_t p1,uint8_t p2,uint8_t p3,uint8_t p4)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CTransaction oracletx; uint8_t taddr,prefix,prefix2,wiftype; CPubKey mypk,importgatewaypk; CScript opret; uint256 hashBlock;
     struct CCcontract_info *cp,*cpTokens,C,CTokens; std::string name,description,format; int32_t i,numvouts;
     char destaddr[64],coinaddr[64],myTokenCCaddr[64],str[65],*fstr;
@@ -562,14 +565,14 @@ std::string ImportGatewayBind(uint64_t txfee,std::string coin,uint256 oracletxid
 
 std::string ImportGatewayDeposit(uint64_t txfee,uint256 bindtxid,int32_t height,std::string refcoin,uint256 burntxid,int32_t claimvout,std::string rawburntx,std::vector<uint8_t>proof,CPubKey destpub,int64_t amount)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight()), burntx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight()), burntx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CTransaction bindtx; CPubKey mypk; uint256 oracletxid,merkleroot,mhash,hashBlock,txid; std::vector<CTxOut> vouts;
     int32_t i,m,n,numvouts; uint8_t M,N,taddr,prefix,prefix2,wiftype; std::string coin; struct CCcontract_info *cp,C;
     std::vector<CPubKey> pubkeys,publishers; std::vector<uint256> txids; char str[128],burnaddr[64];
 
-    if (KOMODO_EARLYTXID!=zeroid && bindtxid!=KOMODO_EARLYTXID)
+    if (HUSH_EARLYTXID!=zeroid && bindtxid!=HUSH_EARLYTXID)
     {
-        CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",KOMODO_EARLYTXID.GetHex());
+        CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",HUSH_EARLYTXID.GetHex());
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
         return("");
     }
@@ -640,15 +643,15 @@ std::string ImportGatewayDeposit(uint64_t txfee,uint256 bindtxid,int32_t height,
 
 std::string ImportGatewayWithdraw(uint64_t txfee,uint256 bindtxid,std::string refcoin,CPubKey withdrawpub,int64_t amount)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CTransaction tx; CPubKey mypk,importgatewaypk,signerpk; uint256 txid,hashBlock,oracletxid,tmptokenid,tmpbindtxid,withdrawtxid; int32_t vout,numvouts;
     int64_t nValue,inputs,CCchange=0,tmpamount; uint8_t funcid,K,M,N,taddr,prefix,prefix2,wiftype; std::string coin,hex;
     std::vector<CPubKey> msigpubkeys; char burnaddr[64],str[65],coinaddr[64]; struct CCcontract_info *cp,C;
     std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > unspentOutputs;
 
-    if (KOMODO_EARLYTXID!=zeroid && bindtxid!=KOMODO_EARLYTXID)
+    if (HUSH_EARLYTXID!=zeroid && bindtxid!=HUSH_EARLYTXID)
     {
-        CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",KOMODO_EARLYTXID.GetHex());
+        CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",HUSH_EARLYTXID.GetHex());
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
         return("");
     }
@@ -718,7 +721,7 @@ std::string ImportGatewayWithdraw(uint64_t txfee,uint256 bindtxid,std::string re
 
 std::string ImportGatewayPartialSign(uint64_t txfee,uint256 lasttxid,std::string refcoin, std::string hex)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CPubKey mypk,withdrawpub,signerpk,importgatewaypk; struct CCcontract_info *cp,C; CTransaction tx,tmptx;
     std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > unspentOutputs; char funcid,str[65],burnaddr[64];
     int32_t numvouts; uint256 withdrawtxid,hashBlock,bindtxid,tokenid,oracletxid; std::string coin,tmphex; int64_t amount;
@@ -745,9 +748,9 @@ std::string ImportGatewayPartialSign(uint64_t txfee,uint256 lasttxid,std::string
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
-        else if (KOMODO_EARLYTXID!=zeroid && bindtxid!=KOMODO_EARLYTXID)
+        else if (HUSH_EARLYTXID!=zeroid && bindtxid!=HUSH_EARLYTXID)
         {
-            CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",KOMODO_EARLYTXID.GetHex());
+            CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",HUSH_EARLYTXID.GetHex());
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
@@ -792,9 +795,9 @@ std::string ImportGatewayPartialSign(uint64_t txfee,uint256 lasttxid,std::string
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
-        else if (KOMODO_EARLYTXID!=zeroid && bindtxid!=KOMODO_EARLYTXID)
+        else if (HUSH_EARLYTXID!=zeroid && bindtxid!=HUSH_EARLYTXID)
         {
-            CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",KOMODO_EARLYTXID.GetHex());
+            CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",HUSH_EARLYTXID.GetHex());
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
@@ -831,7 +834,7 @@ std::string ImportGatewayPartialSign(uint64_t txfee,uint256 lasttxid,std::string
 
 std::string ImportGatewayCompleteSigning(uint64_t txfee,uint256 lasttxid,std::string refcoin,std::string hex)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CPubKey mypk,importgatewaypk,signerpk,withdrawpub; struct CCcontract_info *cp,C; char funcid,str[65],burnaddr[64]; int64_t amount;
     std::string coin,tmphex; CTransaction tx,tmptx; uint256 withdrawtxid,hashBlock,tokenid,bindtxid,oracletxid; int32_t numvouts;
     uint8_t K=0,M,N,taddr,prefix,prefix2,wiftype; std::vector<CPubKey> pubkeys;
@@ -863,9 +866,9 @@ std::string ImportGatewayCompleteSigning(uint64_t txfee,uint256 lasttxid,std::st
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
-        else if (KOMODO_EARLYTXID!=zeroid && bindtxid!=KOMODO_EARLYTXID)
+        else if (HUSH_EARLYTXID!=zeroid && bindtxid!=HUSH_EARLYTXID)
         {
-            CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",KOMODO_EARLYTXID.GetHex());
+            CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",HUSH_EARLYTXID.GetHex());
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
@@ -909,9 +912,9 @@ std::string ImportGatewayCompleteSigning(uint64_t txfee,uint256 lasttxid,std::st
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
-        else if (KOMODO_EARLYTXID!=zeroid && bindtxid!=KOMODO_EARLYTXID)
+        else if (HUSH_EARLYTXID!=zeroid && bindtxid!=HUSH_EARLYTXID)
         {
-            CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",KOMODO_EARLYTXID.GetHex());
+            CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",HUSH_EARLYTXID.GetHex());
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
@@ -948,7 +951,7 @@ std::string ImportGatewayCompleteSigning(uint64_t txfee,uint256 lasttxid,std::st
 
 std::string ImportGatewayMarkDone(uint64_t txfee,uint256 completetxid,std::string refcoin)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CPubKey mypk; struct CCcontract_info *cp,C; char str[65],burnaddr[64]; CTransaction tx; int32_t numvouts;
     uint256 withdrawtxid,bindtxid,oracletxid,tokenid,hashBlock; std::string coin,hex;
     uint8_t K,M,N,taddr,prefix,prefix2,wiftype; std::vector<CPubKey> pubkeys; int64_t amount; CPubKey withdrawpub;
@@ -987,9 +990,9 @@ std::string ImportGatewayMarkDone(uint64_t txfee,uint256 completetxid,std::strin
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
         return("");
     }
-    else if (KOMODO_EARLYTXID!=zeroid && bindtxid!=KOMODO_EARLYTXID)
+    else if (HUSH_EARLYTXID!=zeroid && bindtxid!=HUSH_EARLYTXID)
     {
-        CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",KOMODO_EARLYTXID.GetHex());
+        CCerror = strprintf("invalid import gateway. On this chain only valid import gateway is %s",HUSH_EARLYTXID.GetHex());
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
         return("");
     }
@@ -1242,7 +1245,7 @@ UniValue ImportGatewayDumpPrivKey(uint256 bindtxid,CKey key)
 
 UniValue ImportGatewayInfo(uint256 bindtxid)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     UniValue result(UniValue::VOBJ),a(UniValue::VARR); std::string coin; char str[67],numstr[65],burnaddr[64],gatewaystokens[64];
     uint8_t M,N; std::vector<CPubKey> pubkeys; uint8_t taddr,prefix,prefix2,wiftype; uint256 oracletxid,hashBlock; CTransaction tx;
     CPubKey ImportGatewaypk; struct CCcontract_info *cp,C; int32_t i; int64_t numvouts,remaining; std::vector<CPubKey> msigpubkeys;

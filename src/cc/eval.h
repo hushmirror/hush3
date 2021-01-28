@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -27,7 +27,7 @@
 #include "consensus/validation.h"
 #include "primitives/transaction.h"
 
-#define KOMODO_FIRSTFUNGIBLEID 100
+#define HUSH_FIRSTFUNGIBLEID 100
 
 /*
  * Eval codes
@@ -36,8 +36,8 @@
  *
  * If at some point a new interpretation model is introduced,
  * there should be a code identifying it. For example,
- * a possible code is EVAL_BITCOIN_SCRIPT, where the entire binary
- * after the code is interpreted as a bitcoin script.
+ * a possible code is EVAL_HUSH_SCRIPT, where the entire binary
+ * after the code is interpreted as a Hush (Bitcoin) Protocol Script.
  */
 #define FOREACH_EVAL(EVAL)             \
         EVAL(EVAL_IMPORTPAYOUT, 0xe1)  \
@@ -69,7 +69,7 @@ typedef uint8_t EvalCode;
 
 
 class AppVM;
-class NotarisationData;
+class NotarizationData;
 
 
 class Eval
@@ -110,7 +110,7 @@ public:
     virtual bool GetSpendsConfirmed(uint256 hash, std::vector<CTransaction> &spends) const;
     virtual bool GetBlock(uint256 hash, CBlockIndex& blockIdx) const;
     virtual int32_t GetNotaries(uint8_t pubkeys[64][33], int32_t height, uint32_t timestamp) const;
-    virtual bool GetNotarisationData(uint256 notarisationHash, NotarisationData &data) const;
+    virtual bool GetNotarizationData(uint256 notarisationHash, NotarizationData &data) const;
     virtual bool CheckNotaryInputs(const CTransaction &tx, uint32_t height, uint32_t timestamp) const;
     virtual uint32_t GetAssetchainsCC() const;
     virtual std::string GetAssetchainsSymbol() const;
@@ -160,10 +160,10 @@ extern char SMART_CHAIN_SYMBOL[65];
 /*
  * Data from notarisation OP_RETURN from chain being notarised
  */
-class NotarisationData
+class NotarizationData
 {
 public:
-    int IsBackNotarisation = 0;
+    int IsBackNotarization = 0;
     uint256 blockHash      = uint256();
     uint32_t height        = 0;
     uint256 txHash         = uint256();
@@ -174,7 +174,7 @@ public:
     uint256 MoMoM          = uint256();
     uint32_t MoMoMDepth    = 0;
 
-    NotarisationData(int IsBack=2) : IsBackNotarisation(IsBack) {
+    NotarizationData(int IsBack=2) : IsBackNotarization(IsBack) {
         symbol[0] = '\0';
     }
 
@@ -183,8 +183,8 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action) {
 
-        bool IsBack = IsBackNotarisation;
-        if (2 == IsBackNotarisation) IsBack = DetectBackNotarisation(s, ser_action);
+        bool IsBack = IsBackNotarization;
+        if (2 == IsBackNotarization) IsBack = DetectBackNotarization(s, ser_action);
 
         READWRITE(blockHash);
         READWRITE(height);
@@ -219,7 +219,7 @@ public:
     }
 
     template <typename Stream>
-    bool DetectBackNotarisation(Stream& s, CSerActionUnserialize act)
+    bool DetectBackNotarization(Stream& s, CSerActionUnserialize act)
     {
         if (SMART_CHAIN_SYMBOL[0]) return 1;
         if (s.size() >= 72) {
@@ -230,14 +230,14 @@ public:
     }
     
     template <typename Stream>
-    bool DetectBackNotarisation(Stream& s, CSerActionSerialize act)
+    bool DetectBackNotarization(Stream& s, CSerActionSerialize act)
     {
         return !txHash.IsNull();
     }
 };
 
 
-bool ParseNotarisationOpReturn(const CTransaction &tx, NotarisationData &data);
+bool ParseNotarizationOpReturn(const CTransaction &tx, NotarizationData &data);
 
 
 /*

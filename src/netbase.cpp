@@ -2,7 +2,6 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -21,9 +20,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config/bitcoin-config.h"
 #endif
-
 #include "netbase.h"
-
 #include "hash.h"
 #include "sync.h"
 #include "uint256.h"

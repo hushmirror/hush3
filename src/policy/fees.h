@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_POLICYESTIMATOR_H
-#define BITCOIN_POLICYESTIMATOR_H
+#ifndef HUSH_POLICYESTIMATOR_H
+#define HUSH_POLICYESTIMATOR_H
 
 #include "amount.h"
 #include "uint256.h"
@@ -293,4 +293,4 @@ private:
     CFeeRate feeLikely, feeUnlikely;
     double priLikely, priUnlikely;
 };
-#endif /*BITCOIN_POLICYESTIMATOR_H */
+#endif /*HUSH_POLICYESTIMATOR_H */

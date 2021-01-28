@@ -1,13 +1,14 @@
-#ifndef _BITCOIN_PREVECTOR_H_
-#define _BITCOIN_PREVECTOR_H_
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+#ifndef _HUSH_PREVECTOR_H_
+#define _HUSH_PREVECTOR_H_
 
 #include <util.h>
-
 #include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-
 #include <iterator>
 
 #pragma pack(push, 1)

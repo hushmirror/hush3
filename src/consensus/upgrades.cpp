@@ -1,8 +1,7 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Copyright (c) 2018 The Zcash developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -19,16 +18,16 @@
  ******************************************************************************/
 
 #include "consensus/upgrades.h"
-extern int32_t KOMODO_NSPV;
+extern int32_t HUSH_NSPV;
 #define NSPV_BRANCHID 0x76b809bb
 
-#ifndef KOMODO_NSPV_FULLNODE
-#define KOMODO_NSPV_FULLNODE (KOMODO_NSPV <= 0)
-#endif // !KOMODO_NSPV_FULLNODE
+#ifndef HUSH_NSPV_FULLNODE
+#define HUSH_NSPV_FULLNODE (HUSH_NSPV <= 0)
+#endif // !HUSH_NSPV_FULLNODE
 
-#ifndef KOMODO_NSPV_SUPERLITE
-#define KOMODO_NSPV_SUPERLITE (KOMODO_NSPV > 0)
-#endif // !KOMODO_NSPV_SUPERLITE
+#ifndef HUSH_NSPV_SUPERLITE
+#define HUSH_NSPV_SUPERLITE (HUSH_NSPV > 0)
+#endif // !HUSH_NSPV_SUPERLITE
 
 /**
  * General information about each network upgrade.
@@ -38,22 +37,22 @@ const struct NUInfo NetworkUpgradeInfo[Consensus::MAX_NETWORK_UPGRADES] = {
     {
         /*.nBranchId =*/ 0,
         /*.strName =*/ "Sprout",
-        /*.strInfo =*/ "The Zcash network at launch",
+        /*.strInfo =*/ "The Zcash network at launch. Hush is the first Zcash Protocol coin in the world that contains no Sprout history in it's blockchain!",
     },
     {
         /*.nBranchId =*/ 0x74736554,
         /*.strName =*/ "Test dummy",
-        /*.strInfo =*/ "Test dummy info",
+        /*.strInfo =*/ "Zcash Company Profits From Surveillance",
     },
     {
         /*.nBranchId =*/ 0x5ba81b19,
         /*.strName =*/ "Overwinter",
-        /*.strInfo =*/ "See https://z.cash/upgrade/overwinter.html for details.",
+        /*.strInfo =*/ "See https://hush.is for details.",
     },
     {
         /*.nBranchId =*/ 0x76b809bb,
         /*.strName =*/ "Sapling",
-        /*.strInfo =*/ "See https://z.cash/upgrade/sapling.html for details.",
+        /*.strInfo =*/ "See https://hush.is for details.",
     }
 };
 
@@ -110,7 +109,7 @@ int CurrentEpoch(int nHeight, const Consensus::Params& params) {
 
 uint32_t CurrentEpochBranchId(int nHeight, const Consensus::Params& params)
 {
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
         return(NSPV_BRANCHID);
     return NetworkUpgradeInfo[CurrentEpoch(nHeight, params)].nBranchId;
 }

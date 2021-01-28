@@ -72,7 +72,7 @@ The number of coinbase UTXOs selected for shielding can be adjusted by setting t
 
 If the limit parameter is set to zero, the zcashd `mempooltxinputlimit` option will be used instead, where the default value for `mempooltxinputlimit` is zero, which means no limit.
 
-Any limit is constrained by a hard limit due to the consensus rule defining a maximum transaction size of 100,000 bytes.
+Any limit is constrained by a hard limit due to the consensus rule defining a maximum transaction size.
 
 In general, the more UTXOs that are selected, the longer it takes for the transaction to be verified.  Due to the quadratic hashing problem, some miners use the `mempooltxinputlimit` option to reject transactions with a large number of UTXO inputs.
 
@@ -80,22 +80,8 @@ Currently, as of November 2017, there is no commonly agreed upon limit, but as a
 
 ### Anatomy of a z_shieldcoinbase transaction
 
-The transaction created is a shielded transaction.  It consists of a single joinsplit, which consumes coinbase UTXOs as input, and deposits value at a shielded address, minus any fee.
+The transaction created is a shielded transaction.  It consists of a single ShieldedSpend, which consumes coinbase UTXOs as input, and deposits value at a shielded address, minus any fee.
 
 The number of coinbase UTXOs is determined by a user configured limit.
 
-If no limit is set (in the case when limit parameter and `mempooltxinputlimit` options are set to zero) the behaviour of z_shieldcoinbase is to consume as many UTXOs as possible, with `z_shieldcoinbase` constructing a transaction up to the size limit of 100,000 bytes.
-
-As a result, the maximum number of inputs that can be selected is:
-
-- P2PKH coinbase UTXOs ~ 662
-- 2-of-3 multisig P2SH coinbase UTXOs ~ 244.
-
-Here is an example of using `z_shieldcoinbase` on testnet to shield multi-sig coinbase UTXOs.
-
-- Block 141042 is almost ~2 MB in size (the maximum size for a block) and contains 1 coinbase reward transaction and 20 transactions, each indivually created by a call to z_shieldcoinbase.
-  - https://explorer.testnet.z.cash/block/0050552a78e97c89f666713c8448d49ad1d7263274422272696187dedf6c0d03
-- Drilling down into a transaction, you can see there is one joinsplit, with 244 inputs (vin) and 0 outputs (vout).
-  - https://explorer.testnet.z.cash/tx/cf4f3da2e434f68b6e361303403344e22a9ff9a8fda9abc180d9520d0ca6527d
-
-
+If no limit is set (in the case when limit parameter and `mempooltxinputlimit` options are set to zero) the behaviour of z_shieldcoinbase is to consume as many UTXOs as possible, with `z_shieldcoinbase` constructing a transaction up to the maximum size.

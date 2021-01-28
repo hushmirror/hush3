@@ -1,11 +1,13 @@
+# Copyright (c) 2016-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 # mininode.py - Bitcoin P2P network half-a-node
-# Copyright (c) 2019 The Hush developers
-# Released under the GPLv3
 #
 # This python code was modified from ArtForz' public domain  half-a-node, as
 # found in the mini-node branch of http://github.com/jgarzik/pynode.
 # oringally from https://pastebin.com/ZSM7iHZw
 # Mad respect to ArtForz!!!!
+# No seriously, deep crazy respect for ArtForz. Thank you. -- Duke
 #
 # NodeConn: an object which manages p2p connectivity to a bitcoin node
 # NodeConnCB: a base class that describes the interface for receiving
@@ -16,7 +18,6 @@
 # msg_block, msg_tx, msg_headers, etc.:
 #     data structures that represent network messages
 # ser_*, deser_*: functions that handle serialization/deserialization
-
 
 import struct
 import socket
@@ -40,18 +41,14 @@ from .equihash import (
     zcash_person,
 )
 
-OVERWINTER_PROTO_VERSION = 170003
-BIP0031_VERSION = 60000
-SPROUT_PROTO_VERSION = 170002  # past bip-31 for ping/pong
-SAPLING_PROTO_VERSION = 170006
-MY_SUBVERSION = "/python-mininode-hush-tester:3.3.0/"
-
+OVERWINTER_PROTO_VERSION    = 170003
+BIP0031_VERSION             = 60000
+SPROUT_PROTO_VERSION        = 170002  # past bip-31 for ping/pong
+SAPLING_PROTO_VERSION       = 1987420
+MY_SUBVERSION               = "/SpicySand/"
 OVERWINTER_VERSION_GROUP_ID = 0x03C48270
-
-MAX_INV_SZ = 50000
-
-
-COIN = 100000000 # 1 HUSH in puposhis
+MAX_INV_SZ                  = 50000
+COIN                        = 100000000 # 1 HUSH in puposhis
 
 # Keep our own socket map for asyncore, so that we can track disconnects
 # ourselves (to workaround an issue with closing an asyncore socket when
@@ -410,21 +407,21 @@ class ZCProof(object):
                repr(self.g_K), repr(self.g_H))
 
 
-ZC_NUM_JS_INPUTS = 2
-ZC_NUM_JS_OUTPUTS = 2
+HUSH_NUM_JS_INPUTS = 2
+HUSH_NUM_JS_OUTPUTS = 2
 
 ZC_NOTEPLAINTEXT_LEADING = 1
 ZC_V_SIZE = 8
 ZC_RHO_SIZE = 32
 ZC_R_SIZE = 32
-ZC_MEMO_SIZE = 512
+HUSH_MEMO_SIZE = 512
 
 ZC_NOTEPLAINTEXT_SIZE = (
   ZC_NOTEPLAINTEXT_LEADING +
   ZC_V_SIZE +
   ZC_RHO_SIZE +
   ZC_R_SIZE +
-  ZC_MEMO_SIZE
+  HUSH_MEMO_SIZE
 )
 
 NOTEENCRYPTION_AUTH_BYTES = 16
@@ -439,13 +436,13 @@ class JSDescription(object):
         self.vpub_old = 0
         self.vpub_new = 0
         self.anchor = 0
-        self.nullifiers = [0] * ZC_NUM_JS_INPUTS
-        self.commitments = [0] * ZC_NUM_JS_OUTPUTS
+        self.nullifiers = [0] * HUSH_NUM_JS_INPUTS
+        self.commitments = [0] * HUSH_NUM_JS_OUTPUTS
         self.onetimePubKey = 0
         self.randomSeed = 0
-        self.macs = [0] * ZC_NUM_JS_INPUTS
+        self.macs = [0] * HUSH_NUM_JS_INPUTS
         self.proof = None
-        self.ciphertexts = [None] * ZC_NUM_JS_OUTPUTS
+        self.ciphertexts = [None] * HUSH_NUM_JS_OUTPUTS
 
     def deserialize(self, f):
         self.vpub_old = struct.unpack("<q", f.read(8))[0]
@@ -453,25 +450,25 @@ class JSDescription(object):
         self.anchor = deser_uint256(f)
 
         self.nullifiers = []
-        for i in range(ZC_NUM_JS_INPUTS):
+        for i in range(HUSH_NUM_JS_INPUTS):
             self.nullifiers.append(deser_uint256(f))
 
         self.commitments = []
-        for i in range(ZC_NUM_JS_OUTPUTS):
+        for i in range(HUSH_NUM_JS_OUTPUTS):
             self.commitments.append(deser_uint256(f))
 
         self.onetimePubKey = deser_uint256(f)
         self.randomSeed = deser_uint256(f)
 
         self.macs = []
-        for i in range(ZC_NUM_JS_INPUTS):
+        for i in range(HUSH_NUM_JS_INPUTS):
             self.macs.append(deser_uint256(f))
 
         self.proof = ZCProof()
         self.proof.deserialize(f)
 
         self.ciphertexts = []
-        for i in range(ZC_NUM_JS_OUTPUTS):
+        for i in range(HUSH_NUM_JS_OUTPUTS):
             self.ciphertexts.append(f.read(ZC_NOTECIPHERTEXT_SIZE))
 
     def serialize(self):
@@ -479,16 +476,16 @@ class JSDescription(object):
         r += struct.pack("<q", self.vpub_old)
         r += struct.pack("<q", self.vpub_new)
         r += ser_uint256(self.anchor)
-        for i in range(ZC_NUM_JS_INPUTS):
+        for i in range(HUSH_NUM_JS_INPUTS):
             r += ser_uint256(self.nullifiers[i])
-        for i in range(ZC_NUM_JS_OUTPUTS):
+        for i in range(HUSH_NUM_JS_OUTPUTS):
             r += ser_uint256(self.commitments[i])
         r += ser_uint256(self.onetimePubKey)
         r += ser_uint256(self.randomSeed)
-        for i in range(ZC_NUM_JS_INPUTS):
+        for i in range(HUSH_NUM_JS_INPUTS):
             r += ser_uint256(self.macs[i])
         r += self.proof.serialize()
-        for i in range(ZC_NUM_JS_OUTPUTS):
+        for i in range(HUSH_NUM_JS_OUTPUTS):
             r += ser_uint256(self.ciphertexts[i])
         return r
 

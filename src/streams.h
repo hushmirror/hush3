@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_STREAMS_H
-#define BITCOIN_STREAMS_H
+#ifndef HUSH_STREAMS_H
+#define HUSH_STREAMS_H
 
 #include "support/allocators/zeroafterfree.h"
 #include "serialize.h"
@@ -670,4 +670,4 @@ public:
     }
 };
 
-#endif // BITCOIN_STREAMS_H
+#endif // HUSH_STREAMS_H

@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2013 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -19,11 +19,10 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_PRIMITIVES_BLOCK_H
-#define BITCOIN_PRIMITIVES_BLOCK_H
+#ifndef HUSH_PRIMITIVES_BLOCK_H
+#define HUSH_PRIMITIVES_BLOCK_H
 
 #include "primitives/transaction.h"
-//#include "primitives/nonce.h"
 #include "serialize.h"
 #include "uint256.h"
 #include "arith_uint256.h"
@@ -279,4 +278,4 @@ struct CBlockLocator
     }
 };
 
-#endif // BITCOIN_PRIMITIVES_BLOCK_H
+#endif // HUSH_PRIMITIVES_BLOCK_H

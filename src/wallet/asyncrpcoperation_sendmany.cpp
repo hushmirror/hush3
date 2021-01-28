@@ -1,8 +1,7 @@
 // Copyright (c) 2016 The Zcash developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,7 +16,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "asyncrpcoperation_sendmany.h"
 #include "asyncrpcqueue.h"
 #include "amount.h"
@@ -40,15 +38,12 @@
 #include "zcash/IncrementalMerkleTree.hpp"
 #include "sodium.h"
 #include "miner.h"
-
 #include <stdint.h>
-
 #include <array>
 #include <iostream>
 #include <chrono>
 #include <thread>
 #include <string>
-
 #include <boost/optional/optional_io.hpp>
 
 using namespace libzcash;
@@ -56,7 +51,7 @@ using namespace libzcash;
 extern char SMART_CHAIN_SYMBOL[65];
 
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
-int32_t komodo_blockheight(uint256 hash);
+int32_t hush_blockheight(uint256 hash);
 int tx_height( const uint256 &hash );
 bool hush_hardfork_active(uint32_t time);
 extern UniValue signrawtransaction(const UniValue& params, bool fHelp, const CPubKey& mypk);
@@ -199,11 +194,16 @@ bool AsyncRPCOperation_sendmany::main_impl() {
 
     assert(isfromtaddr_ != isfromzaddr_);
 
-    bool isSingleZaddrOutput = (t_outputs_.size()==0 && z_outputs_.size()==1);
+    if(t_outputs_.size() > 0) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "Extreme Privacy! You cannot send to a transparent address.");
+    }
+
+    bool isSingleZaddrOutput   = (t_outputs_.size()==0 && z_outputs_.size()==1);
     bool isMultipleZaddrOutput = (t_outputs_.size()==0 && z_outputs_.size()>=1);
-    bool isPureTaddrOnlyTx = (isfromtaddr_ && z_outputs_.size() == 0);
+    bool isPureTaddrOnlyTx     = (isfromtaddr_ && z_outputs_.size() == 0);
     CAmount minersFee = fee_;
 
+    // TODO: fix this garbage ZEC prisoner mindset bullshit
     // When spending coinbase utxos, you can only specify a single zaddr as the change must go somewhere
     // and if there are multiple zaddrs, we don't know where to send it.
     if (isfromtaddr_) {
@@ -243,12 +243,13 @@ bool AsyncRPCOperation_sendmany::main_impl() {
         t_outputs_total += std::get<1>(t);
     }
 
+
     CAmount z_outputs_total = 0;
     for (SendManyRecipient & t : z_outputs_) {
         z_outputs_total += std::get<1>(t);
     }
 
-    CAmount sendAmount = z_outputs_total + t_outputs_total;
+    CAmount sendAmount   = z_outputs_total + t_outputs_total;
     CAmount targetAmount = sendAmount + minersFee;
 
     assert(!isfromtaddr_ || z_inputs_total == 0);
@@ -302,7 +303,7 @@ bool AsyncRPCOperation_sendmany::main_impl() {
                 FormatMoney(t_inputs_total), FormatMoney(dustThreshold - dustChange), FormatMoney(dustChange), FormatMoney(dustThreshold)));
         }
 
-        t_inputs_ = selectedTInputs;
+        t_inputs_      = selectedTInputs;
         t_inputs_total = selectedUTXOAmount;
 
         // Check mempooltxinputlimit to avoid creating a transaction which the local mempool rejects
@@ -331,15 +332,8 @@ bool AsyncRPCOperation_sendmany::main_impl() {
                 CAmount amount = std::get<2>(t);
                 builder_.AddTransparentInput(COutPoint(txid, vout), scriptPubKey, amount);
             }
-            // for Komodo, set lock time to accure interest, for other chains, set
-            // locktime to spend time locked coinbases
-            if (SMART_CHAIN_SYMBOL[0] == 0)
-            {
-                if ( !hush_hardfork_active((uint32_t)chainActive.LastTip()->nTime) )
-                    builder_.SetLockTime((uint32_t)time(NULL) - 60); // set lock time for Komodo interest
-                else
-                    builder_.SetLockTime((uint32_t)chainActive.Tip()->GetMedianTimePast());
-            }
+            // for other chains, set locktime to spend time locked coinbases
+            //builder_.SetLockTime((uint32_t)chainActive.Tip()->GetMedianTimePast());
         } else {
             CMutableTransaction rawTx(tx_);
             for (SendManyInputUTXO & t : t_inputs_) {
@@ -349,13 +343,7 @@ bool AsyncRPCOperation_sendmany::main_impl() {
                 CTxIn in(COutPoint(txid, vout));
                 rawTx.vin.push_back(in);
             }
-            if (SMART_CHAIN_SYMBOL[0] == 0)
-            {
-                if ( !hush_hardfork_active((uint32_t)chainActive.LastTip()->nTime) )
-                    rawTx.nLockTime = (uint32_t)time(NULL) - 60; // jl777
-                else
-                    rawTx.nLockTime = (uint32_t)chainActive.Tip()->GetMedianTimePast();
-            }
+            //rawTx.nLockTime = (uint32_t)chainActive.Tip()->GetMedianTimePast();
             tx_ = CTransaction(rawTx);
         }
     }
@@ -370,8 +358,7 @@ bool AsyncRPCOperation_sendmany::main_impl() {
 
 
     /**
-     * SCENARIO #0
-     *
+     * SCENARIO #0 (All HUSH and Hush Smart Chains)
      * Sprout not involved, so we just use the TransactionBuilder and we're done.
      * We added the transparent inputs to the builder earlier.
      */
@@ -516,13 +503,10 @@ bool AsyncRPCOperation_sendmany::main_impl() {
 
         return true;
     }
-    /**
-     * END SCENARIO #0
-     */
-
+    // END SCENARIO #0
+    // No other scenarios, because Hush developers are elite.
     return false;
 }
-
 
 /**
  * Sign and send a raw transaction.
@@ -579,7 +563,6 @@ void AsyncRPCOperation_sendmany::sign_send_raw_transaction(UniValue obj)
         set_result(o);
     } else {
         // Test mode does not send the transaction to the network.
-
         CDataStream stream(ParseHex(signedtxn), SER_NETWORK, PROTOCOL_VERSION);
         CTransaction tx;
         stream >> tx;
@@ -751,9 +734,9 @@ void AsyncRPCOperation_sendmany::add_taddr_change_output_to_tx(CBitcoinAddress *
     tx_ = CTransaction(rawTx);
 }
 
-std::array<unsigned char, ZC_MEMO_SIZE> AsyncRPCOperation_sendmany::get_memo_from_hex_string(std::string s) {
+std::array<unsigned char, HUSH_MEMO_SIZE> AsyncRPCOperation_sendmany::get_memo_from_hex_string(std::string s) {
     // initialize to default memo (no_memo), see section 5.5 of the protocol spec
-    std::array<unsigned char, ZC_MEMO_SIZE> memo = {{0xF6}};
+    std::array<unsigned char, HUSH_MEMO_SIZE> memo = {{0xF6}};
 
     std::vector<unsigned char> rawMemo = ParseHex(s.c_str());
 
@@ -763,21 +746,19 @@ std::array<unsigned char, ZC_MEMO_SIZE> AsyncRPCOperation_sendmany::get_memo_fro
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Memo must be in hexadecimal format");
     }
 
-    if (rawMemo.size() > ZC_MEMO_SIZE) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Memo size of %d is too big, maximum allowed is %d", rawMemo.size(), ZC_MEMO_SIZE));
+    if (rawMemo.size() > HUSH_MEMO_SIZE) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Memo size of %d is too big, maximum allowed is %d", rawMemo.size(), HUSH_MEMO_SIZE));
     }
 
     // copy vector into boost array
     int lenMemo = rawMemo.size();
-    for (int i = 0; i < ZC_MEMO_SIZE && i < lenMemo; i++) {
+    for (int i = 0; i < HUSH_MEMO_SIZE && i < lenMemo; i++) {
         memo[i] = rawMemo[i];
     }
     return memo;
 }
 
-/**
- * Override getStatus() to append the operation's input parameters to the default status object.
- */
+// Override getStatus() to append the operation's input parameters to the default status object.
 UniValue AsyncRPCOperation_sendmany::getStatus() const {
     UniValue v = AsyncRPCOperation::getStatus();
     if (contextinfo_.isNull()) {

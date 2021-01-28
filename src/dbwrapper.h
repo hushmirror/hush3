@@ -1,19 +1,17 @@
 // Copyright (c) 2012-2014 The Bitcoin Core developers
-// Copyright (c) 2019      The Hush developers
+// Copyright (c) 2016-2020  The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_DBWRAPPER_H
-#define BITCOIN_DBWRAPPER_H
+#ifndef HUSH_DBWRAPPER_H
+#define HUSH_DBWRAPPER_H
 
 #include "clientversion.h"
 #include "serialize.h"
 #include "streams.h"
 #include "util.h"
 #include "version.h"
-
 #include <boost/filesystem/path.hpp>
-
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
 
@@ -276,5 +274,5 @@ public:
     bool IsEmpty();
 };
 
-#endif // BITCOIN_DBWRAPPER_H
+#endif // HUSH_DBWRAPPER_H
 

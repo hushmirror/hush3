@@ -1,4 +1,6 @@
-
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -67,9 +69,9 @@ void prices_bardisp(struct prices_bar *bar)
 int64_t prices_blockinfo(int32_t height,char *acaddr)
 {
     std::vector<uint8_t> vopret; CBlockIndex *pindex; CBlock block; CTransaction tx,vintx; uint64_t pricebits; char destaddr[64]; uint32_t aveprice=0,timestamp,uprice; uint256 hashBlock; int64_t dist,mindist=(1LL<<60),prizefund = 0; int32_t mini=-1,i,n,vini,numvouts,iter; struct prices_bar refbar;
-    if ( (pindex= komodo_chainactive(height)) != 0 )
+    if ( (pindex= hush_chainactive(height)) != 0 )
     {
-        if ( komodo_blockload(block,pindex) == 0 )
+        if ( hush_blockload(block,pindex) == 0 )
         {
             n = block.vtx.size();
             vini = 0;
@@ -127,7 +129,7 @@ int64_t prices_blockinfo(int32_t height,char *acaddr)
 
 UniValue games_settle(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    UniValue result(UniValue::VOBJ);  char acaddr[64]; CPubKey acpk,mypk,gamespk; int64_t prizefund = 0; int32_t height,nextheight = komodo_nextheight();
+    UniValue result(UniValue::VOBJ);  char acaddr[64]; CPubKey acpk,mypk,gamespk; int64_t prizefund = 0; int32_t height,nextheight = hush_nextheight();
     if ( ASSETCHAINS_OVERRIDE_PUBKEY33[0] == 0 )
     {
         result.push_back(Pair("result","error"));
@@ -169,7 +171,7 @@ UniValue games_settle(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 
 UniValue games_bet(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     UniValue result(UniValue::VOBJ); std::string rawtx; int64_t amount,inputsum; uint64_t price; CPubKey gamespk,mypk,acpk;
     if ( ASSETCHAINS_OVERRIDE_PUBKEY33[0] == 0 )
     {

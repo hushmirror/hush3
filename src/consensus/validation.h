@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_CONSENSUS_VALIDATION_H
-#define BITCOIN_CONSENSUS_VALIDATION_H
+#ifndef HUSH_CONSENSUS_VALIDATION_H
+#define HUSH_CONSENSUS_VALIDATION_H
 
 #include <string>
 
@@ -93,4 +93,4 @@ public:
     virtual std::string GetRejectReason() const { return strRejectReason; }
 };
 
-#endif // BITCOIN_CONSENSUS_VALIDATION_H
+#endif // HUSH_CONSENSUS_VALIDATION_H

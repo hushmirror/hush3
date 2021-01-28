@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -25,7 +28,7 @@
 #include "cc/utils.h"
 #include "primitives/transaction.h"
 
-int32_t komodo_nextheight();
+int32_t hush_nextheight();
 
 std::vector<CC*> BetProtocol::PlayerConditions()
 {
@@ -54,7 +57,7 @@ CC* BetProtocol::MakeDisputeCond()
  */
 CMutableTransaction BetProtocol::MakeSessionTx(CAmount spendFee)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     CC *disputeCond = MakeDisputeCond();
     mtx.vout.push_back(CTxOut(spendFee, CCPubKey(disputeCond)));
@@ -71,7 +74,7 @@ CMutableTransaction BetProtocol::MakeSessionTx(CAmount spendFee)
 
 CMutableTransaction BetProtocol::MakeDisputeTx(uint256 signedSessionTxHash, uint256 vmResultHash)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     CC *disputeCond = MakeDisputeCond();
     mtx.vin.push_back(CTxIn(signedSessionTxHash, 0, CScript()));
@@ -85,7 +88,7 @@ CMutableTransaction BetProtocol::MakeDisputeTx(uint256 signedSessionTxHash, uint
 CMutableTransaction BetProtocol::MakePostEvidenceTx(uint256 signedSessionTxHash,
         int playerIdx, std::vector<unsigned char> state)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     mtx.vin.push_back(CTxIn(signedSessionTxHash, playerIdx+1, CScript()));
     mtx.vout.push_back(CTxOut(0, CScript() << OP_RETURN << state));
@@ -116,7 +119,7 @@ CC* BetProtocol::MakePayoutCond(uint256 signedSessionTxHash)
 
 CMutableTransaction BetProtocol::MakeStakeTx(CAmount totalPayout, uint256 signedSessionTxHash)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     CC *payoutCond = MakePayoutCond(signedSessionTxHash);
     mtx.vout.push_back(CTxOut(totalPayout, CCPubKey(payoutCond)));
@@ -129,7 +132,7 @@ CMutableTransaction BetProtocol::MakeStakeTx(CAmount totalPayout, uint256 signed
 CMutableTransaction BetProtocol::MakeAgreePayoutTx(std::vector<CTxOut> payouts,
         uint256 signedStakeTxHash)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     mtx.vin.push_back(CTxIn(signedStakeTxHash, 0, CScript()));
     mtx.vout = payouts;
     return mtx;
@@ -139,7 +142,7 @@ CMutableTransaction BetProtocol::MakeAgreePayoutTx(std::vector<CTxOut> payouts,
 CMutableTransaction BetProtocol::MakeImportPayoutTx(std::vector<CTxOut> payouts,
         CTransaction signedDisputeTx, uint256 signedStakeTxHash, MoMProof momProof)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     mtx.vin.push_back(CTxIn(signedStakeTxHash, 0, CScript()));
     mtx.vout = payouts;
     CScript proofData;
@@ -215,8 +218,8 @@ bool Eval::ImportPayout(const std::vector<uint8_t> params, const CTransaction &i
 
     // Check disputeTx solves momproof from vout[0]
     {
-        NotarisationData data(0);
-        if (!GetNotarisationData(proof.notarisationHash, data))
+        NotarizationData data(0);
+        if (!GetNotarizationData(proof.notarisationHash, data))
             return Invalid("coudnt-load-mom");
 
         if (data.MoM != proof.branch.Exec(disputeTx.GetHash()))

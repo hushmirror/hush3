@@ -17,9 +17,9 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_NOUI_H
-#define BITCOIN_NOUI_H
+#ifndef HUSH_NOUI_H
+#define HUSH_NOUI_H
 
 extern void noui_connect();
 
-#endif // BITCOIN_NOUI_H
+#endif // HUSH_NOUI_H

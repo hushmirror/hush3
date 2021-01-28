@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_TEST_BIGNUM_H
-#define BITCOIN_TEST_BIGNUM_H
+#ifndef HUSH_TEST_BIGNUM_H
+#define HUSH_TEST_BIGNUM_H
 
 #include <algorithm>
 #include <cassert>
@@ -190,4 +190,4 @@ inline bool operator>=(const CBigNum& a, const CBigNum& b) { return (BN_cmp(a.bn
 inline bool operator<(const CBigNum& a, const CBigNum& b)  { return (BN_cmp(a.bn, b.bn) < 0); }
 inline bool operator>(const CBigNum& a, const CBigNum& b)  { return (BN_cmp(a.bn, b.bn) > 0); }
 
-#endif // BITCOIN_TEST_BIGNUM_H
+#endif // HUSH_TEST_BIGNUM_H

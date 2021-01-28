@@ -1,14 +1,15 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <iostream>
 #include <string>
-
-// Include local headers
 #include "wallet/walletdb.h"
 #include "util.h"
 #include "base58.h"
 #include "wallet/crypter.h"
 #include <boost/foreach.hpp>
-
 #include "hush_defs.h"
+
 char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 int64_t MAX_MONEY = 200000000 * 100000000LL;
 uint64_t ASSETCHAINS_SUPPLY;
@@ -18,12 +19,10 @@ uint32_t ASSETCHAIN_INIT,ASSETCHAINS_CC;
 uint32_t ASSETCHAINS_MAGIC = 2387029918;
 uint32_t ASSETCHAINS_EQUIHASH = 0;
 uint32_t ASSETCHAINS_ALGO = 0;
-int32_t ASSETCHAINS_LWMAPOS = 0;
-int32_t ASSETCHAINS_OVERWINTER = 227520;
-int32_t ASSETCHAINS_SAPLING = 227520;
-int32_t KOMODO_TESTNODE = 0;
-int32_t KOMODO_BLOCK_POSUNITS = 1000;
-
+int32_t  ASSETCHAINS_LWMAPOS = 0;
+int32_t  ASSETCHAINS_OVERWINTER = 227520;
+int32_t  ASSETCHAINS_SAPLING = 227520;
+int32_t  HUSH_TESTNODE = 0;
 unsigned int MAX_BLOCK_SIGOPS = 20000;
 
 void show_help()

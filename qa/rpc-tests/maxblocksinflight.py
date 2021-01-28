@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# Copyright (c) 2016-2020 The Hush developers
 #
 # Distributed under the GPLv3/X11 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -93,7 +94,7 @@ class MaxBlocksInFlightTest(BitcoinTestFramework):
 
     def setup_network(self):
         self.nodes = start_nodes(1, self.options.tmpdir, 
-                                 extra_args=[['-debug', '-whitelist=127.0.0.1']],
+                                 extra_args=[['-debug', '-allowlist=127.0.0.1']],
                                  binary=[self.options.testbinary])
 
     def run_test(self):

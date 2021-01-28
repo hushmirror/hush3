@@ -1,5 +1,5 @@
-#ifndef BITCOIN_TEST_TEST_BITCOIN_H
-#define BITCOIN_TEST_TEST_BITCOIN_H
+#ifndef HUSH_TEST_TEST_HUSH_H
+#define HUSH_TEST_TEST_HUSH_H
 
 #include "consensus/upgrades.h"
 #include "pubkey.h"

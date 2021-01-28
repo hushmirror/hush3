@@ -1,5 +1,5 @@
 // Copyright (c) 2018 The Zcash developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -36,12 +36,12 @@ struct SpendDescriptionInfo {
 struct OutputDescriptionInfo {
     uint256 ovk;
     libzcash::SaplingNote note;
-    std::array<unsigned char, ZC_MEMO_SIZE> memo;
+    std::array<unsigned char, HUSH_MEMO_SIZE> memo;
 
     OutputDescriptionInfo(
         uint256 ovk,
         libzcash::SaplingNote note,
-        std::array<unsigned char, ZC_MEMO_SIZE> memo) : ovk(ovk), note(note), memo(memo) {}
+        std::array<unsigned char, HUSH_MEMO_SIZE> memo) : ovk(ovk), note(note), memo(memo) {}
 };
 
 struct TransparentInputInfo {
@@ -90,7 +90,7 @@ public:
         uint256 ovk,
         libzcash::SaplingPaymentAddress to,
         CAmount value,
-        std::array<unsigned char, ZC_MEMO_SIZE> memo = {{0}});
+        std::array<unsigned char, HUSH_MEMO_SIZE> memo = {{0}});
 
     // Assumes that the value correctly corresponds to the provided UTXO.
     void AddTransparentInput(COutPoint utxo, CScript scriptPubKey, CAmount value, uint32_t nSequence = 0xffffffff);

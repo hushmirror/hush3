@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,8 +20,10 @@
 #ifndef CC_MARMARA_H
 #define CC_MARMARA_H
 
+/*
+
 #include "CCinclude.h"
-#include "../komodo_cJSON.h"
+#include "../hush_cJSON.h"
 
 #define MARMARA_GROUPSIZE 60
 #define MARMARA_MINLOCK (1440 * 3 * 30)
@@ -27,7 +32,7 @@
 #define EVAL_MARMARA 0xef
 
 extern uint8_t ASSETCHAINS_MARMARA;
-uint64_t komodo_block_prg(uint32_t nHeight);
+uint64_t hush_block_prg(uint32_t nHeight);
 int32_t MarmaraGetcreatetxid(uint256 &createtxid,uint256 txid);
 int32_t MarmaraGetbatontxid(std::vector<uint256> &creditloop,uint256 &batontxid,uint256 txid);
 UniValue MarmaraCreditloop(uint256 txid);
@@ -43,5 +48,6 @@ bool MarmaraValidate(struct CCcontract_info *cp,Eval* eval,const CTransaction &t
 
 // CCcustom
 UniValue MarmaraInfo();
+*/
 
 #endif

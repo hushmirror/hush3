@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_SYNC_H
-#define BITCOIN_SYNC_H
+#ifndef HUSH_SYNC_H
+#define HUSH_SYNC_H
 
 #include "threadsafety.h"
 
@@ -293,4 +293,4 @@ public:
     }
 };
 
-#endif // BITCOIN_SYNC_H
+#endif // HUSH_SYNC_H

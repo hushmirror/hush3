@@ -1,9 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,13 +17,12 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 /**
  * Server/client environment: argument handling, config file parsing,
  * logging, thread wrappers
  */
-#ifndef BITCOIN_UTIL_H
-#define BITCOIN_UTIL_H
+#ifndef HUSH_UTIL_H
+#define HUSH_UTIL_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
@@ -33,14 +31,12 @@
 #include "compat.h"
 #include "tinyformat.h"
 #include "utiltime.h"
-
 #include <atomic>
 #include <exception>
 #include <map>
 #include <stdint.h>
 #include <string>
 #include <vector>
-
 #include <boost/filesystem/path.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/thread/exceptions.hpp>
@@ -261,9 +257,7 @@ int GetNumCores();
 void SetThreadPriority(int nPriority);
 void RenameThread(const char* name);
 
-/**
- * .. and a wrapper that just calls func once
- */
+// a wrapper that just calls func once
 template <typename Callable> void TraceThread(const char* name,  Callable func)
 {
     std::string s = strprintf("hush-%s", name);
@@ -294,5 +288,4 @@ void SplitStr(const std::string& strVal, std::vector<std::string> &outVals);
 
 #define HUSH_SMART_CHAIN_MAXLEN 65
 
-
-#endif // BITCOIN_UTIL_H
+#endif // HUSH_UTIL_H

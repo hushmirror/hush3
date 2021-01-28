@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 #ifndef BENCHMARKS_H
 #define BENCHMARKS_H
 

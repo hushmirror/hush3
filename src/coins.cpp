@@ -1,8 +1,7 @@
 // Copyright (c) 2012-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,18 +16,14 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "coins.h"
-
 #include "memusage.h"
 #include "random.h"
 #include "version.h"
 #include "policy/fees.h"
 #include "hush_defs.h"
 #include "importcoin.h"
-
 #include <assert.h>
-
 /**
  * calculate number of bytes for the bitmask, and its number of non-zero bytes
  * each bit in the bitmask represents the availability of one output, but the
@@ -112,9 +107,7 @@ CCoinsViewCache::~CCoinsViewCache()
 
 size_t CCoinsViewCache::DynamicMemoryUsage() const {
     return memusage::DynamicUsage(cacheCoins) +
-           memusage::DynamicUsage(cacheSproutAnchors) +
            memusage::DynamicUsage(cacheSaplingAnchors) +
-           memusage::DynamicUsage(cacheSproutNullifiers) +
            memusage::DynamicUsage(cacheSaplingNullifiers) +
            cachedCoinsUsage;
 }
@@ -162,10 +155,9 @@ bool CCoinsViewCache::GetSaplingAnchorAt(const uint256 &rt, SaplingMerkleTree &t
 
 bool CCoinsViewCache::GetNullifier(const uint256 &nullifier, ShieldedType type) const {
     CNullifiersMap* cacheToUse;
+    // SAPLING is the only current supported type but we may
+    // have more in The Future
     switch (type) {
-        case SPROUT:
-            cacheToUse = &cacheSproutNullifiers;
-            break;
         case SAPLING:
             cacheToUse = &cacheSaplingNullifiers;
             break;
@@ -219,6 +211,7 @@ void CCoinsViewCache::AbstractPushAnchor(
     }
 }
 
+//TODO: delete
 template<> void CCoinsViewCache::PushAnchor(const SproutMerkleTree &tree)
 {
     AbstractPushAnchor<SproutMerkleTree, CAnchorsSproutMap, CAnchorsSproutMap::iterator, CAnchorsSproutCacheEntry>(
@@ -385,7 +378,6 @@ uint256 CCoinsViewCache::GetBestBlock() const {
     return hashBlock;
 }
 
-
 uint256 CCoinsViewCache::GetBestAnchor(ShieldedType type) const {
     switch (type) {
         case SPROUT:
@@ -508,24 +500,20 @@ bool CCoinsViewCache::BatchWrite(CCoinsMap &mapCoins,
         mapCoins.erase(itOld);
     }
 
-    //::BatchWriteAnchors<CAnchorsSproutMap, CAnchorsSproutMap::iterator, CAnchorsSproutCacheEntry>(mapSproutAnchors, cacheSproutAnchors, cachedCoinsUsage);
     ::BatchWriteAnchors<CAnchorsSaplingMap, CAnchorsSaplingMap::iterator, CAnchorsSaplingCacheEntry>(mapSaplingAnchors, cacheSaplingAnchors, cachedCoinsUsage);
 
-    //::BatchWriteNullifiers(mapSproutNullifiers, cacheSproutNullifiers);
     ::BatchWriteNullifiers(mapSaplingNullifiers, cacheSaplingNullifiers);
 
-    hashSproutAnchor = hashSproutAnchorIn;
+    hashSproutAnchor  = hashSproutAnchorIn;
     hashSaplingAnchor = hashSaplingAnchorIn;
-    hashBlock = hashBlockIn;
+    hashBlock         = hashBlockIn;
     return true;
 }
 
 bool CCoinsViewCache::Flush() {
     bool fOk = base->BatchWrite(cacheCoins, hashBlock, hashSproutAnchor, hashSaplingAnchor, cacheSproutAnchors, cacheSaplingAnchors, cacheSproutNullifiers, cacheSaplingNullifiers);
     cacheCoins.clear();
-    //cacheSproutAnchors.clear();
     cacheSaplingAnchors.clear();
-    //cacheSproutNullifiers.clear();
     cacheSaplingNullifiers.clear();
     cachedCoinsUsage = 0;
     return fOk;
@@ -538,12 +526,13 @@ unsigned int CCoinsViewCache::GetCacheSize() const {
 const CTxOut &CCoinsViewCache::GetOutputFor(const CTxIn& input) const
 {
     const CCoins* coins = AccessCoins(input.prevout.hash);
+    //fprintf(stderr, "GetOutputFor: input=%s", input.ToString().c_str());
+    //fprintf(stderr, "GetOutputFor: prevout n=%d,txid=%s\n", input.prevout.n, input.prevout.hash.ToString().c_str());
     assert(coins && coins->IsAvailable(input.prevout.n));
+    //fprintf(stderr, "GetOutputFor: IsAvailable\n");
     return coins->vout[input.prevout.n];
 }
 
-//uint64_t komodo_interest(int32_t txheight,uint64_t nValue,uint32_t nLockTime,uint32_t tiptime);
-uint64_t komodo_accrued_interest(int32_t *txheightp,uint32_t *locktimep,uint256 hash,int32_t n,int32_t checkheight,uint64_t checkvalue,int32_t tipheight);
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 
 const CScript &CCoinsViewCache::GetSpendFor(const CCoins *coins, const CTxIn& input)
@@ -576,20 +565,6 @@ CAmount CCoinsViewCache::GetValueIn(int32_t nHeight,int64_t *interestp,const CTr
         } 
         value = GetOutputFor(tx.vin[i]).nValue;
         nResult += value;
-#ifdef KOMODO_ENABLE_INTEREST
-        if ( SMART_CHAIN_SYMBOL[0] == 0 && nHeight >= 60000 )
-        {
-            if ( value >= 10*COIN )
-            {
-                int64_t interest; int32_t txheight; uint32_t locktime;
-                interest = komodo_accrued_interest(&txheight,&locktime,tx.vin[i].prevout.hash,tx.vin[i].prevout.n,0,value,(int32_t)nHeight);
-                //printf("nResult %.8f += val %.8f interest %.8f ht.%d lock.%u tip.%u\n",(double)nResult/COIN,(double)value/COIN,(double)interest/COIN,txheight,locktime,tiptime);
-                //fprintf(stderr,"nResult %.8f += val %.8f interest %.8f ht.%d lock.%u tip.%u\n",(double)nResult/COIN,(double)value/COIN,(double)interest/COIN,txheight,locktime,tiptime);
-                nResult += interest;
-                (*interestp) += interest;
-            }
-        }
-#endif
     }
     nResult += tx.GetShieldedValueIn();
 

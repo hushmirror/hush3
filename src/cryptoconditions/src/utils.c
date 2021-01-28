@@ -1,4 +1,6 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -19,13 +21,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-
 #include "include/cJSON.h"
 #include "include/sha256.h"
 #include "asn/asn_application.h"
 #include "cryptoconditions.h"
 #include "internal.h"
-
 
 static unsigned char encoding_table[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
                                 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',

@@ -1,9 +1,8 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "clientversion.h"
 #include "init.h"
 #include "key_io.h"
@@ -35,11 +33,13 @@
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
 #endif
-
 #include <stdint.h>
 #include <boost/assign/list_of.hpp>
 #include <univalue.h>
 #include "zcash/Address.hpp"
+//#ifdef HAVE_BUILD_INFO
+//#include "build.h"
+//#endif
 
 using namespace std;
 
@@ -57,26 +57,19 @@ using namespace std;
  * Or alternatively, create a specific query method for the information.
  **/
 
-int32_t Jumblr_depositaddradd(char *depositaddr);
-int32_t Jumblr_secretaddradd(char *secretaddr);
-uint64_t komodo_interestsum();
-int32_t komodo_longestchain();
-int32_t komodo_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *txidp);
+int32_t hush_longestchain();
+int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *txidp);
 bool komodo_txnotarizedconfirmed(uint256 txid);
-uint32_t komodo_chainactive_timestamp();
-int32_t komodo_whoami(char *pubkeystr,int32_t height,uint32_t timestamp);
-extern uint64_t KOMODO_INTERESTSUM,KOMODO_WALLETBALANCE;
-extern int32_t KOMODO_LASTMINED,JUMBLR_PAUSE,KOMODO_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
+uint32_t hush_chainactive_timestamp();
+int32_t hush_whoami(char *pubkeystr,int32_t height,uint32_t timestamp);
+extern int32_t HUSH_LASTMINED,HUSH_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
-uint32_t komodo_segid32(char *coinaddr);
-int64_t komodo_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
+uint32_t hush_segid32(char *coinaddr);
+int64_t hush_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
 int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_heightp);
 uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount);
-int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
+int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 
-// This is the last version of upstream that was merged in
-// We only cherry-pick since then
-#define KOMODO_VERSION "0.5.0"
 extern uint16_t ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT;
 extern uint32_t ASSETCHAINS_CC;
 extern uint32_t ASSETCHAINS_MAGIC,ASSETCHAINS_ALGO;
@@ -224,22 +217,18 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     
     proxyType proxy;
     GetProxy(NET_IPV4, proxy);
-    notarized_height = komodo_notarized_height(&prevMoMheight,&notarized_hash,&notarized_desttxid);
+    notarized_height = hush_notarized_height(&prevMoMheight,&notarized_hash,&notarized_desttxid);
     //fprintf(stderr,"after notarized_height %u\n",(uint32_t)time(NULL));
     
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("version", CLIENT_VERSION));
     obj.push_back(Pair("protocolversion", PROTOCOL_VERSION));
-    // this KMD version represents the last time we did a full merge, we no longer merge
-    // in the post-KYC "era" of KMD
-    obj.push_back(Pair("KMDversion", KOMODO_VERSION)); // never change this again, it's set in stone. -- Duke
     obj.push_back(Pair("synced", HUSH_INSYNC!=0));
-    // any height larger than this can be attacked!
     obj.push_back(Pair("notarized", notarized_height));
     obj.push_back(Pair("prevMoMheight", prevMoMheight));
     obj.push_back(Pair("notarizedhash", notarized_hash.ToString()));
     obj.push_back(Pair("notarizedtxid", notarized_desttxid.ToString()));
-    if ( KOMODO_NSPV_FULLNODE )
+    if ( HUSH_NSPV_FULLNODE )
     {
         txid_height = notarizedtxid_height(SMART_CHAIN_SYMBOL[0] != 0 ? (char *)"HUSH" : (char *)"BTC",(char *)notarized_desttxid.ToString().c_str(),&hushnotarized_height);
         if ( txid_height > 0 )
@@ -253,20 +242,12 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 #ifdef ENABLE_WALLET
         if (pwalletMain) {
             obj.push_back(Pair("walletversion", pwalletMain->GetVersion()));
-            if ( SMART_CHAIN_SYMBOL[0] == 0 )
-            {
-                obj.push_back(Pair("interest",       ValueFromAmount(KOMODO_INTERESTSUM)));
-                obj.push_back(Pair("balance",       ValueFromAmount(KOMODO_WALLETBALANCE))); //pwalletMain->GetBalance()
-            }
-            else
-            {
-                obj.push_back(Pair("balance",       ValueFromAmount(pwalletMain->GetBalance()))); //
-            }
+            obj.push_back(Pair("balance",       ValueFromAmount(pwalletMain->GetBalance())));
         }
 #endif
         //fprintf(stderr,"after wallet %u\n",(uint32_t)time(NULL));
         obj.push_back(Pair("blocks",        (int)chainActive.Height()));
-        if ( (longestchain= KOMODO_LONGESTCHAIN) != 0 && chainActive.Height() > longestchain )
+        if ( (longestchain= HUSH_LONGESTCHAIN) != 0 && chainActive.Height() > longestchain )
             longestchain = chainActive.Height();
         //fprintf(stderr,"after longestchain %u\n",(uint32_t)time(NULL));
         obj.push_back(Pair("longestchain",        longestchain));
@@ -284,6 +265,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 #endif
         obj.push_back(Pair("sapling", ASSETCHAINS_SAPLING));
     }
+    //obj.push_back(Pair("build_date", BUILD_DATE));
     obj.push_back(Pair("timeoffset",    0));
     obj.push_back(Pair("connections",   (int)vNodes.size()));
     obj.push_back(Pair("tls_connections", (int)std::count_if(vNodes.begin(), vNodes.end(), [](CNode* n) {return n->ssl != NULL;})));
@@ -293,10 +275,10 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     obj.push_back(Pair("errors",        GetWarnings("statusbar")));
      if ( NOTARY_PUBKEY33[0] != 0 ) {
         char pubkeystr[65]; int32_t notaryid; std::string notaryname;
-        if( (notaryid= komodo_whoami(pubkeystr,(int32_t)chainActive.LastTip()->GetHeight(),komodo_chainactive_timestamp())) >= 0 )  {
+        if( (notaryid= hush_whoami(pubkeystr,(int32_t)chainActive.LastTip()->GetHeight(),hush_chainactive_timestamp())) >= 0 )  {
             obj.push_back(Pair("notaryid",        notaryid));
-            if ( KOMODO_LASTMINED != 0 )
-                obj.push_back(Pair("lastmined", KOMODO_LASTMINED));
+            if ( HUSH_LASTMINED != 0 )
+                obj.push_back(Pair("lastmined", HUSH_LASTMINED));
         }
         obj.push_back(Pair("pubkey", NOTARY_PUBKEY));
     }
@@ -432,7 +414,7 @@ UniValue coinsupply(const UniValue& params, bool fHelp, const CPubKey& mypk)
     currentHeight = chainActive.Height();
 
     if (height >= 0 && height <= currentHeight) {
-        if ( (supply= komodo_coinsupply(&zfunds,&sproutfunds,height)) > 0 )
+        if ( (supply= hush_coinsupply(&zfunds,&sproutfunds,height)) > 0 )
         {
             result.push_back(Pair("result", "success"));
             result.push_back(Pair("coin", SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL));
@@ -446,9 +428,9 @@ UniValue coinsupply(const UniValue& params, bool fHelp, const CPubKey& mypk)
                 blocks_per_year = 24*3600*365 / ASSETCHAINS_BLOCKTIME;
                 if ( height > blocks_per_year )
                 {
-                    supply1 = komodo_coinsupply(&zf1,&sf1,height - blocks_per_year/12);
-                    supply3 = komodo_coinsupply(&zf3,&sf3,height - blocks_per_year/4);
-                    supply12 = komodo_coinsupply(&zf12,&sf12,height - blocks_per_year);
+                    supply1 = hush_coinsupply(&zf1,&sf1,height - blocks_per_year/12);
+                    supply3 = hush_coinsupply(&zf3,&sf3,height - blocks_per_year/4);
+                    supply12 = hush_coinsupply(&zf12,&sf12,height - blocks_per_year);
                     if ( supply1 != 0 && supply3 != 0 && supply12 != 0 )
                     {
                         result.push_back(Pair("lastmonth", ValueFromAmount(supply1+zf1)));
@@ -473,14 +455,14 @@ UniValue validateaddress(const UniValue& params, bool fHelp, const CPubKey& mypk
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "validateaddress \"hushaddress\"\n"
-            "\nReturn information about the given Hush address.\n"
+            "validateaddress \"addr\"\n"
+            "\nReturn information about the given Hush or Hush Smart Chain (HSC) address.\n"
             "\nArguments:\n"
-            "1. \"hushaddress\"     (string, required) The Hush address to validate\n"
+            "1. \"addr\"     (string, required) The address to validate\n"
             "\nResult:\n"
             "{\n"
             "  \"isvalid\" : true|false,         (boolean) If the address is valid or not. If not, this is the only property returned.\n"
-            "  \"address\" : \"hushaddress\",   (string) The Hush address validated\n"
+            "  \"address\" : \"addr\",           (string) The Hush or HSC address validated\n"
             "  \"scriptPubKey\" : \"hex\",       (string) The hex encoded scriptPubKey generated by the address\n"
             "  \"ismine\" : true|false,          (boolean) If the address is yours or not\n"
             "  \"isscript\" : true|false,        (boolean) If the key is a script\n"
@@ -489,8 +471,8 @@ UniValue validateaddress(const UniValue& params, bool fHelp, const CPubKey& mypk
             "  \"account\" : \"account\"         (string) DEPRECATED. The account associated with the address, \"\" is the default account\n"
             "}\n"
             "\nExamples:\n"
-            + HelpExampleCli("validateaddress", "\"RTZMZHDFSTFQst8XmX2dR4DaH87cEUs3gC\"")
-            + HelpExampleRpc("validateaddress", "\"RTZMZHDFSTFQst8XmX2dR4DaH87cEUs3gC\"")
+            + HelpExampleCli("validateaddress", "\"RTZMZHDFSTFQst8XmX2dR4DaH87cEUlulz\"")
+            + HelpExampleRpc("validateaddress", "\"RTZMZHDFSTFQst8XmX2dR4DaH87cEUlulz\"")
         );
 
 #ifdef ENABLE_WALLET
@@ -500,7 +482,7 @@ UniValue validateaddress(const UniValue& params, bool fHelp, const CPubKey& mypk
 #endif
 
     CTxDestination dest = DecodeDestination(params[0].get_str());
-    bool isValid = IsValidDestination(dest);
+    bool isValid        = IsValidDestination(dest);
 
     UniValue ret(UniValue::VOBJ);
     ret.push_back(Pair("isvalid", isValid));
@@ -511,7 +493,7 @@ UniValue validateaddress(const UniValue& params, bool fHelp, const CPubKey& mypk
 
         CScript scriptPubKey = GetScriptForDestination(dest);
         ret.push_back(Pair("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
-        ret.push_back(Pair("segid", (int32_t)komodo_segid32((char *)params[0].get_str().c_str()) & 0x3f));
+        ret.push_back(Pair("segid", (int32_t)hush_segid32((char *)params[0].get_str().c_str()) & 0x3f));
 #ifdef ENABLE_WALLET
         isminetype mine = pwalletMain ? IsMine(*pwalletMain, dest) : ISMINE_NO;
         ret.push_back(Pair("ismine", (mine & ISMINE_SPENDABLE) ? true : false));
@@ -1206,9 +1188,9 @@ UniValue getnotarypayinfo(const UniValue& params, bool fHelp, const CPubKey& myp
     // pubkey 020000000000000000000000000000000
     balance = checkburnaddress(received, TotalNotaryPay, height, "REDVp3ox1pbcWYCzySadfHhk8UU3HM4k5x");
     
-    notarycount = komodo_notaries(notarypubkeys, height, chainActive[height]->GetBlockTime());
-    NotaryPay = komodo_notarypayamount(height, notarycount)*notarycount;
-    bool spent = (received != balance);
+    notarycount = hush_notaries(notarypubkeys, height, chainActive[height]->GetBlockTime());
+    NotaryPay   = komodo_notarypayamount(height, notarycount)*notarycount;
+    bool spent  = (received != balance);
     if ( !spent )
     {
         notaleft = ((int64_t)balance - TotalNotaryPay) / NotaryPay;
@@ -1293,7 +1275,7 @@ UniValue getsnapshot(const UniValue& params, bool fHelp, const CPubKey& mypk)
         top = atoi(params[0].get_str().c_str());
         if ( top < 0 ) 
         {
-            if ( KOMODO_SNAPSHOT_INTERVAL == 0 )
+            if ( HUSH_SNAPSHOT_INTERVAL == 0 )
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, top must be a positive integer");
             else 
                 top = -1;

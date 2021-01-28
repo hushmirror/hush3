@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_UINT256_H
-#define BITCOIN_UINT256_H
+#ifndef HUSH_UINT256_H
+#define HUSH_UINT256_H
 
 #include <assert.h>
 #include <cstring>
@@ -174,4 +174,4 @@ inline uint256 uint256S(const std::string& str)
     return rv;
 }
 
-#endif // BITCOIN_UINT256_H
+#endif // HUSH_UINT256_H

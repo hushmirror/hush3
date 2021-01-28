@@ -1,3 +1,7 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+
 /* Based on the public domain implementation in
  * crypto_hash/keccakc512/simple/ from http://bench.cr.yp.to/supercop.html
  * by Ronny Van Keer
@@ -11,8 +15,6 @@
 #define DBENCH_STOP(arg)
 
 #include "dilithium.h"
-
-
 #define NROUNDS 24
 #define ROL(a, offset) ((a << offset) ^ (a >> (64-offset)))
 
@@ -3162,7 +3164,7 @@ CPubKey Faucet_pubkeyget()
 
 UniValue dilithium_register(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     UniValue result(UniValue::VOBJ); std::string rawtx; CPubKey faucetpk,mypk,dilithiumpk; uint8_t seed[SEEDBYTES],pk[CRYPTO_PUBLICKEYBYTES],sk[CRYPTO_SECRETKEYBYTES]; char coinaddr[64],str[CRYPTO_SECRETKEYBYTES*2+1]; int64_t CCchange,inputs; std::vector<uint8_t> bigpub; int32_t i,n,warningflag = 0;
     if ( txfee == 0 )
         txfee = DILITHIUM_TXFEE;
@@ -3290,7 +3292,7 @@ UniValue dilithium_verify(uint64_t txfee,struct CCcontract_info *cp,cJSON *param
 
 UniValue dilithium_send(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     UniValue result(UniValue::VOBJ); std::string rawtx,checkhandle; CPubKey destpub33,mypk,dilithiumpk; int32_t i,n; int64_t amount; uint256 destpubtxid; uint8_t pk[CRYPTO_PUBLICKEYBYTES];
     if ( txfee == 0 )
         txfee = DILITHIUM_TXFEE;
@@ -3318,7 +3320,7 @@ UniValue dilithium_send(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 
 UniValue dilithium_spend(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     UniValue result(UniValue::VOBJ); std::string rawtx; CPubKey mypk,destpub33; CTransaction vintx; uint256 prevhash,hashBlock,destpubtxid; int32_t i,smlen,n,numvouts; char str[129],*scriptstr,*retstr=""; CTxOut vout; std::string handle; uint8_t pk[CRYPTO_PUBLICKEYBYTES],pk2[CRYPTO_PUBLICKEYBYTES],sk[CRYPTO_SECRETKEYBYTES],msg[32],seed[32]; std::vector<uint8_t> sig;
     if ( txfee == 0 )
         txfee = DILITHIUM_TXFEE;
@@ -3414,7 +3416,7 @@ int64_t dilithium_inputs(struct CCcontract_info *cp,CMutableTransaction &mtx,CPu
 
 UniValue dilithium_Qsend(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     UniValue result(UniValue::VOBJ); std::string rawtx; CPubKey mypk,destpub33; CTransaction tx,vintx; uint256 prevhash,mypubtxid,hashBlock,destpubtxid; int64_t amount,inputsum,outputsum,change; int32_t i,smlen,n,numvouts; char str[129],myCCaddr[64],*scriptstr,*retstr=""; CTxOut vout; std::string handle; uint8_t pk[CRYPTO_PUBLICKEYBYTES],pk2[CRYPTO_PUBLICKEYBYTES],sk[CRYPTO_SECRETKEYBYTES],msg[32],seed[32]; std::vector<uint8_t> sig; std::vector<uint256> voutpubtxids;
     if ( txfee == 0 )
         txfee = DILITHIUM_TXFEE;

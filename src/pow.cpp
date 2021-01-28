@@ -1,9 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "pow.h"
 #include "consensus/upgrades.h"
 #include "arith_uint256.h"
@@ -34,7 +32,7 @@
 #ifdef ENABLE_RUST
 #include "librustzcash.h"
 #endif // ENABLE_RUST
-uint32_t komodo_chainactive_timestamp();
+uint32_t hush_chainactive_timestamp();
 
 #include "hush_defs.h"
 
@@ -391,13 +389,14 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         return nProofOfWorkLimit;
 
     bool fNegative,fOverflow; int32_t zawyflag = 0; arith_uint256 easy,origtarget,bnAvg {bnTot / params.nPowAveragingWindow};
-    nbits = CalculateNextWorkRequired(bnAvg, pindexLast->GetMedianTimePast(), pindexFirst->GetMedianTimePast(), params);
+    nbits = CalculateNextWorkRequired(bnAvg, pindexLast->GetMedianTimePast(), pindexFirst->GetMedianTimePast(), params, height);
+
     if ( ASSETCHAINS_ADAPTIVEPOW > 0 )
     {
         bnTarget = arith_uint256().SetCompact(nbits);
         if ( height > (int32_t)(sizeof(ct)/sizeof(*ct)) && pblock != 0 && tipdiff > 0 )
         {
-            easy.SetCompact(KOMODO_MINDIFF_NBITS & (~3),&fNegative,&fOverflow);
+            easy.SetCompact(HUSH_MINDIFF_NBITS & (~3),&fNegative,&fOverflow);
             if ( pblock != 0 )
             {
                 origtarget = bnTarget;
@@ -482,7 +481,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
                 {
                     bnTarget = easy;
                     fprintf(stderr,"cmp.%d mult.%d ht.%d -> easy target\n",mult>1,(int32_t)mult,height);
-                    return(KOMODO_MINDIFF_NBITS & (~3));
+                    return(HUSH_MINDIFF_NBITS & (~3));
                 }
                 {
                     int32_t z;
@@ -501,26 +500,45 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         nbits = bnTarget.GetCompact();
         nbits = (nbits & 0xfffffffc) | zawyflag;
     }
+    if(fDebug)
+        fprintf(stderr,"%s: nbits=%d\n", __func__, nbits);
     return(nbits);
+}
+
+// Changing this requires changing many other things and
+// changes consensus. Have fun -- Duke
+int64_t AveragingWindowTimespan(int32_t height) {
+    int64_t AWT = 2550;
+    /*
+    int32_t forkHeight = 0;
+    if (height >= forkHeight) {
+        AWT = 1275;
+    }
+    */
+    return AWT;
 }
 
 unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
                                        int64_t nLastBlockTime, int64_t nFirstBlockTime,
-                                       const Consensus::Params& params)
+                                       const Consensus::Params& params,
+                                       int32_t height)
 {
-    // Limit adjustment step
-    // Use medians to prevent time-warp attacks
+    // Limit adjustment step and use medians to prevent time-warp attacks
     int64_t nActualTimespan = nLastBlockTime - nFirstBlockTime;
     LogPrint("pow", "  nActualTimespan = %d  before dampening\n", nActualTimespan);
-    nActualTimespan = params.AveragingWindowTimespan() + (nActualTimespan - params.AveragingWindowTimespan())/4;
+    int64_t AWT = AveragingWindowTimespan(height) ;
+    nActualTimespan = AWT + (nActualTimespan - AWT)/4;
     LogPrint("pow", "  nActualTimespan = %d  before bounds\n", nActualTimespan);
 
-    if ( ASSETCHAINS_ADAPTIVEPOW <= 0 )
-    {
-        if (nActualTimespan < params.MinActualTimespan())
+    if ( ASSETCHAINS_ADAPTIVEPOW <= 0 ) {
+        if (nActualTimespan < params.MinActualTimespan()) {
+            fprintf(stderr,"%s: Adjusting nActualTimespan up to min value %li\n", __func__, params.MinActualTimespan() );
             nActualTimespan = params.MinActualTimespan();
-        if (nActualTimespan > params.MaxActualTimespan())
+        }
+        if (nActualTimespan > params.MaxActualTimespan()) {
+            fprintf(stderr,"%s: Adjusting nActualTimespan down to max value %li\n", __func__, params.MaxActualTimespan() );
             nActualTimespan = params.MaxActualTimespan();
+        }
     }
     // Retarget
     arith_uint256 bnLimit;
@@ -531,7 +549,7 @@ unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
 
     const arith_uint256 bnPowLimit = bnLimit; //UintToArith256(params.powLimit);
     arith_uint256 bnNew {bnAvg};
-    bnNew /= params.AveragingWindowTimespan();
+    bnNew /= AWT;
     bnNew *= nActualTimespan;
 
     if (bnNew > bnPowLimit)
@@ -539,13 +557,19 @@ unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
 
     /// debug print
     LogPrint("pow", "GetNextWorkRequired RETARGET\n");
-    LogPrint("pow", "params.AveragingWindowTimespan() = %d    nActualTimespan = %d\n", params.AveragingWindowTimespan(), nActualTimespan);
+    LogPrint("pow", "AveragingWindowTimespan = %d nActualTimespan = %d\n", AWT, nActualTimespan);
     LogPrint("pow", "Current average: %08x  %s\n", bnAvg.GetCompact(), bnAvg.ToString());
     LogPrint("pow", "After:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString());
-
+    //if(fDebug) {
+    fprintf(stderr, "%s: nbits Current average: %08x  %s\n", __func__, bnAvg.GetCompact(), bnAvg.ToString().c_str());
+    fprintf(stderr, "%s: bits After:  %08x  %s\n", __func__, bnNew.GetCompact(), bnNew.ToString().c_str());
+    fprintf(stderr,"%s: AWT=%lu ActualTimeSpan=%li MinActual=%li MaxActual=%li\n",__func__, AWT, nActualTimespan, params.MinActualTimespan(), params.MaxActualTimespan());
+    //}
     return bnNew.GetCompact();
 }
 
+// HUSH does not use these functions but Hush Smart Chains can opt-in to using more bleeding edge DAA's
+// ASIC chains do not need these protections as much -- Duke Leto
 unsigned int lwmaGetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
     return lwmaCalculateNextWorkRequired(pindexLast, params);
@@ -562,7 +586,6 @@ unsigned int lwmaCalculateNextWorkRequired(const CBlockIndex* pindexLast, const 
     unsigned int nProofOfWorkLimit = bnLimit.GetCompact();
     
     //printf("PoWLimit: %u\n", nProofOfWorkLimit);
-
     // Find the first block in the averaging interval as we total the linearly weighted average
     const CBlockIndex* pindexFirst = pindexLast;
     const CBlockIndex* pindexNext;
@@ -650,24 +673,23 @@ bool CheckEquihashSolution(const CBlockHeader *pblock, const CChainParams& param
     return true;
 }
 
-int32_t komodo_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
-int32_t komodo_is_special(uint8_t pubkeys[66][33],int32_t mids[66],uint32_t blocktimes[66],int32_t height,uint8_t pubkey33[33],uint32_t blocktime);
-int32_t komodo_currentheight();
+int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
+int32_t hush_currentheight();
 void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
-bool komodo_checkopret(CBlock *pblock, CScript &merkleroot);
+bool hush_checkopret(CBlock *pblock, CScript &merkleroot);
 CScript komodo_makeopret(CBlock *pblock, bool fNew);
-extern int32_t KOMODO_CHOSEN_ONE;
+extern int32_t HUSH_CHOSEN_ONE;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 #define KOMODO_ELECTION_GAP 2000
 
 int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blocktimes[66],int32_t *nonzpkeysp,int32_t height);
-int32_t KOMODO_LOADINGBLOCKS = 1;
+int32_t HUSH_LOADINGBLOCKS = 1;
 
 extern std::string NOTARY_PUBKEY;
 
 bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t height, const Consensus::Params& params)
 {
-    extern int32_t KOMODO_REWIND;
+    extern int32_t HUSH_REWIND;
     uint256 hash;
     bool fNegative,fOverflow; uint8_t origpubkey33[33]; int32_t i,nonzpkeys=0,nonz=0,special=0,special2=0,notaryid=-1,flag = 0, mids[66]; uint32_t tiptime,blocktimes[66];
     arith_uint256 bnTarget; uint8_t pubkeys[66][33];
@@ -676,49 +698,11 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
     //fprintf(stderr," checkpow\n");
     memcpy(origpubkey33,pubkey33,33);
     memset(blocktimes,0,sizeof(blocktimes));
-    tiptime = komodo_chainactive_timestamp();
+    tiptime = hush_chainactive_timestamp();
     bnTarget.SetCompact(blkHeader.nBits, &fNegative, &fOverflow);
-    if ( height == 0 )
-    {
-        height = komodo_currentheight() + 1;
+    if ( height == 0 ) {
+        height = hush_currentheight() + 1;
         //fprintf(stderr,"set height to %d\n",height);
-    }
-    if ( height > 34000 && SMART_CHAIN_SYMBOL[0] == 0 ) // 0 -> non-special notary
-    {
-        special = komodo_chosennotary(&notaryid,height,pubkey33,tiptime);
-        for (i=0; i<33; i++)
-        {
-            if ( pubkey33[i] != 0 )
-                nonz++;
-        }
-        if ( nonz == 0 )
-        {
-            //fprintf(stderr,"ht.%d null pubkey checkproof return\n",height);
-            return(true); // will come back via different path with pubkey set
-        }
-        flag = komodo_eligiblenotary(pubkeys,mids,blocktimes,&nonzpkeys,height);
-        special2 = komodo_is_special(pubkeys,mids,blocktimes,height,pubkey33,blkHeader.nTime);
-        if ( notaryid >= 0 )
-        {
-            if ( height > 10000 && height < 80000 && (special != 0 || special2 > 0) )
-                flag = 1;
-            else if ( height >= 80000 && height < 108000 && special2 > 0 )
-                flag = 1;
-            else if ( height >= 108000 && special2 > 0 )
-                flag = (height > 1000000 || (height % KOMODO_ELECTION_GAP) > 64 || (height % KOMODO_ELECTION_GAP) == 0);
-            else if ( height == 790833 )
-                flag = 1;
-            else if ( special2 < 0 )
-            {
-                if ( height > 792000 )
-                    flag = 0;
-                else fprintf(stderr,"ht.%d notaryid.%d special.%d flag.%d special2.%d\n",height,notaryid,special,flag,special2);
-            }
-            if ( (flag != 0 || special2 > 0) && special2 != -2 )
-            {
-                bnTarget.SetCompact(KOMODO_MINDIFF_NBITS,&fNegative,&fOverflow);
-            }
-        }
     }
     arith_uint256 bnLimit = (height <= 1 || ASSETCHAINS_ALGO == ASSETCHAINS_EQUIHASH) ? UintToArith256(params.powLimit) : UintToArith256(params.powAlternate);
     if (fNegative || bnTarget == 0 || fOverflow || bnTarget > bnLimit)
@@ -726,19 +710,18 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
     if ( ASSETCHAINS_STAKED != 0 )
     {
         arith_uint256 bnMaxPoSdiff;
-        bnTarget.SetCompact(KOMODO_MINDIFF_NBITS,&fNegative,&fOverflow);
+        bnTarget.SetCompact(HUSH_MINDIFF_NBITS,&fNegative,&fOverflow);
     }
-    //else if ( ASSETCHAINS_ADAPTIVEPOW > 0 && ASSETCHAINS_STAKED == 0 )
-    //    bnTarget = komodo_adaptivepow_target(height,bnTarget,blkHeader.nTime);
+
     // Check proof of work matches claimed amount
     if ( UintToArith256(hash = blkHeader.GetHash()) > bnTarget )
     {
-        if ( KOMODO_LOADINGBLOCKS != 0 )
+        if ( HUSH_LOADINGBLOCKS != 0 )
             return true;
 
+        /*
         if ( SMART_CHAIN_SYMBOL[0] != 0 || height > 792000 )
         {
-            //if ( 0 && height > 792000 )
             if ( Params().NetworkIDString() != "regtest" )
             {
                 for (i=31; i>=0; i--)
@@ -756,6 +739,7 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
             }
             return false;
         }
+        */
     }
     /*for (i=31; i>=0; i--)
      fprintf(stderr,"%02x",((uint8_t *)&hash)[i]);

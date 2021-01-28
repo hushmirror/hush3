@@ -1,5 +1,4 @@
-In-memory caches
-----------------
+# In-memory caches
 
 The size of some in-memory caches can be reduced. As caches trade off memory usage for performance, usually reducing these have a negative effect on performance.
 

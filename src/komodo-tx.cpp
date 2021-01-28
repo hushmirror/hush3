@@ -1,8 +1,7 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,7 +16,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "clientversion.h"
 #include "coins.h"
 #include "consensus/consensus.h"
@@ -32,9 +30,7 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
-
 #include <stdio.h>
-
 #include <boost/algorithm/string.hpp>
 #include <boost/assign/list_of.hpp>
 
@@ -42,27 +38,19 @@ using namespace std;
 
 #include "uint256.h"
 #include "arith_uint256.h"
-#include "komodo_structs.h"
-#include "komodo_globals.h"
+#include "hush_structs.h"
+#include "hush_globals.h"
 #include "hush_defs.h"
-
-#include "komodo_interest.h"
 
 CKey NSPV_key;
 char NSPV_pubkeystr[67],NSPV_wifstr[64];
-uint64_t komodo_accrued_interest(int32_t *txheightp,uint32_t *locktimep,uint256 hash,int32_t n,int32_t checkheight,uint64_t checkvalue,int32_t tipheight)
-{
-    return(0);
-}
 
 static bool fCreateBlank;
 static std::map<std::string,UniValue> registers;
 static const int CONTINUE_EXECUTION=-1;
 
-//
 // This function returns either one of EXIT_ codes when it's expected to stop the process or
 // CONTINUE_EXECUTION when it's expected to continue further.
-//
 static int AppInitRawTx(int argc, char* argv[])
 {
     //
@@ -81,10 +69,10 @@ static int AppInitRawTx(int argc, char* argv[])
     if (argc<2 || mapArgs.count("-?") || mapArgs.count("-h") || mapArgs.count("-help"))
     {
         // First part of help message is specific to this utility
-        std::string strUsage = _("Hush komodo-tx utility version") + " " + FormatFullVersion() + "\n\n" +
+        std::string strUsage = _("hush-tx utility version") + " " + FormatFullVersion() + "\n\n" +
             _("Usage:") + "\n" +
-              "  komodo-tx [options] <hex-tx> [commands]  " + _("Update hex-encoded zcash transaction") + "\n" +
-              "  komodo-tx [options] -create [commands]   " + _("Create hex-encoded zcash transaction") + "\n" +
+              "  hush-tx [options] <hex-tx> [commands]  " + _("Update hex-encoded Hush transaction") + "\n" +
+              "  hush-tx [options] -create [commands]   " + _("Create hex-encoded Hush transaction") + "\n" +
               "\n";
 
         fprintf(stdout, "%s", strUsage.c_str());
@@ -196,7 +184,7 @@ static void RegisterLoad(const std::string& strInput)
 }
 
 
-int32_t komodo_nextheight()
+int32_t hush_nextheight()
 {
     return(100000000);
 }

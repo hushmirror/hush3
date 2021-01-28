@@ -1,9 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020  The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,9 +17,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "wallet/walletdb.h"
-
 #include "consensus/validation.h"
 #include "key_io.h"
 #include "main.h"
@@ -32,7 +29,6 @@
 #include "wallet/wallet.h"
 #include "zcash/Proof.hpp"
 #include "hush_defs.h"
-
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -42,7 +38,7 @@ using namespace std;
 
 static uint64_t nAccountingEntryNumber = 0;
 static list<uint256> deadTxns; 
-extern CBlockIndex *komodo_blockindex(uint256 hash);
+extern CBlockIndex *hush_blockindex(uint256 hash);
 
 //
 // CWalletDB
@@ -936,7 +932,7 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
             if (!EraseTx(hash))
                 fprintf(stderr, "could not delete tx.%s\n",hash.ToString().c_str());
             uint256 blockhash; CTransaction tx; CBlockIndex* pindex;
-            if ( GetTransaction(hash,tx,blockhash,false) && (pindex= komodo_blockindex(blockhash)) != 0 && chainActive.Contains(pindex) )
+            if ( GetTransaction(hash,tx,blockhash,false) && (pindex= hush_blockindex(blockhash)) != 0 && chainActive.Contains(pindex) )
             {
                 CWalletTx wtx(pwallet,tx);
                 pwallet->AddToWallet(wtx, true, NULL);

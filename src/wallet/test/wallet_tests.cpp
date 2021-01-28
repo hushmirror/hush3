@@ -1,16 +1,14 @@
 // Copyright (c) 2012-2014 The Bitcoin Core developers
-// Distributed under the MIT software license, see the accompanying
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include "wallet/wallet.h"
-
 #include <set>
 #include <stdint.h>
 #include <utility>
 #include <vector>
-
 #include "test/test_bitcoin.h"
-
 #include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
 

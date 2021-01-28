@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# Copyright (c) 2016-2020 The Hush developers
 # Copyright (c) 2018 SuperNET developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -53,7 +54,7 @@ class CryptoConditionsTest (BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '--daemon',
                     '-rpcuser=rt',
@@ -70,7 +71,7 @@ class CryptoConditionsTest (BitcoinTestFramework):
                     '-ac_reward=10000000000000',
                     '-pubkey=' + self.pubkey1,
                     '-ac_cc=2',
-                    '-whitelist=127.0.0.1',
+                    '-allowlist=127.0.0.1',
                     '-debug',
                     '-addnode=127.0.0.1:64367',
                     '--daemon',

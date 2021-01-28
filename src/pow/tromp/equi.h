@@ -1,5 +1,8 @@
-// Equihash solver
+// Copyright (c) 2019-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 // Copyright (c) 2016-2016 John Tromp, The Zcash developers
+// Equihash solver
 
 #include "sodium.h"
 #ifdef __APPLE__

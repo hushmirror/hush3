@@ -3,34 +3,32 @@
 ## Security Audits
 
 Hush has not been subjected to a formal third-party security review! But the
-Zcash source code has. For security
-announcements, audit results and other general security information, see
-https://z.cash/support/security.html
+some of the Zcash and Komodo source code it is based on has.
 
-Hush does our best to integrate fixes and recommendations from Zcash audits
+Hush does our best to integrate fixes and recommendations from upstream audits
 to our own code, such as audits on ZecWallet that apply to SilentDragon.
-Hush also reports many new bugs and issues to upstream Zcash and many other
-Zcash Protocol coins.
+Hush used to report many new bugs and CVEs to upstream Zcash and Komodo but
+those relations have broken down.
 
 Additionally, Hush itself finds many CVE's and things-that-should-be-CVE's
 in Zcash internals. Since Zcash community treats Hush people so poorly, we
 keep these bugs and fixes to ourselves. If you want to know some of them,
-let us know and bring your wallet.
-
+let us know and bring your wallet. Public information available at
+<a href="https://attackingzcash.com">attackingzcash.com</a>
 
 ## Wallet Encryption
 
 Wallet encryption is disabled, for several reasons:
 
 - Encrypted wallets are unable to correctly detect shielded spends (due to the
-  nature of unlinkability of JoinSplits) and can incorrectly show larger
+  nature of unlinkability of ShieldedSpends) and can incorrectly show larger
   available shielded balances until the next time the wallet is unlocked. This
   problem was not limited to failing to recognize the spend; it was possible for
   the shown balance to increase by the amount of change from a spend, without
   deducting the spent amount.
 
 - While encrypted wallets prevent spending of funds, they do not maintain the
-  shielding properties of JoinSplits (due to the need to detect spends). That
+  shielding properties of ShieldedOutputs (due to the need to detect spends). That
   is, someone with access to an encrypted wallet.dat has full visibility of
   your entire transaction graph (other than newly-detected spends, which suffer
   from the earlier issue).
@@ -53,9 +51,8 @@ are physically near the hardware, that your `hushd` process is running on will
 be able to:
 
 - Determine the values of your secret spending keys, as well as which notes you
-  are spending, by observing cache side-channels as you perform a JoinSplit
-  operation. This is due to probable side-channel leakage in the libsnark
-  proving machinery.
+  are spending, by observing cache side-channels as you perform a SheildedSpend
+  operation. This is due to probable side-channel leakage in C++.
 
 - Determine which notes you own by observing cache side-channel information
   leakage from the incremental witnesses as they are updated with new notes.

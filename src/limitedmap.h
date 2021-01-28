@@ -2,8 +2,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_LIMITEDMAP_H
-#define BITCOIN_LIMITEDMAP_H
+#ifndef HUSH_LIMITEDMAP_H
+#define HUSH_LIMITEDMAP_H
 
 #include <assert.h>
 #include <map>
@@ -91,4 +91,4 @@ public:
     }
 };
 
-#endif // BITCOIN_LIMITEDMAP_H
+#endif // HUSH_LIMITEDMAP_H

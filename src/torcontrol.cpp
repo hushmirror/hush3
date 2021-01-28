@@ -1,6 +1,6 @@
 // Copyright (c) 2015-2017 The Bitcoin Core developers
 // Copyright (c) 2017 The Zcash developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -9,12 +9,10 @@
 #include "net.h"
 #include "util.h"
 #include "crypto/hmac_sha256.h"
-
 #include <vector>
 #include <deque>
 #include <set>
 #include <stdlib.h>
-
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/signals2/signal.hpp>
@@ -23,7 +21,6 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/replace.hpp>
-
 #include <event2/bufferevent.h>
 #include <event2/buffer.h>
 #include <event2/util.h>

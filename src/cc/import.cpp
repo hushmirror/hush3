@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -39,7 +39,7 @@
 extern std::string ASSETCHAINS_SELFIMPORT;
 extern uint16_t ASSETCHAINS_CODAPORT,ASSETCHAINS_BEAMPORT;
 extern uint8_t ASSETCHAINS_OVERRIDE_PUBKEY33[33];
-extern uint256 KOMODO_EARLYTXID;
+extern uint256 HUSH_EARLYTXID;
 
 // utilities from gateways.cpp
 uint256 BitcoinGetProofMerkleRoot(const std::vector<uint8_t> &proofData, std::vector<uint256> &txids);
@@ -82,7 +82,7 @@ CMutableTransaction MakeSelfImportSourceTx(CTxDestination &dest, int64_t amount)
 
     cpDummy = CCinit(&C, EVAL_TOKENS);  // this is just for FinalizeCCTx to work
 
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     if (AddNormalinputs(mtx, myPubKey, 2 * txfee, 4) == 0) {
         LOGSTREAM("importcoin", CCLOG_INFO, stream << "MakeSelfImportSourceTx() warning: cannot find normal inputs for txfee" << std::endl);
@@ -129,7 +129,7 @@ int32_t GetSelfimportProof(const CMutableTransaction sourceMtx, CMutableTransact
     CMutableTransaction tmpmtx; 
     //CTransaction sourcetx; 
 
-    tmpmtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    tmpmtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     /*
     if (!E_UNMARSHAL(ParseHex(rawsourcetx), ss >> sourcetx)) {
@@ -203,7 +203,7 @@ int32_t GetSelfimportProof(const CMutableTransaction sourceMtx, CMutableTransact
 // make import tx with burntx and dual daemon
 std::string MakeCodaImportTx(uint64_t txfee, std::string receipt, std::string srcaddr, std::vector<CTxOut> vouts)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight()),burntx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight()),burntx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CPubKey mypk; uint256 codaburntxid; std::vector<unsigned char> dummyproof;
     int32_t i,numvouts,n,m; std::string coin,error; struct CCcontract_info *cp, C;
     cJSON *result,*tmp,*tmp1; unsigned char hash[SHA256_DIGEST_LENGTH+1];
@@ -364,9 +364,9 @@ int32_t CheckGATEWAYimport(CTransaction importTx,CTransaction burnTx,std::string
     std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > unspentOutputs;
 
     // ASSETCHAINS_SELFIMPORT is coin
-    if (KOMODO_EARLYTXID!=zeroid && bindtxid!=KOMODO_EARLYTXID)
+    if (HUSH_EARLYTXID!=zeroid && bindtxid!=HUSH_EARLYTXID)
     { 
-        LOGSTREAM("importgateway", CCLOG_INFO, stream << "CheckGATEWAYimport invalid import gateway. On this chain only valid import gateway is " << KOMODO_EARLYTXID.GetHex() << std::endl);
+        LOGSTREAM("importgateway", CCLOG_INFO, stream << "CheckGATEWAYimport invalid import gateway. On this chain only valid import gateway is " << HUSH_EARLYTXID.GetHex() << std::endl);
         return(-1);
     }
     // check for valid burn from external coin blockchain and if valid return(0);
@@ -705,7 +705,7 @@ bool Eval::ImportCoin(const std::vector<uint8_t> params, const CTransaction &imp
     // Check burntx shows correct outputs hash
     if (payoutsHash != SerializeHash(payouts))
         return Invalid("wrong-payouts");
-    if (targetCcid < KOMODO_FIRSTFUNGIBLEID)
+    if (targetCcid < HUSH_FIRSTFUNGIBLEID)
         return Invalid("chain-not-fungible");
 
     if ( targetCcid != 0xffffffff )

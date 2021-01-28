@@ -1,7 +1,7 @@
 #!/bin/bash
 # THIS FILE IS GENERATED FROM run-bitcoind-for-test.sh.in
 # Copyright (c) 2013-2014 The Bitcoin Core developers
-# Copyright (c) 2019-2020 The Hush developers
+# Copyright (c) 2016-2020 The Hush developers
 # Released under the GPLv3
 #
 HUSH_LOAD_TIMEOUT=500
@@ -13,7 +13,7 @@ touch "$DATADIR/regtest/debug.log"
 tail -q -n 1 -F "$DATADIR/regtest/debug.log" | grep -m 1 -q "Done loading" &
 WAITER=$!
 PORT=`expr 10000 + $$ % 55536`
-"@abs_top_builddir@/src/hushd@EXEEXT@" -connect=0.0.0.0 -datadir="$DATADIR" -rpcuser=user -rpcpassword=pass -listen -keypool=3 -debug -debug=net -logtimestamps -checkmempool=0 -relaypriority=0 -port=$PORT -whitelist=127.0.0.1 -regtest -rpcport=`expr $PORT + 1` &
+"@abs_top_builddir@/src/hushd@EXEEXT@" -connect=0.0.0.0 -datadir="$DATADIR" -rpcuser=user -rpcpassword=pass -listen -keypool=3 -debug -debug=net -logtimestamps -checkmempool=0 -relaypriority=0 -port=$PORT -allowlist=127.0.0.1 -regtest -rpcport=`expr $PORT + 1` &
 BITCOIND=$!
 
 #Install a watchdog.

@@ -1,9 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
 #endif
@@ -35,7 +33,7 @@
 #include "httpserver.h"
 #include "httprpc.h"
 #include "key.h"
-#include "notarisationdb.h"
+#include "notarizationdb.h"
 
 #ifdef ENABLE_MINING
 #include "key_io.h"
@@ -58,7 +56,6 @@
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
 #include "wallet/asyncrpcoperation_saplingconsolidation.h"
-
 #endif
 #include <stdint.h>
 #include <stdio.h>
@@ -91,14 +88,11 @@ using namespace std;
 
 #include "hush_defs.h"
 extern void ThreadSendAlert();
-extern bool komodo_dailysnapshot(int32_t height);
-extern int32_t KOMODO_LOADINGBLOCKS;
+extern bool hush_dailysnapshot(int32_t height);
+extern int32_t HUSH_LOADINGBLOCKS;
 extern char SMART_CHAIN_SYMBOL[];
-extern int32_t KOMODO_SNAPSHOT_INTERVAL;
-
+extern int32_t HUSH_SNAPSHOT_INTERVAL;
 extern void komodo_init(int32_t height);
-
-//ZCJoinSplit* pzcashParams = NULL;
 
 #ifdef ENABLE_WALLET
 CWallet* pwalletMain = NULL;
@@ -123,7 +117,7 @@ enum BindFlags {
     BF_NONE         = 0,
     BF_EXPLICIT     = (1U << 0),
     BF_REPORT_ERROR = (1U << 1),
-    BF_WHITELIST    = (1U << 2),
+    BF_ALLOWLIST    = (1U << 2),
 };
 
 static const char* FEE_ESTIMATES_FILENAME="fee_estimates.dat";
@@ -132,11 +126,7 @@ static const char* DEFAULT_ASMAP_FILENAME="ip_asn.map";
 
 CClientUIInterface uiInterface; // Declared but not defined in ui_interface.h
 
-//////////////////////////////////////////////////////////////////////////////
-//
 // Shutdown
-//
-
 //
 // Thread management and startup/shutdown:
 //
@@ -156,7 +146,6 @@ CClientUIInterface uiInterface; // Declared but not defined in ui_interface.h
 // Note that if running -daemon the parent process returns from AppInit2
 // before adding any threads to the threadGroup, so .join_all() returns
 // immediately and the parent exits from main().
-//
 
 std::atomic<bool> fRequestShutdown(false);
 
@@ -206,7 +195,8 @@ void Interrupt(boost::thread_group& threadGroup)
 
 void Shutdown()
 {
-	fprintf(stderr,"%s: start\n", __FUNCTION__);
+    if(fDebug)
+	    fprintf(stderr,"%s: start\n", __FUNCTION__);
     LogPrintf("%s: In progress...\n", __func__);
     static CCriticalSection cs_Shutdown;
     TRY_LOCK(cs_Shutdown, lockShutdown);
@@ -222,7 +212,7 @@ void Shutdown()
     RenameThread(shutoffstr);
     mempool.AddTransactionsUpdated(1);
 
-	fprintf(stderr,"%s: stopping HTTP/REST/RPC\n", __FUNCTION__);
+	fprintf(stderr,"%s: stopping HUSH HTTP/REST/RPC\n", __FUNCTION__);
     StopHTTPRPC();
     StopREST();
     StopRPC();
@@ -293,17 +283,14 @@ void Shutdown()
     delete pwalletMain;
     pwalletMain = NULL;
 #endif
-    //delete pzcashParams;
-    //pzcashParams = NULL;
     globalVerifyHandle.reset();
     ECC_Stop();
     CNode::NetCleanup();
     LogPrintf("%s: done\n", __func__);
 }
 
-/**
- * Signal handlers are very limited in what they are allowed to do, so:
- */
+// Signal handlers are very limited in what they are allowed to do, so:
+#ifndef WIN32
 void HandleSIGTERM(int)
 {
 	fprintf(stderr,"%s\n",__FUNCTION__);
@@ -315,6 +302,26 @@ void HandleSIGHUP(int)
 	fprintf(stderr,"%s\n",__FUNCTION__);
     fReopenDebugLog = true;
 }
+#else
+static BOOL WINAPI consoleCtrlHandler(DWORD dwCtrlType)
+{
+    fRequestShutdown = true;
+    // This signal now sleeps with the fishes
+    Sleep(INFINITE);
+    return true;
+}
+#endif
+
+#ifndef WIN32
+static void registerSignalHandler(int signal, void(*handler)(int))
+{
+    struct sigaction sa;
+    sa.sa_handler = handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(signal, &sa, nullptr);
+}
+#endif
 
 bool static InitError(const std::string &str)
 {
@@ -332,7 +339,7 @@ bool static Bind(const CService &addr, unsigned int flags) {
     if (!(flags & BF_EXPLICIT) && IsLimited(addr))
         return false;
     std::string strError;
-    if (!BindListenPort(addr, strError, (flags & BF_WHITELIST) != 0)) {
+    if (!BindListenPort(addr, strError, (flags & BF_ALLOWLIST) != 0)) {
         if (flags & BF_REPORT_ERROR)
             return InitError(strError);
         return false;
@@ -364,13 +371,12 @@ std::string HelpMessage(HelpMessageMode mode)
 
     string strUsage = HelpMessageGroup(_("Options:"));
     strUsage += HelpMessageOpt("-?", _("This help message"));
-    strUsage += HelpMessageOpt("-alerts", strprintf(_("Receive and display P2P network alerts (default: %u)"), DEFAULT_ALERTS));
     strUsage += HelpMessageOpt("-alertnotify=<cmd>", _("Execute command when a relevant alert is received or we see a really long fork (%s in cmd is replaced by message)"));
     strUsage += HelpMessageOpt("-blocknotify=<cmd>", _("Execute command when the best block changes (%s in cmd is replaced by block hash)"));
     strUsage += HelpMessageOpt("-checkblocks=<n>", strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 288));
     strUsage += HelpMessageOpt("-checklevel=<n>", strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3));
-    strUsage += HelpMessageOpt("-clientname=<SomeName>", _("Full node client name, default 'MagicBean'"));
-    strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "komodo.conf"));
+    strUsage += HelpMessageOpt("-clientname=<SomeName>", _("Full node client name, default 'GoldenSandtrout'"));
+    strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "HUSH3.conf"));
     if (mode == HMM_BITCOIND)
     {
 #if !defined(WIN32)
@@ -386,7 +392,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-par=<n>", strprintf(_("Set the number of script verification threads (%u to %d, 0 = auto, <0 = leave that many cores free, default: %d)"),
         -(int)boost::thread::hardware_concurrency(), MAX_SCRIPTCHECK_THREADS, DEFAULT_SCRIPTCHECK_THREADS));
 #ifndef _WIN32
-    strUsage += HelpMessageOpt("-pid=<file>", strprintf(_("Specify pid file (default: %s)"), "komodod.pid"));
+    strUsage += HelpMessageOpt("-pid=<file>", strprintf(_("Specify pid file (default: %s)"), "hushd.pid"));
 #endif
     strUsage += HelpMessageOpt("-txexpirynotify=<cmd>", _("Execute command when transaction expires (%s in cmd is replaced by transaction id)"));
     strUsage += HelpMessageOpt("-prune=<n>", strprintf(_("Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex. "
@@ -425,23 +431,22 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-peerbloomfilters", strprintf(_("Support filtering of blocks and transaction with Bloom filters (default: %u)"), 1));
     if (showDebug)
         strUsage += HelpMessageOpt("-enforcenodebloom", strprintf("Enforce minimum protocol version to limit use of Bloom filters (default: %u)", 0));
-    strUsage += HelpMessageOpt("-port=<port>", strprintf(_("Listen for connections on <port> (default: %u or testnet: %u)"), 7770, 17770));
+    strUsage += HelpMessageOpt("-port=<port>", strprintf(_("Listen for connections on <port> (default: %u or testnet: %u)"), 55555, 55420));
     strUsage += HelpMessageOpt("-proxy=<ip:port>", _("Connect through SOCKS5 proxy"));
     strUsage += HelpMessageOpt("-proxyrandomize", strprintf(_("Randomize credentials for every proxy connection. This enables Tor stream isolation (default: %u)"), 1));
     strUsage += HelpMessageOpt("-seednode=<ip>", _("Connect to a node to retrieve peer addresses, and disconnect"));
     strUsage += HelpMessageOpt("-timeout=<n>", strprintf(_("Specify connection timeout in milliseconds (minimum: 1, default: %d)"), DEFAULT_CONNECT_TIMEOUT));
     strUsage += HelpMessageOpt("-torcontrol=<ip>:<port>", strprintf(_("Tor control port to use if onion listening enabled (default: %s)"), DEFAULT_TOR_CONTROL));
     strUsage += HelpMessageOpt("-torpassword=<pass>", _("Tor control port password (default: empty)"));
-    strUsage += HelpMessageOpt("-tls=<option>", _("Specify TLS usage (default: 1 => enabled and preferred, yet compatible); other options are -tls=0 to disable TLS and -tls=only to enforce it"));
-    strUsage += HelpMessageOpt("-tlsfallbacknontls=<0 or 1>", _("If a TLS connection fails, the next connection attempt of the same peer (based on IP address) takes place without TLS (default: 1)"));
+    strUsage += HelpMessageOpt("-tls=<option>", _("Specify TLS usage (default: 1 => enabled and required); Cannot be turned off."));
     strUsage += HelpMessageOpt("-tlsvalidate=<0 or 1>", _("Connect to peers only with valid certificates (default: 0)"));
     strUsage += HelpMessageOpt("-tlskeypath=<path>", _("Full path to a private key"));
     strUsage += HelpMessageOpt("-tlskeypwd=<password>", _("Password for a private key encryption (default: not set, i.e. private key will be stored unencrypted)"));
     strUsage += HelpMessageOpt("-tlscertpath=<path>", _("Full path to a certificate"));
     strUsage += HelpMessageOpt("-tlstrustdir=<path>", _("Full path to a trusted certificates directory"));
-    strUsage += HelpMessageOpt("-whitebind=<addr>", _("Bind to given address and whitelist peers connecting to it. Use [host]:port notation for IPv6"));
-    strUsage += HelpMessageOpt("-whitelist=<netmask>", _("Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.") +
-        " " + _("Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway"));
+    strUsage += HelpMessageOpt("-allowbind=<addr>", _("Bind to given address and allowlist peers connecting to it. Use [host]:port notation for IPv6"));
+    strUsage += HelpMessageOpt("-allowlist=<netmask>", _("Allowlist peers connecting from the given netmask or IP address. Can be specified multiple times.") +
+        " " + _("Allowlisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway"));
 
 #ifdef ENABLE_WALLET
     strUsage += HelpMessageGroup(_("Wallet options:"));
@@ -471,7 +476,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-wallet=<file>", _("Specify wallet file absolute path or a path relative to the data directory") + " " + strprintf(_("(default: %s)"), DEFAULT_WALLET_DAT));
     strUsage += HelpMessageOpt("-walletbroadcast", _("Make the wallet broadcast transactions") + " " + strprintf(_("(default: %u)"), true));
     strUsage += HelpMessageOpt("-walletnotify=<cmd>", _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)"));
-    strUsage += HelpMessageOpt("-whitelistaddress=<Raddress>", _("Enable the wallet filter for notary nodes and add one Raddress to the whitelist of the wallet filter. If -whitelistaddress= is used, then the wallet filter is automatically activated. Several Raddresses can be defined using several -whitelistaddress= (similar to -addnode). The wallet filter will filter the utxo to only ones coming from my own Raddress (derived from pubkey) and each Raddress defined using -whitelistaddress= this option is mostly for Notary Nodes)."));
+    strUsage += HelpMessageOpt("-allowlistaddress=<Raddress>", _("Enable the wallet filter for notary nodes and add one Raddress to the allowlist of the wallet filter. If -allowlistaddress= is used, then the wallet filter is automatically activated. Several Raddresses can be defined using several -allowlistaddress= (similar to -addnode). The wallet filter will filter the utxo to only ones coming from my own Raddress (derived from pubkey) and each Raddress defined using -allowlistaddress= this option is mostly for Notary Nodes)."));
     strUsage += HelpMessageOpt("-zapwallettxes=<mode>", _("Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup") +
         " " + _("(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)"));
 #endif
@@ -657,8 +662,8 @@ void CleanupBlockRevFiles()
                 remove(it->path());
         }
     }
-    path komodostate = GetDataDir() / "komodostate";
-    remove(komodostate);
+    path hushstate = GetDataDir() / "hushstate";
+    remove(hushstate);
     path minerids = GetDataDir() / "minerids";
     remove(minerids);
     // Remove all block files that aren't part of a contiguous set starting at
@@ -698,7 +703,7 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
         LogPrintf("Reindexing finished\n");
         // To avoid ending up in a situation without genesis block, re-try initializing (no-op if reindexing worked):
         InitBlockIndex();
-        KOMODO_LOADINGBLOCKS = 0;
+        HUSH_LOADINGBLOCKS = 0;
     }
 
     // hardcoded $DATADIR/bootstrap.dat
@@ -948,11 +953,11 @@ bool AppInitServers(boost::thread_group& threadGroup)
 /** Initialize Hush.
  *  @pre Parameters should be parsed and config file should be read.
  */
-extern int32_t KOMODO_REWIND;
+extern int32_t HUSH_REWIND;
 
 bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
-	fprintf(stderr,"%s start\n", __FUNCTION__);
+	//fprintf(stderr,"%s start\n", __FUNCTION__);
     // ********************************************************* Step 1: setup
 #ifdef _MSC_VER
     // Turn off Microsoft heap dump noise
@@ -979,7 +984,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     if (!SetupNetworking())
         return InitError("Error: Initializing networking failed");
-	fprintf(stderr,"%s networking setup\n", __FUNCTION__);
+    if(fDebug)
+        fprintf(stderr,"%s networking setup\n", __FUNCTION__);
 
 #ifndef _WIN32
     if (GetBoolArg("-sysperms", false)) {
@@ -992,21 +998,13 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         umask(077);
     }
 
-	//fprintf(stderr,"%s tik1\n", __FUNCTION__);
     // Clean shutdown on SIGTERM
-    struct sigaction sa;
-    sa.sa_handler = HandleSIGTERM;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sigaction(SIGTERM, &sa, NULL);
-    sigaction(SIGINT, &sa, NULL);
+    registerSignalHandler(SIGTERM, HandleSIGTERM);
+    registerSignalHandler(SIGINT, HandleSIGTERM);
 
     // Reopen debug.log on SIGHUP
-    struct sigaction sa_hup;
-    sa_hup.sa_handler = HandleSIGHUP;
-    sigemptyset(&sa_hup.sa_mask);
-    sa_hup.sa_flags = 0;
-    sigaction(SIGHUP, &sa_hup, NULL);
+    registerSignalHandler(SIGHUP, HandleSIGHUP);
+
 
     // Ignore SIGPIPE, otherwise it will bring the daemon down if the client closes unexpectedly
     signal(SIGPIPE, SIG_IGN);
@@ -1024,25 +1022,22 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // Set this early so that experimental features are correctly enabled/disabled
     fExperimentalMode = GetBoolArg("-experimentalfeatures", true);
 
-    fprintf(stderr,"%s: fExperimentalMode=%d\n", __FUNCTION__, fExperimentalMode);
+    if(fDebug)
+        fprintf(stderr,"%s: fExperimentalMode=%d\n", __FUNCTION__, fExperimentalMode);
 
     // Fail early if user has set experimental options without the global flag
     if (!fExperimentalMode) {
         if (mapArgs.count("-developerencryptwallet")) {
 			fprintf(stderr,"%s wallet encryption error\n", __FUNCTION__);
             return InitError(_("Wallet encryption requires -experimentalfeatures."));
-        //TODO: make this non experimental
-        } else if (mapArgs.count("-zmergetoaddress")) {
-			fprintf(stderr,"%s zmerge error\n", __FUNCTION__);
-            return InitError(_("RPC method z_mergetoaddress requires -experimentalfeatures."));
         }
     }
 	//fprintf(stderr,"%s tik2\n", __FUNCTION__);
 
     // Set this early so that parameter interactions go to console
     fPrintToConsole = GetBoolArg("-printtoconsole", false);
-    fLogTimestamps = GetBoolArg("-logtimestamps", true);
-    fLogIPs = GetBoolArg("-logips", false);
+    fLogTimestamps  = GetBoolArg("-logtimestamps", true);
+    fLogIPs         = GetBoolArg("-logips", false);
 
 
     LogPrintf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -1054,9 +1049,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         if (SoftSetBoolArg("-listen", true))
             LogPrintf("%s: parameter interaction: -bind set -> setting -listen=1\n", __func__);
     }
-    if (mapArgs.count("-whitebind")) {
+    if (mapArgs.count("-allowbind")) {
         if (SoftSetBoolArg("-listen", true))
-            LogPrintf("%s: parameter interaction: -whitebind set -> setting -listen=1\n", __func__);
+            LogPrintf("%s: parameter interaction: -allowbind set -> setting -listen=1\n", __func__);
     }
 
 	//fprintf(stderr,"%s tik3\n", __FUNCTION__);
@@ -1130,7 +1125,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 	//fprintf(stderr,"%s tik4\n", __FUNCTION__);
 
     // Make sure enough file descriptors are available
-    int nBind = std::max((int)mapArgs.count("-bind") + (int)mapArgs.count("-whitebind"), 1);
+    int nBind = std::max((int)mapArgs.count("-bind") + (int)mapArgs.count("-allowbind"), 1);
     nMaxConnections = GetArg("-maxconnections", DEFAULT_MAX_PEER_CONNECTIONS);
     //fprintf(stderr,"nMaxConnections %d\n",nMaxConnections);
     nMaxConnections = std::max(std::min(nMaxConnections, (int)(FD_SETSIZE - nBind - MIN_CORE_FILEDESCRIPTORS)), 0);
@@ -1236,7 +1231,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     RegisterAllCoreRPCCommands(tableRPC);
 #ifdef ENABLE_WALLET
     bool fDisableWallet = GetBoolArg("-disablewallet", false);
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         fDisableWallet = true;
         nLocalServices = 0;
@@ -1318,7 +1313,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // Option to startup with mocktime set (used for regression testing):
     SetMockTime(GetArg("-mocktime", 0)); // SetMockTime(0) is a no-op
 
-    if ( KOMODO_NSPV_FULLNODE )
+    if ( HUSH_NSPV_FULLNODE )
     {
         if (GetBoolArg("-peerbloomfilters", true))
             nLocalServices |= NODE_BLOOM;
@@ -1474,7 +1469,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
 	//fprintf(stderr,"%s tik15\n", __FUNCTION__);
 
-    if ( KOMODO_NSPV_FULLNODE )
+    if ( HUSH_NSPV_FULLNODE )
     {
         // Initialize Zcash circuit parameters
         ZC_LoadParams(chainparams);
@@ -1503,8 +1498,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         std::string warningString;
         std::string errorString;
 
-        if (!CWallet::Verify(strWalletFile, warningString, errorString))
+        if (!CWallet::Verify(strWalletFile, warningString, errorString)) {
+            uiInterface.InitMessage(_("Verification failed!"));
             return false;
+        }
 
         if (!warningString.empty())
             InitWarning(warningString);
@@ -1526,7 +1523,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             return InitError(strprintf("User Agent comment (%s) contains unsafe characters.", cmt));
         uacomments.push_back(SanitizeString(cmt, SAFE_CHARS_UA_COMMENT));
     }
-    strSubVersion = FormatSubVersion(GetArg("-clientname","MagicBean"), CLIENT_VERSION, uacomments);
+    strSubVersion = FormatSubVersion(GetArg("-clientname","jl777sRemorse"), CLIENT_VERSION, uacomments);
     if (strSubVersion.size() > MAX_SUBVERSION_LENGTH) {
         return InitError(strprintf("Total length of network version string %i exceeds maximum of %i characters. Reduce the number and/or size of uacomments.",
             strSubVersion.size(), MAX_SUBVERSION_LENGTH));
@@ -1549,12 +1546,12 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     }
 
 	//fprintf(stderr,"%s tik19\n", __FUNCTION__);
-    if (mapArgs.count("-whitelist")) {
-        BOOST_FOREACH(const std::string& net, mapMultiArgs["-whitelist"]) {
+    if (mapArgs.count("-allowlist")) {
+        BOOST_FOREACH(const std::string& net, mapMultiArgs["-allowlist"]) {
             CSubNet subnet(net);
             if (!subnet.IsValid())
-                return InitError(strprintf(_("Invalid netmask specified in -whitelist: '%s'"), net));
-            CNode::AddWhitelistedRange(subnet);
+                return InitError(strprintf(_("Invalid netmask specified in -allowlist: '%s'"), net));
+            CNode::AddAllowlistedRange(subnet);
         }
     }
 
@@ -1600,23 +1597,22 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 	//fprintf(stderr,"%s tik22\n", __FUNCTION__);
     bool fBound = false;
     if (fListen) {
-        if (mapArgs.count("-bind") || mapArgs.count("-whitebind")) {
+        if (mapArgs.count("-bind") || mapArgs.count("-allowbind")) {
             BOOST_FOREACH(const std::string& strBind, mapMultiArgs["-bind"]) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, GetListenPort(), false))
                     return InitError(strprintf(_("Cannot resolve -bind address: '%s'"), strBind));
                 fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR));
             }
-            BOOST_FOREACH(const std::string& strBind, mapMultiArgs["-whitebind"]) {
+            BOOST_FOREACH(const std::string& strBind, mapMultiArgs["-allowbind"]) {
                 CService addrBind;
                 if (!Lookup(strBind.c_str(), addrBind, 0, false))
-                    return InitError(strprintf(_("Cannot resolve -whitebind address: '%s'"), strBind));
+                    return InitError(strprintf(_("Cannot resolve -allowbind address: '%s'"), strBind));
                 if (addrBind.GetPort() == 0)
-                    return InitError(strprintf(_("Need to specify a port with -whitebind: '%s'"), strBind));
-                fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR | BF_WHITELIST));
+                    return InitError(strprintf(_("Need to specify a port with -allowbind: '%s'"), strBind));
+                fBound |= Bind(addrBind, (BF_EXPLICIT | BF_REPORT_ERROR | BF_ALLOWLIST));
             }
-        }
-        else {
+        } else {
             struct in_addr inaddr_any;
             inaddr_any.s_addr = INADDR_ANY;
             fBound |= Bind(CService(in6addr_any, GetListenPort()), BF_NONE);
@@ -1666,7 +1662,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     }
 #endif
 
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         std::vector<boost::filesystem::path> vImportFiles;
         threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));
@@ -1760,20 +1756,20 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 delete pcoinsdbview;
                 delete pcoinscatcher;
                 delete pblocktree;
-                delete pnotarisations;
+                delete pnotarizations;
 
-                pblocktree = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex, dbCompression, dbMaxOpenFiles);
-                pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex);
-                pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
-                pcoinsTip = new CCoinsViewCache(pcoinscatcher);
-                pnotarisations = new NotarisationDB(100*1024*1024, false, fReindex);
+                pblocktree     = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex, dbCompression, dbMaxOpenFiles);
+                pcoinsdbview   = new CCoinsViewDB(nCoinDBCache, false, fReindex);
+                pcoinscatcher  = new CCoinsViewErrorCatcher(pcoinsdbview);
+                pcoinsTip      = new CCoinsViewCache(pcoinscatcher);
+                pnotarizations = new NotarizationDB(100*1024*1024, false, fReindex);
 
 
                 if (fReindex) {
-                    boost::filesystem::remove(GetDataDir() / "komodostate");
-                    boost::filesystem::remove(GetDataDir() / "signedmasks");
+                    boost::filesystem::remove(GetDataDir() / "hushstate");
+                    boost::filesystem::remove(GetDataDir() / "hushsignedmasks");
                     pblocktree->WriteReindexing(true);
-					fprintf(stderr, "%s: Deleted komodostate and signedmasks...\n", __FUNCTION__);
+					fprintf(stderr, "%s: Deleted hushstate and hushsignedmasks...\n", __FUNCTION__);
 
                     //If we're reindexing in prune mode, wipe away unusable block files and all undo data files
                     if (fPruneMode)
@@ -1796,7 +1792,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     strLoadError = _("Error initializing block database");
                     break;
                 }
-                KOMODO_LOADINGBLOCKS = 0;
+                HUSH_LOADINGBLOCKS = 0;
                 // Check for changed -txindex state
                 if (fTxIndex != GetBoolArg("-txindex", true)) {
                     strLoadError = _("You need to rebuild the database using -reindex to change -txindex");
@@ -1816,9 +1812,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     break;
                 }
                 
-                if ( ASSETCHAINS_CC != 0 && KOMODO_SNAPSHOT_INTERVAL != 0 && chainActive.Height() >= KOMODO_SNAPSHOT_INTERVAL )
+                if ( ASSETCHAINS_CC != 0 && HUSH_SNAPSHOT_INTERVAL != 0 && chainActive.Height() >= HUSH_SNAPSHOT_INTERVAL )
                 {
-                    if ( !komodo_dailysnapshot(chainActive.Height()) )
+                    if ( !hush_dailysnapshot(chainActive.Height()) )
                     {
                         strLoadError = _("daily snapshot failed, please reindex your chain.");
                         break;
@@ -1838,7 +1834,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     LogPrintf("Prune: pruned datadir may not have more than %d blocks; -checkblocks=%d may fail\n",
                         MIN_BLOCKS_TO_KEEP, GetArg("-checkblocks", 288));
                 }
-                if ( KOMODO_REWIND == 0 )
+                if ( HUSH_REWIND == 0 )
                 {
                     LogPrintf("Verifying block DB...");
                     if (!CVerifyDB().VerifyDB(pcoinsdbview, GetArg("-checklevel", 3), GetArg("-checkblocks", 288))) {
@@ -1874,7 +1870,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             }
         }
     }
-    KOMODO_LOADINGBLOCKS = 0;
+    HUSH_LOADINGBLOCKS = 0;
 
     // As LoadBlockIndex can take several minutes, it's possible the user
     // requested to kill the GUI during the last operation. If so, exit.
@@ -2028,9 +2024,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         {
             pwalletMain->ClearNoteWitnessCache();
             pindexRescan = chainActive.Genesis();
-        }
-        else
-        {
+        } else {
             CWalletDB walletdb(strWalletFile);
             CBlockLocator locator;
             if (walletdb.ReadBestBlock(locator))
@@ -2135,7 +2129,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             PruneAndFlush();
         }
     }
-    if ( KOMODO_NSPV == 0 )
+    if ( HUSH_NSPV == 0 )
     {
         if ( GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX) != 0 )
             nLocalServices |= NODE_ADDRINDEX;
@@ -2149,7 +2143,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         uiInterface.NotifyBlockTip.connect(BlockNotifyCallback);
      if (mapArgs.count("-txexpirynotify"))
         uiInterface.NotifyTxExpiration.connect(TxExpiryNotifyCallback);
-    if ( KOMODO_REWIND >= 0 )
+    if ( HUSH_REWIND >= 0 )
     {
         uiInterface.InitMessage(_("Activating best chain..."));
         // scan for better chains in the block chain database, that are not yet connected in the active best chain
@@ -2157,7 +2151,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         if ( !ActivateBestChain(true,state))
             strErrors << "Failed to connect best block";
     } else {
-        fprintf(stderr,"KOMODO_REWIND < 0\n");
+        fprintf(stderr,"HUSH_REWIND < 0\n");
     }
     std::vector<boost::filesystem::path> vImportFiles;
     if (mapArgs.count("-loadblock"))
@@ -2186,7 +2180,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     // ********************************************************* Step 11: start node
 
-    fprintf(stderr,"Checking disk space...\n");
+    //fprintf(stderr,"Checking disk space...\n");
     if (!CheckDiskSpace())
         return false;
 
@@ -2205,7 +2199,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (GetBoolArg("-listenonion", DEFAULT_LISTEN_ONION))
         StartTorControl(threadGroup, scheduler);
 
-    fprintf(stderr,"Starting txnotify thread\n");
+    if(fDebug)
+        fprintf(stderr,"Starting txnotify thread\n");
     StartNode(threadGroup, scheduler);
 
 #ifdef ENABLE_MINING
@@ -2222,16 +2217,19 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // ********************************************************* Step 11: finished
 
     SetRPCWarmupFinished();
-    fprintf(stderr,"RPC warmump finished\n");
-    uiInterface.InitMessage(_("Done loading!"));
+    if(fDebug)
+        fprintf(stderr,"RPC warmump finished\n");
+    uiInterface.InitMessage(_("Hush Full Node Done Loading! :)"));
 
 #ifdef ENABLE_WALLET
     if (pwalletMain) {
-	     fprintf(stderr,"%s Reaccepting wallet xtns\n", __FUNCTION__);
+        if(fDebug)
+	        fprintf(stderr,"%s Reaccepting wallet xtns\n", __FUNCTION__);
         // Add wallet transactions that aren't already in a block to mapTransactions
         pwalletMain->ReacceptWalletTransactions();
 
-	     fprintf(stderr,"%s Starting wallet flusher thread\n", __FUNCTION__);
+        if(fDebug)
+	        fprintf(stderr,"%s Starting wallet flusher thread\n", __FUNCTION__);
         // Run a thread to flush wallet periodically
         threadGroup.create_thread(boost::bind(&ThreadFlushWalletDB, boost::ref(pwalletMain->strWalletFile)));
     }
@@ -2240,6 +2238,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // SENDALERT
     threadGroup.create_thread(boost::bind(ThreadSendAlert));
 
-	fprintf(stderr,"%s end fRequestShutdown=%d\n", __FUNCTION__, !!fRequestShutdown);
+    if(fDebug)
+	    fprintf(stderr,"%s end fRequestShutdown=%d\n", __FUNCTION__, !!fRequestShutdown);
     return !fRequestShutdown;
 }

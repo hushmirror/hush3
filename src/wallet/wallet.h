@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_WALLET_WALLET_H
-#define BITCOIN_WALLET_WALLET_H
+#ifndef HUSH_WALLET_WALLET_H
+#define HUSH_WALLET_WALLET_H
 
 #include "amount.h"
 #include "asyncrpcoperation.h"
@@ -203,7 +203,7 @@ public:
     uint256 hash;
     // Index into CTransaction.vjoinsplit
     uint64_t js;
-    // Index into JSDescription fields of length ZC_NUM_JS_OUTPUTS
+    // Index into JSDescription fields of length HUSH_NUM_JS_OUTPUTS
     uint8_t n;
 
     JSOutPoint() { SetNull(); }
@@ -347,7 +347,7 @@ struct SaplingNoteEntry
     SaplingOutPoint op;
     libzcash::SaplingPaymentAddress address;
     libzcash::SaplingNote note;
-    std::array<unsigned char, ZC_MEMO_SIZE> memo;
+    std::array<unsigned char, HUSH_MEMO_SIZE> memo;
     int confirmations;
 };
 
@@ -1499,4 +1499,4 @@ public:
 
 #define RETURN_IF_ERROR(CCerror) if ( CCerror != "" ) { ERR_RESULT(CCerror); return(result); }
 
-#endif // BITCOIN_WALLET_WALLET_H
+#endif // HUSH_WALLET_WALLET_H

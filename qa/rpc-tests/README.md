@@ -20,10 +20,9 @@ Possible options:
 
 ```
 -h, --help       show this help message and exit
-  --nocleanup      Leave komodods and test.* datadir on exit or error
-  --noshutdown     Don't stop komodods after the test execution
-  --srcdir=SRCDIR  Source directory containing hushd/hush-cli (default:
-                   ../../src)
+  --nocleanup      Leave binaries and test.* datadir on exit or error
+  --noshutdown     Don't stop full node after the test execution
+  --srcdir=SRCDIR  Source directory containing hushd/hush-cli (default: ../../src)
   --tmpdir=TMPDIR  Root directory for datadirs
   --tracerpc       Print out all RPC calls as they are made
 ```
@@ -39,8 +38,7 @@ After the first run, the cache/ blockchain and wallets are
 copied into a temporary directory and used as the initial
 test state.
 
-If you get into a bad state, you should be able
-to recover with:
+If you get into a bad state, you should be able to recover with:
 
 ```bash
 rm -rf cache

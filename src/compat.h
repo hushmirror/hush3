@@ -2,7 +2,6 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,8 +17,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_COMPAT_H
-#define BITCOIN_COMPAT_H
+#ifndef HUSH_COMPAT_H
+#define HUSH_COMPAT_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
@@ -42,7 +41,6 @@
 #define FD_SETSIZE 1024 // max number of fds in fd_set
 
 #include <winsock2.h>     // Must be included before mswsock.h and windows.h
-
 #include <mswsock.h>
 #include <windows.h>
 #include <ws2tcpip.h>
@@ -85,10 +83,12 @@ typedef u_int SOCKET;
 #define S_IWUSR             0200
 #endif
 #else
+#undef MAX_PATH
 #define MAX_PATH            1024
 #endif
 
 // As Solaris does not have the MSG_NOSIGNAL flag for send(2) syscall, it is defined as 0
+// Should we add support for PDP-11's too? - Duke
 #if !defined(HAVE_MSG_NOSIGNAL) && !defined(MSG_NOSIGNAL)
 #define MSG_NOSIGNAL 0
 #endif
@@ -116,4 +116,4 @@ bool static inline IsSelectableSocket(SOCKET s) {
 #endif
 }
 
-#endif // BITCOIN_COMPAT_H
+#endif // HUSH_COMPAT_H

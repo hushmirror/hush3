@@ -1,10 +1,10 @@
 // Copyright (c) 2017 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef KOMODO_FS_H
-#define KOMODO_FS_H
+#ifndef HUSH_FS_H
+#define HUSH_FS_H
 
 #include <stdio.h>
 #include <string>
@@ -22,4 +22,4 @@ namespace fsbridge {
     FILE *freopen(const fs::path& p, const char *mode, FILE *stream);
 };
 
-#endif // KOMODO_FS_H
+#endif // HUSH_FS_H

@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -21,7 +21,7 @@
 #include "chainparams.h"
 #include "checkpoints.h"
 #include "crosschain.h"
-#include "notarisationdb.h"
+#include "notarizationdb.h"
 #include "importcoin.h"
 #include "base58.h"
 #include "consensus/validation.h"
@@ -56,11 +56,11 @@ int32_t ensure_CCrequirements(uint8_t evalcode);
 bool EnsureWalletIsAvailable(bool avoidException);
 
 
-int32_t komodo_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip);
-int32_t komodo_MoMoMdata(char *hexstr,int32_t hexsize,struct komodo_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height);
-struct komodo_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi);
+int32_t hush_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip);
+int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height);
+struct hush_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi);
 uint256 komodo_calcMoM(int32_t height,int32_t MoMdepth);
-int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
+int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 extern std::string ASSETCHAINS_SELFIMPORT;
 
 //std::string MakeSelfImportSourceTx(CTxDestination &dest, int64_t amount, CMutableTransaction &mtx);
@@ -108,7 +108,7 @@ UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
         height = chainActive.Tip()->GetHeight();
     }
     //fprintf(stderr,"height_MoM height.%d\n",height);
-    depth = komodo_MoM(&notarized_height,&MoM,&kmdtxid,height,&MoMoM,&MoMoMoffset,&MoMoMdepth,&kmdstarti,&kmdendi);
+    depth = hush_MoM(&notarized_height,&MoM,&kmdtxid,height,&MoMoM,&MoMoMoffset,&MoMoMdepth,&kmdstarti,&kmdendi);
     ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL)));
     ret.push_back(Pair("height",height));
     ret.push_back(Pair("timestamp",(uint64_t)timestamp));
@@ -143,14 +143,14 @@ UniValue MoMoMdata(const UniValue& params, bool fHelp, const CPubKey& mypk)
     ret.push_back(Pair("kmdheight",kmdheight-5));
     ret.push_back(Pair("ccid", (int) ccid));
 
-    uint256 destNotarisationTxid;
+    uint256 destNotarizationTxid;
     std::vector<uint256> moms;
-    uint256 MoMoM = CalculateProofRoot(symbol, ccid, kmdheight-5, moms, destNotarisationTxid);
+    uint256 MoMoM = CalculateProofRoot(symbol, ccid, kmdheight-5, moms, destNotarizationTxid);
 
     UniValue valMoms(UniValue::VARR);
     for (int i=0; i<moms.size(); i++) valMoms.push_back(moms[i].GetHex());
     ret.push_back(Pair("MoMs", valMoms));
-    ret.push_back(Pair("notarization_hash", destNotarisationTxid.GetHex()));
+    ret.push_back(Pair("notarization_hash", destNotarizationTxid.GetHex()));
     ret.push_back(Pair("MoMoM", MoMoM.GetHex()));
     auto vmomomdata = E_MARSHAL(ss << MoMoM; ss << ((uint32_t)0));
     ret.push_back(Pair("data", HexStr(vmomomdata)));
@@ -192,8 +192,8 @@ UniValue migrate_converttoexport(const UniValue& params, bool fHelp, const CPubK
             "import transaction.\n"
             );
 
-    if (ASSETCHAINS_CC < KOMODO_FIRSTFUNGIBLEID)
-        throw runtime_error("-ac_cc < KOMODO_FIRSTFUNGIBLEID");
+    if (ASSETCHAINS_CC < HUSH_FIRSTFUNGIBLEID)
+        throw runtime_error("-ac_cc < HUSH_FIRSTFUNGIBLEID");
 
     if (SMART_CHAIN_SYMBOL[0] == 0)
         throw runtime_error("Must be called on assetchain");
@@ -266,8 +266,8 @@ UniValue migrate_createburntransaction(const UniValue& params, bool fHelp, const
             "the \"migrate_createimporttransaction\" method to get the corresponding import transaction.\n"
         );
 
-    if (ASSETCHAINS_CC < KOMODO_FIRSTFUNGIBLEID)
-        throw runtime_error("-ac_cc < KOMODO_FIRSTFUNGIBLEID");
+    if (ASSETCHAINS_CC < HUSH_FIRSTFUNGIBLEID)
+        throw runtime_error("-ac_cc < HUSH_FIRSTFUNGIBLEID");
 
     if (SMART_CHAIN_SYMBOL[0] == 0)
         throw runtime_error("Must be called on assetchain");
@@ -305,7 +305,7 @@ UniValue migrate_createburntransaction(const UniValue& params, bool fHelp, const
     struct CCcontract_info *cpTokens, C;
     cpTokens = CCinit(&C, EVAL_TOKENS);
 
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
     const std::string chainSymbol(SMART_CHAIN_SYMBOL);
     std::vector<uint8_t> rawproof; //(chainSymbol.begin(), chainSymbol.end());
@@ -545,8 +545,8 @@ UniValue migrate_createimporttransaction(const UniValue& params, bool fHelp, con
                 "optional notarytxids are txids of notary operator proofs of burn tx existense (from destination chain).\n"
                 "Do not make subsequent call to migrate_completeimporttransaction if notary txids are set");
 
-    if (ASSETCHAINS_CC < KOMODO_FIRSTFUNGIBLEID)
-        throw runtime_error("-ac_cc < KOMODO_FIRSTFUNGIBLEID");
+    if (ASSETCHAINS_CC < HUSH_FIRSTFUNGIBLEID)
+        throw runtime_error("-ac_cc < HUSH_FIRSTFUNGIBLEID");
 
     if (SMART_CHAIN_SYMBOL[0] == 0)
         throw runtime_error("Must be called on assetchain");
@@ -694,7 +694,7 @@ UniValue migrate_createnotaryapprovaltransaction(const UniValue& params, bool fH
     cpDummy = CCinit(&C, EVAL_TOKENS);  // just for FinalizeCCtx to work 
 
     // creating a tx with proof:
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     if (AddNormalinputs(mtx, Mypubkey(), txfee*2, 4) == 0) 
         throw runtime_error("Cannot find normal inputs\n");
     
@@ -789,7 +789,7 @@ UniValue selfimport(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return result;
 }
 
-bool GetNotarisationNotaries(uint8_t notarypubkeys[64][33], int8_t &numNN, const std::vector<CTxIn> &vin, std::vector<int8_t> &NotarisationNotaries);
+bool GetNotarizationNotaries(uint8_t notarypubkeys[64][33], int8_t &numNN, const std::vector<CTxIn> &vin, std::vector<int8_t> &NotarizationNotaries);
 
 
 UniValue importdual(const UniValue& params, bool fHelp, const CPubKey& mypk)
@@ -1121,11 +1121,11 @@ UniValue importgatewaydumpprivkey(const UniValue& params, bool fHelp, const CPub
     return(ImportGatewayDumpPrivKey(bindtxid,vchSecret));
 }
 
-UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
+UniValue getNotarizationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     // TODO take timestamp as param, and loop blockindex to get starting/finish height.
     if (fHelp || params.size() != 1)
-        throw runtime_error("getNotarisationsForBlock height\n\n"
+        throw runtime_error("getNotarizationsForBlock height\n\n"
                 "Takes a block height and returns notarisation information "
                 "within the block");
 
@@ -1136,21 +1136,21 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
     
     uint256 blockHash = chainActive[height]->GetBlockHash(); 
     
-    NotarisationsInBlock nibs;
-    GetBlockNotarisations(blockHash, nibs);
+    NotarizationsInBlock nibs;
+    GetBlockNotarizations(blockHash, nibs);
     UniValue out(UniValue::VOBJ);
     //out.push_back(make_pair("blocktime",(int)));
     UniValue hush(UniValue::VARR);
     int8_t numNN = 0; uint8_t notarypubkeys[64][33] = {0};
-    numNN = komodo_notaries(notarypubkeys, height, chainActive[height]->nTime);
+    numNN = hush_notaries(notarypubkeys, height, chainActive[height]->nTime);
 
-    BOOST_FOREACH(const Notarisation& n, nibs)
+    BOOST_FOREACH(const Notarization& n, nibs)
     {
-        UniValue item(UniValue::VOBJ); UniValue notaryarr(UniValue::VARR); std::vector<int8_t> NotarisationNotaries;
+        UniValue item(UniValue::VOBJ); UniValue notaryarr(UniValue::VARR); std::vector<int8_t> NotarizationNotaries;
         uint256 hash; CTransaction tx;
         if ( myGetTransaction(n.first,tx,hash) )
         {
-            if ( !GetNotarisationNotaries(notarypubkeys, numNN, tx.vin, NotarisationNotaries) )
+            if ( !GetNotarizationNotaries(notarypubkeys, numNN, tx.vin, NotarizationNotaries) )
                 continue;
         }
         item.push_back(make_pair("txid", n.first.GetHex()));
@@ -1159,7 +1159,7 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
         item.push_back(make_pair("blockhash", n.second.blockHash.GetHex()));
         //item.push_back(make_pair("HUSH_height", height)); // for when timstamp input is used.
         
-        for ( auto notary : NotarisationNotaries )
+        for ( auto notary : NotarizationNotaries )
             notaryarr.push_back(notary);
         item.push_back(make_pair("notaries",notaryarr));
         hush.push_back(item);
@@ -1168,19 +1168,19 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
     return out;
 }
 
-/*UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
+/*UniValue getNotarizationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     if (fHelp || params.size() != 1)
-        throw runtime_error("getNotarisationsForBlock blockHash\n\n"
+        throw runtime_error("getNotarizationsForBlock blockHash\n\n"
                 "Takes a block hash and returns notarisation transactions "
                 "within the block");
 
     uint256 blockHash = uint256S(params[0].get_str());
 
-    NotarisationsInBlock nibs;
-    GetBlockNotarisations(blockHash, nibs);
+    NotarizationsInBlock nibs;
+    GetBlockNotarizations(blockHash, nibs);
     UniValue out(UniValue::VARR);
-    BOOST_FOREACH(const Notarisation& n, nibs)
+    BOOST_FOREACH(const Notarization& n, nibs)
     {
         UniValue item(UniValue::VARR);
         item.push_back(n.first.GetHex());
@@ -1191,10 +1191,10 @@ UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPub
 }*/
 
 
-UniValue scanNotarisationsDB(const UniValue& params, bool fHelp, const CPubKey& mypk)
+UniValue scanNotarizationsDB(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     if (fHelp || params.size() < 2 || params.size() > 3)
-        throw runtime_error("scanNotarisationsDB blockHeight symbol [blocksLimit=1440]\n\n"
+        throw runtime_error("scanNotarizationsDB blockHeight symbol [blocksLimit=1440]\n\n"
                 "Scans notarisationsdb backwards from height for a notarisation"
                 " of given symbol");
     int height = atoi(params[0].get_str().c_str());
@@ -1209,8 +1209,8 @@ UniValue scanNotarisationsDB(const UniValue& params, bool fHelp, const CPubKey& 
         height = chainActive.Height();
     }
 
-    Notarisation nota;
-    int matchedHeight = ScanNotarisationsDB(height, symbol, limit, nota);
+    Notarization nota;
+    int matchedHeight = ScanNotarizationsDB(height, symbol, limit, nota);
     if (!matchedHeight) return NullUniValue;
     UniValue out(UniValue::VOBJ);
     out.pushKV("height", matchedHeight);

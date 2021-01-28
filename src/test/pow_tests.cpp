@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Copyright (c) 2015 The Bitcoin Core developers
 // Distributed under the GPLv3/X11 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -38,8 +38,8 @@ BOOST_AUTO_TEST_CASE(get_next_work_pow_limit)
     int64_t nThisTime = 1233061996;  // Block #2015 of Bitcoin
     arith_uint256 bnAvg;
     // TODO change once the harder genesis block is generated
-    bnAvg.SetCompact(KOMODO_MINDIFF_NBITS);
-    BOOST_CHECK_EQUAL(KOMODO_MINDIFF_NBITS,
+    bnAvg.SetCompact(HUSH_MINDIFF_NBITS);
+    BOOST_CHECK_EQUAL(HUSH_MINDIFF_NBITS,
     CalculateNextWorkRequired(bnAvg, nThisTime, nLastRetargetTime, params));
 }
 

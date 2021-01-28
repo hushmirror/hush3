@@ -1,8 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,9 +17,8 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-#ifndef BITCOIN_NET_H
-#define BITCOIN_NET_H
+#ifndef HUSH_NET_H
+#define HUSH_NET_H
 
 #include "bloom.h"
 #include "compat.h"
@@ -34,20 +33,22 @@
 #include "uint256.h"
 #include "utilstrencodings.h"
 #include "util.h"
-
 #include <deque>
 #include <stdint.h>
 
 #ifndef _WIN32
 #include <arpa/inet.h>
 #endif
-
 #include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
 #include <boost/signals2/signal.hpp>
-
 // Enable WolfSSL Support for Hush
 #include <wolfssl/options.h>
+// TODO: these are not set correctly by wolfssl for some reason. Ja bless.
+#undef ECC_TIMING_RESISTANT
+#undef TFM_TIMING_RESISTANT
+#define ECC_TIMING_RESISTANT 420
+#define TFM_TIMING_RESISTANT 420
 #include <wolfssl/ssl.h>
 
 class CAddrMan;
@@ -94,7 +95,7 @@ CNode* FindNode(const CService& ip);
 CNode* ConnectNode(CAddress addrConnect, const char *pszDest = NULL);
 bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound = NULL, const char *strDest = NULL, bool fOneShot = false);
 unsigned short GetListenPort();
-bool BindListenPort(const CService &bindAddr, std::string& strError, bool fWhitelisted = false);
+bool BindListenPort(const CService &bindAddr, std::string& strError, bool fAllowlisted = false);
 void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler);
 bool StopNode();
 void SocketSendData(CNode *pnode);
@@ -207,6 +208,7 @@ public:
     uint64_t nServices;
     bool fTLSEstablished;
     bool fTLSVerified;
+    std::string tls_cipher;
     int64_t nLastSend;
     int64_t nLastRecv;
     int64_t nTimeConnected;
@@ -218,7 +220,7 @@ public:
     int nStartingHeight;
     uint64_t nSendBytes;
     uint64_t nRecvBytes;
-    bool fWhitelisted;
+    bool fAllowlisted;
     double dPingTime;
     double dPingWait;
     std::string addrLocal;
@@ -278,8 +280,9 @@ public:
 class CNode
 {
 public:
-    // OpenSSL
+    // TLS via WolfSSL
     SSL *ssl;
+    std::string tls_cipher;
 
     // socket
     uint64_t nServices;
@@ -316,7 +319,7 @@ public:
     // store the sanitized version in cleanSubVer. The original should be used when dealing with
     // the network or wire types and the cleaned string used when displayed or logged.
     std::string strSubVer, cleanSubVer;
-    bool fWhitelisted; // This peer can bypass DoS banning.
+    bool fAllowlisted; // This peer can bypass DoS banning.
     bool fOneShot;
     bool fClient;
     bool fInbound;
@@ -344,10 +347,10 @@ protected:
     static std::map<CSubNet, int64_t> setBanned;
     static CCriticalSection cs_setBanned;
 
-    // Whitelisted ranges. Any node connecting from these is automatically
-    // whitelisted (as well as those connecting to whitelisted binds).
-    static std::vector<CSubNet> vWhitelistedRange;
-    static CCriticalSection cs_vWhitelistedRange;
+    // Allowlisted ranges. Any node connecting from these is automatically
+    // allowlisted (as well as those connecting to allowlisted binds).
+    static std::vector<CSubNet> vAllowlistedRange;
+    static CCriticalSection cs_vAllowlistedRange;
 
     // Basic fuzz-testing
     void Fuzz(int nChance); // modifies ssSend
@@ -673,7 +676,7 @@ public:
     // now but might be valid in a later version is also
     // dangerous, because it can cause a network split
     // between nodes running old code and nodes running
-    // new code.
+    // new code. Fun timez!
     static void ClearBanned(); // needed for unit testing
     static bool IsBanned(CNetAddr ip);
     static bool IsBanned(CSubNet subnet);
@@ -685,8 +688,8 @@ public:
 
     void copyStats(CNodeStats &stats, const std::vector<bool> &m_asmap);
 
-    static bool IsWhitelistedRange(const CNetAddr &ip);
-    static void AddWhitelistedRange(const CSubNet &subnet);
+    static bool IsAllowlistedRange(const CNetAddr &ip);
+    static void AddAllowlistedRange(const CSubNet &subnet);
 
     // Network stats
     static void RecordBytesRecv(uint64_t bytes);
@@ -698,8 +701,6 @@ public:
     // resource deallocation on cleanup, called at node shutdown
     static void NetCleanup();
 
-    // returns the value of the tlsfallbacknontls and tlsvalidate flags set at zend startup (see init.cpp)
-    static bool GetTlsFallbackNonTls();
     static bool GetTlsValidate();
 };
 
@@ -709,7 +710,10 @@ class CTransaction;
 void RelayTransaction(const CTransaction& tx);
 void RelayTransaction(const CTransaction& tx, const CDataStream& ss);
 
-/** Access to the (IP) address database (peers.dat) */
+/** Access to the (IP) address database (peers.dat)
+which now has 2 versions and soon a 3rd
+(classic, asmap, bip155+asmap)
+ */
 class CAddrDB
 {
 private:
@@ -720,4 +724,4 @@ public:
     bool Read(CAddrMan& addr);
 };
 
-#endif // BITCOIN_NET_H
+#endif // HUSH_NET_H

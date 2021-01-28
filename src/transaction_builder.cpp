@@ -1,18 +1,17 @@
 // Copyright (c) 2018 The Zcash developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include "transaction_builder.h"
-
 #include "main.h"
 #include "pubkey.h"
 #include "script/sign.h"
-
 #include <boost/variant.hpp>
 #include <boost/optional/optional_io.hpp>
 #include <librustzcash.h>
 #include "zcash/Note.hpp"
+extern bool fZDebug;
 
 SpendDescriptionInfo::SpendDescriptionInfo(
     libzcash::SaplingExpandedSpendingKey expsk,
@@ -53,7 +52,7 @@ void TransactionBuilder::AddSaplingOutput(
     uint256 ovk,
     libzcash::SaplingPaymentAddress to,
     CAmount value,
-    std::array<unsigned char, ZC_MEMO_SIZE> memo)
+    std::array<unsigned char, HUSH_MEMO_SIZE> memo)
 {
     auto note = libzcash::SaplingNote(to, value);
     outputs.emplace_back(ovk, note, memo);
@@ -128,9 +127,7 @@ bool TransactionBuilder::SendChangeTo(CTxDestination& changeAddr)
 
 boost::optional<CTransaction> TransactionBuilder::Build()
 {
-    //
     // Consistency checks
-    //
 
     // Valid change
     CAmount change = mtx.valueBalance - fee;
@@ -145,33 +142,31 @@ boost::optional<CTransaction> TransactionBuilder::Build()
         return boost::none;
     }
 
-    //
     // Change output
-    //
 
     if (change > 0) {
         // Send change to the specified change address. If no change address
         // was set, send change to the first Sapling address given as input.
         if (zChangeAddr) {
-            LogPrintf("%s: Adding specified Sapling change output: %s\n", __FUNCTION__, zChangeAddr->second.GetHash().ToString().c_str());
+            if(fZdebug)
+                LogPrintf("%s: Adding specified Sapling change output: %s\n", __FUNCTION__, zChangeAddr->second.GetHash().ToString().c_str());
             AddSaplingOutput(zChangeAddr->first, zChangeAddr->second, change);
         } else if (tChangeAddr) {
             // tChangeAddr has already been validated.
             assert(AddTransparentOutput(tChangeAddr.value(), change));
         } else if (!spends.empty()) {
-            auto fvk = spends[0].expsk.full_viewing_key();
+            auto fvk  = spends[0].expsk.full_viewing_key();
             auto note = spends[0].note;
             libzcash::SaplingPaymentAddress changeAddr(note.d, note.pk_d);
             AddSaplingOutput(fvk.ovk, changeAddr, change);
-            LogPrintf("%s: Adding Sapling change output from first zinput: %s\n", __FUNCTION__, changeAddr.GetHash().ToString().c_str() );
+            if(fZdebug)
+                LogPrintf("%s: Adding Sapling change output from first zinput: %s\n", __FUNCTION__, changeAddr.GetHash().ToString().c_str() );
         } else {
             return boost::none;
         }
     }
 
-    //
     // Sapling spends and outputs
-    //
 
     auto ctx = librustzcash_sapling_proving_ctx_init();
 
@@ -212,7 +207,8 @@ boost::optional<CTransaction> TransactionBuilder::Build()
 
         sdesc.anchor = spend.anchor;
         sdesc.nullifier = *nf;
-        LogPrintf("%s: Created cm + nullifier=%s\n", __FUNCTION__, sdesc.nullifier.ToString().c_str() );
+        if(fZdebug)
+            LogPrintf("%s: Created cm + nullifier=%s\n", __FUNCTION__, sdesc.nullifier.ToString().c_str() );
         mtx.vShieldedSpend.push_back(sdesc);
     }
 
@@ -266,9 +262,7 @@ boost::optional<CTransaction> TransactionBuilder::Build()
     // add op_return if there is one to add
     AddOpRetLast();
 
-    //
     // Signatures
-    //
 
     auto consensusBranchId = CurrentEpochBranchId(nHeight, consensusParams);
 

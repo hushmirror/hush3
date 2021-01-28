@@ -1,9 +1,8 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "amount.h"
 #include "chainparams.h"
 #include "consensus/consensus.h"
@@ -52,8 +50,8 @@ using namespace std;
 #include "hush_defs.h"
 
 extern int32_t ASSETCHAINS_FOUNDERS;
-uint64_t komodo_commission(const CBlock *pblock,int32_t height);
-int32_t komodo_blockload(CBlock& block,CBlockIndex *pindex);
+uint64_t the_commission(const CBlock *pblock,int32_t height);
+int32_t hush_blockload(CBlock& block,CBlockIndex *pindex);
 arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
 
 /**
@@ -185,7 +183,7 @@ UniValue getgenerate(const UniValue& params, bool fHelp, const CPubKey& mypk)
     LOCK(cs_main);
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("generate",         GetBoolArg("-gen", false) && GetBoolArg("-genproclimit", -1) != 0 ));
-    obj.push_back(Pair("numthreads",       (int64_t)KOMODO_MININGTHREADS));
+    obj.push_back(Pair("numthreads",       (int64_t)HUSH_MININGTHREADS));
     return obj;
 }
 
@@ -214,7 +212,7 @@ UniValue generate(const UniValue& params, bool fHelp, const CPubKey& mypk)
             throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Wallet disabled and -mineraddress not set");
         }
 #else
-        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "komodod compiled without wallet and -mineraddress not set");
+        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "hushd compiled without wallet and -mineraddress not set");
 #endif
     }
     if (!Params().MineBlocksOnDemand())
@@ -257,7 +255,7 @@ UniValue generate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         lastTime = GetTime();
 
 #ifdef ENABLE_WALLET
-        std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey,nHeight,KOMODO_MAXGPUCOUNT));
+        std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey,nHeight,HUSH_MAXGPUCOUNT));
 #else
         std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey());
 #endif
@@ -345,7 +343,7 @@ UniValue setgenerate(const UniValue& params, bool fHelp, const CPubKey& mypk)
             throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Wallet disabled and -mineraddress not set");
         }
 #else
-        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "komodod compiled without wallet and -mineraddress not set");
+        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "hushd compiled without wallet and -mineraddress not set");
 #endif
     }
     if (Params().MineBlocksOnDemand())
@@ -363,11 +361,11 @@ UniValue setgenerate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         //    fGenerate = false;
     }
 
-    KOMODO_MININGTHREADS = (int32_t)nGenProcLimit;
-	fprintf(stderr,"%s:KOMODO_MININGTHREADS=%d\n", __FUNCTION__, KOMODO_MININGTHREADS);
+    HUSH_MININGTHREADS = (int32_t)nGenProcLimit;
+	fprintf(stderr,"%s:HUSH_MININGTHREADS=%d\n", __FUNCTION__, HUSH_MININGTHREADS);
 
     mapArgs["-gen"]           = (fGenerate ? "1" : "0");
-    mapArgs ["-genproclimit"] = itostr(KOMODO_MININGTHREADS);
+    mapArgs ["-genproclimit"] = itostr(HUSH_MININGTHREADS);
 
 #ifdef ENABLE_WALLET
     GenerateBitcoins(fGenerate, pwalletMain, nGenProcLimit);
@@ -379,7 +377,7 @@ UniValue setgenerate(const UniValue& params, bool fHelp, const CPubKey& mypk)
 }
 #endif
 
-CBlockIndex *komodo_chainactive(int32_t height);
+CBlockIndex *hush_chainactive(int32_t height);
 arith_uint256 zawy_ctB(arith_uint256 bnTarget,uint32_t solvetime);
 
 UniValue genminingCSV(const UniValue& params, bool fHelp, const CPubKey& mypk)
@@ -392,10 +390,10 @@ UniValue genminingCSV(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( (fp= fopen(fname,"wb")) != 0 )
     {
         fprintf(fp,"height,nTime,nBits,bnTarget,bnTargetB,diff,solvetime\n");
-        height = komodo_nextheight();
+        height = hush_nextheight();
         for (i=0; i<height; i++)
         {
-            if ( (pindex= komodo_chainactive(i)) != 0 )
+            if ( (pindex= hush_chainactive(i)) != 0 )
             {
                 bnTarget.SetCompact(pindex->nBits,&fNegative,&fOverflow);
                 solvetime = (prevtime==0) ? 0 : (int32_t)(pindex->nTime - prevtime);
@@ -476,7 +474,7 @@ UniValue getmininginfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     obj.push_back(Pair("chain",            Params().NetworkIDString()));
 #ifdef ENABLE_MINING
     obj.push_back(Pair("generate",         GetBoolArg("-gen", false) && GetBoolArg("-genproclimit", -1) != 0 ));
-    obj.push_back(Pair("numthreads",       (int64_t)KOMODO_MININGTHREADS));
+    obj.push_back(Pair("numthreads",       (int64_t)HUSH_MININGTHREADS));
 #endif
     return obj;
 }
@@ -605,7 +603,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp, const CPubKey& myp
             throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Wallet disabled and -mineraddress not set");
         }
 #else
-        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "komodod compiled without wallet and -mineraddress not set");
+        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "hushd compiled without wallet and -mineraddress not set");
 #endif
     }
     
@@ -755,7 +753,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp, const CPubKey& myp
 #ifdef ENABLE_WALLET
         CReserveKey reservekey(pwalletMain);
         LEAVE_CRITICAL_SECTION(cs_main);
-        pblocktemplate = CreateNewBlockWithKey(reservekey,pindexPrevNew->GetHeight()+1,KOMODO_MAXGPUCOUNT,false);
+        pblocktemplate = CreateNewBlockWithKey(reservekey,pindexPrevNew->GetHeight()+1,HUSH_MAXGPUCOUNT,false);
 #else
         pblocktemplate = CreateNewBlockWithKey();
 #endif
@@ -1047,14 +1045,14 @@ UniValue getblocksubsidy(const UniValue& params, bool fHelp, const CPubKey& mypk
             {
                 CBlockIndex* pblockIndex = chainActive[nHeight];
                 CBlock block;
-                if ( komodo_blockload(block, pblockIndex) == 0 )
-                    nFoundersReward = komodo_commission(&block, nHeight);
+                if ( hush_blockload(block, pblockIndex) == 0 )
+                    nFoundersReward = the_commission(&block, nHeight);
             }
         }
         else if ( ASSETCHAINS_FOUNDERS != 0 )
         {
             // Assetchains founders chains have a fixed reward so can be calculated at any given height.
-            nFoundersReward = komodo_commission(0, nHeight);
+            nFoundersReward = the_commission(0, nHeight);
         }
         result.push_back(Pair("ac_pubkey", ValueFromAmount(nFoundersReward)));
     }

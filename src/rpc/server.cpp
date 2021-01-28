@@ -1,9 +1,8 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,9 +17,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "rpc/server.h"
-
 #include "init.h"
 #include "key_io.h"
 #include "random.h"
@@ -29,11 +26,8 @@
 #include "util.h"
 #include "utilstrencodings.h"
 #include "asyncrpcqueue.h"
-
 #include <memory>
-
 #include <univalue.h>
-
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
@@ -283,7 +277,7 @@ UniValue stop(const UniValue& params, bool fHelp, const CPubKey& mypk)
     StartShutdown();
 
     if ((strncmp(SMART_CHAIN_SYMBOL, "HUSH3", 5) == 0) ) {
-        sprintf(buf,"Hush server stopping...");
+        sprintf(buf,"Hush server stopping, for now...");
 	} else {
         sprintf(buf,"%s server stopping...",SMART_CHAIN_SYMBOL);
 	}
@@ -354,8 +348,8 @@ static const CRPCCommand vRPCCommands[] =
     { "crosschain",         "height_MoM",             &height_MoM,             true  },
     { "crosschain",         "assetchainproof",        &assetchainproof,        true  },
     { "crosschain",         "crosschainproof",        &crosschainproof,        true  },
-    { "crosschain",         "getNotarisationsForBlock", &getNotarisationsForBlock, true },
-    { "crosschain",         "scanNotarisationsDB",    &scanNotarisationsDB,    true },
+    { "crosschain",         "getNotarizationsForBlock", &getNotarizationsForBlock, true },
+    { "crosschain",         "scanNotarizationsDB",    &scanNotarizationsDB,    true },
     { "crosschain",         "getimports",             &getimports,             true },
     { "crosschain",         "getwalletburntransactions",  &getwalletburntransactions,             true },
     { "crosschain",         "migrate_converttoexport", &migrate_converttoexport, true  },
@@ -482,20 +476,6 @@ static const CRPCCommand vRPCCommands[] =
     { "oracles",       "oraclesdata",      &oraclesdata,        true },
     { "oracles",       "oraclessample",   &oraclessample,     true },
     { "oracles",       "oraclessamples",   &oraclessamples,     true },
-
-    // Prices
-    { "prices",       "prices",      &prices,      true },
-    { "prices",       "pricesaddress",      &pricesaddress,      true },
-    { "prices",       "priceslist",         &priceslist,         true },
-    { "prices",       "mypriceslist",         &mypriceslist,         true },
-    { "prices",       "pricesinfo",         &pricesinfo,         true },
-    { "prices",       "pricesbet",         &pricesbet,         true },
-    { "prices",       "pricessetcostbasis",         &pricessetcostbasis,         true },
-    { "prices",       "pricescashout",         &pricescashout,         true },
-    { "prices",       "pricesrekt",         &pricesrekt,         true },
-    { "prices",       "pricesaddfunding",         &pricesaddfunding,         true },
-    { "prices",       "pricesgetorderbook",         &pricesgetorderbook,         true },
-    { "prices",       "pricesrefillfund",         &pricesrefillfund,         true },
 
     // Pegs
     { "pegs",       "pegsaddress",   &pegsaddress,      true },
@@ -889,7 +869,7 @@ std::string HelpExampleRpc(const std::string& methodname, const std::string& arg
 
 string experimentalDisabledHelpMsg(const string& rpc, const string& enableArg)
 {
-    string daemon = SMART_CHAIN_SYMBOL[0] == 0 ? "komodod" : "hushd";
+    string daemon = "hushd";
     string ticker = SMART_CHAIN_SYMBOL[0] == 0 ? "komodo" : SMART_CHAIN_SYMBOL;
 
     return "\nWARNING: " + rpc + " is disabled.\n"

@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_SUPPORT_PAGELOCKER_H
-#define BITCOIN_SUPPORT_PAGELOCKER_H
+#ifndef HUSH_SUPPORT_PAGELOCKER_H
+#define HUSH_SUPPORT_PAGELOCKER_H
 
 #include "support/cleanse.h"
 
@@ -175,4 +175,4 @@ void UnlockObject(const T& t)
     LockedPageManager::Instance().UnlockRange((void*)(&t), sizeof(T));
 }
 
-#endif // BITCOIN_SUPPORT_PAGELOCKER_H
+#endif // HUSH_SUPPORT_PAGELOCKER_H

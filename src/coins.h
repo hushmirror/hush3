@@ -1,9 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,12 +17,8 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-#ifndef BITCOIN_COINS_H
-#define BITCOIN_COINS_H
-
-#define KOMODO_ENABLE_INTEREST //enabling this is a hardfork, activate with new RR method
-
+#ifndef HUSH_COINS_H
+#define HUSH_COINS_H
 #include "compressor.h"
 #include "core_memusage.h"
 #include "memusage.h"
@@ -31,12 +26,10 @@
 #include "uint256.h"
 #include "base58.h"
 #include "pubkey.h"
-
 #include <assert.h>
 #include <stdint.h>
 #include <vector>
 #include <unordered_map>
-
 #include <boost/foreach.hpp>
 #include <boost/unordered_map.hpp>
 #include "zcash/IncrementalMerkleTree.hpp"
@@ -245,6 +238,9 @@ public:
 
     //! check whether a particular output is still available
     bool IsAvailable(unsigned int nPos) const {
+        //fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li, vout[%d].IsNull()=%d", nPos, vout.size(), nPos, vout[nPos].IsNull() );
+        //fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li, vout[%d]=%d", nPos, vout.size(), nPos, vout[nPos] );
+        //fprintf(stderr,"IsAvailable(nPos=%d), vout.size()=%li", nPos, vout.size() );
         return (nPos < vout.size() && !vout[nPos].IsNull());
     }
 
@@ -573,9 +569,7 @@ private:
     CCoinsMap::iterator FetchCoins(const uint256 &txid);
     CCoinsMap::const_iterator FetchCoins(const uint256 &txid) const;
 
-    /**
-     * By making the copy constructor private, we prevent accidentally using it when one intends to create a cache on top of a base cache.
-     */
+    // By making the copy constructor private, we prevent accidentally using it when one intends to create a cache on top of a base cache.
     CCoinsViewCache(const CCoinsViewCache &);
 
     //! Generalized interface for popping anchors
@@ -604,4 +598,4 @@ private:
     );
 };
 
-#endif // BITCOIN_COINS_H
+#endif // HUSH_COINS_H

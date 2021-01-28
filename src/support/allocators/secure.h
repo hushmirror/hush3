@@ -1,19 +1,16 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2013 The Bitcoin Core developers
-// Distributed under the MIT software license, see the accompanying
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_SUPPORT_ALLOCATORS_SECURE_H
-#define BITCOIN_SUPPORT_ALLOCATORS_SECURE_H
+#ifndef HUSH_SUPPORT_ALLOCATORS_SECURE_H
+#define HUSH_SUPPORT_ALLOCATORS_SECURE_H
 
 #include "support/pagelocker.h"
-
 #include <string>
-
-//
 // Allocator that locks its contents from being paged
 // out of memory and clears its contents before deletion.
-//
 template <typename T>
 struct secure_allocator : public std::allocator<T> {
     // MSVC8 default copy constructor is broken
@@ -59,4 +56,4 @@ struct secure_allocator : public std::allocator<T> {
 // This is exactly like std::string, but with a custom allocator.
 typedef std::basic_string<char, std::char_traits<char>, secure_allocator<char> > SecureString;
 
-#endif // BITCOIN_SUPPORT_ALLOCATORS_SECURE_H
+#endif // HUSH_SUPPORT_ALLOCATORS_SECURE_H

@@ -1,9 +1,8 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,7 +17,6 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "amount.h"
 #include "consensus/upgrades.h"
 #include "core_io.h"
@@ -64,10 +62,10 @@ extern std::string ASSETCHAINS_OVERRIDE_PUBKEY;
 const std::string ADDR_TYPE_SAPLING = "sapling";
 const std::string ADDR_TYPE_AMNESIA = "amnesia";
 extern int32_t HUSH_INSYNC;
-uint32_t komodo_segid32(char *coinaddr);
+uint32_t hush_segid32(char *coinaddr);
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
-int32_t komodo_isnotaryvout(char *coinaddr,uint32_t tiptime); // from ac_private chains only
-CBlockIndex *komodo_getblockindex(uint256 hash);
+int32_t hush_isnotaryvout(char *coinaddr,uint32_t tiptime); // from ac_private chains only
+CBlockIndex *hush_getblockindex(uint256 hash);
 extern string randomSietchZaddr();
 extern CAmount fConsolidationTxFee;
 extern bool fZindex;
@@ -85,7 +83,7 @@ UniValue z_getoperationstatus_IMPL(const UniValue&, bool);
 
 #define PLAN_NAME_MAX   8
 #define VALID_PLAN_NAME(x)  (strlen(x) <= PLAN_NAME_MAX)
-#define THROW_IF_SYNCING(INSYNC)  if (INSYNC == 0) { throw runtime_error(strprintf("%s: Chain still syncing at height %d, aborting to prevent linkability analysis!",__FUNCTION__,chainActive.Tip()->GetHeight())); }
+#define THROW_IF_SYNCING(INSYNC)  if (INSYNC == 0) { throw runtime_error(strprintf("%s: Extreme Privacy! Chain still syncing at height %d, aborting to prevent linkability analysis",__FUNCTION__,chainActive.Tip()->GetHeight())); }
 
 int tx_height( const uint256 &hash );
 
@@ -132,21 +130,18 @@ void Unlock2NSPV(const CPubKey &pk)
     }
 }
 
-uint64_t komodo_accrued_interest(int32_t *txheightp,uint32_t *locktimep,uint256 hash,int32_t n,int32_t checkheight,uint64_t checkvalue,int32_t tipheight);
-
 void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
 {
-    //int32_t i,n,txheight; uint32_t locktime; uint64_t interest = 0;
     int confirms = wtx.GetDepthInMainChain();
     entry.push_back(Pair("rawconfirmations", confirms));
     if (wtx.IsCoinBase())
         entry.push_back(Pair("generated", true));
     if (confirms > 0)
     {
-        entry.push_back(Pair("confirmations", hush_dpowconfs((int32_t)komodo_blockheight(wtx.hashBlock),confirms)));
+        entry.push_back(Pair("confirmations", hush_dpowconfs((int32_t)hush_blockheight(wtx.hashBlock),confirms)));
         entry.push_back(Pair("blockhash", wtx.hashBlock.GetHex()));
         entry.push_back(Pair("blockindex", wtx.nIndex));
-        entry.push_back(Pair("blocktime", (uint64_t)komodo_blocktime(wtx.hashBlock)));
+        entry.push_back(Pair("blocktime", (uint64_t)hush_blocktime(wtx.hashBlock)));
         entry.push_back(Pair("expiryheight", (int64_t)wtx.nExpiryHeight));
     } else entry.push_back(Pair("confirmations", confirms));
     uint256 hash = wtx.GetHash();
@@ -170,32 +165,32 @@ string AccountFromValue(const UniValue& value)
     return strAccount;
 }
 
-char *komodo_chainname()
+char *hush_chainname()
 {
-     return(SMART_CHAIN_SYMBOL[0] == 0 ? (char *)"KMD" : SMART_CHAIN_SYMBOL);
+     return(SMART_CHAIN_SYMBOL);
 }
 
 void OS_randombytes(unsigned char *x,long xlen);
 
 UniValue getnewaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    if ( KOMODO_NSPV_FULLNODE && !EnsureWalletIsAvailable(fHelp) )
+    if ( HUSH_NSPV_FULLNODE && !EnsureWalletIsAvailable(fHelp) )
         return NullUniValue;
 
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getnewaddress ( \"account\" )\n"
-            "\nReturns a new " + strprintf("%s",komodo_chainname()) + " address for receiving payments.\n"
+            "\nReturns a new " + strprintf("%s",hush_chainname()) + " address for receiving payments.\n"
             "\nArguments:\n"
             "1. \"account\"        (string, optional) DEPRECATED. If provided, it MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
             "\nResult:\n"
-            "\"" + strprintf("%s",komodo_chainname()) + "_address\"    (string) The new " + strprintf("%s",komodo_chainname()) + " address\n"
+            "\"" + strprintf("%s",hush_chainname()) + "_address\"    (string) The new " + strprintf("%s",hush_chainname()) + " address\n"
             "\nExamples:\n"
             + HelpExampleCli("getnewaddress", "")
             + HelpExampleRpc("getnewaddress", "")
         );
 
-    if ( KOMODO_NSPV_SUPERLITE )
+    if ( HUSH_NSPV_SUPERLITE )
     {
         UniValue result(UniValue::VOBJ); uint8_t priv32[32];
 #ifndef __WIN32
@@ -279,11 +274,11 @@ UniValue getaccountaddress(const UniValue& params, bool fHelp, const CPubKey& my
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaccountaddress \"account\"\n"
-            "\nDEPRECATED. Returns the current " + strprintf("%s",komodo_chainname()) + " address for receiving payments to this account.\n"
+            "\nDEPRECATED. Returns the current " + strprintf("%s",hush_chainname()) + " address for receiving payments to this account.\n"
             "\nArguments:\n"
             "1. \"account\"       (string, required) MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
             "\nResult:\n"
-            "\"" + strprintf("%s",komodo_chainname()) + "_address\"   (string) The account " + strprintf("%s",komodo_chainname()) + " address\n"
+            "\"" + strprintf("%s",hush_chainname()) + "_address\"   (string) The account " + strprintf("%s",hush_chainname()) + " address\n"
             "\nExamples:\n"
             + HelpExampleCli("getaccountaddress", "")
             + HelpExampleCli("getaccountaddress", "\"\"")
@@ -311,7 +306,7 @@ UniValue getrawchangeaddress(const UniValue& params, bool fHelp, const CPubKey& 
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getrawchangeaddress\n"
-            "\nReturns a new " + strprintf("%s",komodo_chainname()) + " address, for receiving change.\n"
+            "\nReturns a new " + strprintf("%s",hush_chainname()) + " address, for receiving change.\n"
             "This is for use with raw transactions, NOT normal use.\n"
             "\nResult:\n"
             "\"address\"    (string) The address\n"
@@ -345,10 +340,10 @@ UniValue setaccount(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
-            "setaccount \"" + strprintf("%s",komodo_chainname()) + "_address\" \"account\"\n"
+            "setaccount \"" + strprintf("%s",hush_chainname()) + "_address\" \"account\"\n"
             "\nDEPRECATED. Sets the account associated with the given address.\n"
             "\nArguments:\n"
-            "1. \"" + strprintf("%s",komodo_chainname()) + "_address\"  (string, required) The " + strprintf("%s",komodo_chainname()) + " address to be associated with an account.\n"
+            "1. \"" + strprintf("%s",hush_chainname()) + "_address\"  (string, required) The " + strprintf("%s",hush_chainname()) + " address to be associated with an account.\n"
             "2. \"account\"         (string, required) MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
             "\nExamples:\n"
             + HelpExampleCli("setaccount", "\"RD6GgnrMpPaTSMn8vai6yiGA7mN4QGPV\" \"tabby\"")
@@ -391,10 +386,10 @@ UniValue getaccount(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "getaccount \"" + strprintf("%s",komodo_chainname()) + "_address\"\n"
+            "getaccount \"" + strprintf("%s",hush_chainname()) + "_address\"\n"
             "\nDEPRECATED. Returns the account associated with the given address.\n"
             "\nArguments:\n"
-            "1. \"" + strprintf("%s",komodo_chainname()) + "_address\"  (string, required) The " + strprintf("%s",komodo_chainname()) + " address for account lookup.\n"
+            "1. \"" + strprintf("%s",hush_chainname()) + "_address\"  (string, required) The " + strprintf("%s",hush_chainname()) + " address for account lookup.\n"
             "\nResult:\n"
             "\"accountname\"        (string) the account address\n"
             "\nExamples:\n"
@@ -431,7 +426,7 @@ UniValue getaddressesbyaccount(const UniValue& params, bool fHelp, const CPubKey
             "1. \"account\"  (string, required) MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
             "\nResult:\n"
             "[                     (json array of string)\n"
-            "  \"" + strprintf("%s",komodo_chainname()) + "_address\"  (string) a " + strprintf("%s",komodo_chainname()) + " address associated with the given account\n"
+            "  \"" + strprintf("%s",hush_chainname()) + "_address\"  (string) a " + strprintf("%s",hush_chainname()) + " address associated with the given account\n"
             "  ,...\n"
             "]\n"
             "\nExamples:\n"
@@ -507,19 +502,19 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     if (fHelp || params.size() < 2 || params.size() > 5)
         throw runtime_error(
-            "sendtoaddress \"" + strprintf("%s",komodo_chainname()) + "_address\" amount ( \"comment\" \"comment-to\" subtractfeefromamount )\n"
+            "sendtoaddress \"" + strprintf("%s",hush_chainname()) + "_address\" amount ( \"comment\" \"comment-to\" subtractfeefromamount )\n"
             "\nSend an amount to a given address. The amount is a real and is rounded to the nearest 0.00000001\n"
             + HelpRequiringPassphrase() +
             "\nArguments:\n"
-            "1. \"" + strprintf("%s",komodo_chainname()) + "_address\"  (string, required) The " + strprintf("%s",komodo_chainname()) + " address to send to.\n"
-            "2. \"amount\"      (numeric, required) The amount in " + strprintf("%s",komodo_chainname()) + " to send. eg 0.1\n"
+            "1. \"" + strprintf("%s",hush_chainname()) + "_address\"  (string, required) The " + strprintf("%s",hush_chainname()) + " address to send to.\n"
+            "2. \"amount\"      (numeric, required) The amount in " + strprintf("%s",hush_chainname()) + " to send. eg 0.1\n"
             "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
             "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
             "                             to which you're sending the transaction. This is not part of the \n"
             "                             transaction, just kept in your wallet.\n"
             "5. subtractfeefromamount  (boolean, optional, default=false) The fee will be deducted from the amount being sent.\n"
-            "                             The recipient will receive less " + strprintf("%s",komodo_chainname()) + " than you enter in the amount field.\n"
+            "                             The recipient will receive less " + strprintf("%s",hush_chainname()) + " than you enter in the amount field.\n"
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
             "\nExamples:\n"
@@ -531,9 +526,9 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     if ( ASSETCHAINS_PRIVATE != 0 && AmountFromValue(params[1]) > 0 )
     {
-        if ( komodo_isnotaryvout((char *)params[0].get_str().c_str(),chainActive.LastTip()->nTime) == 0 )
+        if ( hush_isnotaryvout((char *)params[0].get_str().c_str(),chainActive.LastTip()->nTime) == 0 )
         {
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid " + strprintf("%s",komodo_chainname()) + " address");
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid " + strprintf("%s",hush_chainname()) + " address");
         }
     }
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -568,20 +563,18 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
 #include "hush_defs.h"
 
-#define KOMODO_KVPROTECTED 1
-#define KOMODO_KVBINARY 2
-#define KOMODO_KVDURATION 1440
-#define IGUANA_MAXSCRIPTSIZE 10001
+#define HUSH_KVPROTECTED 1
+#define HUSH_KVBINARY 2
+#define HUSH_KVDURATION 1440
+#define DRAGON_MAXSCRIPTSIZE 10001
 uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pubkey37[37],char *coinaddr,int32_t height,char *base,int64_t fiatoshis);
 int32_t komodo_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen);
-#define CRYPTO777_KMDADDR "RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA"
-extern int32_t KOMODO_PAX;
-extern uint64_t KOMODO_INTERESTSUM,KOMODO_WALLETBALANCE;
+extern int32_t HUSH_PAX;
 int32_t komodo_is_issuer();
 int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
 int32_t komodo_isrealtime(int32_t *kmdheightp);
 int32_t pax_fiatstatus(uint64_t *available,uint64_t *deposited,uint64_t *issued,uint64_t *withdrawn,uint64_t *approved,uint64_t *redeemed,char *base);
-int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[IGUANA_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
+int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
 int32_t komodo_kvcmp(uint8_t *refvalue,uint16_t refvaluesize,uint8_t *value,uint16_t valuesize);
 uint64_t komodo_kvfee(uint32_t flags,int32_t opretlen,int32_t keylen);
 uint256 komodo_kvsig(uint8_t *buf,int32_t len,uint256 privkey);
@@ -593,7 +586,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     static uint256 zeroes;
     CWalletTx wtx; UniValue ret(UniValue::VOBJ);
-    uint8_t keyvalue[IGUANA_MAXSCRIPTSIZE*8],opretbuf[IGUANA_MAXSCRIPTSIZE*8]; int32_t i,coresize,haveprivkey,duration,opretlen,height; uint16_t keylen=0,valuesize=0,refvaluesize=0; uint8_t *key,*value=0; uint32_t flags,tmpflags,n; struct komodo_kv *ptr; uint64_t fee; uint256 privkey,pubkey,refpubkey,sig;
+    uint8_t keyvalue[DRAGON_MAXSCRIPTSIZE*8],opretbuf[DRAGON_MAXSCRIPTSIZE*8]; int32_t i,coresize,haveprivkey,duration,opretlen,height; uint16_t keylen=0,valuesize=0,refvaluesize=0; uint8_t *key,*value=0; uint32_t flags,tmpflags,n; struct komodo_kv *ptr; uint64_t fee; uint256 privkey,pubkey,refpubkey,sig;
     if (fHelp || params.size() < 3 )
         throw runtime_error(
             "kvupdate key \"value\" days passphrase\n"
@@ -657,7 +650,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         memcpy(keyvalue,key,keylen);
         if ( (refvaluesize= komodo_kvsearch(&refpubkey,chainActive.LastTip()->GetHeight(),&tmpflags,&height,&keyvalue[keylen],key,keylen)) >= 0 )
         {
-            if ( (tmpflags & KOMODO_KVPROTECTED) != 0 )
+            if ( (tmpflags & HUSH_KVPROTECTED) != 0 )
             {
                 if ( memcmp(&refpubkey,&pubkey,sizeof(refpubkey)) != 0 )
                 {
@@ -684,7 +677,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         if ( memcmp(&zeroes,&refpubkey,sizeof(refpubkey)) != 0 )
             ret.push_back(Pair("owner",refpubkey.GetHex()));
         ret.push_back(Pair("height", (int64_t)height));
-        duration = komodo_kvduration(flags); //((flags >> 2) + 1) * KOMODO_KVDURATION;
+        duration = komodo_kvduration(flags); //((flags >> 2) + 1) * HUSH_KVDURATION;
         ret.push_back(Pair("expiration", (int64_t)(height+duration)));
         ret.push_back(Pair("flags",(int64_t)flags));
         ret.push_back(Pair("key",params[0].get_str()));
@@ -722,9 +715,9 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         EnsureWalletIsUnlocked();
         fee = komodo_kvfee(flags,opretlen,keylen);
         ret.push_back(Pair("fee",(double)fee/COIN));
-        CBitcoinAddress destaddress(CRYPTO777_KMDADDR);
+        CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
         if (!destaddress.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid destination address!");
         SendMoney(destaddress.Get(),10000,false,wtx,opretbuf,opretlen,fee);
         ret.push_back(Pair("txid",wtx.GetHash().GetHex()));
     } else ret.push_back(Pair("error",(char *)"null key"));
@@ -735,12 +728,12 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     uint64_t available,deposited,issued,withdrawn,approved,redeemed,seed,komodoshis = 0; int32_t height; char destaddr[64]; uint8_t i,pubkey37[33];
     bool fSubtractFeeFromAmount = false;
-    if ( KOMODO_PAX == 0 )
+    if ( HUSH_PAX == 0 )
     {
         throw runtime_error("paxdeposit disabled without -pax");
     }
     if ( komodo_is_issuer() != 0 )
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "paxdeposit only from KMD");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "paxdeposit only from KYC");
     if (!EnsureWalletIsAvailable(fHelp))
         throw runtime_error("paxdeposit needs wallet"); //return Value::null;
     if (fHelp || params.size() != 3)
@@ -760,7 +753,7 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
     }
     komodoshis = PAX_fiatdest(&seed,0,destaddr,pubkey37,(char *)params[0].get_str().c_str(),height,(char *)base.c_str(),fiatoshis);
     dest.append(destaddr);
-    CBitcoinAddress destaddress(CRYPTO777_KMDADDR);
+    CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
     if (!destaddress.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
     for (i=0; i<33; i++)
@@ -796,7 +789,7 @@ UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
     int64_t fiatoshis = atof(params[1].get_str().c_str()) * COIN;
     komodoshis = PAX_fiatdest(&seed,1,destaddr,pubkey37,(char *)params[0].get_str().c_str(),kmdheight,SMART_CHAIN_SYMBOL,fiatoshis);
     dest.append(destaddr);
-    CBitcoinAddress destaddress(CRYPTO777_KMDADDR);
+    CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
     if (!destaddress.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
     for (i=0; i<33; i++)
@@ -827,8 +820,8 @@ UniValue listaddressgroupings(const UniValue& params, bool fHelp, const CPubKey&
             "[\n"
             "  [\n"
             "    [\n"
-            "      \"" + strprintf("%s",komodo_chainname()) + " address\",     (string) The " + strprintf("%s",komodo_chainname()) + " address\n"
-            "      amount,                 (numeric) The amount in " + strprintf("%s",komodo_chainname()) + "\n"
+            "      \"" + strprintf("%s",hush_chainname()) + " address\",     (string) The " + strprintf("%s",hush_chainname()) + " address\n"
+            "      amount,                 (numeric) The amount in " + strprintf("%s",hush_chainname()) + "\n"
             "      \"account\"             (string, optional) The account (DEPRECATED)\n"
             "    ]\n"
             "    ,...\n"
@@ -929,13 +922,13 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp, const CPubKey&
 
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
-            "getreceivedbyaddress \"" + strprintf("%s",komodo_chainname()) + "_address\" ( minconf )\n"
-            "\nReturns the total amount received by the given " + strprintf("%s",komodo_chainname()) + " address in transactions with at least minconf confirmations.\n"
+            "getreceivedbyaddress \"" + strprintf("%s",hush_chainname()) + "_address\" ( minconf )\n"
+            "\nReturns the total amount received by the given " + strprintf("%s",hush_chainname()) + " address in transactions with at least minconf confirmations.\n"
             "\nArguments:\n"
-            "1. \"" + strprintf("%s",komodo_chainname()) + "_address\"  (string, required) The " + strprintf("%s",komodo_chainname()) + " address for transactions.\n"
+            "1. \"" + strprintf("%s",hush_chainname()) + "_address\"  (string, required) The " + strprintf("%s",hush_chainname()) + " address for transactions.\n"
             "2. minconf             (numeric, optional, default=1) Only include transactions confirmed at least this many times.\n"
             "\nResult:\n"
-            "amount   (numeric) The total amount in " + strprintf("%s",komodo_chainname()) + " received at this address.\n"
+            "amount   (numeric) The total amount in " + strprintf("%s",hush_chainname()) + " received at this address.\n"
             "\nExamples:\n"
             "\nThe amount from transactions with at least 1 confirmation\n"
             + HelpExampleCli("getreceivedbyaddress", "\"RD6GgnrMpPaTSMn8vai6yiGA7mN4QGPV\"") +
@@ -979,11 +972,11 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp, const CPubKey&
                     int nHeight    = tx_height(wtx.GetHash());
                     int dpowconfs  = hush_dpowconfs(nHeight, nDepth);
                     if (dpowconfs >= nMinDepth) {
-                        nAmount   += txout.nValue; // komodo_interest?
+                        nAmount   += txout.nValue;
                     }
                 } else {
                     if (nDepth  >= nMinDepth) {
-                        nAmount += txout.nValue; // komodo_interest?
+                        nAmount += txout.nValue;
                     }
                 }
             }
@@ -1006,7 +999,7 @@ UniValue getreceivedbyaccount(const UniValue& params, bool fHelp, const CPubKey&
             "1. \"account\"      (string, required) MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
             "2. minconf          (numeric, optional, default=1) Only include transactions confirmed at least this many times.\n"
             "\nResult:\n"
-            "amount              (numeric) The total amount in " + strprintf("%s",komodo_chainname()) + " received for this account.\n"
+            "amount              (numeric) The total amount in " + strprintf("%s",hush_chainname()) + " received for this account.\n"
             "\nExamples:\n"
             "\nAmount received by the default account with at least 1 confirmation\n"
             + HelpExampleCli("getreceivedbyaccount", "\"\"") +
@@ -1042,7 +1035,7 @@ UniValue getreceivedbyaccount(const UniValue& params, bool fHelp, const CPubKey&
             CTxDestination address;
             if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*pwalletMain, address) && setAddress.count(address))
                 if (wtx.GetDepthInMainChain() >= nMinDepth)
-                    nAmount += txout.nValue; // komodo_interest?
+                    nAmount += txout.nValue;
         }
     }
 
@@ -1105,7 +1098,7 @@ UniValue cleanwallettransactions(const UniValue& params, bool fHelp, const CPubK
             "1. \"txid\"    (string, optional) The transaction id to keep.\n"
             "\nResult:\n"
             "{\n"
-            "  \"total_transactions\" : n,         (numeric) Transactions in wallet of " + strprintf("%s",komodo_chainname()) + "\n"
+            "  \"total_transactions\" : n,         (numeric) Transactions in wallet of " + strprintf("%s",hush_chainname()) + "\n"
             "  \"remaining_transactions\" : n,     (numeric) Transactions in wallet after clean.\n"
             "  \"removed_transactions\" : n,       (numeric) The number of transactions removed.\n"
             "}\n"
@@ -1208,7 +1201,7 @@ UniValue getbalance(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "2. minconf          (numeric, optional, default=1) Only include transactions confirmed at least this many times.\n"
             "3. includeWatchonly (bool, optional, default=false) Also include balance in watchonly addresses (see 'importaddress')\n"
             "\nResult:\n"
-            "amount              (numeric) The total amount in " + strprintf("%s",komodo_chainname()) + " received for this account.\n"
+            "amount              (numeric) The total amount in " + strprintf("%s",hush_chainname()) + " received for this account.\n"
             "\nExamples:\n"
             "\nThe total amount in the wallet\n"
             + HelpExampleCli("getbalance", "") +
@@ -1304,15 +1297,15 @@ UniValue movecmd(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nArguments:\n"
             "1. \"fromaccount\"   (string, required) MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
             "2. \"toaccount\"     (string, required) MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
-            "3. amount            (numeric) Quantity of " + strprintf("%s",komodo_chainname()) + " to move between accounts.\n"
+            "3. amount            (numeric) Quantity of " + strprintf("%s",hush_chainname()) + " to move between accounts.\n"
             "4. minconf           (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
             "5. \"comment\"       (string, optional) An optional comment, stored in the wallet only.\n"
             "\nResult:\n"
             "true|false           (boolean) true if successful.\n"
             "\nExamples:\n"
-            "\nMove 0.01 " + strprintf("%s",komodo_chainname()) + " from the default account to the account named tabby\n"
+            "\nMove 0.01 " + strprintf("%s",hush_chainname()) + " from the default account to the account named tabby\n"
             + HelpExampleCli("move", "\"\" \"tabby\" 0.01") +
-            "\nMove 0.01 " + strprintf("%s",komodo_chainname()) + " timotei to akiko with a comment and funds have 6 confirmations\n"
+            "\nMove 0.01 " + strprintf("%s",hush_chainname()) + " timotei to akiko with a comment and funds have 6 confirmations\n"
             + HelpExampleCli("move", "\"timotei\" \"akiko\" 0.01 6 \"happy birthday!\"") +
             "\nAs a json rpc call\n"
             + HelpExampleRpc("move", "\"timotei\", \"akiko\", 0.01, 6, \"happy birthday!\"")
@@ -1374,14 +1367,14 @@ UniValue sendfrom(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     if (fHelp || params.size() < 3 || params.size() > 6)
         throw runtime_error(
-            "sendfrom \"fromaccount\" \"to" + strprintf("%s",komodo_chainname()) + "address\" amount ( minconf \"comment\" \"comment-to\" )\n"
-            "\nDEPRECATED (use sendtoaddress). Sent an amount from an account to a " + strprintf("%s",komodo_chainname()) + " address.\n"
+            "sendfrom \"fromaccount\" \"to" + strprintf("%s",hush_chainname()) + "address\" amount ( minconf \"comment\" \"comment-to\" )\n"
+            "\nDEPRECATED (use sendtoaddress). Sent an amount from an account to a " + strprintf("%s",hush_chainname()) + " address.\n"
             "The amount is a real and is rounded to the nearest 0.00000001."
             + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. \"fromaccount\"       (string, required) MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
-            "2. \"to" + strprintf("%s",komodo_chainname()) + "address\"  (string, required) The " + strprintf("%s",komodo_chainname()) + " address to send funds to.\n"
-            "3. amount                (numeric, required) The amount in " + strprintf("%s",komodo_chainname()) + " (transaction fee is added on top).\n"
+            "2. \"to" + strprintf("%s",hush_chainname()) + "address\"  (string, required) The " + strprintf("%s",hush_chainname()) + " address to send funds to.\n"
+            "3. amount                (numeric, required) The amount in " + strprintf("%s",hush_chainname()) + " (transaction fee is added on top).\n"
             "4. minconf               (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
             "5. \"comment\"           (string, optional) A comment used to store what the transaction is for. \n"
             "                                     This is not part of the transaction, just kept in your wallet.\n"
@@ -1391,7 +1384,7 @@ UniValue sendfrom(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nResult:\n"
             "\"transactionid\"        (string) The transaction id.\n"
             "\nExamples:\n"
-            "\nSend 0.01 " + strprintf("%s",komodo_chainname()) + " from the default account to the address, must have at least 1 confirmation\n"
+            "\nSend 0.01 " + strprintf("%s",hush_chainname()) + " from the default account to the address, must have at least 1 confirmation\n"
             + HelpExampleCli("sendfrom", "\"\" \"RD6GgnrMpPaTSMn8vai6yiGA7mN4QGPV\" 0.01") +
             "\nSend 0.01 from the tabby account to the given address, funds must have at least 6 confirmations\n"
             + HelpExampleCli("sendfrom", "\"tabby\" \"RD6GgnrMpPaTSMn8vai6yiGA7mN4QGPV\" 0.01 6 \"donation\" \"seans outpost\"") +
@@ -1449,14 +1442,14 @@ UniValue sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "1. \"fromaccount\"         (string, required) MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
             "2. \"amounts\"             (string, required) A json object with addresses and amounts\n"
             "    {\n"
-            "      \"address\":amount   (numeric) The " + strprintf("%s",komodo_chainname()) + " address is the key, the numeric amount in " + strprintf("%s",komodo_chainname()) + " is the value\n"
+            "      \"address\":amount   (numeric) The " + strprintf("%s",hush_chainname()) + " address is the key, the numeric amount in " + strprintf("%s",hush_chainname()) + " is the value\n"
             "      ,...\n"
             "    }\n"
             "3. minconf                 (numeric, optional, default=1) Only use the balance confirmed at least this many times.\n"
             "4. \"comment\"             (string, optional) A comment\n"
             "5. subtractfeefromamount   (string, optional) A json array with addresses.\n"
             "                           The fee will be equally deducted from the amount of each selected address.\n"
-            "                           Those recipients will receive less " + strprintf("%s",komodo_chainname()) + " than you enter in their corresponding amount field.\n"
+            "                           Those recipients will receive less " + strprintf("%s",hush_chainname()) + " than you enter in their corresponding amount field.\n"
             "                           If no addresses are specified here, the sender pays the fee.\n"
             "    [\n"
             "      \"address\"            (string) Subtract fee from this address\n"
@@ -1560,20 +1553,20 @@ UniValue addmultisigaddress(const UniValue& params, bool fHelp, const CPubKey& m
     {
         string msg = "addmultisigaddress nrequired [\"key\",...] ( \"account\" )\n"
             "\nAdd a nrequired-to-sign multisignature address to the wallet.\n"
-            "Each key is a " + strprintf("%s",komodo_chainname()) + " address or hex-encoded public key.\n"
+            "Each key is a " + strprintf("%s",hush_chainname()) + " address or hex-encoded public key.\n"
             "If 'account' is specified (DEPRECATED), assign address to that account.\n"
 
             "\nArguments:\n"
             "1. nrequired        (numeric, required) The number of required signatures out of the n keys or addresses.\n"
-            "2. \"keysobject\"   (string, required) A json array of " + strprintf("%s",komodo_chainname()) + " addresses or hex-encoded public keys\n"
+            "2. \"keysobject\"   (string, required) A json array of " + strprintf("%s",hush_chainname()) + " addresses or hex-encoded public keys\n"
             "     [\n"
-            "       \"address\"  (string) " + strprintf("%s",komodo_chainname()) + " address or hex-encoded public key\n"
+            "       \"address\"  (string) " + strprintf("%s",hush_chainname()) + " address or hex-encoded public key\n"
             "       ...,\n"
             "     ]\n"
             "3. \"account\"      (string, optional) DEPRECATED. If provided, MUST be set to the empty string \"\" to represent the default account. Passing any other string will result in an error.\n"
 
             "\nResult:\n"
-            "\"" + strprintf("%s",komodo_chainname()) + "_address\"  (string) A " + strprintf("%s",komodo_chainname()) + " address associated with the keys.\n"
+            "\"" + strprintf("%s",hush_chainname()) + "_address\"  (string) A " + strprintf("%s",hush_chainname()) + " address associated with the keys.\n"
 
             "\nExamples:\n"
             "\nAdd a multisig address from 2 addresses\n"
@@ -1663,9 +1656,9 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
                 continue;
 
             tallyitem& item = mapTally[address];
-            item.nAmount += txout.nValue; // komodo_interest?
+            item.nAmount += txout.nValue;
             item.nConf = min(item.nConf, nDepth);
-            item.nHeight = komodo_blockheight(wtx.hashBlock);
+            item.nHeight = hush_blockheight(wtx.hashBlock);
             item.txids.push_back(wtx.GetHash());
             if (mine & ISMINE_WATCH_ONLY)
                 item.fIsWatchonly = true;
@@ -1766,7 +1759,7 @@ UniValue listreceivedbyaddress(const UniValue& params, bool fHelp, const CPubKey
             "    \"involvesWatchonly\" : true,        (bool) Only returned if imported addresses were involved in transaction\n"
             "    \"address\" : \"receivingaddress\",  (string) The receiving address\n"
             "    \"account\" : \"accountname\",       (string) DEPRECATED. The account of the receiving address. The default account is \"\".\n"
-            "    \"amount\" : x.xxx,                  (numeric) The total amount in " + strprintf("%s",komodo_chainname()) + " received by the address\n"
+            "    \"amount\" : x.xxx,                  (numeric) The total amount in " + strprintf("%s",hush_chainname()) + " received by the address\n"
             "    \"confirmations\" : n                (numeric) The number of confirmations of the most recent transaction included\n"
             "  }\n"
             "  ,...\n"
@@ -1945,17 +1938,17 @@ UniValue listtransactions(const UniValue& params, bool fHelp, const CPubKey& myp
             "  {\n"
             "    \"account\":\"accountname\",       (string) DEPRECATED. The account name associated with the transaction. \n"
             "                                                It will be \"\" for the default account.\n"
-            "    \"address\":\"" + strprintf("%s",komodo_chainname()) + "_address\",    (string) The " + strprintf("%s",komodo_chainname()) + " address of the transaction. Not present for \n"
+            "    \"address\":\"" + strprintf("%s",hush_chainname()) + "_address\",    (string) The " + strprintf("%s",hush_chainname()) + " address of the transaction. Not present for \n"
             "                                                move transactions (category = move).\n"
             "    \"category\":\"send|receive|move\", (string) The transaction category. 'move' is a local (off blockchain)\n"
             "                                                transaction between accounts, and not associated with an address,\n"
             "                                                transaction id or block. 'send' and 'receive' transactions are \n"
             "                                                associated with an address, transaction id and block details\n"
-            "    \"amount\": x.xxx,          (numeric) The amount in " + strprintf("%s",komodo_chainname()) + ". This is negative for the 'send' category, and for the\n"
+            "    \"amount\": x.xxx,          (numeric) The amount in " + strprintf("%s",hush_chainname()) + ". This is negative for the 'send' category, and for the\n"
             "                                         'move' category for moves outbound. It is positive for the 'receive' category,\n"
             "                                         and for the 'move' category for inbound funds.\n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"fee\": x.xxx,             (numeric) The amount of the fee in " + strprintf("%s",komodo_chainname()) + ". This is negative and only available for the \n"
+            "    \"fee\": x.xxx,             (numeric) The amount of the fee in " + strprintf("%s",hush_chainname()) + ". This is negative and only available for the \n"
             "                                         'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and \n"
             "                                         'receive' category of transactions.\n"
@@ -2148,12 +2141,12 @@ UniValue listsinceblock(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "{\n"
             "  \"transactions\": [\n"
             "    \"account\":\"accountname\",       (string) DEPRECATED. The account name associated with the transaction. Will be \"\" for the default account.\n"
-            "    \"address\":\"" + strprintf("%s",komodo_chainname()) + "_address\",    (string) The " + strprintf("%s",komodo_chainname()) + " address of the transaction. Not present for move transactions (category = move).\n"
+            "    \"address\":\"" + strprintf("%s",hush_chainname()) + "_address\",    (string) The " + strprintf("%s",hush_chainname()) + " address of the transaction. Not present for move transactions (category = move).\n"
             "    \"category\":\"send|receive\",     (string) The transaction category. 'send' has negative amounts, 'receive' has positive amounts.\n"
-            "    \"amount\": x.xxx,          (numeric) The amount in " + strprintf("%s",komodo_chainname()) + ". This is negative for the 'send' category, and for the 'move' category for moves \n"
+            "    \"amount\": x.xxx,          (numeric) The amount in " + strprintf("%s",hush_chainname()) + ". This is negative for the 'send' category, and for the 'move' category for moves \n"
             "                                          outbound. It is positive for the 'receive' category, and for the 'move' category for inbound funds.\n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"fee\": x.xxx,             (numeric) The amount of the fee in " + strprintf("%s",komodo_chainname()) + ". This is negative and only available for the 'send' category of transactions.\n"
+            "    \"fee\": x.xxx,             (numeric) The amount of the fee in " + strprintf("%s",hush_chainname()) + ". This is negative and only available for the 'send' category of transactions.\n"
             "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blockhash\": \"hashvalue\",     (string) The block hash containing the transaction. Available for 'send' and 'receive' category of transactions.\n"
             "    \"blockindex\": n,          (numeric) The block index containing the transaction. Available for 'send' and 'receive' category of transactions.\n"
@@ -2236,7 +2229,7 @@ UniValue gettransaction(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "2. \"includeWatchonly\"    (bool, optional, default=false) Whether to include watchonly addresses in balance calculation and details[]\n"
             "\nResult:\n"
             "{\n"
-            "  \"amount\" : x.xxx,        (numeric) The transaction amount in " + strprintf("%s",komodo_chainname()) + "\n"
+            "  \"amount\" : x.xxx,        (numeric) The transaction amount in " + strprintf("%s",hush_chainname()) + "\n"
             "  \"confirmations\" : n,     (numeric) The number of confirmations\n"
             "  \"blockhash\" : \"hash\",  (string) The block hash\n"
             "  \"blockindex\" : xx,       (numeric) The block index\n"
@@ -2247,9 +2240,9 @@ UniValue gettransaction(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "  \"details\" : [\n"
             "    {\n"
             "      \"account\" : \"accountname\",  (string) DEPRECATED. The account name involved in the transaction, can be \"\" for the default account.\n"
-            "      \"address\" : \"" + strprintf("%s",komodo_chainname()) + "_address\",   (string) The " + strprintf("%s",komodo_chainname()) + " address involved in the transaction\n"
+            "      \"address\" : \"" + strprintf("%s",hush_chainname()) + "_address\",   (string) The " + strprintf("%s",hush_chainname()) + " address involved in the transaction\n"
             "      \"category\" : \"send|receive\",    (string) The category, either 'send' or 'receive'\n"
-            "      \"amount\" : x.xxx                  (numeric) The amount in " + strprintf("%s",komodo_chainname()) + "\n"
+            "      \"amount\" : x.xxx                  (numeric) The amount in " + strprintf("%s",hush_chainname()) + "\n"
             "      \"vout\" : n,                       (numeric) the vout value\n"
             "    }\n"
             "    ,...\n"
@@ -2407,7 +2400,7 @@ UniValue walletpassphrase(const UniValue& params, bool fHelp, const CPubKey& myp
         throw runtime_error(
             "walletpassphrase \"passphrase\" timeout\n"
             "\nStores the wallet decryption key in memory for 'timeout' seconds.\n"
-            "This is needed prior to performing transactions related to private keys such as sending " + strprintf("%s",komodo_chainname()) + "\n"
+            "This is needed prior to performing transactions related to private keys such as sending " + strprintf("%s",hush_chainname()) + "\n"
             "\nArguments:\n"
             "1. \"passphrase\"     (string, required) The wallet passphrase\n"
             "2. timeout            (numeric, required) The time to keep the decryption key in seconds.\n"
@@ -2544,7 +2537,7 @@ UniValue walletlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return NullUniValue;
 }
 
-int32_t komodo_acpublic(uint32_t tiptime);
+int32_t hush_scpublic(uint32_t tiptime);
 
 UniValue encryptwallet(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
@@ -2552,7 +2545,7 @@ UniValue encryptwallet(const UniValue& params, bool fHelp, const CPubKey& mypk)
         return NullUniValue;
 
     string enableArg = "developerencryptwallet";
-    int32_t flag = (komodo_acpublic(0) || SMART_CHAIN_SYMBOL[0] == 0);
+    int32_t flag = (hush_scpublic(0) || SMART_CHAIN_SYMBOL[0] == 0);
     auto fEnableWalletEncryption = fExperimentalMode && GetBoolArg("-" + enableArg, flag);
 
     std::string strWalletEncryptionDisabledMsg = "";
@@ -2575,10 +2568,10 @@ UniValue encryptwallet(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nExamples:\n"
             "\nEncrypt you wallet\n"
             + HelpExampleCli("encryptwallet", "\"my pass phrase\"") +
-            "\nNow set the passphrase to use the wallet, such as for signing or sending " + strprintf("%s",komodo_chainname()) + "\n"
+            "\nNow set the passphrase to use the wallet, such as for signing or sending " + strprintf("%s",hush_chainname()) + "\n"
             + HelpExampleCli("walletpassphrase", "\"my pass phrase\"") +
             "\nNow we can so something like sign\n"
-            + HelpExampleCli("signmessage", "\"" + strprintf("%s",komodo_chainname()) + "_address\" \"test message\"") +
+            + HelpExampleCli("signmessage", "\"" + strprintf("%s",hush_chainname()) + "_address\" \"test message\"") +
             "\nNow lock the wallet again by removing the passphrase\n"
             + HelpExampleCli("walletlock", "") +
             "\nAs a json rpc call\n"
@@ -2626,7 +2619,7 @@ UniValue lockunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "lockunspent unlock [{\"txid\":\"txid\",\"vout\":n},...]\n"
             "\nUpdates list of temporarily unspendable outputs.\n"
             "Temporarily lock (unlock=false) or unlock (unlock=true) specified transaction outputs.\n"
-            "A locked transaction output will not be chosen by automatic coin selection, when spending " + strprintf("%s",komodo_chainname()) + ".\n"
+            "A locked transaction output will not be chosen by automatic coin selection, when spending " + strprintf("%s",hush_chainname()) + ".\n"
             "Locks are stored in memory only. Nodes start with zero locked outputs, and the locked output list\n"
             "is always cleared (by virtue of process exit) when a node stops or fails.\n"
             "Also see the listunspent call\n"
@@ -2759,7 +2752,7 @@ UniValue settxfee(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "settxfee amount\n"
             "\nSet the transaction fee per kB.\n"
             "\nArguments:\n"
-            "1. amount         (numeric, required) The transaction fee in " + strprintf("%s",komodo_chainname()) + "/kB rounded to the nearest 0.00000001\n"
+            "1. amount         (numeric, required) The transaction fee in " + strprintf("%s",hush_chainname()) + "/kB rounded to the nearest 0.00000001\n"
             "\nResult\n"
             "true|false        (boolean) Returns true if successful\n"
             "\nExamples:\n"
@@ -2788,9 +2781,9 @@ UniValue getwalletinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nResult:\n"
             "{\n"
             "  \"walletversion\": xxxxx,     (numeric) the wallet version\n"
-            "  \"balance\": xxxxxxx,         (numeric) the total confirmed balance of the wallet in " + strprintf("%s",komodo_chainname()) + "\n"
-            "  \"unconfirmed_balance\": xxx, (numeric) the total unconfirmed balance of the wallet in " + strprintf("%s",komodo_chainname()) + "\n"
-            "  \"immature_balance\": xxxxxx, (numeric) the total immature balance of the wallet in " + strprintf("%s",komodo_chainname()) + "\n"
+            "  \"balance\": xxxxxxx,         (numeric) the total confirmed balance of the wallet in " + strprintf("%s",hush_chainname()) + "\n"
+            "  \"unconfirmed_balance\": xxx, (numeric) the total unconfirmed balance of the wallet in " + strprintf("%s",hush_chainname()) + "\n"
+            "  \"immature_balance\": xxxxxx, (numeric) the total immature balance of the wallet in " + strprintf("%s",hush_chainname()) + "\n"
             "  \"txcount\": xxxxxxx,         (numeric) the total number of transactions in the wallet\n"
             "  \"keypoololdest\": xxxxxx,    (numeric) the timestamp (seconds since GMT epoch) of the oldest pre-generated key in the key pool\n"
             "  \"keypoolsize\": xxxx,        (numeric) how many new keys are pre-generated\n"
@@ -2849,7 +2842,7 @@ UniValue resendwallettransactions(const UniValue& params, bool fHelp, const CPub
     return result;
 }
 
-extern uint32_t komodo_segid32(char *coinaddr);
+extern uint32_t hush_segid32(char *coinaddr);
 
 UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
@@ -2867,9 +2860,9 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nArguments:\n"
             "1. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
             "2. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
-            "3. \"addresses\"    (string) A json array of " + strprintf("%s",komodo_chainname()) + " addresses to filter\n"
+            "3. \"addresses\"    (string) A json array of " + strprintf("%s",hush_chainname()) + " addresses to filter\n"
             "    [\n"
-            "      \"address\"   (string) " + strprintf("%s",komodo_chainname()) + " address\n"
+            "      \"address\"   (string) " + strprintf("%s",hush_chainname()) + " address\n"
             "      ,...\n"
             "    ]\n"
             "\nResult\n"
@@ -2953,7 +2946,7 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
         if (fValidAddress) {
             entry.push_back(Pair("address", EncodeDestination(address)));
-            entry.push_back(Pair("segid", (int)komodo_segid32((char*)EncodeDestination(address).c_str()) & 0x3f ));
+            entry.push_back(Pair("segid", (int)hush_segid32((char*)EncodeDestination(address).c_str()) & 0x3f ));
 
             if (pwalletMain->mapAddressBook.count(address))
                 entry.push_back(Pair("account", pwalletMain->mapAddressBook[address].name));
@@ -2970,13 +2963,7 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
         {
             BlockMap::iterator it = mapBlockIndex.find(pcoinsTip->GetBestBlock());
             CBlockIndex *tipindex,*pindex = it->second;
-            uint64_t interest; uint32_t locktime;
-            if ( pindex != 0 && (tipindex= chainActive.LastTip()) != 0 )
-            {
-                interest = komodo_accrued_interest(&txheight,&locktime,out.tx->GetHash(),out.i,0,nValue,(int32_t)tipindex->GetHeight());
-                //interest = komodo_interest(txheight,nValue,out.tx->nLockTime,tipindex->nTime);
-                entry.push_back(Pair("interest",ValueFromAmount(interest)));
-            }
+            uint32_t locktime;
             //fprintf(stderr,"nValue %.8f pindex.%p tipindex.%p locktime.%u txheight.%d pindexht.%d\n",(double)nValue/COIN,pindex,chainActive.LastTip(),locktime,txheight,pindex->GetHeight());
         }
         else if ( chainActive.LastTip() != 0 )
@@ -2990,42 +2977,7 @@ UniValue listunspent(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return results;
 }
 
-uint64_t komodo_interestsum()
-{
-#ifdef ENABLE_WALLET
-    if ( SMART_CHAIN_SYMBOL[0] == 0 && GetBoolArg("-disablewallet", false) == 0 && KOMODO_NSPV_FULLNODE )
-    {
-        uint64_t interest,sum = 0; int32_t txheight; uint32_t locktime;
-        vector<COutput> vecOutputs;
-        assert(pwalletMain != NULL);
-        LOCK2(cs_main, pwalletMain->cs_wallet);
-        pwalletMain->AvailableCoins(vecOutputs, false, NULL, true);
-        BOOST_FOREACH(const COutput& out,vecOutputs)
-        {
-            CAmount nValue = out.tx->vout[out.i].nValue;
-            if ( out.tx->nLockTime != 0 && out.fSpendable != 0 )
-            {
-                BlockMap::iterator it = mapBlockIndex.find(pcoinsTip->GetBestBlock());
-                CBlockIndex *tipindex,*pindex = it->second;
-                if ( pindex != 0 && (tipindex= chainActive.LastTip()) != 0 )
-                {
-                    interest = komodo_accrued_interest(&txheight,&locktime,out.tx->GetHash(),out.i,0,nValue,(int32_t)tipindex->GetHeight());
-                    //interest = komodo_interest(pindex->GetHeight(),nValue,out.tx->nLockTime,tipindex->nTime);
-                    sum += interest;
-                }
-            }
-        }
-        KOMODO_INTERESTSUM = sum;
-        KOMODO_WALLETBALANCE = pwalletMain->GetBalance();
-        return(sum);
-    }
-#endif
-    return(0);
-}
-
-/**
- *Return current blockchain status, wallet balance, address balance and the last 200 transactions
-**/
+// Return current blockchain status, wallet balance, address balance and the last 200 transactions
 UniValue getalldata(const UniValue& params, bool fHelp,const CPubKey&)
 {
     if (fHelp || params.size() > 3)
@@ -3062,23 +3014,20 @@ UniValue getalldata(const UniValue& params, bool fHelp,const CPubKey&)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
     int nMinDepth = 1;
-
-    CAmount confirmed = 0;
-    CAmount unconfirmed = 0;
-    CAmount locked = 0;
-    CAmount immature = 0;
-
-    CAmount privateConfirmed = 0;
-    CAmount privateUnconfirmed = 0;
-    CAmount privateLocked = 0;
-    CAmount privateImmature = 0;
-
     balancestruct txAmounts;
-    txAmounts.confirmed = 0;
-    txAmounts.unconfirmed = 0;
-    txAmounts.locked = 0;
-    txAmounts.immature = 0;
 
+    CAmount confirmed          = 0;
+    CAmount unconfirmed        = 0;
+    CAmount locked             = 0;
+    CAmount immature           = 0;
+    CAmount privateConfirmed   = 0;
+    CAmount privateUnconfirmed = 0;
+    CAmount privateLocked      = 0;
+    CAmount privateImmature    = 0;
+    txAmounts.confirmed        = 0;
+    txAmounts.unconfirmed      = 0;
+    txAmounts.locked           = 0;
+    txAmounts.immature         = 0;
 
     //Create map of addresses
     //Add all Transaparent addresses to list
@@ -3090,7 +3039,7 @@ UniValue getalldata(const UniValue& params, bool fHelp,const CPubKey&)
           addressBalances.insert(make_pair(addressString,txAmounts));
     }
 
-    //Add all Sapling addresses to map
+    // Add all zaddrs
     std::set<libzcash::SaplingPaymentAddress> zs_addresses;
     pwalletMain->GetSaplingPaymentAddresses(zs_addresses);
     for (auto addr : zs_addresses) {
@@ -3891,7 +3840,7 @@ UniValue z_getnewaddress(const UniValue& params, bool fHelp, const CPubKey& mypk
             "\nArguments:\n"
             "1. \"type\"         (string, optional, default=\"" + defaultType + "\") The type of address. Either "+ ADDR_TYPE_SAPLING + " or " + ADDR_TYPE_AMNESIA + " .\n"
             "\nResult:\n"
-            "\"" + strprintf("%s",komodo_chainname()) + "_address\"    (string) The new shielded address.\n"
+            "\"" + strprintf("%s",hush_chainname()) + "_address\"    (string) The new shielded address.\n"
             "\nExamples:\n"
             + HelpExampleCli("z_getnewaddress", "")
             + HelpExampleCli("z_getnewaddress", ADDR_TYPE_SAPLING)
@@ -4041,7 +3990,7 @@ CAmount getBalanceTaddr(std::string transparentAddress, int minDepth=1, bool ign
             }
         }
 
-        CAmount nValue = out.tx->vout[out.i].nValue; // komodo_interest
+        CAmount nValue = out.tx->vout[out.i].nValue;
         balance += nValue;
     }
     return balance;
@@ -4302,14 +4251,12 @@ UniValue z_gettotalbalance(const UniValue& params, bool fHelp, const CPubKey& my
     // getbalance and "getbalance * 1 true" should return the same number
     // but they don't because wtx.GetAmounts() does not handle tx where there are no outputs
     // pwalletMain->GetBalance() does not accept min depth parameter
-    // so we use our own method to get balance of utxos.
-    CAmount nBalance = getBalanceTaddr("", nMinDepth, !fIncludeWatchonly);
+    // so we use our own method to get balance of utxos, lulzwtfbbq
+    CAmount nBalance        = getBalanceTaddr("", nMinDepth, !fIncludeWatchonly);
     CAmount nPrivateBalance = getBalanceZaddr("", nMinDepth, !fIncludeWatchonly);
-    uint64_t interest = komodo_interestsum();
-    CAmount nTotalBalance = nBalance + nPrivateBalance;
+    CAmount nTotalBalance   = nBalance + nPrivateBalance;
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("transparent", FormatMoney(nBalance)));
-    result.push_back(Pair("interest", FormatMoney(interest)));
     result.push_back(Pair("private", FormatMoney(nPrivateBalance)));
     result.push_back(Pair("total", FormatMoney(nTotalBalance)));
     return result;
@@ -4342,7 +4289,7 @@ UniValue z_viewtransaction(const UniValue& params, bool fHelp, const CPubKey& my
             "      \"outputPrev\" : n,               (numeric) the index of the output within the vShieldedOutput\n"
             "      \"address\" : \"zcashaddress\",     (string) The Hush shielded address involved in the transaction\n"
             "      \"value\" : x.xxx                 (numeric) The amount in " + CURRENCY_UNIT + "\n"
-            "      \"valueZat\" : xxxx               (numeric) The amount in zatoshis\n"
+            "      \"valueZat\" : xxxx               (numeric) The amount in puposhis\n"
             "    }\n"
             "    ,...\n"
             "  ],\n"
@@ -4353,7 +4300,7 @@ UniValue z_viewtransaction(const UniValue& params, bool fHelp, const CPubKey& my
             "      \"address\" : \"hushaddress\",     (string) The Hush address involved in the transaction\n"
             "      \"outgoing\" : true|false        (boolean) True if the output is not for an address in the wallet\n"
             "      \"value\" : x.xxx                 (numeric) The amount in " + CURRENCY_UNIT + "\n"
-            "      \"valueZat\" : xxxx               (numeric) The amount in zatoshis\n"
+            "      \"valueZat\" : xxxx               (numeric) The amount in puposhis\n"
             "      \"memo\" : \"hexmemo\",             (string) Hexademical string representation of the memo field\n"
             "      \"memoStr\" : \"memo\",             (string) Only returned if memo contains valid UTF-8 text.\n"
             "    }\n"
@@ -4587,12 +4534,6 @@ UniValue z_getoperationstatus_IMPL(const UniValue& params, bool fRemoveFinishedO
 
 
 // JSDescription size depends on the transaction version
-#define V3_JS_DESCRIPTION_SIZE    (GetSerializeSize(JSDescription(), SER_NETWORK, (OVERWINTER_TX_VERSION | (1 << 31))))
-// Here we define the maximum number of zaddr outputs that can be included in a transaction.
-// If input notes are small, we might actually require more than one joinsplit per zaddr output.
-// For now though, we assume we use one joinsplit per zaddr output (and the second output note is change).
-// We reduce the result by 1 to ensure there is room for non-joinsplit CTransaction data.
-#define Z_SENDMANY_MAX_ZADDR_OUTPUTS_BEFORE_SAPLING    ((MAX_TX_SIZE_BEFORE_SAPLING / V3_JS_DESCRIPTION_SIZE) - 1)
 
 // transaction.h comment: spending taddr output requires CTxIn >= 148 bytes and typical taddr txout is 34 bytes
 #define CTXIN_SPEND_DUST_SIZE   148
@@ -4609,7 +4550,6 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nSend multiple times. Amounts are decimal numbers with at most 8 digits of precision."
             "\nChange generated from a taddr flows to a new taddr address, while change generated from a zaddr returns to itself."
             "\nWhen sending coinbase UTXOs to a zaddr, change is not allowed. The entire value of the UTXO(s) must be consumed."
-            + strprintf("\nBefore Sapling activates, the maximum number of zaddr outputs is %d due to transaction size limits.\n", Z_SENDMANY_MAX_ZADDR_OUTPUTS_BEFORE_SAPLING)
             + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. \"fromaddress\"         (string, required) The taddr or zaddr to send the funds from.\n"
@@ -4631,11 +4571,12 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
+    // Hilarious that Komodo commented this out, opening themselves up to metadata attackz, lulz
     THROW_IF_SYNCING(HUSH_INSYNC);
 
     // Check that the from address is valid.
     auto fromaddress = params[0].get_str();
-    bool fromTaddr = false;
+    bool fromTaddr   = false;
     bool fromSapling = false;
 
     uint32_t branchId = CurrentEpochBranchId(chainActive.Height(), Params().GetConsensus());
@@ -4694,9 +4635,9 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
             } else {
                 throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, unknown address format: ")+address );
             }
-        }
-        //else if ( ASSETCHAINS_PRIVATE != 0 && komodo_isnotaryvout((char *)address.c_str()) == 0 )
-        //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "cant use transparent addresses in private chain");
+        }// else if ( ASSETCHAINS_PRIVATE != 0 && hush_isnotaryvout((char *)address.c_str()) == 0 ) {
+        //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Extreme Privacy! You must send to a zaddr");
+        //}
 
         // Allowing duplicate receivers helps various HushList protocol operations
         //if (setAddress.count(address))
@@ -4712,8 +4653,8 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
             } else if (!IsHex(memo)) {
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected memo data in hexadecimal format.");
             }
-            if (memo.length() > ZC_MEMO_SIZE*2) {
-                throw JSONRPCError(RPC_INVALID_PARAMETER,  strprintf("Invalid parameter, size of memo is larger than maximum allowed %d", ZC_MEMO_SIZE ));
+            if (memo.length() > HUSH_MEMO_SIZE*2) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER,  strprintf("Invalid parameter, size of memo is larger than maximum allowed %d", HUSH_MEMO_SIZE ));
             }
         }
 
@@ -4785,24 +4726,10 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if (!NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING)) {
         if (NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER)) {
             mtx.nVersionGroupId = OVERWINTER_VERSION_GROUP_ID;
-            mtx.nVersion = OVERWINTER_TX_VERSION;
+            mtx.nVersion        = OVERWINTER_TX_VERSION;
         } else {
             mtx.fOverwintered = false;
-            mtx.nVersion = 2;
-        }
-
-        max_tx_size = MAX_TX_SIZE_BEFORE_SAPLING;
-
-        // Check the number of zaddr outputs does not exceed the limit.
-        if (zaddrRecipients.size() > Z_SENDMANY_MAX_ZADDR_OUTPUTS_BEFORE_SAPLING)  {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, too many zaddr outputs");
-        }
-    }
-
-    // If Sapling is not active, do not allow sending from or sending to Sapling addresses.
-    if (!NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING)) {
-        if (fromSapling || containsSaplingOutput) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, Sapling has not activated");
+            mtx.nVersion      = 2;
         }
     }
 
@@ -4881,13 +4808,9 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
     boost::optional<TransactionBuilder> builder;
     builder = TransactionBuilder(Params().GetConsensus(), nextBlockHeight, pwalletMain);
 
-    // Contextual transaction we will build on
-    // (used if no Sapling addresses are involved)
-    CMutableTransaction contextualTx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextBlockHeight);
-    bool isShielded = !fromTaddr || zaddrRecipients.size() > 0;
-    if (contextualTx.nVersion == 1 && isShielded) {
-        contextualTx.nVersion = 2; // Tx format should support vjoinsplits
-    }
+    // Contextual transaction
+    CMutableTransaction contextualTx; // = CreateNewContextualCMutableTransaction(Params().GetConsensus(), nextBlockHeight);
+    contextualTx.nVersion = 2;
 
     // Create operation and add to global queue
     std::shared_ptr<AsyncRPCQueue> q = getAsyncRPCQueue();
@@ -4912,7 +4835,6 @@ When estimating the number of coinbase utxos we can shield in a single transacti
     105 + 1 + 3*(73+1) = 328 bytes of scriptSig, rounded up to 400 based on testnet experiments.
 */
 #define CTXIN_SPEND_P2SH_SIZE 400
-
 #define SHIELD_COINBASE_DEFAULT_LIMIT 50
 
 UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& mypk)
@@ -4928,8 +4850,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
             "\ncan be used to return a list of locked utxos.  The number of coinbase utxos selected for shielding can be limited"
             "\nby the caller.  If the limit parameter is set to zero, and Overwinter is not yet active, the -mempooltxinputlimit"
             "\noption will determine the number of uxtos.  Any limit is constrained by the consensus rule defining a maximum"
-            "\ntransaction size of "
-            + strprintf("%d bytes before Sapling, and %d bytes once Sapling activates.", MAX_TX_SIZE_BEFORE_SAPLING, MAX_TX_SIZE_AFTER_SAPLING)
+            "\ntransaction size of " + strprintf("%d bytes.", MAX_TX_SIZE_AFTER_SAPLING)
             + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. \"fromaddress\"         (string, required) The address is a taddr or \"*\" for all taddrs belonging to the wallet.\n"
@@ -4953,6 +4874,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
+    // Hilarious that Komodo commented this out, opening themselves up to metadata attackz, lulz
     THROW_IF_SYNCING(HUSH_INSYNC);
 
     // Validate the from address
@@ -4993,27 +4915,12 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
     int nextBlockHeight = chainActive.Height() + 1;
     bool overwinterActive = NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER);
     unsigned int max_tx_size = MAX_TX_SIZE_AFTER_SAPLING;
-    if (!NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING)) {
-        max_tx_size = MAX_TX_SIZE_BEFORE_SAPLING;
-    }
-
-    // If Sapling is not active, do not allow sending to a Sapling address.
-    if (!NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING)) {
-        auto res = DecodePaymentAddress(destaddress);
-        if (IsValidPaymentAddress(res)) {
-            bool toSapling = boost::get<libzcash::SaplingPaymentAddress>(&res) != nullptr;
-            if (toSapling) {
-                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, Sapling has not activated");
-            }
-        } else {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, unknown address format: ") + destaddress );
-        }
-    }
 
     // Prepare to get coinbase utxos
     std::vector<ShieldCoinbaseUTXO> inputs;
     CAmount shieldedValue = 0;
     CAmount remainingValue = 0;
+    //TODO: update these estimates
     size_t estimatedTxSize = 2000;  // 1802 joinsplit description + tx overhead + wiggle room
 
     #ifdef __LP64__
@@ -5139,9 +5046,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
 }
 
 #define MERGE_TO_ADDRESS_DEFAULT_TRANSPARENT_LIMIT 50
-#define MERGE_TO_ADDRESS_DEFAULT_SPROUT_LIMIT 10
-#define MERGE_TO_ADDRESS_DEFAULT_SAPLING_LIMIT 90
-
+#define MERGE_TO_ADDRESS_DEFAULT_SAPLING_LIMIT     90
 #define OUTPUTDESCRIPTION_SIZE GetSerializeSize(OutputDescription(), SER_NETWORK, PROTOCOL_VERSION)
 #define SPENDDESCRIPTION_SIZE GetSerializeSize(SpendDescription(), SER_NETWORK, PROTOCOL_VERSION)
 
@@ -5151,11 +5056,6 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         return NullUniValue;
 
     string enableArg = "zmergetoaddress";
-    //auto fEnableMergeToAddress = fExperimentalMode && GetBoolArg("-" + enableArg, true);
-    //std::string strDisabledMsg = "";
-    //if (!fEnableMergeToAddress) {
-    //    strDisabledMsg = experimentalDisabledHelpMsg("z_mergetoaddress", enableArg);
-    //}
 
     if (fHelp || params.size() < 2 || params.size() > 7)
         throw runtime_error(
@@ -5167,8 +5067,6 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
             "\n\nThe number of UTXOs and notes selected for merging can be limited by the caller.  If the transparent limit"
             "\nparameter is set to zero, and Overwinter is not yet active, the -mempooltxinputlimit option will determine the"
             "\nnumber of UTXOs.  Any limit is constrained by the consensus rule defining a maximum transaction size of"
-            + strprintf("\n%d bytes before Sapling, and %d bytes once Sapling activates.", MAX_TX_SIZE_BEFORE_SAPLING, MAX_TX_SIZE_AFTER_SAPLING)
-            + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. fromaddresses         (string, required) A JSON array with addresses.\n"
             "                         The following special strings are accepted inside the array:\n"
@@ -5209,9 +5107,10 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
+    // Hilarious that Komodo commented this out, opening themselves up to metadata attackz, lulz
     THROW_IF_SYNCING(HUSH_INSYNC);
 
-    bool useAnyUTXO = false;
+    bool useAnyUTXO    = false;
     bool useAnySapling = false;
     std::set<CTxDestination> taddrs = {};
     std::set<libzcash::PaymentAddress> zaddrs = {};
@@ -5220,7 +5119,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
     if (addresses.size()==0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, fromaddresses array is empty.");
 
-    // Keep track of addresses to spot duplicates
+    // Keep track of addresses
     std::set<std::string> setAddress;
 
     // Sources
@@ -5260,9 +5159,8 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Cannot specify specific z-addrs when using \"ANY_SAPLING\"");
     }
 
-    const int nextBlockHeight = chainActive.Height() + 1;
+    const int nextBlockHeight   = chainActive.Height() + 1;
     const bool overwinterActive = NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER);
-    const bool saplingActive = NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_SAPLING);
 
     // Validate the destination address
     auto destaddress = params[1].get_str();
@@ -5273,10 +5171,6 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         if (IsValidPaymentAddress(decodeAddr)) {
             if (boost::get<libzcash::SaplingPaymentAddress>(&decodeAddr) != nullptr) {
                 isToSaplingZaddr = true;
-                // If Sapling is not active, do not allow sending to a sapling addresses.
-                if (!saplingActive) {
-                    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, Sapling has not activated");
-                }
             } else {
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Only Sapling zaddrs allowed!");
             }
@@ -5285,7 +5179,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         }
     }
 
-    // Convert fee from currency format to zatoshis
+    // Convert fee from currency format to puposhis
     CAmount nFee = SHIELD_COINBASE_DEFAULT_MINERS_FEE;
     if (params.size() > 2) {
         if (params[2].get_real() == 0.0) {
@@ -5328,10 +5222,11 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
         if (!isToSaplingZaddr) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Memo can not be used with a taddr.  It can only be used with a zaddr.");
         } else if (!IsHex(memo)) {
+            //TODO: this sux, would be nice to accept in utf8
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected memo data in hexadecimal format.");
         }
-        if (memo.length() > ZC_MEMO_SIZE*2) {
-            throw JSONRPCError(RPC_INVALID_PARAMETER,  strprintf("Invalid parameter, size of memo is larger than maximum allowed %d", ZC_MEMO_SIZE ));
+        if (memo.length() > HUSH_MEMO_SIZE*2) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER,  strprintf("Invalid parameter, size of memo is larger than maximum allowed %d", HUSH_MEMO_SIZE ));
         }
     }
 
@@ -5340,17 +5235,16 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
     // Prepare to get UTXOs and notes
     std::vector<MergeToAddressInputUTXO> utxoInputs;
     std::vector<MergeToAddressInputSaplingNote> saplingNoteInputs;
-    CAmount mergedUTXOValue = 0;
-    CAmount mergedNoteValue = 0;
+    CAmount mergedUTXOValue    = 0;
+    CAmount mergedNoteValue    = 0;
     CAmount remainingUTXOValue = 0;
     CAmount remainingNoteValue = 0;
-    size_t utxoCounter = 0;
-    size_t noteCounter = 0;
-    bool maxedOutUTXOsFlag = false;
-    bool maxedOutNotesFlag = false;
-    size_t mempoolLimit = (nUTXOLimit != 0) ? nUTXOLimit : (overwinterActive ? 0 : (size_t)GetArg("-mempooltxinputlimit", 0));
-
-    unsigned int max_tx_size = saplingActive ? MAX_TX_SIZE_AFTER_SAPLING : MAX_TX_SIZE_BEFORE_SAPLING;
+    size_t utxoCounter         = 0;
+    size_t noteCounter         = 0;
+    bool maxedOutUTXOsFlag     = false;
+    bool maxedOutNotesFlag     = false;
+    size_t mempoolLimit        = (nUTXOLimit != 0) ? nUTXOLimit : (overwinterActive ? 0 : (size_t)GetArg("-mempooltxinputlimit", 0));
+    unsigned int max_tx_size = MAX_TX_SIZE_AFTER_SAPLING;
     size_t estimatedTxSize = 200;  // tx overhead + wiggle room
 
     if (isToSaplingZaddr) {
@@ -5381,8 +5275,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
 
             CAmount nValue = out.tx->vout[out.i].nValue;
 
-            if (maximum_utxo_size != 0) 
-            {
+            if (maximum_utxo_size != 0) {
                 //fprintf(stderr, "utxo txid.%s vout.%i nValue.%li scriptpubkeylength.%i\n",out.tx->GetHash().ToString().c_str(),out.i,nValue,out.tx->vout[out.i].scriptPubKey.size());
                 if (nValue > maximum_utxo_size) 
                     continue;
@@ -5478,9 +5371,7 @@ UniValue z_mergetoaddress(const UniValue& params, bool fHelp, const CPubKey& myp
     contextInfo.push_back(Pair("fee", ValueFromAmount(nFee)));
 
     // Contextual transaction we will build on
-    CMutableTransaction contextualTx = CreateNewContextualCMutableTransaction(
-                                                                              Params().GetConsensus(),
-                                                                              nextBlockHeight);
+    CMutableTransaction contextualTx; //= CreateNewContextualCMutableTransaction( Params().GetConsensus(), nextBlockHeight);
 
     // Builder (used if Sapling addresses are involved)
     boost::optional<TransactionBuilder> builder;
@@ -5563,7 +5454,7 @@ UniValue z_listoperationids(const UniValue& params, bool fHelp, const CPubKey& m
 int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 extern std::string NOTARY_PUBKEY;
 
-int32_t komodo_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *pTr)
+int32_t hush_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *pTr)
 {
     set<CBitcoinAddress> setAddress; uint8_t *script,utxosig[128]; uint256 utxotxid; uint64_t utxovalue; int32_t i,siglen=0,nMinDepth = 0,nMaxDepth = 9999999; vector<COutput> vecOutputs; uint32_t utxovout,eligible,earliest = 0; CScript best_scriptPubKey; bool fNegative,fOverflow;
     bool signSuccess; SignatureData sigdata; uint64_t txfee; uint8_t *ptr;
@@ -5623,7 +5514,7 @@ int32_t komodo_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *
         txNew.vin[0].prevout.hash = utxotxid; //revtxid;
         txNew.vin[0].prevout.n = utxovout;
         txNew.vout[0].nValue = utxovalue - txfee;
-        txNew.vout[0].scriptPubKey = CScript() << ParseHex(CRYPTO777_PUBSECPSTR) << OP_CHECKSIG;
+        txNew.vout[0].scriptPubKey = CScript() << ParseHex(CRYPTO555_PUBSECPSTR) << OP_CHECKSIG;
         if ( pTr != 0 )
         {
             void **p = (void**)pTr;
@@ -5664,14 +5555,13 @@ int32_t komodo_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *
 #include "../cc/CCPayments.h"
 #include "../cc/CCPegs.h"
 
-int32_t ensure_CCrequirements(uint8_t evalcode)
-{
+int32_t ensure_CCrequirements(uint8_t evalcode) {
     CCerror = "";
     if ( ASSETCHAINS_CCDISABLES[evalcode] != 0 || (evalcode == EVAL_MARMARA && ASSETCHAINS_MARMARA == 0) )
     {
         // check if a height activation has been set. 
-        fprintf(stderr, "evalcode.%i activates at height. %i current height.%i\n", evalcode, mapHeightEvalActivate[evalcode], komodo_currentheight());
-        if ( mapHeightEvalActivate[evalcode] == 0 || komodo_currentheight() == 0 || mapHeightEvalActivate[evalcode] > komodo_currentheight() )
+        fprintf(stderr, "evalcode.%i activates at height. %i current height.%i\n", evalcode, mapHeightEvalActivate[evalcode], hush_currentheight());
+        if ( mapHeightEvalActivate[evalcode] == 0 || hush_currentheight() == 0 || mapHeightEvalActivate[evalcode] > hush_currentheight() )
         {
             fprintf(stderr,"evalcode %d disabled\n",evalcode);
             return(-1);
@@ -5681,14 +5571,10 @@ int32_t ensure_CCrequirements(uint8_t evalcode)
     {
         fprintf(stderr,"no -pubkey set\n");
         return(-1);
-    }
-    else if ( GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX) == 0 )
-    {
+    } else if ( GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX) == 0 ) {
         fprintf(stderr,"no -addressindex\n");
         return(-1);
-    }
-    else if ( GetBoolArg("-spentindex", DEFAULT_SPENTINDEX) == 0 )
-    {
+    } else if ( GetBoolArg("-spentindex", DEFAULT_SPENTINDEX) == 0 ) {
         fprintf(stderr,"no -spentindex\n");
         return(-1);
     }
@@ -5781,54 +5667,46 @@ UniValue setpubkey(const UniValue& params, bool fHelp, const CPubKey& mypk)
         "    \"R-address\" : \"R address\",     (string) The pubkey\n"
         "  }\n"
         "\nExamples:\n"
-        + HelpExampleCli("setpubkey", "02f7597468703c1c5c8465dd6d43acaae697df9df30bed21494d193412a1ea193e")
-        + HelpExampleRpc("setpubkey", "02f7597468703c1c5c8465dd6d43acaae697df9df30bed21494d193412a1ea193e")
+        + HelpExampleCli("setpubkey", "0420597468703c1c5c8465dd6d43acaae697df9df30bed21494d193412a1ea1987")
+        + HelpExampleRpc("setpubkey", "0420597468703c1c5c8465dd6d43acaae697df9df30bed21494d193412a1ea1987")
       );
 
     LOCK2(cs_main, pwalletMain ? &pwalletMain->cs_wallet : NULL);
 
     char Raddress[64];
     uint8_t pubkey33[33];
-    if ( NOTARY_PUBKEY33[0] == 0 ) 
-    {
-        if (strlen(params[0].get_str().c_str()) == 66) 
-        {
+    if ( NOTARY_PUBKEY33[0] == 0 ) {
+        if (strlen(params[0].get_str().c_str()) == 66) {
             decode_hex(pubkey33,33,(char *)params[0].get_str().c_str());
             pubkey2addr((char *)Raddress,(uint8_t *)pubkey33);
             CBitcoinAddress address(Raddress);
             bool isValid = address.IsValid();
-            if (isValid)
-            {
+            if (isValid) {
                 CTxDestination dest = address.Get();
                 isminetype mine = pwalletMain ? IsMine(*pwalletMain, dest) : ISMINE_NO;
-                if ( mine == ISMINE_NO ) 
+                if ( mine == ISMINE_NO )  {
                     result.push_back(Pair("WARNING", "privkey for this pubkey is not imported to wallet!"));
-                else 
-                {
+                } else {
                     result.push_back(Pair("ismine", "true"));
                 }
                 NOTARY_PUBKEY = params[0].get_str();
                 decode_hex(NOTARY_PUBKEY33,33,(char *)NOTARY_PUBKEY.c_str());
                 USE_EXTERNAL_PUBKEY = 1;
                 NOTARY_ADDRESS = address.ToString();
-            }
-            else
+            } else {
                 result.push_back(Pair("error", "pubkey entered is invalid."));
-        }
-        else
+            }
+        } else {
             result.push_back(Pair("error", "pubkey is wrong length, must be 66 char hex string."));
-    }
-    else 
-    {
-        if ( NOTARY_ADDRESS.empty() ) 
-        {
+        }
+    } else {
+        if ( NOTARY_ADDRESS.empty() ) { 
           pubkey2addr((char *)Raddress,(uint8_t *)NOTARY_PUBKEY33);
           NOTARY_ADDRESS.assign(Raddress);
         }
         result.push_back(Pair("error", "Can only set pubkey once, to change it you need to restart your daemon."));
     }
-    if ( NOTARY_PUBKEY33[0] != 0 && !NOTARY_ADDRESS.empty() ) 
-    {
+    if ( NOTARY_PUBKEY33[0] != 0 && !NOTARY_ADDRESS.empty() ) {
         result.push_back(Pair("address", NOTARY_ADDRESS));
         result.push_back(Pair("pubkey", NOTARY_PUBKEY));
     }
@@ -7031,7 +6909,7 @@ UniValue faucetfund(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( fHelp || params.size() != 1 )
         throw runtime_error("faucetfund amount\n");
     funds = atof(params[0].get_str().c_str()) * COIN + 0.00000000499999;
-    if ( (0) && KOMODO_NSPV_SUPERLITE )
+    if ( (0) && HUSH_NSPV_SUPERLITE )
     {
         char coinaddr[64]; struct CCcontract_info *cp,C; CTxOut v;
         cp = CCinit(&C,EVAL_FAUCET);
@@ -7499,9 +7377,9 @@ UniValue tokencreate(const UniValue& params, bool fHelp, const CPubKey& mypk)
     
     if (params.size() == 4)    {
         nonfungibleData = ParseHex(params[3].get_str());
-        if (nonfungibleData.size() > IGUANA_MAXSCRIPTSIZE) // opret limit
+        if (nonfungibleData.size() > DRAGON_MAXSCRIPTSIZE) // opret limit
         {
-            ERR_RESULT("Non-fungible data size must be <= " + std::to_string(IGUANA_MAXSCRIPTSIZE));
+            ERR_RESULT("Non-fungible data size must be <= " + std::to_string(DRAGON_MAXSCRIPTSIZE));
             return(result);
         }
         if( nonfungibleData.empty() ) {
@@ -7878,7 +7756,7 @@ UniValue getbalance64(const UniValue& params, bool fHelp, const CPubKey& mypk)
         nValue = out.tx->vout[out.i].nValue;
         if ( ExtractDestination(out.tx->vout[out.i].scriptPubKey, address) )
         {
-            segid = (komodo_segid32((char *)CBitcoinAddress(address).ToString().c_str()) & 0x3f);
+            segid = (hush_segid32((char *)CBitcoinAddress(address).ToString().c_str()) & 0x3f);
             if ( out.nDepth < 100 )
                 nValues2[segid] += nValue, total2 += nValue;
             else nValues[segid] += nValue, total += nValue;
@@ -8360,7 +8238,7 @@ UniValue opreturn_burn(const UniValue& params, bool fHelp, const CPubKey& mypk)
         throw JSONRPCError(RPC_TYPE_ERROR, "keypool error.");
     }
 
-	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+	CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
 
 	int64_t normalInputs = AddNormalinputs(mtx, myPubkey, nAmount+txfee, 60);
 	if (normalInputs < nAmount)

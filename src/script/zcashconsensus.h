@@ -18,12 +18,12 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_ZCASHCONSENSUS_H
-#define BITCOIN_ZCASHCONSENSUS_H
+#ifndef HUSH_ZCASHCONSENSUS_H
+#define HUSH_ZCASHCONSENSUS_H
 
 #include <stdint.h>
 
-#if defined(BUILD_BITCOIN_INTERNAL) && defined(HAVE_CONFIG_H)
+#if defined(BUILD_HUSH_INTERNAL) && defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
   #if defined(_WIN32)
     #if defined(DLL_EXPORT)
@@ -82,4 +82,4 @@ EXPORT_SYMBOL unsigned int zcashconsensus_version();
 
 #undef EXPORT_SYMBOL
 
-#endif // BITCOIN_ZCASHCONSENSUS_H
+#endif // HUSH_ZCASHCONSENSUS_H

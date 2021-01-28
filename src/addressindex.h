@@ -1,11 +1,11 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_ADDRESSINDEX_H
-#define BITCOIN_ADDRESSINDEX_H
+#ifndef HUSH_ADDRESSINDEX_H
+#define HUSH_ADDRESSINDEX_H
 
 #include "uint256.h"
 #include "amount.h"
@@ -80,4 +80,4 @@ struct CMempoolAddressDeltaKeyCompare
     }
 };
 
-#endif // BITCOIN_ADDRESSINDEX_H
+#endif // HUSH_ADDRESSINDEX_H

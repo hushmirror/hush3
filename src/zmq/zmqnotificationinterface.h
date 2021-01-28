@@ -2,8 +2,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_ZMQ_ZMQNOTIFICATIONINTERFACE_H
-#define BITCOIN_ZMQ_ZMQNOTIFICATIONINTERFACE_H
+#ifndef HUSH_ZMQ_ZMQNOTIFICATIONINTERFACE_H
+#define HUSH_ZMQ_ZMQNOTIFICATIONINTERFACE_H
 
 #include "validationinterface.h"
 #include "consensus/validation.h"
@@ -36,4 +36,4 @@ private:
     std::list<CZMQAbstractNotifier*> notifiers;
 };
 
-#endif // BITCOIN_ZMQ_ZMQNOTIFICATIONINTERFACE_H
+#endif // HUSH_ZMQ_ZMQNOTIFICATIONINTERFACE_H

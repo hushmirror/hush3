@@ -17,8 +17,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_MEMUSAGE_H
-#define BITCOIN_MEMUSAGE_H
+#ifndef HUSH_MEMUSAGE_H
+#define HUSH_MEMUSAGE_H
 
 #include <stdlib.h>
 

@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /*-
  * Copyright (c) 2004, 2005, 2006 Lev Walkin <vlm@lionet.info>.
  * All rights reserved.

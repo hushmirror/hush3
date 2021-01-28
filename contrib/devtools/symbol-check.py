@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Copyright (c) 2014 Wladimir J. van der Laan
-# Distributed under the MIT software license, see the accompanying
+# Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 '''
 A script to check that the (Linux) executables produced by gitian only contain

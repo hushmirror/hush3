@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush Developers
+// Copyright (c) 2016-2020 The Hush Developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -19,21 +19,18 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_RPCSERVER_H
-#define BITCOIN_RPCSERVER_H
+#ifndef HUSH_RPCSERVER_H
+#define HUSH_RPCSERVER_H
 
 #include "amount.h"
 #include "rpc/protocol.h"
 #include "uint256.h"
-
 #include <list>
 #include <map>
 #include <stdint.h>
 #include <string>
 #include <memory>
-
 #include <boost/function.hpp>
-
 #include <univalue.h>
 #include <pubkey.h>
 
@@ -275,10 +272,6 @@ extern UniValue oraclessubscribe(const UniValue& params, bool fHelp, const CPubK
 extern UniValue oraclesdata(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue oraclessample(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue oraclessamples(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesaddress(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue priceslist(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue mypriceslist(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesinfo(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue pegsaddress(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue paymentsaddress(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue payments_release(const UniValue& params, bool fHelp, const CPubKey& mypk);
@@ -495,8 +488,8 @@ extern UniValue calc_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk
 extern UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue assetchainproof(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue crosschainproof(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue getNotarisationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue scanNotarisationsDB(const UniValue& params, bool fHelp, const CPubKey& mypk);
+extern UniValue getNotarizationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk);
+extern UniValue scanNotarizationsDB(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getimports(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getwalletburntransactions(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue migrate_converttoexport(const UniValue& params, bool fHelp, const CPubKey& mypk);
@@ -516,15 +509,4 @@ extern UniValue paxprices(const UniValue& params, bool fHelp, const CPubKey& myp
 extern UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk);
 
-extern UniValue prices(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesbet(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricessetcostbasis(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricescashout(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesrekt(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesaddfunding(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesgetorderbook(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue pricesrefillfund(const UniValue& params, bool fHelp, const CPubKey& mypk);
-
-
-
-#endif // BITCOIN_RPCSERVER_H
+#endif // HUSH_RPCSERVER_H

@@ -34,13 +34,11 @@ COVERAGE_INFO = baseline_filtered_combined.info baseline.info block_test.info \
 	leveldb_baseline.info test_bitcoin_filtered.info total_coverage.info \
 	baseline_filtered.info block_test_filtered.info \
 	leveldb_baseline_filtered.info test_bitcoin_coverage.info test_bitcoin.info
-#  zcash-gtest.info zcash-gtest_filtered.info zcash-gtest_coverage.info
 else
 COVERAGE_INFO = baseline_filtered_combined.info baseline.info block_test.info \
   leveldb_baseline.info test_bitcoin_filtered.info total_coverage.info \
   baseline_filtered.info \
-  leveldb_baseline_filtered.info test_bitcoin_coverage.info test_bitcoin.info \
-  #zcash-gtest.info zcash-gtest_filtered.info zcash-gtest_coverage.info
+  leveldb_baseline_filtered.info test_bitcoin_coverage.info test_bitcoin.info
 endif
 
 dist-hook:
@@ -205,17 +203,12 @@ endif
 test_bitcoin_coverage.info: baseline_filtered_combined.info test_bitcoin_filtered.info
 	$(LCOV) -a baseline_filtered.info -a leveldb_baseline_filtered.info -a test_bitcoin_filtered.info -o $@
 
-if ! BUILD_DARWIN
-zcash-gtest_coverage.info: baseline_filtered_combined.info zcash-gtest_filtered.info
-	$(LCOV) -a baseline_filtered.info -a leveldb_baseline_filtered.info -a zcash-gtest_filtered.info -o $@
-endif
-
 if BUILD_DARWIN
-total_coverage.info:  baseline_filtered_combined.info test_bitcoin_filtered.info zcash-gtest_filtered.info block_test_filtered.info
-	$(LCOV) -a baseline_filtered.info -a leveldb_baseline_filtered.info -a test_bitcoin_filtered.info -a zcash-gtest_filtered.info -a block_test_filtered.info -o $@ | $(GREP) "\%" | $(AWK) '{ print substr($$3,2,50) "/" $$5 }' > coverage_percent.txt
+total_coverage.info:  baseline_filtered_combined.info test_bitcoin_filtered.info block_test_filtered.info
+	$(LCOV) -a baseline_filtered.info -a leveldb_baseline_filtered.info -a test_bitcoin_filtered.info -a block_test_filtered.info -o $@ | $(GREP) "\%" | $(AWK) '{ print substr($$3,2,50) "/" $$5 }' > coverage_percent.txt
 else
-total_coverage.info:  baseline_filtered_combined.info test_bitcoin_filtered.info zcash-gtest_filtered.info block_test_filtered.info
-	$(LCOV) -a baseline_filtered.info -a leveldb_baseline_filtered.info -a test_bitcoin_filtered.info -a zcash-gtest_filtered.info -a block_test_filtered.info -o $@ | $(GREP) "\%" | $(AWK) '{ print substr($$3,2,50) "/" $$5 }' > coverage_percent.txt
+total_coverage.info:  baseline_filtered_combined.info test_bitcoin_filtered.info block_test_filtered.info
+	$(LCOV) -a baseline_filtered.info -a leveldb_baseline_filtered.info -a test_bitcoin_filtered.info -a block_test_filtered.info -o $@ | $(GREP) "\%" | $(AWK) '{ print substr($$3,2,50) "/" $$5 }' > coverage_percent.txt
 endif
 
 
@@ -223,26 +216,19 @@ test_bitcoin.coverage/.dirstamp:  test_bitcoin_coverage.info
 	$(GENHTML) -s $< -o $(@D)
 	@touch $@
 
-if TARGET_DARWIN
-zcash-gtest.coverage/.dirstamp:  zcash-gtest_coverage.info
-	$(GENHTML) -s $< -o $(@D)
-	@touch $@
-cov-zcash: zcash-gtest.coverage/.dirstamp
-endif
-
 total.coverage/.dirstamp: total_coverage.info
 	$(GENHTML) -s $< -o $(@D)
 	@touch $@
 
 if BUILD_DARWIN
-cov: test_bitcoin.coverage/.dirstamp cov-zcash total.coverage/.dirstamp
+cov: test_bitcoin.coverage/.dirstamp total.coverage/.dirstamp
 else
-cov: test_bitcoin.coverage/.dirstamp cov-zcash total.coverage/.dirstamp
+cov: test_bitcoin.coverage/.dirstamp total.coverage/.dirstamp
 endif
 
 endif
 
-dist_bin_SCRIPTS = zcutil/fetch-params.sh
+dist_bin_SCRIPTS = 
 dist_noinst_SCRIPTS = autogen.sh zcutil/build-debian-package.sh zcutil/build.sh
 
 EXTRA_DIST = $(top_srcdir)/share/genbuild.sh qa/pull-tester/rpc-tests.sh qa/pull-tester/run-bitcoin-cli qa/rpc-tests qa/hush $(DIST_DOCS) $(BIN_CHECKS)
@@ -255,4 +241,6 @@ install-exec-hook:
 DISTCHECK_CONFIGURE_FLAGS = --enable-man
 
 clean-local:
-	rm -rf test_bitcoin.coverage/ zcash-gtest.coverage/ total.coverage/
+	rm -rf test_bitcoin.coverage/ total.coverage/
+
+# I also heard about a bug in the UNIVAC but it's too big for this comment. -- Duke

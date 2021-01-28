@@ -1,18 +1,19 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <wolfssl/options.h>
 #include <wolfssl/ssl.h>
 #include <wolfssl/openssl/dh.h>
 #include <wolfssl/wolfcrypt/asn.h>
-
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
-
 #include "tlsmanager.h"
 #include "utiltls.h"
 
 using namespace std;
+// store our preferred cipherlist so we can use it for debug/etc later on
+std::string TLS_CIPHERLIST;
+
 namespace hush
 {
     static WOLFSSL_EVP_PKEY *mykey;
@@ -70,19 +71,17 @@ static WOLFSSL_DH *get_dh2048(void)
     return dh;
 }
 
-DH *tmp_dh_callback(WOLFSSL *ssl, int is_export, int keylength)
-{
-    LogPrint("tls", "TLS: %s: %s():%d - Using Diffie-Hellman param for PFS: is_export=%d, keylength=%d\n",
-        __FILE__, __func__, __LINE__, is_export, keylength);
+DH *tmp_dh_callback(WOLFSSL *ssl, int is_export, int keylength) {
+    LogPrint("tls", "TLS: %s: %s():%d - Using Diffie-Hellman param for PFS: is_export=%d, keylength=%d\n", __FILE__, __func__, __LINE__, is_export, keylength);
 
     return get_dh2048();
 }
 
-int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* ssl, int timeoutSec, unsigned long& err_code)
-{
+int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* ssl, int timeoutSec, unsigned long& err_code) {
     int retOp = 0;
-    err_code = 0;
+    err_code  = 0;
     char err_buffer[1024];
+    std::string disconnectedPeer("no info");
 
     while (true)
     {
@@ -119,7 +118,7 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
             case SSL_SHUTDOWN:
             {
                 if (hSocket != INVALID_SOCKET) {
-                    std::string disconnectedPeer("no info");
+                    disconnectedPeer = "no info";
                     struct sockaddr_in addr;
                     socklen_t serv_len = sizeof(addr);
                     int ret = getpeername(hSocket, (struct sockaddr *)&addr, &serv_len);
@@ -138,21 +137,27 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
 
         if (eRoutine == SSL_SHUTDOWN) {
             if (retOp == 0) {
-                LogPrint("tls", "TLS: WARNING: %s: %s():%d - SSL_SHUTDOWN: The close_notify was sent but the peer did not send it back yet.\n",
+                LogPrint("tls", "TLS: WARNING: %s: %s():%d - SSL_SHUTDOWN: The close_notify was sent but the peer did not send it back yet. Whatevz\n",
                         __FILE__, __func__, __LINE__);
                 // do not call SSL_get_error() because it may misleadingly indicate an error even though no error occurred.
                 break;
             } else if (retOp == 1) {
-                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN completed\n", __FILE__, __func__, __LINE__);
+                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN completed from peer %s\n", __FILE__, __func__, __LINE__, disconnectedPeer.c_str());
                 break;
             } else {
-                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN failed\n", __FILE__, __func__, __LINE__);
-                // the error will be read afterwards
+                LogPrint("tls", "TLS: %s: %s():%d - SSL_SHUTDOWN failed to %s with ret=%d\n", __FILE__, __func__, __LINE__, disconnectedPeer.c_str(), retOp);
             }
         } else {
             if (retOp == 1) {
-                LogPrint("tls", "TLS: %s: %s():%d - %s completed\n", __FILE__, __func__, __LINE__,
-                    eRoutine == SSL_CONNECT ? "SSL_CONNECT" : "SSL_ACCEPT");
+                std::string goodPeer = "";
+                struct sockaddr_in addr;
+                socklen_t serv_len = sizeof(addr);
+                int ret = getpeername(hSocket, (struct sockaddr *)&addr, &serv_len);
+                if (ret == 0) {
+                    goodPeer = std::string(inet_ntoa(addr.sin_addr)) + ":" + std::to_string(ntohs(addr.sin_port));
+                }
+                LogPrint("tls", "TLS: %s: %s():%d - %s completed to %s\n", __FILE__, __func__, __LINE__,
+                    eRoutine == SSL_CONNECT ? "SSL_CONNECT" : "SSL_ACCEPT", goodPeer);
                 break;
             }
         }
@@ -161,10 +166,15 @@ int TLSManager::waitFor(SSLConnectionRoutine eRoutine, SOCKET hSocket, WOLFSSL* 
 
         if (sslErr != WOLFSSL_ERROR_WANT_READ && sslErr != WOLFSSL_ERROR_WANT_WRITE) {
             err_code = wolfSSL_ERR_get_error();
-            const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
+            const char* error_str = NULL;
+            // calling this with err_code=0 generates more warnings, lulz
+            if(err_code) {
+                error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
+            }
+
             LogPrint("tls", "TLS: WARNING: %s: %s():%d - routine(%d), sslErr[0x%x], retOp[%d], errno[0x%x], lib[0x%x], func[0x%x], reas[0x%x]-> err: %s\n",
                 __FILE__, __func__, __LINE__,
-                eRoutine, sslErr, retOp, errno, wolfSSL_ERR_GET_LIB(err_code), ERR_GET_FUNC(err_code), wolfSSL_ERR_GET_REASON(err_code), err_buffer);
+                eRoutine, sslErr, retOp, errno, wolfSSL_ERR_GET_LIB(err_code), ERR_GET_FUNC(err_code), wolfSSL_ERR_GET_REASON(err_code), error_str);
             retOp = -1;
             break;
         }
@@ -231,26 +241,30 @@ WOLFSSL* TLSManager::connect(SOCKET hSocket, const CAddress& addrConnect, unsign
     if ((ssl = wolfSSL_new(tls_ctx_client))) {
         if (wolfSSL_set_fd(ssl, hSocket)) {
             int ret = TLSManager::waitFor(SSL_CONNECT, hSocket, ssl, (DEFAULT_CONNECT_TIMEOUT / 1000), err_code);
-            if (ret == 1)
-            {
+            if (ret == 1) {
                 bConnectedTLS = true;
+            } else {
+                err_code = wolfSSL_ERR_get_error();
+                LogPrint("tls", "%s: timed out waiting for %s\n", __func__, addrConnect.ToString());
             }
+        } else {
+            LogPrint("tls", "TLS: %s: failed to set file descriptor for socket!\n", __func__, addrConnect.ToString());
         }
-    }
-    else
-    {
+    } else {
         err_code = wolfSSL_ERR_get_error();
         const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
-        LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n",
-            __FILE__, __func__, __LINE__, err_buffer);
+        LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n", __FILE__, __func__, __LINE__, err_buffer);
     }
 
     if (bConnectedTLS) {
         LogPrintf("TLS: connection to %s has been established (tlsv = %s 0x%04x / ssl = %s 0x%x ). Using cipher: %s\n",
             addrConnect.ToString(), wolfSSL_get_version(ssl), wolfSSL_version(ssl), wolfSSL_OpenSSL_version(), wolfSSL_lib_version_hex(), wolfSSL_get_cipher_name(ssl));
     } else {
-        LogPrintf("TLS: %s: %s():%d - TLS connection to %s failed (err_code 0x%X)\n",
-            __FILE__, __func__, __LINE__, addrConnect.ToString(), err_code);
+        if(err_code) {
+            LogPrintf("TLS: %s: %s():%d - TLS connection to %s failed with err_code=0x%X\n", __FILE__, __func__, __LINE__, addrConnect.ToString(), err_code);
+        } else {
+            LogPrintf("TLS: %s: %s():%d - TLS connection to %s timed out\n", __FILE__, __func__, __LINE__, addrConnect.ToString());
+        }
 
         if (ssl) {
             wolfSSL_free(ssl);
@@ -278,7 +292,7 @@ WOLFSSL_CTX* TLSManager::initCtx(TLSContextType ctxType)
         return NULL;   
     }
     
-    bool bInitialized = false;
+    bool bInitialized   = false;
     WOLFSSL_CTX* tlsCtx = NULL;
 
     byte *pem;
@@ -287,7 +301,7 @@ WOLFSSL_CTX* TLSManager::initCtx(TLSContextType ctxType)
     if ((tlsCtx = wolfSSL_CTX_new(ctxType == SERVER_CONTEXT ? wolfTLSv1_3_server_method() : wolfTLSv1_3_client_method()))) {
         wolfSSL_CTX_set_mode(tlsCtx, SSL_MODE_AUTO_RETRY);
 
-        // Disable TLS < 1.3 ... imho redundant, because v1.3 is required via method
+        // Disable TLS < 1.3, just in case
         int ret = wolfSSL_CTX_set_min_proto_version(tlsCtx, TLS1_3_VERSION);
         if (ret == 0) {
             LogPrintf("TLS: WARNING: %s: %s():%d - failed to set min TLS version\n", __FILE__, __func__, __LINE__);
@@ -301,12 +315,15 @@ WOLFSSL_CTX* TLSManager::initCtx(TLSContextType ctxType)
         if(GetRand(100) > 50) {
             if (wolfSSL_CTX_set_cipher_list(tlsCtx, "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256")) {
                 LogPrintf("%s: Preferring TLS_AES256-GCM-SHA384\n", __func__);
+                TLS_CIPHERLIST = "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256";
             } else {
                 LogPrintf("%s: Setting preferred cipher failed !!!\n", __func__);
             }
         } else {
             if (wolfSSL_CTX_set_cipher_list(tlsCtx, "TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384")) {
-                LogPrintf("%s: Preferring TLS_AES256-GCM-SHA384\n", __func__);
+                LogPrintf("%s: Preferring TLS_XCHACHA20_POLY1305\n", __func__);
+                // WolfSSL 4.6.0 added xchacha but calls it the same ciphersuite, which causes compatibility issues
+                TLS_CIPHERLIST = "TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384";
             } else {
                 LogPrintf("%s: Setting preferred cipher failed !!!\n", __func__);
             }
@@ -367,11 +384,10 @@ WOLFSSL_CTX* TLSManager::initCtx(TLSContextType ctxType)
  */
 bool TLSManager::prepareCredentials()
 {
-    mykey = NULL;
+    mykey  = NULL;
     mycert = NULL;
 
     // Generating key and the self-signed certificate for it
-    //
     mykey = GenerateEcKey();
     if (mykey) {
         mycert = GenerateCertificate(mykey);
@@ -431,26 +447,26 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
 {
     LogPrint("tls", "TLS: accepting connection from %s (tid = %X)\n", addr.ToString(), pthread_self());
 
-    err_code = 0; 
     char err_buffer[1024];
-    WOLFSSL* ssl = NULL;
+    err_code          = 0;
+    WOLFSSL* ssl      = NULL;
     bool bAcceptedTLS = false;
 
     if ((ssl = wolfSSL_new(tls_ctx_server))) {
         if (wolfSSL_set_fd(ssl, hSocket)) {
             int ret = TLSManager::waitFor(SSL_ACCEPT, hSocket, ssl, (DEFAULT_CONNECT_TIMEOUT / 1000), err_code);
-            if (ret == 1)
-            {
+            if (ret == 1) {
                 bAcceptedTLS = true;
+            } else {
+                err_code = wolfSSL_ERR_get_error();
             }
+        } else {
+            LogPrint("tls", "TLS: %s: failed to set file descriptor for socket!\n", __func__, addr.ToString());
         }
-    }
-    else
-    {
+    } else {
         err_code = wolfSSL_ERR_get_error();
         const char* error_str = wolfSSL_ERR_error_string(err_code, err_buffer);
-        LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n",
-            __FILE__, __func__, __LINE__, err_buffer);
+        LogPrint("tls", "TLS: %s: %s():%d - SSL_new failed err: %s\n", __FILE__, __func__, __LINE__, err_buffer);
     }
 
     if (bAcceptedTLS) {
@@ -463,8 +479,7 @@ WOLFSSL* TLSManager::accept(SOCKET hSocket, const CAddress& addr, unsigned long&
             LogPrint("tls", "TLS: supporting cipher: %s\n", wolfSSL_CIPHER_get_name(c));
         }
     } else {
-        LogPrintf("TLS: %s: %s():%d - TLS connection from %s failed (err_code 0x%X)\n",
-            __FILE__, __func__, __LINE__, addr.ToString(), err_code);
+        LogPrintf("TLS: %s: %s():%d - TLS connection from %s failed (err_code 0x%X)\n", __FILE__, __func__, __LINE__, addr.ToString(), err_code);
 
         if (ssl) {
             SSL_free(ssl);
@@ -591,15 +606,12 @@ int TLSManager::threadSocketHandler(CNode* pnode, fd_set& fdsetRecv, fd_set& fds
                             __FILE__, __func__, __LINE__, error_str);
                     }
                     // socket closed gracefully (peer disconnected)
-                    //
                     if (!pnode->fDisconnect)
                         LogPrint("tls", "socket closed (%s)\n", pnode->addr.ToString());
                     pnode->CloseSocketDisconnect();
 
-
                 } else if (nBytes < 0) {
                     // error
-                    //
                     if (bIsSSL) {
                         if (nRet != WOLFSSL_ERROR_WANT_READ && nRet != WOLFSSL_ERROR_WANT_WRITE)
                         {
@@ -614,7 +626,6 @@ int TLSManager::threadSocketHandler(CNode* pnode, fd_set& fdsetRecv, fd_set& fds
 
                         } else {
                             // preventive measure from exhausting CPU usage
-                            //
                             MilliSleep(1); // 1 msec
                         }
                     } else {
@@ -629,9 +640,7 @@ int TLSManager::threadSocketHandler(CNode* pnode, fd_set& fdsetRecv, fd_set& fds
         }
     }
 
-    //
     // Send
-    //
     if (sendSet) {
         TRY_LOCK(pnode->cs_vSend, lockSend);
         if (lockSend)
@@ -652,17 +661,13 @@ bool TLSManager::initialize()
     bool bInitializationStatus = false;
     
     // Initialization routines for the WolfSSL library
-    //
     wolfSSL_load_error_strings();
     wolfSSL_ERR_load_crypto_strings();
     wolfSSL_library_init();
 
     // Initialization of the server and client contexts
-    //
-    if ((tls_ctx_server = TLSManager::initCtx(SERVER_CONTEXT)))
-    {
-        if ((tls_ctx_client = TLSManager::initCtx(CLIENT_CONTEXT)))
-        {
+    if ((tls_ctx_server = TLSManager::initCtx(SERVER_CONTEXT))) {
+        if ((tls_ctx_client = TLSManager::initCtx(CLIENT_CONTEXT))) {
             LogPrint("tls", "TLS: contexts are initialized\n");
             bInitializationStatus = true;
         } else {

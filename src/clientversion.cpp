@@ -1,8 +1,7 @@
 // Copyright (c) 2012-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,12 +16,9 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "clientversion.h"
-
 #include "tinyformat.h"
 #include "util.h"
-
 #include <string>
 
 #include <boost/preprocessor/arithmetic/add.hpp>
@@ -36,7 +32,7 @@
  * for both bitcoind and bitcoin-core, to make it harder for attackers to
  * target servers or GUI users specifically.
  */
-const std::string CLIENT_NAME = GetArg("-clientname", "MagicBean");
+const std::string CLIENT_NAME = GetArg("-clientname", "jl777sRemorse");
 
 /**
  * Client version number

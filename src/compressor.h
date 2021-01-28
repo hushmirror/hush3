@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_COMPRESSOR_H
-#define BITCOIN_COMPRESSOR_H
+#ifndef HUSH_COMPRESSOR_H
+#define HUSH_COMPRESSOR_H
 
 #include "primitives/transaction.h"
 #include "script/script.h"
@@ -133,4 +133,4 @@ public:
     }
 };
 
-#endif // BITCOIN_COMPRESSOR_H
+#endif // HUSH_COMPRESSOR_H

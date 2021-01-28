@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -117,7 +117,7 @@ public:
     }
 
     // Encrypts `message` with `pk_enc` and returns the ciphertext.
-    // This is only called ZC_NUM_JS_OUTPUTS times for a given instantiation; 
+    // This is only called HUSH_NUM_JS_OUTPUTS times for a given instantiation; 
     // but can be called 255 times before the nonce-space runs out.
     Ciphertext encrypt(const uint256 &pk_enc,
                        const Plaintext &message

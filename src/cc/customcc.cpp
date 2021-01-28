@@ -1,11 +1,14 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /*
  simple stub custom cc
  
- Just update the functions in this file, then from ~/komodo/src/cc
+ Just update the functions in this file, then from ~/hush3/src/cc
  
- ../komodo-cli -ac_name=CUSTOM stop
+ ../hush-cli -ac_name=CUSTOM stop
  ./makecustom
- ../komodod -ac_name=CUSTOM -ac_cclib=custom -ac_cc=2 ...
+ ../hush-smart-chain -ac_name=CUSTOM -ac_cclib=custom -ac_cc=2 ...
  
  The above will rebuild komodod and get it running again
  */
@@ -57,7 +60,7 @@ UniValue custom_func0(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 
 UniValue custom_func1(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight()); std::string rawtx;
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight()); std::string rawtx;
     UniValue result(UniValue::VOBJ); CPubKey mypk; int64_t amount = COIN; int32_t broadcastflag=0;
     if ( txfee == 0 )
         txfee = CUSTOM_TXFEE;

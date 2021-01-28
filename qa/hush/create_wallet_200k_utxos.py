@@ -1,9 +1,8 @@
 #!/usr/bin/env python2
+# Copyright (c) 2016-2020 The Hush developers
 # Copyright (c) 2017 The Zcash developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
-#
 # Create a large wallet
 #
 # To use:
@@ -11,7 +10,6 @@
 # - Add wallet_large.py to RPC tests list
 # - ./qa/pull-tester/rpc-tests.sh wallet_large --nocleanup
 # - Archive the resulting /tmp/test###### directory
-#
 
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (

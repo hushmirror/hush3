@@ -2,8 +2,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_HTTPSERVER_H
-#define BITCOIN_HTTPSERVER_H
+#ifndef HUSH_HTTPSERVER_H
+#define HUSH_HTTPSERVER_H
 
 #include <string>
 #include <stdint.h>
@@ -152,4 +152,4 @@ private:
     struct event* ev;
 };
 
-#endif // BITCOIN_HTTPSERVER_H
+#endif // HUSH_HTTPSERVER_H

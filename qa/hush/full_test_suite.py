@@ -1,9 +1,8 @@
 #!/usr/bin/env python2
-# Copyright (c) 2019-2020 Hush developers
-# Released under the GPLv3
-#
+# Copyright (c) 2016-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 # Execute all of the automated tests related to Hush
-#
 
 import argparse
 from glob import glob

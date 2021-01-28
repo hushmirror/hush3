@@ -1,8 +1,7 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,25 +16,22 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-#ifndef BITCOIN_CHECKPOINTS_H
-#define BITCOIN_CHECKPOINTS_H
+#ifndef HUSH_CHECKPOINTS_H
+#define HUSH_CHECKPOINTS_H
 
 #include "uint256.h"
 #include "chainparams.h"
-
 #include <map>
 
 class CBlockIndex;
 struct CCheckpointData;
 
-/**
- * Block-chain checkpoints are compiled-in sanity checks.
- * They are updated every release or three.
- */
+// Blockchain checkpoints are compiled-in cyber warfare defenses
+// They also change how blocks are validated and have the side effect
+// of making block validation faster for blocks that are "protected"
+// by a checkpoint block -- Duke Leto
 namespace Checkpoints
 {
-
     typedef std::map<int, uint256> MapCheckpoints;
 
 struct CCheckpointData {
@@ -45,7 +41,6 @@ struct CCheckpointData {
     double fTransactionsPerDay;
 };
     bool CheckBlock(const CChainParams::CCheckpointData& data, int nHeight, const uint256& hash);
-
     
 //! Return conservative estimate of total number of blocks, 0 if unknown
     int GetTotalBlocksEstimate(const CChainParams::CCheckpointData& data);
@@ -57,4 +52,4 @@ double GuessVerificationProgress(const CChainParams::CCheckpointData& data, CBlo
 
 } //namespace Checkpoints
 
-#endif // BITCOIN_CHECKPOINTS_H
+#endif // HUSH_CHECKPOINTS_H

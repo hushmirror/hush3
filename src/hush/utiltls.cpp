@@ -1,11 +1,10 @@
 // Copyright (c) 2017 The Zen Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include <stdio.h>
 #include <vector>
-
 #include <wolfssl/options.h>
 #include <wolfssl/ssl.h>
 #include "../util.h"

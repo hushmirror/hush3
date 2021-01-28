@@ -1,5 +1,5 @@
 // Copyright (c) 2016 The Zcash developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -112,7 +112,7 @@ private:
     void add_taddr_outputs_to_tx();
     bool find_unspent_notes();
     bool find_utxos(bool fAcceptCoinbase);
-    std::array<unsigned char, ZC_MEMO_SIZE> get_memo_from_hex_string(std::string s);
+    std::array<unsigned char, HUSH_MEMO_SIZE> get_memo_from_hex_string(std::string s);
     bool main_impl();
 
     void sign_send_raw_transaction(UniValue obj);     // throws exception if there was an error
@@ -152,7 +152,7 @@ public:
         return delegate->find_utxos(fAcceptCoinbase);
     }
     
-    std::array<unsigned char, ZC_MEMO_SIZE> get_memo_from_hex_string(std::string s) {
+    std::array<unsigned char, HUSH_MEMO_SIZE> get_memo_from_hex_string(std::string s) {
         return delegate->get_memo_from_hex_string(s);
     }
     

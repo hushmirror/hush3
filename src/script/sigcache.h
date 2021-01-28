@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_SCRIPT_SIGCACHE_H
-#define BITCOIN_SCRIPT_SIGCACHE_H
+#ifndef HUSH_SCRIPT_SIGCACHE_H
+#define HUSH_SCRIPT_SIGCACHE_H
 
 #include "script/interpreter.h"
 
@@ -38,4 +38,4 @@ public:
     bool VerifySignature(const std::vector<unsigned char>& vchSig, const CPubKey& vchPubKey, const uint256& sighash) const;
 };
 
-#endif // BITCOIN_SCRIPT_SIGCACHE_H
+#endif // HUSH_SCRIPT_SIGCACHE_H

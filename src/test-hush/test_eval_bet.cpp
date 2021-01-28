@@ -1,9 +1,8 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <cryptoconditions.h>
 #include <gtest/gtest.h>
-
 #include "cc/betprotocol.h"
 #include "cc/eval.h"
 #include "base58.h"
@@ -13,15 +12,11 @@
 #include "primitives/transaction.h"
 #include "script/interpreter.h"
 #include "script/serverchecker.h"
-
 #include "testutils.h"
-
 
 extern Eval* EVAL_TEST;
 
-
 namespace TestBet {
-
 
 static std::vector<CKey> playerSecrets;
 static std::vector<CPubKey> players;
@@ -128,16 +123,16 @@ public:
         return true;
     }
 
-    bool GetNotarisationData(uint256 notarisationHash, NotarisationData &data) const
+    bool GetNotarizationData(uint256 notarisationHash, NotarizationData &data) const
     {
-        if (notarisationHash == NotarisationHash()) {
+        if (notarisationHash == NotarizationHash()) {
             data.MoM = MoM;
             return true;
         }
         return false;
     }
 
-    static uint256 NotarisationHash()
+    static uint256 NotarizationHash()
     {
         uint256 h;
         h.begin()[0] = 123;
@@ -211,7 +206,7 @@ public:
         int nIndex = 5;
         std::vector<uint256> vBranch;
         vBranch.resize(3);
-        return {MerkleBranch(nIndex, vBranch), EvalMock::NotarisationHash()};
+        return {MerkleBranch(nIndex, vBranch), EvalMock::NotarizationHash()};
     }
 
     CMutableTransaction ImportPayoutTx()
@@ -567,7 +562,7 @@ TEST_F(TestBet, testImportPayoutMangleSessionId)
 }
 
 
-TEST_F(TestBet, testImportPayoutInvalidNotarisationHash)
+TEST_F(TestBet, testImportPayoutInvalidNotarizationHash)
 {
     EvalMock eval = ebet.SetEvalMock(12);
 

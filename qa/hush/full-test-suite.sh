@@ -1,9 +1,8 @@
 #!/usr/bin/env python2
-# Copyright (c) 2019-2020 The Hush developers
-# Released under the GPLv3
-#
+# Copyright (c) 2016-2020 The Hush developers
 # Execute all of the automated tests related to Hush
-#
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 import argparse
 import os
@@ -22,10 +21,7 @@ REPOROOT = os.path.dirname(
 def repofile(filename):
     return os.path.join(REPOROOT, filename)
 
-
-#
 # Custom test runners
-#
 
 RE_RPATH_RUNPATH = re.compile('No RPATH.*No RUNPATH')
 RE_FORTIFY_AVAILABLE = re.compile('FORTIFY_SOURCE support available.*Yes')
@@ -117,11 +113,7 @@ def util_test():
         env={'PYTHONPATH': repofile('src/test'), 'srcdir': repofile('src')}
     ) == 0
 
-
-#
 # Tests
-#
-
 STAGES = [
     'btest',
     'gtest',
@@ -129,7 +121,6 @@ STAGES = [
     'no-dot-so',
     'util-test',
     'secp256k1',
-    'libsnark',
     'univalue',
     'rpc',
 ]
@@ -141,16 +132,11 @@ STAGE_COMMANDS = {
     'no-dot-so': ensure_no_dot_so_in_depends,
     'util-test': util_test,
     'secp256k1': ['make', '-C', repofile('src/secp256k1'), 'check'],
-    'libsnark': ['make', '-C', repofile('src'), 'libsnark-tests'],
     'univalue': ['make', '-C', repofile('src/univalue'), 'check'],
     'rpc': [repofile('qa/pull-tester/rpc-tests.sh')],
 }
 
-
-#
 # Test driver
-#
-
 def run_stage(stage):
     print('Running stage %s' % stage)
     print('=' * (len(stage) + 14))

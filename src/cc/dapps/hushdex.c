@@ -1,4 +1,6 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2020 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,7 +19,7 @@
 // build hushdex and put in path: git pull; gcc cc/dapps/hushdex.c -lm -o hushdex; cp hushdex /usr/bin
 // alice sends relcoin and gets basecoin
 
-#define DEXP2P_CHAIN ((char *)"ZEX")
+#define DEXP2P_CHAIN ((char *)"HUSHDEX")
 #define DEXP2P_PUBKEYS ((char *)"hushdex")
 #include "dappinc.h"
 
@@ -152,9 +154,13 @@ char *hushdex_checkname(char *tmpstr,struct msginfo *mp,int32_t baserel,char *co
 
 int32_t hushdex_zonly(struct coininfo *coin)
 {
-    if ( strcmp(coin->coin,"PIRATE") == 0 )
+    if ( strcmp(coin->coin,"HUSH3") == 0 )
         return(1);
-    else return(coin->iszaddr);
+
+    if ( strcmp(coin->coin,"HUSHFILE") == 0 )
+        return(1);
+
+    return 0;
 }
 
 // //////////////////////////////// the four key functions needed to support a new item for hushdexs
@@ -229,24 +235,8 @@ int64_t hushdex_getbalance(struct coininfo *coin)
             retval = SATOSHIDEN;
         }
         return(retval);
-    }
-    else if ( hushdex_zonly(coin) != 0 )
+    } else if ( hushdex_zonly(coin) != 0 ) {
         return(z_getbalance(coinstr,acname,DPOW_recvZaddr));
-    else
-    {
-        if ( coin->istoken != 0 )
-        {
-            if ( get_getbalance(coinstr,acname) < SUBATOMIC_TXFEE )
-            {
-                fprintf(stderr,"not enough balance to send token\n");
-                return(0);
-            }
-            //fprintf(stderr,"token balance %s\n",coin->tokenid);
-            return(get_tokenbalance(coinstr,acname,coin->tokenid) * SATOSHIDEN);
-        }
-        else if ( coin->isexternal == 0 )
-            return(get_getbalance(coinstr,acname));
-        else return(_hushdex_getbalance(coin));
     }
 }
 

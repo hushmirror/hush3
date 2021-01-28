@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -21,9 +21,7 @@
 #include "include/cJSON.h"
 #include "cryptoconditions.h"
 
-
 struct CCType CC_AnonType;
-
 
 CC *mkAnon(const Condition_t *asnCond) {
 

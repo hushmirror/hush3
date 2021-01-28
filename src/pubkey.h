@@ -1,9 +1,9 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Copyright (c) 2017 The Zcash developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,14 +18,11 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
-#ifndef BITCOIN_PUBKEY_H
-#define BITCOIN_PUBKEY_H
-
+#ifndef HUSH_PUBKEY_H
+#define HUSH_PUBKEY_H
 #include "hash.h"
 #include "serialize.h"
 #include "uint256.h"
-
 #include <stdexcept>
 #include <vector>
 
@@ -266,4 +263,4 @@ public:
     ~ECCVerifyHandle();
 };
 
-#endif // BITCOIN_PUBKEY_H
+#endif // HUSH_PUBKEY_H

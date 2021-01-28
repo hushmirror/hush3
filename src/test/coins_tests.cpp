@@ -1,5 +1,5 @@
 // Copyright (c) 2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -60,9 +60,6 @@ public:
     {
         const std::map<uint256, bool>* mapToUse;
         switch (type) {
-            case SPROUT:
-                mapToUse = &mapSproutNullifiers_;
-                break;
             case SAPLING:
                 mapToUse = &mapSaplingNullifiers_;
                 break;
@@ -81,9 +78,6 @@ public:
 
     uint256 GetBestAnchor(ShieldedType type) const {
         switch (type) {
-            case SPROUT:
-                return hashBestSproutAnchor_;
-                break;
             case SAPLING:
                 return hashBestSaplingAnchor_;
                 break;
@@ -246,9 +240,7 @@ BOOST_FIXTURE_TEST_SUITE(coins_tests, BasicTestingSetup)
 void checkNullifierCache(const CCoinsViewCacheTest &cache, const TxWithNullifiers &txWithNullifiers, bool shouldBeInCache) {
     // Make sure the nullifiers have not gotten mixed up
     BOOST_CHECK(!cache.GetNullifier(txWithNullifiers.sproutNullifier, SAPLING));
-    BOOST_CHECK(!cache.GetNullifier(txWithNullifiers.saplingNullifier, SPROUT));
     // Check if the nullifiers either are or are not in the cache
-    bool containsSproutNullifier = cache.GetNullifier(txWithNullifiers.sproutNullifier, SPROUT);
     bool containsSaplingNullifier = cache.GetNullifier(txWithNullifiers.saplingNullifier, SAPLING);
     BOOST_CHECK(containsSproutNullifier == shouldBeInCache);
     BOOST_CHECK(containsSaplingNullifier == shouldBeInCache);
@@ -417,9 +409,6 @@ template<typename Tree> void anchorPopRegressionTestImpl(ShieldedType type)
 
 BOOST_AUTO_TEST_CASE(anchor_pop_regression_test)
 {
-    BOOST_TEST_CONTEXT("Sprout") {
-        anchorPopRegressionTestImpl<SproutMerkleTree>(SPROUT);
-    }
     BOOST_TEST_CONTEXT("Sapling") {
         anchorPopRegressionTestImpl<SaplingMerkleTree>(SAPLING);
     }
@@ -509,9 +498,6 @@ template<typename Tree> void anchorRegressionTestImpl(ShieldedType type)
 
 BOOST_AUTO_TEST_CASE(anchor_regression_test)
 {
-    BOOST_TEST_CONTEXT("Sprout") {
-        anchorRegressionTestImpl<SproutMerkleTree>(SPROUT);
-    }
     BOOST_TEST_CONTEXT("Sapling") {
         anchorRegressionTestImpl<SaplingMerkleTree>(SAPLING);
     }
@@ -572,9 +558,6 @@ template<typename Tree> void anchorsFlushImpl(ShieldedType type)
 
 BOOST_AUTO_TEST_CASE(anchors_flush_test)
 {
-    BOOST_TEST_CONTEXT("Sprout") {
-        anchorsFlushImpl<SproutMerkleTree>(SPROUT);
-    }
     BOOST_TEST_CONTEXT("Sapling") {
         anchorsFlushImpl<SaplingMerkleTree>(SAPLING);
     }
@@ -730,9 +713,6 @@ template<typename Tree> void anchorsTestImpl(ShieldedType type)
 
 BOOST_AUTO_TEST_CASE(anchors_test)
 {
-    BOOST_TEST_CONTEXT("Sprout") {
-        anchorsTestImpl<SproutMerkleTree>(SPROUT);
-    }
     BOOST_TEST_CONTEXT("Sapling") {
         anchorsTestImpl<SaplingMerkleTree>(SAPLING);
     }

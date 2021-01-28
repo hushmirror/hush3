@@ -3,8 +3,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_UTILTIME_H
-#define BITCOIN_UTILTIME_H
+#ifndef HUSH_UTILTIME_H
+#define HUSH_UTILTIME_H
 
 #include <stdint.h>
 #include <string>
@@ -17,4 +17,4 @@ void MilliSleep(int64_t n);
 
 std::string DateTimeStrFormat(const char* pszFormat, int64_t nTime);
 
-#endif // BITCOIN_UTILTIME_H
+#endif // HUSH_UTILTIME_H

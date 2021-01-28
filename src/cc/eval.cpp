@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -12,10 +15,8 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include <assert.h>
 #include <cryptoconditions.h>
-
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "script/cc.h"
@@ -32,14 +33,14 @@ char *CClib_name();
 
 Eval* EVAL_TEST = 0;
 struct CCcontract_info CCinfos[0x100];
-extern pthread_mutex_t KOMODO_CC_mutex;
+extern pthread_mutex_t HUSH_CC_mutex;
 
 bool RunCCEval(const CC *cond, const CTransaction &tx, unsigned int nIn)
 {
     EvalRef eval;
-    pthread_mutex_lock(&KOMODO_CC_mutex);
+    pthread_mutex_lock(&HUSH_CC_mutex);
     bool out = eval->Dispatch(cond, tx, nIn);
-    pthread_mutex_unlock(&KOMODO_CC_mutex);
+    pthread_mutex_unlock(&HUSH_CC_mutex);
     if ( eval->state.IsValid() != out)
         fprintf(stderr,"out %d vs %d isValid\n",(int32_t)out,(int32_t)eval->state.IsValid());
     //assert(eval->state.IsValid() == out);
@@ -160,12 +161,12 @@ bool Eval::GetBlock(uint256 hash, CBlockIndex& blockIdx) const
     return false;
 }
 
-extern int32_t komodo_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
+extern int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 
 
 int32_t Eval::GetNotaries(uint8_t pubkeys[64][33], int32_t height, uint32_t timestamp) const
 {
-    return komodo_notaries(pubkeys, height, timestamp);
+    return hush_notaries(pubkeys, height, timestamp);
 }
 
 bool Eval::CheckNotaryInputs(const CTransaction &tx, uint32_t height, uint32_t timestamp) const
@@ -179,16 +180,14 @@ bool Eval::CheckNotaryInputs(const CTransaction &tx, uint32_t height, uint32_t t
     return CheckTxAuthority(tx, auth);
 }
 
-/*
- * Get MoM from a notarisation tx hash (on KMD)
- */
-bool Eval::GetNotarisationData(const uint256 notaryHash, NotarisationData &data) const
+// Get MoM from a notarisation tx hash (on HUSH)
+bool Eval::GetNotarizationData(const uint256 notaryHash, NotarizationData &data) const
 {
     CTransaction notarisationTx;
     CBlockIndex block;
     if (!GetTxConfirmed(notaryHash, notarisationTx, block)) return false;
     if (!CheckNotaryInputs(notarisationTx, block.GetHeight(), block.nTime)) return false;
-    if (!ParseNotarisationOpReturn(notarisationTx, data)) return false;
+    if (!ParseNotarizationOpReturn(notarisationTx, data)) return false;
     return true;
 }
 
@@ -206,9 +205,9 @@ std::string Eval::GetAssetchainsSymbol() const
 
 
 /*
- * Notarisation data, ie, OP_RETURN payload in notarisation transactions
+ * Notarization data, ie, OP_RETURN payload in notarisation transactions
  */
-bool ParseNotarisationOpReturn(const CTransaction &tx, NotarisationData &data)
+bool ParseNotarizationOpReturn(const CTransaction &tx, NotarizationData &data)
 {
     if (tx.vout.size() < 2) return false;
     std::vector<unsigned char> vdata;
@@ -217,10 +216,7 @@ bool ParseNotarisationOpReturn(const CTransaction &tx, NotarisationData &data)
     return out;
 }
 
-
-/*
- * Misc
- */
+// Misc
 std::string EvalToStr(EvalCode c)
 {
     FOREACH_EVAL(EVAL_GENERATE_STRING);
@@ -229,7 +225,6 @@ std::string EvalToStr(EvalCode c)
     return std::string(s);
 
 }
-
 
 uint256 SafeCheckMerkleBranch(uint256 hash, const std::vector<uint256>& vMerkleBranch, int nIndex)
 {
@@ -250,7 +245,6 @@ uint256 SafeCheckMerkleBranch(uint256 hash, const std::vector<uint256>& vMerkleB
     }
     return hash;
 }
-
 
 uint256 GetMerkleRoot(const std::vector<uint256>& vLeaves)
 {

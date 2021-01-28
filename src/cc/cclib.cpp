@@ -1,4 +1,6 @@
-// Copyright © 2019-2020 The Hush Developers
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -13,10 +15,8 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include <assert.h>
 #include <cryptoconditions.h>
-
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "script/cc.h"
@@ -27,14 +27,11 @@
 #include "chain.h"
 #include "core_io.h"
 #include "crosschain.h"
-
 #define FAUCET2SIZE COIN
 #define EVAL_FAUCET2 EVAL_FIRSTUSER
-
 #ifdef BUILD_ROGUE
 #define EVAL_ROGUE 17
 std::string MYCCLIBNAME = (char *)"rogue";
-
 
 #elif BUILD_CUSTOMCC
 #include "customcc.h"
@@ -446,13 +443,12 @@ bool CClib_validate(struct CCcontract_info *cp,int32_t height,Eval *eval,const C
         else return eval->Invalid("invalid evalcode");
 #endif
     }
-    numvins = tx.vin.size();
-    numvouts = tx.vout.size();
+    numvins       = tx.vin.size();
+    numvouts      = tx.vout.size();
     preventCCvins = preventCCvouts = -1;
-    if ( numvouts < 1 )
+    if ( numvouts < 1 ) {
         return eval->Invalid("no vouts");
-    else
-    {
+    } else {
         for (i=0; i<numvins; i++)
         {
             if ( IsCCInput(tx.vin[0].scriptSig) == 0 )
@@ -462,13 +458,10 @@ bool CClib_validate(struct CCcontract_info *cp,int32_t height,Eval *eval,const C
             }
         }
         //fprintf(stderr,"check amounts\n");
-        if ( CClibExactAmounts(cp,eval,tx,1,10000) == false )
-        {
+        if ( CClibExactAmounts(cp,eval,tx,1,10000) == false ) {
             fprintf(stderr,"faucetget invalid amount\n");
             return false;
-        }
-        else
-        {
+        } else {
             preventCCvouts = 1;
             if ( IsCClibvout(cp,tx,0,cp->unspendableCCaddr) != 0 )
             {
@@ -565,7 +558,7 @@ int64_t AddCClibtxfee(struct CCcontract_info *cp,CMutableTransaction &mtx,CPubKe
 
 std::string Faucet2Fund(struct CCcontract_info *cp,uint64_t txfee,int64_t funds)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CPubKey mypk,cclibpk; CScript opret;
     if ( txfee == 0 )
         txfee = 10000;
@@ -581,7 +574,7 @@ std::string Faucet2Fund(struct CCcontract_info *cp,uint64_t txfee,int64_t funds)
 
 std::string CClib_rawtxgen(struct CCcontract_info *cp,uint8_t funcid,cJSON *params)
 {
-    CMutableTransaction tmpmtx,mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction tmpmtx,mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     CPubKey mypk,cclibpk; int64_t funds,txfee=0,inputs,CCchange=0,nValue=FAUCET2SIZE; std::string rawhex; uint32_t j; int32_t i,len; uint8_t buf[32768]; bits256 hash;
     if ( txfee == 0 )
         txfee = 10000;

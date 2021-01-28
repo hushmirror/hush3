@@ -1,7 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
-
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -21,16 +20,13 @@
  ******************************************************************************/
 
 #include "txdb.h"
-
 #include "chainparams.h"
 #include "hash.h"
 #include "main.h"
 #include "pow.h"
 #include "uint256.h"
 #include "core_io.h"
-
 #include <stdint.h>
-
 #include <boost/thread.hpp>
 
 using namespace std;
@@ -430,7 +426,7 @@ bool CBlockTreeDB::ReadAddressIndex(uint160 addressHash, int type,
 }
 
 bool getAddressFromIndex(const int &type, const uint160 &hash, std::string &address);
-uint32_t komodo_segid32(char *coinaddr);
+uint32_t hush_segid32(char *coinaddr);
 
 #define DECLARE_IGNORELIST std::map <std::string,int> ignoredMap = { \
     {"RReUxSs5hGE39ELU23DfydX8riUuzdrHAE", 1}, \
@@ -584,7 +580,7 @@ UniValue CBlockTreeDB::Snapshot(int top)
           	char amount[32];
           	sprintf(amount, "%.8f", (double) it->first / COIN);
           	obj.push_back( make_pair("amount", amount) );
-            obj.push_back( make_pair("segid",(int32_t)komodo_segid32((char *)it->second.c_str()) & 0x3f) );
+            obj.push_back( make_pair("segid",(int32_t)hush_segid32((char *)it->second.c_str()) & 0x3f) );
           	addressesSorted.push_back(obj);
             topN++;
             // If requested, only show top N addresses in output JSON

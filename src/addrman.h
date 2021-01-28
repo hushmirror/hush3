@@ -1,5 +1,5 @@
 // Copyright (c) 2012 Pieter Wuille
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_ADDRMAN_H
-#define BITCOIN_ADDRMAN_H
+#ifndef HUSH_ADDRMAN_H
+#define HUSH_ADDRMAN_H
 
 #include "netbase.h"
 #include "protocol.h"
@@ -645,4 +645,4 @@ public:
 
 };
 
-#endif // BITCOIN_ADDRMAN_H
+#endif // HUSH_ADDRMAN_H

@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_SCRIPT_INTERPRETER_H
-#define BITCOIN_SCRIPT_INTERPRETER_H
+#ifndef HUSH_SCRIPT_INTERPRETER_H
+#define HUSH_SCRIPT_INTERPRETER_H
 
 #include "script_error.h"
 #include "primitives/transaction.h"
@@ -204,4 +204,4 @@ bool VerifyScript(
     const BaseSignatureChecker& checker,
     uint32_t consensusBranchId,
     ScriptError* serror = NULL);
-#endif // BITCOIN_SCRIPT_INTERPRETER_H
+#endif // HUSH_SCRIPT_INTERPRETER_H

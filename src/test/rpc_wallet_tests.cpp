@@ -1,5 +1,5 @@
 // Copyright (c) 2013-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -910,8 +910,8 @@ BOOST_AUTO_TEST_CASE(rpc_z_sendmany_parameters)
             "1 50.00000001"
             ), runtime_error);
 
-    // memo bigger than allowed length of ZC_MEMO_SIZE
-    std::vector<char> v (2 * (ZC_MEMO_SIZE+1));     // x2 for hexadecimal string format
+    // memo bigger than allowed length of HUSH_MEMO_SIZE
+    std::vector<char> v (2 * (HUSH_MEMO_SIZE+1));     // x2 for hexadecimal string format
     std::fill(v.begin(),v.end(), 'A');
     std::string badmemo(v.begin(), v.end());
     auto pa = pwalletMain->GenerateNewSproutZKey();
@@ -1035,17 +1035,17 @@ BOOST_AUTO_TEST_CASE(rpc_z_sendmany_internals)
         TEST_FRIEND_AsyncRPCOperation_sendmany proxy(ptr);
 
         std::string memo = "DEADBEEF";
-        std::array<unsigned char, ZC_MEMO_SIZE> array = proxy.get_memo_from_hex_string(memo);
+        std::array<unsigned char, HUSH_MEMO_SIZE> array = proxy.get_memo_from_hex_string(memo);
         BOOST_CHECK_EQUAL(array[0], 0xDE);
         BOOST_CHECK_EQUAL(array[1], 0xAD);
         BOOST_CHECK_EQUAL(array[2], 0xBE);
         BOOST_CHECK_EQUAL(array[3], 0xEF);
-        for (int i=4; i<ZC_MEMO_SIZE; i++) {
+        for (int i=4; i<HUSH_MEMO_SIZE; i++) {
             BOOST_CHECK_EQUAL(array[i], 0x00);  // zero padding
         }
 
         // memo is longer than allowed
-        std::vector<char> v (2 * (ZC_MEMO_SIZE+1));
+        std::vector<char> v (2 * (HUSH_MEMO_SIZE+1));
         std::fill(v.begin(),v.end(), 'A');
         std::string bigmemo(v.begin(), v.end());
 
@@ -1697,8 +1697,8 @@ BOOST_AUTO_TEST_CASE(rpc_z_mergetoaddress_parameters)
             "0.0001 100 -1"
             ), runtime_error);
 
-    // memo bigger than allowed length of ZC_MEMO_SIZE
-    std::vector<char> v (2 * (ZC_MEMO_SIZE+1));     // x2 for hexadecimal string format
+    // memo bigger than allowed length of HUSH_MEMO_SIZE
+    std::vector<char> v (2 * (HUSH_MEMO_SIZE+1));     // x2 for hexadecimal string format
     std::fill(v.begin(),v.end(), 'A');
     std::string badmemo(v.begin(), v.end());
     auto pa = pwalletMain->GenerateNewSproutZKey();
@@ -1806,17 +1806,17 @@ BOOST_AUTO_TEST_CASE(rpc_z_mergetoaddress_internals)
         TEST_FRIEND_AsyncRPCOperation_mergetoaddress proxy(ptr);
 
         std::string memo = "DEADBEEF";
-        std::array<unsigned char, ZC_MEMO_SIZE> array = proxy.get_memo_from_hex_string(memo);
+        std::array<unsigned char, HUSH_MEMO_SIZE> array = proxy.get_memo_from_hex_string(memo);
         BOOST_CHECK_EQUAL(array[0], 0xDE);
         BOOST_CHECK_EQUAL(array[1], 0xAD);
         BOOST_CHECK_EQUAL(array[2], 0xBE);
         BOOST_CHECK_EQUAL(array[3], 0xEF);
-        for (int i=4; i<ZC_MEMO_SIZE; i++) {
+        for (int i=4; i<HUSH_MEMO_SIZE; i++) {
             BOOST_CHECK_EQUAL(array[i], 0x00);  // zero padding
         }
 
         // memo is longer than allowed
-        std::vector<char> v (2 * (ZC_MEMO_SIZE+1));
+        std::vector<char> v (2 * (HUSH_MEMO_SIZE+1));
         std::fill(v.begin(),v.end(), 'A');
         std::string bigmemo(v.begin(), v.end());
 

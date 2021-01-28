@@ -2,8 +2,8 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
-#ifndef BITCOIN_ZMQ_ZMQCONFIG_H
-#define BITCOIN_ZMQ_ZMQCONFIG_H
+#ifndef HUSH_ZMQ_ZMQCONFIG_H
+#define HUSH_ZMQ_ZMQCONFIG_H
 
 #if defined(HAVE_CONFIG_H)
 #include "config/bitcoin-config.h"
@@ -21,4 +21,4 @@
 
 void zmqError(const char *str);
 
-#endif // BITCOIN_ZMQ_ZMQCONFIG_H
+#endif // HUSH_ZMQ_ZMQCONFIG_H

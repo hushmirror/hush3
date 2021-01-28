@@ -1,4 +1,7 @@
-// start https://github.com/attractivechaos/plb/blob/master/sudoku/incoming/sudoku_solver.c
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+// From https://github.com/attractivechaos/plb/blob/master/sudoku/incoming/sudoku_solver.c
 /************************************************************************************/
 /*                                                                                  */
 /* Author: Bill DuPree                                                              */
@@ -192,10 +195,10 @@
 /*                                                                                  */
 /* CHANGE LOG:                                                                      */
 /*                                                                                  */
-/* Rev.	  Date        Init.	Description                                         */
+/* Rev.	  Date        Init.	Description                                             */
 /* -------------------------------------------------------------------------------- */
-/* 1.00   2006-02-25  WD	Initial version.                                    */
-/* 1.01   2006-03-13  WD	Fixed return code calc. Added signon message.       */
+/* 1.00   2006-02-25  WD	Initial version.                                        */
+/* 1.01   2006-03-13  WD	Fixed return code calc. Added signon message.           */
 /* 1.10   2006-03-20  WD        Added explain option, add'l speed optimizations     */
 /* 1.11   2006-03-23  WD        More simple speed optimizations, cleanup, bug fixes */
 /*                                                                                  */
@@ -2640,7 +2643,7 @@ uint8_t sudoku_genopreturndecode(char *unsolved,CScript scriptPubKey)
 
 UniValue sudoku_generate(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     UniValue result(UniValue::VOBJ); CPubKey sudokupk,pk; uint8_t privkey[32],unsolved[9][9],pub33[33]; uint32_t srandi; int32_t i,score; uint256 hash; char coinaddr[64],str[82],*jsonstr; uint64_t inputsum,amount,change=0; std::string rawtx;
     amount = COIN;
     /*if ( params != 0 )
@@ -2735,7 +2738,7 @@ UniValue sudoku_txidinfo(uint64_t txfee,struct CCcontract_info *cp,cJSON *params
                 if ( sudoku_genopreturndecode(unsolved,tx.vout[numvouts-1].scriptPubKey) == 'G' )
                 {
                     result.push_back(Pair("result","success"));
-                    if ( (pindex= komodo_blockindex(hashBlock)) != 0 )
+                    if ( (pindex= hush_blockindex(hashBlock)) != 0 )
                         result.push_back(Pair("height",pindex->GetHeight()));
                     Getscriptaddress(CCaddr,tx.vout[1].scriptPubKey);
                     result.push_back(Pair("sudokuaddr",CCaddr));
@@ -2787,7 +2790,7 @@ UniValue sudoku_pending(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
                 if ( sudoku_genopreturndecode(unsolved,tx.vout[numvouts-1].scriptPubKey) == 'G' )
                 {
                     UniValue obj(UniValue::VOBJ);
-                    if ( (pindex= komodo_blockindex(hashBlock)) != 0 )
+                    if ( (pindex= hush_blockindex(hashBlock)) != 0 )
                         obj.push_back(Pair("height",pindex->GetHeight()));
                     obj.push_back(Pair("amount",ValueFromAmount(tx.vout[1].nValue)));
                     obj.push_back(Pair("txid",txid.GetHex()));
@@ -2808,7 +2811,7 @@ UniValue sudoku_pending(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 
 UniValue sudoku_solution(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
 {
-    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), komodo_nextheight());
+    CMutableTransaction mtx = CreateNewContextualCMutableTransaction(Params().GetConsensus(), hush_nextheight());
     UniValue result(UniValue::VOBJ); int32_t i,j,good,ind,n,numvouts; uint256 txid; char *jsonstr,*newstr,*txidstr,coinaddr[64],checkaddr[64],CCaddr[64],*solution=0,unsolved[82]; CPubKey pk,mypk; uint8_t vals9[9][9],priv32[32],pub33[33]; uint32_t timestamps[81]; uint64_t balance,inputsum; std::string rawtx; CTransaction tx; uint256 hashBlock;
     mypk = pubkey2pk(Mypubkey());
     memset(timestamps,0,sizeof(timestamps));
@@ -2846,7 +2849,7 @@ UniValue sudoku_solution(uint64_t txfee,struct CCcontract_info *cp,cJSON *params
                     result.push_back(Pair("sudokuaddr",CCaddr));
                     balance = CCaddress_balance(CCaddr,1);
                     result.push_back(Pair("amount",ValueFromAmount(balance)));
-                    if ( sudoku_captcha(1,timestamps,komodo_nextheight()) < 0 )
+                    if ( sudoku_captcha(1,timestamps,hush_nextheight()) < 0 )
                     {
                         result.push_back(Pair("result","error"));
                         result.push_back(Pair("error","captcha failure"));

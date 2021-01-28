@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <wolfssl/options.h>
@@ -33,10 +33,7 @@ bool operator==(const _NODE_ADDR b) const
 }
 } NODE_ADDR, *PNODE_ADDR;
 
-/**
- * @brief A class to wrap some of hush specific TLS functionalities used in the net.cpp
- * 
- */
+// A class to wrap some of hush specific TLS functionalities used in the net.cpp
 class TLSManager
 {
 public:

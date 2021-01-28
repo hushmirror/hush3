@@ -1,5 +1,8 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /*
- * Version number.  Whenever a new version number is desired, use sccs
+ * Version number.  Whenever a new version number is desired, use sccs(!)
  * to get vers.c.  encstr is declared here to force it to be loaded
  * before the version number, and therefore not to be written in saved
  * games.

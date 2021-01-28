@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2019-2020 The Hush developers
+// Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -19,8 +19,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_INIT_H
-#define BITCOIN_INIT_H
+#ifndef HUSH_INIT_H
+#define HUSH_INIT_H
 
 #include <string>
 
@@ -49,4 +49,4 @@ enum HelpMessageMode {
 /** Help for options shared between UI and daemon (for -help) */
 std::string HelpMessage(HelpMessageMode mode);
 
-#endif // BITCOIN_INIT_H
+#endif // HUSH_INIT_H

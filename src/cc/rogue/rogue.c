@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2020 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /*
  * Rogue: Exploring the Dungeons of Doom
  * Copyright (C) 1980-1983, 1985, 1999 Michael Toy, Ken Arnold and Glenn Wichman
@@ -16,9 +19,9 @@
 
 #include "rogue.h"
 #ifdef STANDALONE
-#include "../komodo/src/komodo_cJSON.h"
+#include "../hush3/src/hush_cJSON.h"
 #else
-#include "../../komodo_cJSON.h"
+#include "../../hush_cJSON.h"
 #endif
 
 /*

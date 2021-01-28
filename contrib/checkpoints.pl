@@ -1,15 +1,16 @@
 #!/usr/bin/perl
-# Copyright 2019-2020 The Hush developers
-# Released under the GPLv3
+# Copyright 2016-2020 The Hush developers
+# Copyright (c) 2016-2020 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 use warnings;
 use strict;
-# Generate checkpoint data for use in src/main.cpp
 
-# TODO: update when blocktime changes to 75s
-my $perday  = 576;
+# Generate checkpoint data for use in src/chainparams.cpp
+my $perday  = 1152;
 my $hush    = "./src/hush-cli";
 my $gethash = "$hush getblockhash";
-my $stride  = shift || 5000;
+my $stride  = shift || 1000;
 my $count   = 0;
 my $blocks  = qx{$hush getblockcount};
 if($?) {

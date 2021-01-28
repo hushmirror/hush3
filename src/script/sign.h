@@ -18,8 +18,8 @@
  *                                                                            *
  ******************************************************************************/
 
-#ifndef BITCOIN_SCRIPT_SIGN_H
-#define BITCOIN_SCRIPT_SIGN_H
+#ifndef HUSH_SCRIPT_SIGN_H
+#define HUSH_SCRIPT_SIGN_H
 
 #include "script/interpreter.h"
 
@@ -120,4 +120,4 @@ SignatureData CombineSignatures(
 SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nIn);
 void UpdateTransaction(CMutableTransaction& tx, unsigned int nIn, const SignatureData& data);
 
-#endif // BITCOIN_SCRIPT_SIGN_H
+#endif // HUSH_SCRIPT_SIGN_H
