@@ -28,7 +28,7 @@ evil organizations.
     * `tls_verified`    - if the TLS certificate was validated
   * :kiss: Important Windows bugfix: SIGTERM is now handled correctly on Windows, which means
     hushd will be less likely to corrupt data on disk
-  * :nerd: New developer documentation in DEVELOPING.md
+  * :nerd_face: New developer documentation in DEVELOPING.md
   * :alien: `-whitelist` and `-whitelistaddress` are now called `-allowlist` and `-allowlistaddress`
     * Duke Leto felt the old terminology of a "whitelist" was racist and unintuitive for
       non-native speakers, so it was changed.
