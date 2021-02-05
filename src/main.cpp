@@ -6740,16 +6740,12 @@ void static ProcessGetData(CNode* pfrom)
                 }
                 // Pruned nodes may have deleted the block, so check whether
                 // it's available before trying to send.
-                if (send && (mi->second->nStatus & BLOCK_HAVE_DATA))
-                {
+                if (send && (mi->second->nStatus & BLOCK_HAVE_DATA)) {
                     // Send block from disk
                     CBlock block;
-                    if (!ReadBlockFromDisk(block, (*mi).second,1))
-                    {
-                        assert(!"cannot load block from disk");
-                    }
-                    else
-                    {
+                    if (!ReadBlockFromDisk(block, (*mi).second,1)) {
+                        fprintf(stderr,"Cannot load block from disk, disk I/O may be limited by VPS or failing hard drive...");
+                    } else {
                         if (inv.type == MSG_BLOCK)
                         {
                             //uint256 hash; int32_t z;
