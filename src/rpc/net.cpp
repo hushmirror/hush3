@@ -1,8 +1,7 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -241,8 +240,8 @@ UniValue addnode(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "1. \"node\"     (string, required) The node (see getpeerinfo for nodes)\n"
             "2. \"command\"  (string, required) 'add' to add a node to the list, 'remove' to remove a node from the list, 'onetry' to try a connection to the node once\n"
             "\nExamples:\n"
-            + HelpExampleCli("addnode", "\"192.168.0.6:8233\" \"onetry\"")
-            + HelpExampleRpc("addnode", "\"192.168.0.6:8233\", \"onetry\"")
+            + HelpExampleCli("addnode", "\"192.168.0.6:18030\" \"onetry\"")
+            + HelpExampleRpc("addnode", "\"192.168.0.6:18030\", \"onetry\"")
         );
 
     string strNode = params[0].get_str();
@@ -285,8 +284,8 @@ UniValue disconnectnode(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nArguments:\n"
             "1. \"node\"     (string, required) The node (see getpeerinfo for nodes)\n"
             "\nExamples:\n"
-            + HelpExampleCli("disconnectnode", "\"192.168.0.6:8233\"")
-            + HelpExampleRpc("disconnectnode", "\"192.168.0.6:8233\"")
+            + HelpExampleCli("disconnectnode", "\"192.168.0.6:18030\"")
+            + HelpExampleRpc("disconnectnode", "\"192.168.0.6:18030\"")
         );
 
     CNode* pNode = FindNode(params[0].get_str());
@@ -317,7 +316,7 @@ UniValue getaddednodeinfo(const UniValue& params, bool fHelp, const CPubKey& myp
             "    \"connected\" : true|false,          (boolean) If connected\n"
             "    \"addresses\" : [\n"
             "       {\n"
-            "         \"address\" : \"192.168.0.201:8233\",  (string) The Hush server host and port\n"
+            "         \"address\" : \"192.168.0.201:18030\",  (string) The Hush server host and port\n"
             "         \"connected\" : \"outbound\"           (string) connection, inbound or outbound\n"
             "       }\n"
             "       ,...\n"
