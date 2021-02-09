@@ -1093,11 +1093,11 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         char cwd[1024];
         bool ret         = getcwd(cwd, sizeof(cwd));
         fs::path pwd     = fs::path(cwd);
-        fs::path contrib = pwd / "contrib" / "asmap";
+        fs::path contrib = pwd / ".." / "contrib" / "asmap";
 
         // if no filepath, use the default in contrib
         if (asmap_path.empty()) {
-            asmap_path = pwd / DEFAULT_ASMAP_FILENAME;
+            asmap_path = contrib / DEFAULT_ASMAP_FILENAME;
         }
         if (!asmap_path.is_absolute()) {
             asmap_path = GetDataDir() / asmap_path;
@@ -1112,10 +1112,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             return false;
         }
         const uint256 asmap_version = SerializeHash(asmap);
+        printf("%s: asmap version=%s with %lu mappings\n", __func__, asmap_version.ToString().c_str(), asmap.size());
         addrman.m_asmap = std::move(asmap); // //node.connman->SetAsmap(std::move(asmap));
         LogPrintf("Using asmap version %s for IP bucketing\n", asmap_version.ToString());
 
-        printf("%s: asmap version=%s with %d mappings\n", __func__, asmap_version.ToString(), asmap.size());
     } else {
         LogPrintf("Using /16 prefix for IP bucketing, but why?\n");
     }
