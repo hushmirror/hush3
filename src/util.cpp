@@ -846,13 +846,13 @@ void AllocateFileRange(FILE *file, unsigned int offset, unsigned int length) {
 
 void ShrinkDebugFile()
 {
-    fprintf(stderr,"Shrinking %s\n", GetDataDir().c_str() );
     // Scroll debug.log if it's getting too big
     boost::filesystem::path pathLog = GetDataDir() / "debug.log";
     FILE* file = fopen(pathLog.string().c_str(), "r");
-    unsigned int MAX_DEBUG_LOG_SIZE = 100*(1024*1024); // 100MB
-    if (file && boost::filesystem::file_size(pathLog) > MAX_DEBUG_LOG_SIZE )
-    {
+    int maxlogsize = GetArg("-maxdebugfilesize", 15);
+    unsigned int MAX_DEBUG_LOG_SIZE = maxlogsize*(1024*1024); // convert to MB
+    if (file && boost::filesystem::file_size(pathLog) > MAX_DEBUG_LOG_SIZE ) {
+        fprintf(stderr,"Shrinking %s to be at most %d bytes\n", GetDataDir().c_str(), MAX_DEBUG_LOG_SIZE );
         // Restart the file with some of the end
         std::vector <char> vch(200000,0);
         fseek(file, -((long)vch.size()), SEEK_END);
@@ -865,9 +865,9 @@ void ShrinkDebugFile()
             fwrite(begin_ptr(vch), 1, nBytes, file);
             fclose(file);
         }
-    }
-    else if (file != NULL)
+    } else if (file != NULL) {
         fclose(file);
+    }
 }
 
 #ifdef _WIN32
