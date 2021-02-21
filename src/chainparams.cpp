@@ -716,10 +716,16 @@ void *chainparams_commandline() {
                                 (425000,     uint256S("0x000000104d409a2b87617ad6f7638d5000b6ec8aad5f54dee6d6b13e0f7f66b3"))
                                 (426000,     uint256S("0x0000000bdddcaaa58568a7d5da4380c5735b9d9374e8e393e14303fca51e374f"))
                                 (427000,     uint256S("0x00000002195dafd6ba01b4089c55e35521fed90bf95420abdb73e9edb0c7e779"))
-                                (428000,     uint256S("0x00000002ea968e35749a7f41c52e61b0f4635384020a82282d997594b017d446")),
-                                (int64_t)  1613427108, // time of last checkpointed block
-                                (int64_t) 746450,      // total txs
-                                (double)  1326        // txs in the last day before block 428724
+                                (428000,     uint256S("0x00000002ea968e35749a7f41c52e61b0f4635384020a82282d997594b017d446"))
+                                (429000,     uint256S("0x00000007e213a5778b3a942016a7d7576c6c141f913342a1f627417c4f334224"))
+                                (430000,     uint256S("0x0000000f827d7a004367c15c973814cc47e32287b727ebe3a4cb581703979593"))
+                                (431000,     uint256S("0x0000000d709ec810da6a2f55ff5d10bff9a5580ffe4fee8ce27abaf175cb6312"))
+                                (432000,     uint256S("0x000000007d91ea56e7e129991aa33e57224d0f898a5a46b02efb81f40aae5ed8"))
+                                (433000,     uint256S("0x00000009da7df1aad22c96ed458fa7feae1216811568fb0e9c2f09db25dee3f0"))
+                                (434000,     uint256S("0x0000001003f3460d4b0414f94e35025c76f72b8607e0ea00c7790e10172ef8e3")),
+                                (int64_t)  1613879454, // time of last checkpointed block
+                                (int64_t) 752357,      // total txs
+                                (double)  1187        // txs in the last day before block 434429
                 };
         } else {
             checkpointData = //(Checkpoints::CCheckpointData)
