@@ -1,11 +1,12 @@
 #!/bin/bash
-# Copyright (c) 2016-2020 The Hush developers
+# Copyright (c) 2016-2021 The Hush developers
 # Released under the GPLv3
 
 #TODO: autodect version number, error handling
-FILE="hush-3.6.0-linux-amd64.tar"
+FILE="hush-3.6.2-linux-amd64.tar"
 
 mkdir build
+cp contrib/asmap/asmap.dat build/
 cp sapling*.params build/
 cd src
 cp komodod komodo-cli komodo-tx hushd hush-cli hush-tx hush-smart-chain ../build
