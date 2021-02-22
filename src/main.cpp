@@ -7344,10 +7344,15 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
         LOCK(cs_main);
 
-        if (chainActive.LastTip() != 0 && chainActive.LastTip()->GetHeight() > 100000 && IsInitialBlockDownload())
-        {
-            //fprintf(stderr,"dont process getheaders during initial download\n");
-            return true;
+
+        if (chainActive.LastTip() != 0 && chainActive.LastTip()->GetHeight() > 100000 && IsInitialBlockDownload()) {
+            if(pfrom->fAllowlisted) {
+                LogPrint("net", "Allowing getheaders from allowlisted peer=%d during initial block download\n", pfrom->id);
+            } else {
+                LogPrint("net", "Ignoring getheaders from peer=%d because node is in initial block download\n", pfrom->id);
+                //fprintf(stderr,"dont process getheaders during initial download\n");
+                return true;
+            }
         }
         CBlockIndex* pindex = NULL;
         if (locator.IsNull())
