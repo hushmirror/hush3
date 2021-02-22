@@ -122,7 +122,7 @@ enum BindFlags {
 
 static const char* FEE_ESTIMATES_FILENAME="fee_estimates.dat";
 
-static const char* DEFAULT_ASMAP_FILENAME="ip_asn.map";
+static const char* DEFAULT_ASMAP_FILENAME="asmap.dat";
 
 CClientUIInterface uiInterface; // Declared but not defined in ui_interface.h
 
@@ -1089,8 +1089,15 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // Read asmap file if configured
     if (mapArgs.count("-asmap")) {
         fs::path asmap_path = fs::path(GetArg("-asmap", ""));
+
+        char cwd[1024];
+        bool ret         = getcwd(cwd, sizeof(cwd));
+        fs::path pwd     = fs::path(cwd);
+        fs::path contrib = pwd / ".." / "contrib" / "asmap";
+
+        // if no filepath, use the default in contrib
         if (asmap_path.empty()) {
-            asmap_path = DEFAULT_ASMAP_FILENAME;
+            asmap_path = contrib / DEFAULT_ASMAP_FILENAME;
         }
         if (!asmap_path.is_absolute()) {
             asmap_path = GetDataDir() / asmap_path;
@@ -1105,10 +1112,12 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             return false;
         }
         const uint256 asmap_version = SerializeHash(asmap);
+        printf("%s: asmap version=%s with %lu mappings\n", __func__, asmap_version.ToString().c_str(), asmap.size());
         addrman.m_asmap = std::move(asmap); // //node.connman->SetAsmap(std::move(asmap));
         LogPrintf("Using asmap version %s for IP bucketing\n", asmap_version.ToString());
+
     } else {
-        LogPrintf("Using /16 prefix for IP bucketing\n");
+        LogPrintf("Using /16 prefix for IP bucketing, but why?\n");
     }
 
     if (GetBoolArg("-salvagewallet", false)) {

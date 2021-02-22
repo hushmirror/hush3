@@ -86,6 +86,7 @@ $KMD -ac_name=$NAME           \
      -ac_supply=$SUPPLY       \
      -ac_perc=$PERC           \
      -clientname=$CLIENTNAME  \
+     -asmap                   \
      -addnode=$NODE1          \
      -addnode=$NODE2          \
      -addnode=$NODE3          \
