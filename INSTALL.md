@@ -42,6 +42,18 @@ cd hush3
 ./build.sh -j$(nproc)
 ```
 
+## Building On Ubuntu 16.04 and older systems
+
+Some older compilers may not be able to compile modern code, such as gcc 5.4 which comes with Ubuntu 16.04 by default. Here is how to install gcc 7 on Ubuntu 16.04:
+
+```
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test && \
+apt update && \
+apt-get install -y gcc-7 g++-7 && \
+  update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60 && \
+  update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
+```
+
 ## Run a HUSH Node
 
 ```sh
