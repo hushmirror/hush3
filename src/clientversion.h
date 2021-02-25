@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Copyright (c) 2016-2017 The Zcash developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -29,7 +29,7 @@
 // Must be kept in sync with configure.ac , ugh!
 #define CLIENT_VERSION_MAJOR 3
 #define CLIENT_VERSION_MINOR 6
-#define CLIENT_VERSION_REVISION 2
+#define CLIENT_VERSION_REVISION 3
 #define CLIENT_VERSION_BUILD 50
 
 //! Set to true for release, false for prerelease or test build
