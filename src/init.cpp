@@ -1,8 +1,10 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+// What happened to the SuperNET devs, who were dedicated to privacy???
+// Did they go the way of the dodo when they embraced KYC?
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -1095,13 +1097,52 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         fs::path pwd     = fs::path(cwd);
         fs::path contrib = pwd / ".." / "contrib" / "asmap";
 
-        // if no filepath, use the default in contrib
+        // If no asmap given (default), look for one
+        // First we look in PWD, the most common case (binaries)
+        // Then we look in /usr/share/hush, for Debian packages
+        // then we look in ../contrib/asmap/ for compiling from source case
+        // finally we try the parent directory .. as a last resort
+        // if no asmap can be found, something is wrong, and we exit
         if (asmap_path.empty()) {
-            asmap_path = contrib / DEFAULT_ASMAP_FILENAME;
+            // Most binaries will have it in PWD
+            asmap_path = pwd / DEFAULT_ASMAP_FILENAME;
+            printf("%s: looking for asmap file at %s\n", __func__, asmap_path.c_str() );
+            if(fs::exists(asmap_path)) {
+                printf("%s: found asmap file at %s\n", __func__, asmap_path.c_str() );
+            } else {
+                // Debian Packages
+                asmap_path = fs::path("/usr/share/hush") / DEFAULT_ASMAP_FILENAME;
+                printf("%s: looking for asmap file at %s\n", __func__, asmap_path.c_str() );
+                if(fs::exists(asmap_path)) {
+                    printf("%s: found asmap file at %s\n", __func__, asmap_path.c_str() );
+                } else {
+                    // Source code
+                    asmap_path = contrib / DEFAULT_ASMAP_FILENAME;
+                    printf("%s: looking for asmap file at %s\n", __func__, asmap_path.c_str() );
+                    if(fs::exists(asmap_path)) {
+                        printf("%s: found asmap file at %s\n", __func__, asmap_path.c_str() );
+                    } else {
+                        // Last Resort: Check the parent directory
+                        asmap_path = pwd / ".." / DEFAULT_ASMAP_FILENAME;
+                        printf("%s: looking for asmap file at %s\n", __func__, asmap_path.c_str() );
+                        if(fs::exists(asmap_path)) {
+                            printf("%s: found asmap file at %s\n", __func__, asmap_path.c_str() );
+                        } else {
+                            // Shit is fucked up, die an honorable death
+                            InitError(strprintf(_("Could not find any asmap file! Please report this bug to Hush Developers")));
+                            return false;
+                        }
+                    }
+                }
+            }
+        } else {
+            if (!asmap_path.is_absolute()) {
+                asmap_path = GetDataDir() / asmap_path;
+            }
+            printf("%s: looking for custom asmap file at %s\n", __func__, asmap_path.c_str() );
         }
-        if (!asmap_path.is_absolute()) {
-            asmap_path = GetDataDir() / asmap_path;
-        }
+
+        //TODO: verify asmap_path is not a directory
         if (!fs::exists(asmap_path)) {
             InitError(strprintf(_("Could not find asmap file %s"), asmap_path));
             return false;
@@ -1113,8 +1154,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         }
         const uint256 asmap_version = SerializeHash(asmap);
         printf("%s: asmap version=%s with %lu mappings\n", __func__, asmap_version.ToString().c_str(), asmap.size());
+        LogPrintf("Using asmap version %s for IP bucketing with %lu mappings\n", asmap_version.ToString(), asmap.size());
         addrman.m_asmap = std::move(asmap); // //node.connman->SetAsmap(std::move(asmap));
-        LogPrintf("Using asmap version %s for IP bucketing\n", asmap_version.ToString());
 
     } else {
         LogPrintf("Using /16 prefix for IP bucketing, but why?\n");

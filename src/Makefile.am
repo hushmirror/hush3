@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Hush developers
+# Copyright 2016-2021 The Hush developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -483,8 +483,8 @@ nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 
 # komodod binary #
 komodod_SOURCES = bitcoind.cpp
-komodod_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-komodod_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+komodod_CPPFLAGS = -fPIC $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+komodod_CXXFLAGS = -fPIC $(AM_CXXFLAGS) $(PIE_FLAGS)
 komodod_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
