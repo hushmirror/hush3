@@ -5,8 +5,10 @@
 set -e
 set -x
 
-#TODO: autodect version number, error handling
-FILE="hush-3.6.2-linux-amd64.tar"
+#hardcode and uncomment if hushd is not running on this machine
+#VERSION=3.6.3
+VERSION=$(./src/hushd --version|grep version|cut -d' ' -f4|cut -d- -f1|sed 's/v//g')
+FILE="hush-$VERSION-linux-amd64.tar"
 TIME=$(perl -e 'print time')
 
 mv build build.$TIME
