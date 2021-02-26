@@ -722,10 +722,16 @@ void *chainparams_commandline() {
                                 (431000,     uint256S("0x0000000d709ec810da6a2f55ff5d10bff9a5580ffe4fee8ce27abaf175cb6312"))
                                 (432000,     uint256S("0x000000007d91ea56e7e129991aa33e57224d0f898a5a46b02efb81f40aae5ed8"))
                                 (433000,     uint256S("0x00000009da7df1aad22c96ed458fa7feae1216811568fb0e9c2f09db25dee3f0"))
-                                (434000,     uint256S("0x0000001003f3460d4b0414f94e35025c76f72b8607e0ea00c7790e10172ef8e3")),
-                                (int64_t)  1613879454, // time of last checkpointed block
-                                (int64_t) 752357,      // total txs
-                                (double)  1187        // txs in the last day before block 434429
+                                (434000,     uint256S("0x0000001003f3460d4b0414f94e35025c76f72b8607e0ea00c7790e10172ef8e3"))
+                                (435000,     uint256S("0x0000001c399778d54b821c0622087149f39ee688e80bb88b6960ec6e42788918"))
+                                (436000,     uint256S("0x0000000c4e21e0ac0f9541357c1a3ce483fd2dd210874ca930dc5b271c7e6b21"))
+                                (437000,     uint256S("0x00000003ce6d4b0ea02f483633abae9da2b71e62e14e08f20af13452ab6814a7"))
+                                (438000,     uint256S("0x0000000d845b717aec3b273f9cb2d894d3caa05f91b3ad41b6581adfd90b267c"))
+                                (439000,     uint256S("0x000000099a44794ccf54bcba10780b163b6a369292263df1d8d62d2d58cc7cea"))
+                                (440000,     uint256S("0x0000000b741bda60e14a5d668581f60bfb852b09249428ca7c3a59b01db31af0")),
+                                (int64_t)    1614333866, // time of last checkpointed block
+                                (int64_t)    759609,     // total txs
+                                (double)     1606        // txs in the last day before block 440133
                 };
         } else {
             checkpointData = //(Checkpoints::CCheckpointData)
