@@ -45,6 +45,7 @@ chmod 0755 -R $BUILD_DIR/*
 #cp $SRC_DEB/prerm $BUILD_DIR/DEBIAN
 # Copy binaries. We prefix our komodod binaries with hush- to prevent conflicting with
 # a stock komodod or other flavors of KMD
+cp $SRC_PATH/contrib/asmap/asmap.dat $DEB_SHR
 cp $SRC_PATH/sapling-spend.params $DEB_SHR
 cp $SRC_PATH/sapling-output.params $DEB_SHR
 cp $SRC_PATH/src/komodod $DEB_BIN/hush-komodod

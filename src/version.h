@@ -1,5 +1,5 @@
 // Copyright (c) 2012-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -21,7 +21,7 @@
 #define HUSH_VERSION_H
 
 // network protocol versioning
-static const int PROTOCOL_VERSION = 1987420;
+static const int PROTOCOL_VERSION = 1987421;
 //! initial proto version, to be increased after version/verack negotiation
 static const int INIT_PROTO_VERSION = 209;
 //! In this version, 'getheaders' was introduced.

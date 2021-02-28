@@ -50,7 +50,7 @@ endef
 #endef
 
 define $(package)_build_cmds
-  $(MAKE) -j1 src/libwolfssl.la
+  $(MAKE) CPPFLAGS='-fPIC' -j1 src/libwolfssl.la
 endef
 
 define $(package)_stage_cmds

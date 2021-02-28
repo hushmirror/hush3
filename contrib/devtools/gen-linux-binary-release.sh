@@ -1,15 +1,25 @@
 #!/bin/bash
-# Copyright (c) 2016-2020 The Hush developers
+# Copyright (c) 2016-2021 The Hush developers
 # Released under the GPLv3
 
-#TODO: autodect version number, error handling
-FILE="hush-3.6.0-linux-amd64.tar"
+set -e
+set -x
 
+#hardcode and uncomment if hushd is not running on this machine
+#VERSION=3.6.3
+VERSION=$(./src/hushd --version|grep version|cut -d' ' -f4|cut -d- -f1|sed 's/v//g')
+FILE="hush-$VERSION-linux-amd64.tar"
+TIME=$(perl -e 'print time')
+
+mv build build.$TIME
 mkdir build
+cp contrib/asmap/asmap.dat build/
 cp sapling*.params build/
 cd src
 cp komodod komodo-cli komodo-tx hushd hush-cli hush-tx hush-smart-chain ../build
 cd ../build
+strip komodo*
 tar -f $FILE -c  *
-gzip $FILE
-
+gzip -9 $FILE
+sha256sum *.gz
+du -sh *.gz

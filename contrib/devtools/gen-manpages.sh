@@ -12,8 +12,9 @@ HUSHTX=${HUSHTX:-$SRCDIR/hush-tx}
 
 [ ! -x $HUSHD ] && echo "$HUSHD not found or not executable." && exit 1
 
-HUSHVER="v3.6.1"
-#HUSHVER=$(./src/hushd --version|head -n2|tail -n1|cut -d' ' -f4|cut -d- -f1)
+# use this if hushd is not running
+#HUSHVER="v3.6.2"
+HUSHVER=$(./src/hushd --version|head -n1|cut -d' ' -f4|cut -d- -f1)
 
 # Create a footer file with copyright content.
 # This gets autodetected fine for hushd if --version-string is not set,

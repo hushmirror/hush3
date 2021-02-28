@@ -557,7 +557,7 @@ void *chainparams_commandline() {
                 {
                         boost::assign::map_list_of
                                 (0, pCurrentParams->consensus.hashGenesisBlock)
-                                // Generated at 1600532337 via hush3 contrib/checkpoints.pl by Duke Leto
+                                // Last updated at 1613482505 via hush3 contrib/checkpoints.pl by Duke Leto
                                 (5000,     uint256S("0x000000018f8543066baa9c5f83e981749da4cb625fad02c187b4a9c4693ebd60"))
                                 (10000,     uint256S("0x00000002d177d1cbfeaf7c27a2a32766ea9063d222cbcc7623dc08355b07a3ad"))
                                 (15000,     uint256S("0x000000008dbfbd5d5e27d819bf2989c5658c3494608bfa1320ad0b090660cd44"))
@@ -690,10 +690,48 @@ void *chainparams_commandline() {
                                 (399000,     uint256S("0x0000000d6741914a85e696364cda252340747a3b47f955b99c29e8163192c4cb"))
                                 (400000,     uint256S("0x00000004956ccd26d7532b6bf229777675f326523b904f4e1f40b9535a124641"))
                                 (401000,     uint256S("0x0000000a974824aa14a61c3b442a15d6bdf0aaa75f5c280d94e43898ef143463"))
-                                (402000,     uint256S("0x0000000c071f67605a6764573fd6524fd90628f9ea339ff55c7a20567093251e")),
-                                (int64_t)  1611465410, // time of last checkpointed block
-                                (int64_t) 708317,      // total txs
-                                (double)  1540        // txs in the last day before block 402232
+                                (402000,     uint256S("0x0000000c071f67605a6764573fd6524fd90628f9ea339ff55c7a20567093251e"))
+                                (403000,     uint256S("0x00000000532805ef6cb2c755149a7fbf8b855528fcb513942fa7f5463bfc6cc4"))
+                                (404000,     uint256S("0x00000000a2638bf8b0a48d705b117f9ce7457e6fab16b16f70c66d9a50390a53"))
+                                (405000,     uint256S("0x0000001cb3b08ce66003deb4d05182ef6f74e4e17dceaf3fd272184cbc6118a4"))
+                                (406000,     uint256S("0x0000001292e18ce355fd9c608b029cf16ef459c47503899db896ea5aebf78e34"))
+                                (407000,     uint256S("0x0000000efdeebe216c58ac94d9d9bc5aa0d772509e98a256014ecfe1002d31d3"))
+                                (408000,     uint256S("0x00000009a0d66c11cc08a8f1d96c7acbd0a97165176045421eba3bc017a42e93"))
+                                (409000,     uint256S("0x00000001df73a93028f836593d32511b047e3f4abd73fb92db02809c751457cb"))
+                                (410000,     uint256S("0x0000000306911b54cfec6f566e0b8bed99a177ed10e4cc4ca9ff855c906e4b73"))
+                                (411000,     uint256S("0x0000000b273b786e21e636c40d4c979b754e97eb3ce9e76d22b8a1901f74a46a"))
+                                (412000,     uint256S("0x0000000e850a5c492e1aa8137a721b650297bc599886167def5663abe5804315"))
+                                (413000,     uint256S("0x00000005d8c4d2404a301aa254302e70d7f74dde1661279a1f55c0009c48bc94"))
+                                (414000,     uint256S("0x000000197263852a1d5f46fa495853723393a36e9c35230c681619aeb9935bf9"))
+                                (415000,     uint256S("0x000000119792e3de106d9cd0a91bb922ca1e2717816cd3d3b350578c99985698"))
+                                (416000,     uint256S("0x00000005b112e5e5adc86b0dd453cf55038656c0fad340c3a5177923d2f4b0cd"))
+                                (417000,     uint256S("0x0000001e947478180ca348d8b6ae653727092327d592d25dbde33fd1cf4ed8cb"))
+                                (418000,     uint256S("0x00000018ea0c59fcb9ef2946f6b44eae6794da0a9fa2327258748c5ff0d1ad0d"))
+                                (419000,     uint256S("0x0000001dee9250903e8c2bea76ac144dc2dbbeca60d7041dcd5706597ddd5e38"))
+                                (420000,     uint256S("0x000000047d784123e1ac2a5b7687b72a8bcf0ff43b02d71db52f7c8f967e3179"))
+                                (421000,     uint256S("0x00000015f35a10a8baefd4f0291742f68f84ce0417491c4be3a006cb4c3959e9"))
+                                (422000,     uint256S("0x00000004f8fb248fc0e9bf3d99e5379a8e8120c18357f52eabc74553deb7b1c5"))
+                                (423000,     uint256S("0x00000010239e5fc5489d350496950b27ab5f34e3774c424a12353bba7440d78e"))
+                                (424000,     uint256S("0x0000000a43a0a4a68b2cd61d20065eea7d8a27c20d64555c8320cd4a45d769e7"))
+                                (425000,     uint256S("0x000000104d409a2b87617ad6f7638d5000b6ec8aad5f54dee6d6b13e0f7f66b3"))
+                                (426000,     uint256S("0x0000000bdddcaaa58568a7d5da4380c5735b9d9374e8e393e14303fca51e374f"))
+                                (427000,     uint256S("0x00000002195dafd6ba01b4089c55e35521fed90bf95420abdb73e9edb0c7e779"))
+                                (428000,     uint256S("0x00000002ea968e35749a7f41c52e61b0f4635384020a82282d997594b017d446"))
+                                (429000,     uint256S("0x00000007e213a5778b3a942016a7d7576c6c141f913342a1f627417c4f334224"))
+                                (430000,     uint256S("0x0000000f827d7a004367c15c973814cc47e32287b727ebe3a4cb581703979593"))
+                                (431000,     uint256S("0x0000000d709ec810da6a2f55ff5d10bff9a5580ffe4fee8ce27abaf175cb6312"))
+                                (432000,     uint256S("0x000000007d91ea56e7e129991aa33e57224d0f898a5a46b02efb81f40aae5ed8"))
+                                (433000,     uint256S("0x00000009da7df1aad22c96ed458fa7feae1216811568fb0e9c2f09db25dee3f0"))
+                                (434000,     uint256S("0x0000001003f3460d4b0414f94e35025c76f72b8607e0ea00c7790e10172ef8e3"))
+                                (435000,     uint256S("0x0000001c399778d54b821c0622087149f39ee688e80bb88b6960ec6e42788918"))
+                                (436000,     uint256S("0x0000000c4e21e0ac0f9541357c1a3ce483fd2dd210874ca930dc5b271c7e6b21"))
+                                (437000,     uint256S("0x00000003ce6d4b0ea02f483633abae9da2b71e62e14e08f20af13452ab6814a7"))
+                                (438000,     uint256S("0x0000000d845b717aec3b273f9cb2d894d3caa05f91b3ad41b6581adfd90b267c"))
+                                (439000,     uint256S("0x000000099a44794ccf54bcba10780b163b6a369292263df1d8d62d2d58cc7cea"))
+                                (440000,     uint256S("0x0000000b741bda60e14a5d668581f60bfb852b09249428ca7c3a59b01db31af0")),
+                                (int64_t)    1614333866, // time of last checkpointed block
+                                (int64_t)    759609,     // total txs
+                                (double)     1606        // txs in the last day before block 440133
                 };
         } else {
             checkpointData = //(Checkpoints::CCheckpointData)
