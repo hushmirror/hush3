@@ -1434,6 +1434,7 @@ void ThreadOpenConnections()
         }
     }
 
+
     // Initiate network connections
     int64_t nStart = GetTime();
     while (true)
@@ -1476,12 +1477,19 @@ void ThreadOpenConnections()
             }
         }
 
-        int64_t nANow = GetTime();
+        addrman.ResolveCollisions();
 
-        int nTries = 0;
-        while (true)
-        {
-            CAddrInfo addr = addrman.Select();
+        int64_t nANow = GetTime();
+        int nTries    = 0;
+        while (true) {
+            CAddrInfo addr = addrman.SelectTriedCollision();
+
+            // SelectTriedCollision returns an invalid address if it is empty.
+            /* TODO: Uncomment when merged with feeler connections
+            if (!fFeeler || !addr.IsValid()) {
+                addr = addrman.Select(fFeeler);
+            }
+            */
 
             // if we selected an invalid address, restart
             if (!addr.IsValid() || setConnected.count(addr.GetGroup(addrman.m_asmap)) || IsLocal(addr))
