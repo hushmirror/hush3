@@ -76,10 +76,9 @@ using namespace hush;
 using namespace std;
 
 namespace {
-    //TODO: Make these CLI args
-    const int MAX_OUTBOUND_CONNECTIONS = 64;
-    const int MAX_FEELER_CONNECTIONS   = 1;
-    const int MAX_INBOUND_FROMIP       = 3;
+    int MAX_OUTBOUND_CONNECTIONS = GetArg("-maxoutboundconnections",64);
+    int MAX_FEELER_CONNECTIONS   = GetArg("-maxfeelerconnections",1);
+    int MAX_INBOUND_FROMIP       = GetArg("-maxinboundfromip",3);
 
     struct ListenSocket {
         SOCKET socket;
