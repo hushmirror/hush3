@@ -1,8 +1,7 @@
 // Copyright (c) 2012 Pieter Wuille
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -31,7 +30,6 @@
 #include "clientversion.h"
 #include "hash.h"
 #include "netbase.h"
-
 #include <map>
 #include <set>
 #include <stdint.h>
@@ -42,7 +40,6 @@
  */
 class CAddrInfo : public CAddress
 {
-
 
 public:
     //! last try whatsoever by us (memory only)
@@ -174,11 +171,17 @@ public:
 //! after how many failed attempts we give up on a new node
 #define ADDRMAN_RETRIES 3
 
+//! the maximum number of tried addr collisions to store
+#define ADDRMAN_SET_TRIED_COLLISION_SIZE 10
+
 //! how many successive failures are allowed ...
 #define ADDRMAN_MAX_FAILURES 10
 
 //! ... in at least this many days
 #define ADDRMAN_MIN_FAIL_DAYS 7
+
+//! how recent a successful connection should be before we allow an address to be evicted from tried
+#define ADDRMAN_REPLACEMENT_HOURS 4
 
 //! the maximum percentage of nodes to return in a getaddr call
 #define ADDRMAN_GETADDR_MAX_PCT 23
@@ -220,6 +223,12 @@ private:
     //! list of "new" buckets
     int vvNew[ADDRMAN_NEW_BUCKET_COUNT][ADDRMAN_BUCKET_SIZE];
 
+    //! last time Good was called (memory only)
+    int64_t nLastGood;
+
+    //! Holds addrs inserted into tried table that collide with existing entries. Test-before-evict discpline used to resolve these collisions.
+    std::set<int> m_tried_collisions;
+
 protected:
     //! secret key to randomize bucket select with
     uint256 nKey;
@@ -244,7 +253,14 @@ protected:
     void ClearNew(int nUBucket, int nUBucketPos);
 
     //! Mark an entry "good", possibly moving it from "new" to "tried".
-    void Good_(const CService &addr, int64_t nTime);
+    void Good_(const CService &addr, bool test_before_evict, int64_t time);
+
+
+    //! See if any to-be-evicted tried table entries have been tested and if so resolve the collisions.
+    void ResolveCollisions_();
+
+    //! Return a random to-be-evicted tried table address.
+    CAddrInfo SelectTriedCollision_();
 
     //! Add an entry to the "new" table.
     bool Add_(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty);
@@ -583,12 +599,12 @@ public:
     }
 
     //! Mark an entry as accessible.
-    void Good(const CService &addr, int64_t nTime = GetTime())
+    void Good(const CService &addr, bool test_before_evict = true, int64_t nTime = GetTime())
     {
         {
             LOCK(cs);
             Check();
-            Good_(addr, nTime);
+            Good_(addr, test_before_evict, nTime);
             Check();
         }
     }
@@ -604,9 +620,30 @@ public:
         }
     }
 
-    /**
-     * Choose an address to connect to.
-     */
+    //! See if any to-be-evicted tried table entries have been tested and if so resolve the collisions.
+    void ResolveCollisions()
+    {
+        LOCK(cs);
+        Check();
+        ResolveCollisions_();
+        Check();
+    }
+
+    //! Randomly select an address in tried that another address is attempting to evict.
+    CAddrInfo SelectTriedCollision()
+    {
+        CAddrInfo ret;
+        {
+            LOCK(cs);
+            Check();
+            ret = SelectTriedCollision_();
+            Check();
+        }
+        return ret;
+    }
+
+
+    // Choose an address to connect to.
     CAddrInfo Select(bool newOnly = false)
     {
         CAddrInfo addrRet;

@@ -1442,6 +1442,7 @@ void ThreadOpenConnections()
         }
     }
 
+
     // Initiate network connections
     int64_t nStart = GetTime();
 
@@ -1512,10 +1513,18 @@ void ThreadOpenConnections()
             }
         }
 
-        int64_t nANow = GetTime();
-        int nTries    = 0;
+        int64_t nNow = GetTime();
+        int nTries   = 0;
+
+        addrman.ResolveCollisions();
+
         while (true) {
-            CAddrInfo addr = addrman.Select(fFeeler);
+            CAddrInfo addr = addrman.SelectTriedCollision();
+
+            // SelectTriedCollision returns an invalid address if it is empty.
+            if (!fFeeler || !addr.IsValid()) {
+                addr = addrman.Select(fFeeler);
+            }
 
             // if we selected an invalid address, restart
             if (!addr.IsValid() || setConnected.count(addr.GetGroup(addrman.m_asmap)) || IsLocal(addr))
@@ -1532,7 +1541,7 @@ void ThreadOpenConnections()
                 continue;
 
             // only consider very recently tried nodes after 30 failed attempts
-            if (nANow - addr.nLastTry < 600 && nTries < 30)
+            if (nNow - addr.nLastTry < 600 && nTries < 30)
                 continue;
 
             /* TODO: port this code

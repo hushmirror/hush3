@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -1266,7 +1266,7 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp, const CPubKey& m
                     if (fMissingInputs) {
                         throw JSONRPCError(RPC_TRANSACTION_ERROR, "Missing inputs");
                     }
-                    throw JSONRPCError(RPC_TRANSACTION_ERROR, state.GetRejectReason());
+                    throw JSONRPCError(RPC_TRANSACTION_ERROR, strprintf("Invalid state: %s", state.GetRejectReason()));
                 }
             }
         } else if (fHaveChain) {
@@ -1274,9 +1274,7 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp, const CPubKey& m
         }
         LogPrintf("%s: Relaying raw tx to mempool\n", __FUNCTION__);
         RelayTransaction(tx);
-    }
-    else
-    {
+    } else {
         NSPV_broadcast((char *)params[0].get_str().c_str());
     }
     return hashTx.GetHex();
