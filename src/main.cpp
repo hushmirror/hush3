@@ -5033,20 +5033,21 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     assert(pindexPrev);
 
-    int nHeight  = pindexPrev->GetHeight()+1;
-    bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
+    int daaForkHeight = GetArg("-daaforkheight", 448450);
+    int nHeight       = pindexPrev->GetHeight()+1;
+    bool ishush3      = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
     // Check Proof-of-Work difficulty
     if (ishush3) {
         // The change of blocktime from 150s to 75s caused Weird Stuff in the difficulty/work calculations
         // caused by the fact that Difficulty Adjustment Algorithms do not take into account blocktime
         // changing at run-time, which breaks assumptions in the algorithm
         unsigned int nNextWork = GetNextWorkRequired(pindexPrev, &block, consensusParams);
-        //if ((nHeight < 340000 || nHeight > 342500) && block.nBits != nNextWork) {
+        //if ((nHeight < daaheight) && block.nBits != nNextWork) {
         if (block.nBits != nNextWork) {
             //cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
             //    " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
             //    " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
-                if (nHeight < 340000) {
+                if (nHeight < daaForkHeight) {
                    return state.DoS(100, error("%s: Incorrect diffbits at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
                 } else {
                     LogPrintf("%s: Ignoring nbits calc : %lu vs block %lu\n",__func__, nNextWork, block.nBits   );

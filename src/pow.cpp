@@ -508,13 +508,10 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 // Changing this requires changing many other things and
 // changes consensus. Have fun -- Duke
 int64_t AveragingWindowTimespan(int32_t height) {
-    int64_t AWT = 2550;
-    /*
-    int32_t forkHeight = 0;
-    if (height >= forkHeight) {
-        AWT = 1275;
-    }
-    */
+    // used in const methods, beware!
+    // This is the correct AWT for 75s blocktime, before block 340k
+    // the correct value was 2550 when the blocktime was 150s
+    int64_t AWT = 1275;
     return AWT;
 }
 
