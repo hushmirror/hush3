@@ -5038,19 +5038,21 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     bool ishush3      = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
     // Check Proof-of-Work difficulty
     if (ishush3) {
-        // The change of blocktime from 150s to 75s caused Weird Stuff in the difficulty/work calculations
+        // The change of blocktime from 150s to 75s caused incorrect AWT of 34 blocks instead of 17
         // caused by the fact that Difficulty Adjustment Algorithms do not take into account blocktime
-        // changing at run-time, which breaks assumptions in the algorithm
+        // changing at run-time, from Consensus::Params being a const struct
         unsigned int nNextWork = GetNextWorkRequired(pindexPrev, &block, consensusParams);
-        //if ((nHeight < daaheight) && block.nBits != nNextWork) {
+
         if (block.nBits != nNextWork) {
-            //cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
-            //    " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
-            //    " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
-                if (nHeight < daaForkHeight) {
-                   return state.DoS(100, error("%s: Incorrect diffbits at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
+                // Enforce correct nbits at DAA fork height, before that, ignore
+                if (nHeight > daaForkHeight) {
+                    //cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
+                    //    " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
+                    //    " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
+
+                    return state.DoS(100, error("%s: Incorrect diffbits at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
                 } else {
-                    LogPrintf("%s: Ignoring nbits calc : %lu vs block %lu\n",__func__, nNextWork, block.nBits   );
+                    //LogPrintf("%s: Ignoring nbits calc : %lu vs block %lu\n",__func__, nNextWork, block.nBits   );
                     cout << "Ignoring nbits for height=" << nHeight << endl;
                 }
         }
