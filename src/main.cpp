@@ -5033,7 +5033,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     assert(pindexPrev);
 
-    int daaForkHeight = GetArg("-daaforkheight", 448450);
+    int daaForkHeight = GetArg("-daaforkheight", 450000);
     int nHeight       = pindexPrev->GetHeight()+1;
     bool ishush3      = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
     // Check Proof-of-Work difficulty
