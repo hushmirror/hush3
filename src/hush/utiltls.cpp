@@ -43,6 +43,7 @@ WOLFSSL_EVP_PKEY* GenerateEcKey(int nid)
 WOLFSSL_X509* GenerateCertificate(WOLFSSL_EVP_PKEY *keypair)
 {
     if (!keypair) {
+        LogPrintf("%s: Null keypair!\n", __func__);
         return NULL;
     } 
 
@@ -60,12 +61,17 @@ WOLFSSL_X509* GenerateCertificate(WOLFSSL_EVP_PKEY *keypair)
                 // private key from keypair is used; signature will be set inside of the cert
                 bCertSigned = wolfSSL_X509_sign(cert, keypair, wolfSSL_EVP_sha512());
             }
+        } else {
+            LogPrintf("%s: Unable to alloc rand bytes!\n", __func__);
         }
 
         if (!bCertSigned) {
+            LogPrintf("%s: TLS cert not signed correctly!\n", __func__);
             wolfSSL_X509_free(cert);
             cert = NULL;
         }
+    } else {
+        LogPrintf("%s: Unable to create x509 cert!\n", __func__);
     }
     
     return cert;
