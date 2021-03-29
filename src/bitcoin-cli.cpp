@@ -1,9 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2013 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -18,17 +17,14 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "chainparamsbase.h"
 #include "clientversion.h"
 #include "rpc/client.h"
 #include "rpc/protocol.h"
 #include "util.h"
 #include "utilstrencodings.h"
-
 #include <boost/filesystem/operations.hpp>
 #include <stdio.h>
-
 #include <event2/buffer.h>
 #include <event2/keyvalq_struct.h>
 #include "support/events.h"
@@ -63,15 +59,8 @@ std::string HelpMessageCli()
     return strUsage;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// Start
-//
-
-//
 // Exception thrown on connection error.  This error is used to determine
 // when to wait if -rpcwait is given.
-//
 class CConnectionFailed : public std::runtime_error
 {
 public:
@@ -82,19 +71,15 @@ public:
 
 };
 
-//
 // This function returns either one of EXIT_ codes when it's expected to stop the process or
 // CONTINUE_EXECUTION when it's expected to continue further.
-//
 static int AppInitRPC(int argc, char* argv[])
 {
     static_assert(CONTINUE_EXECUTION != EXIT_FAILURE,
                   "CONTINUE_EXECUTION should be different from EXIT_FAILURE");
     static_assert(CONTINUE_EXECUTION != EXIT_SUCCESS,
                   "CONTINUE_EXECUTION should be different from EXIT_SUCCESS");
-    //
     // Parameters
-    //
     ParseParameters(argc, argv);
     std:string name;
     name = GetArg("-ac_name","");
@@ -143,7 +128,6 @@ static int AppInitRPC(int argc, char* argv[])
     }
     return CONTINUE_EXECUTION;
 }
-
 
 /** Reply structure for request_done to fill in */
 struct HTTPReply
@@ -277,7 +261,7 @@ UniValue CallRPC(const std::string& strMethod, const UniValue& params)
     // Parse reply
     UniValue valReply(UniValue::VSTR);
     if (!valReply.read(response.body))
-        throw std::runtime_error("couldn't parse reply from server");
+        throw std::runtime_error(strprintf("couldn't parse reply from server: %s",response.body));
     const UniValue& reply = valReply.get_obj();
     if (reply.empty())
         throw std::runtime_error("expected reply to have result, error and id properties");
