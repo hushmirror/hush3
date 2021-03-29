@@ -5050,9 +5050,9 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
                     //    " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
                     //    " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
 
-                    return state.DoS(100, error("%s: Incorrect diffbits at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
+                    return state.DoS(100, error("%s: Incorrect diffbits at height %d: %lu vs %lu ", __func__, nHeight, nNextWork, block.nBits), REJECT_INVALID, "bad-diffbits");
                 } else {
-                    //LogPrintf("%s: Ignoring nbits calc : %lu vs block %lu\n",__func__, nNextWork, block.nBits   );
+                    LogPrintf("%s: Ignoring nbits calc : %lu vs block %lu\n",__func__, nNextWork, block.nBits   );
                     cout << "Ignoring nbits for height=" << nHeight << endl;
                 }
         }
