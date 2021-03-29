@@ -1,9 +1,9 @@
 package=wolfssl
-$(package)_version=4.7.0
+$(package)_version=4.6.0
 $(package)_download_path=https://github.com/wolfSSL/wolfssl/archive
 $(package)_download_file=v$($(package)_version)-stable.tar.gz
 $(package)_file_name=wolfssl-$($(package)_version).tar.gz
-$(package)_sha256_hash=b0e740b31d4d877d540ad50cc539a8873fc41af02bd3091c4357b403f7106e31
+$(package)_sha256_hash=053aefbb02d0b06b27c5e2df6875b4b587318755b7db9d6aa8d72206b310a848
 
 define $(package)_set_vars
 $(package)_config_env=AR="$($(package)_ar)" RANLIB="$($(package)_ranlib)" CC="$($(package)_cc)"
