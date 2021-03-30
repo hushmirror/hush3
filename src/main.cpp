@@ -5043,16 +5043,15 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         // changing at run-time, from Consensus::Params being a const struct
         unsigned int nNextWork = GetNextWorkRequired(pindexPrev, &block, consensusParams);
 
+        LogPrintf("%s: nbits ,%d,%lu,%lu,%d\n",__func__, nHeight, nNextWork, block.nBits, nNextWork - block.nBits );
         if (block.nBits != nNextWork) {
                 // Enforce correct nbits at DAA fork height, before that, ignore
-                if (nHeight > daaForkHeight) {
+                if (0 && nHeight > daaForkHeight) {
                     //cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
                     //    " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
                     //    " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
-
                     return state.DoS(100, error("%s: Incorrect diffbits at height %d: %lu vs %lu ", __func__, nHeight, nNextWork, block.nBits), REJECT_INVALID, "bad-diffbits");
                 } else {
-                    LogPrintf("%s: Ignoring nbits calc : %lu vs block %lu\n",__func__, nNextWork, block.nBits   );
                     cout << "Ignoring nbits for height=" << nHeight << endl;
                 }
         }
