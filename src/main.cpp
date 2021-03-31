@@ -5054,7 +5054,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         LogPrintf("%s: nbits ,%d,%lu,%lu,%d\n",__func__, nHeight, nNextWork, block.nBits, nNextWork - block.nBits );
         if (block.nBits != nNextWork) {
                 // Enforce correct nbits at DAA fork height, before that, ignore
-                if (0 && nHeight > daaForkHeight) {
+                if (nHeight > daaForkHeight) {
                     //cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
                     //    " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
                     //    " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
