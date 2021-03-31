@@ -5039,6 +5039,13 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     bool ishush3      = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
     // Check Proof-of-Work difficulty
     if (ishush3) {
+
+        // Difficulty (nBits) relies on the current blocktime of this block
+        if ((ASSETCHAINS_BLOCKTIME != 75) && (nHeight >= nFirstHalvingHeight)) {
+            LogPrintf("%s: Blocktime halving to 75s at height %d!\n",__func__,nHeight);
+            ASSETCHAINS_BLOCKTIME = 75;
+            hush_changeblocktime();
+        }
         // The change of blocktime from 150s to 75s caused incorrect AWT of 34 blocks instead of 17
         // caused by the fact that Difficulty Adjustment Algorithms do not take into account blocktime
         // changing at run-time, from Consensus::Params being a const struct
