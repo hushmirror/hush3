@@ -557,11 +557,11 @@ unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
     LogPrint("pow", "AveragingWindowTimespan = %d nActualTimespan = %d\n", AWT, nActualTimespan);
     LogPrint("pow", "Current average: %08x  %s\n", bnAvg.GetCompact(), bnAvg.ToString());
     LogPrint("pow", "After:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString());
-    //if(fDebug) {
+    if(fDebug) {
     fprintf(stderr, "%s: nbits Current average: %08x  %s\n", __func__, bnAvg.GetCompact(), bnAvg.ToString().c_str());
     fprintf(stderr, "%s: bits After:  %08x  %s\n", __func__, bnNew.GetCompact(), bnNew.ToString().c_str());
     fprintf(stderr,"%s: AWT=%lu ActualTimeSpan=%li MinActual=%li MaxActual=%li\n",__func__, AWT, nActualTimespan, params.MinActualTimespan(), params.MaxActualTimespan());
-    //}
+    }
     return bnNew.GetCompact();
 }
 
