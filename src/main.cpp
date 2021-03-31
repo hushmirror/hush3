@@ -5381,33 +5381,6 @@ static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned 
 
 void hush_currentheight_set(int32_t height);
 
-CBlockIndex *komodo_ensure(CBlock *pblock, uint256 hash)
-{
-    CBlockIndex *pindex = 0;
-    BlockMap::iterator miSelf = mapBlockIndex.find(hash);
-    if ( miSelf != mapBlockIndex.end() )
-    {
-        if ( (pindex = miSelf->second) == 0 ) // create pindex so first Accept block doesnt fail
-        {
-            miSelf->second = AddToBlockIndex(*pblock);
-            //fprintf(stderr,"Block header %s is already known, but without pindex -> ensured %p\n",hash.ToString().c_str(),miSelf->second);
-        }
-        /*if ( hash != Params().GetConsensus().hashGenesisBlock )
-        {
-            miSelf = mapBlockIndex.find(pblock->hashPrevBlock);
-            if ( miSelf != mapBlockIndex.end() )
-            {
-                if ( miSelf->second == 0 )
-                {
-                    miSelf->second = InsertBlockIndex(pblock->hashPrevBlock);
-                    fprintf(stderr,"autocreate previndex %s\n",pblock->hashPrevBlock.ToString().c_str());
-                }
-            }
-        }*/
-    }
-    return(pindex);
-}
-
 bool ProcessNewBlock(bool from_miner,int32_t height,CValidationState &state, CNode* pfrom, CBlock* pblock, bool fForceProcessing, CDiskBlockPos *dbp)
 {
     // Preliminary checks
