@@ -3,6 +3,7 @@
 // Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+// What happened to the SuperNET developers, who cared about privacy?
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -28,8 +29,8 @@
 //! These need to be macros, as clientversion.cpp's and bitcoin*-res.rc's voodoo requires it
 // Must be kept in sync with configure.ac , ugh!
 #define CLIENT_VERSION_MAJOR 3
-#define CLIENT_VERSION_MINOR 6
-#define CLIENT_VERSION_REVISION 3
+#define CLIENT_VERSION_MINOR 7
+#define CLIENT_VERSION_REVISION 0
 #define CLIENT_VERSION_BUILD 50
 
 //! Set to true for release, false for prerelease or test build
