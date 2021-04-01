@@ -19,7 +19,7 @@ Divide how many GBs of RAM you have by 2, subtract one. Use that many jobs.
 
 ## Dealing with dependency changes
 
-Let's say you change a dependency and want the compile the notice. If your
+Let's say you change a dependency and want the compile to notice. If your
 change is outside of the main Hush source code, in ./src, simply running
 `make` will not notice, and sometimes not even `build.sh`. You can always
 do a fresh clone or `make clean`, but that will take a lot of time. Those

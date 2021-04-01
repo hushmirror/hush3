@@ -425,8 +425,11 @@ bool TLSManager::CheckKeyCert()
         return false;
     }
 
-    if (wolfSSL_X509_verify(mycert, mykey) == WOLFSSL_SUCCESS) {
+    int err = wolfSSL_X509_verify(mycert, mykey);
+    if (err == WOLFSSL_SUCCESS) {
         return true;
+    } else {
+        LogPrintf("%s: x509 verification error: %d = %s\n", __func__, err);
     }
     
     LogPrintf("Generated key and certificate do not match!!!\n");
