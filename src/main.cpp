@@ -3160,7 +3160,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     int32_t futureblock;
     CAmount blockReward = GetBlockSubsidy(pindex->GetHeight(), chainparams.GetConsensus());
     uint64_t notarypaycheque = 0;
-    // Check it again to verify JoinSplit proofs, and in case a previous version let a bad block in
+
+    // Check it again to verify ztx proofs, and in case a previous version let a bad block in
     if ( !CheckBlock(&futureblock,pindex->GetHeight(),pindex,block, state, fExpensiveChecks ? verifier : disabledVerifier, fCheckPOW, !fJustCheck) || futureblock != 0 )
     {
         //fprintf(stderr,"checkblock failure in connectblock futureblock.%d\n",futureblock);
@@ -5033,23 +5034,32 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
     assert(pindexPrev);
 
-    int nHeight  = pindexPrev->GetHeight()+1;
-    bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
+    int daaForkHeight = GetArg("-daaforkheight", 450000);
+    int nHeight       = pindexPrev->GetHeight()+1;
+    bool ishush3      = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
     // Check Proof-of-Work difficulty
     if (ishush3) {
-        // The change of blocktime from 150s to 75s caused Weird Stuff in the difficulty/work calculations
+
+        // Difficulty (nBits) relies on the current blocktime of this block
+        if ((ASSETCHAINS_BLOCKTIME != 75) && (nHeight >= nFirstHalvingHeight)) {
+            LogPrintf("%s: Blocktime halving to 75s at height %d!\n",__func__,nHeight);
+            ASSETCHAINS_BLOCKTIME = 75;
+            hush_changeblocktime();
+        }
+        // The change of blocktime from 150s to 75s caused incorrect AWT of 34 blocks instead of 17
         // caused by the fact that Difficulty Adjustment Algorithms do not take into account blocktime
-        // changing at run-time, which breaks assumptions in the algorithm
+        // changing at run-time, from Consensus::Params being a const struct
         unsigned int nNextWork = GetNextWorkRequired(pindexPrev, &block, consensusParams);
-        //if ((nHeight < 340000 || nHeight > 342500) && block.nBits != nNextWork) {
+
+        LogPrintf("%s: nbits ,%d,%lu,%lu,%d\n",__func__, nHeight, nNextWork, block.nBits, nNextWork - block.nBits );
         if (block.nBits != nNextWork) {
-            //cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
-            //    " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
-            //    " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
-                if (nHeight < 340000) {
-                   return state.DoS(100, error("%s: Incorrect diffbits at height %d", __func__, nHeight), REJECT_INVALID, "bad-diffbits");
+                // Enforce correct nbits at DAA fork height, before that, ignore
+                if (nHeight > daaForkHeight) {
+                    //cout    << "Incorrect HUSH diffbits at height " << nHeight   <<
+                    //    " " << block.nBits << " block.nBits vs. calc "   << nNextWork <<
+                    //    " " << block.GetHash().ToString() << " @ "       << block.GetBlockTime() <<  endl;
+                    return state.DoS(100, error("%s: Incorrect diffbits at height %d: %lu vs %lu ", __func__, nHeight, nNextWork, block.nBits), REJECT_INVALID, "bad-diffbits");
                 } else {
-                    LogPrintf("%s: Ignoring nbits calc : %lu vs block %lu\n",__func__, nNextWork, block.nBits   );
                     cout << "Ignoring nbits for height=" << nHeight << endl;
                 }
         }
@@ -5370,33 +5380,6 @@ static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned 
 }
 
 void hush_currentheight_set(int32_t height);
-
-CBlockIndex *komodo_ensure(CBlock *pblock, uint256 hash)
-{
-    CBlockIndex *pindex = 0;
-    BlockMap::iterator miSelf = mapBlockIndex.find(hash);
-    if ( miSelf != mapBlockIndex.end() )
-    {
-        if ( (pindex = miSelf->second) == 0 ) // create pindex so first Accept block doesnt fail
-        {
-            miSelf->second = AddToBlockIndex(*pblock);
-            //fprintf(stderr,"Block header %s is already known, but without pindex -> ensured %p\n",hash.ToString().c_str(),miSelf->second);
-        }
-        /*if ( hash != Params().GetConsensus().hashGenesisBlock )
-        {
-            miSelf = mapBlockIndex.find(pblock->hashPrevBlock);
-            if ( miSelf != mapBlockIndex.end() )
-            {
-                if ( miSelf->second == 0 )
-                {
-                    miSelf->second = InsertBlockIndex(pblock->hashPrevBlock);
-                    fprintf(stderr,"autocreate previndex %s\n",pblock->hashPrevBlock.ToString().c_str());
-                }
-            }
-        }*/
-    }
-    return(pindex);
-}
 
 bool ProcessNewBlock(bool from_miner,int32_t height,CValidationState &state, CNode* pfrom, CBlock* pblock, bool fForceProcessing, CDiskBlockPos *dbp)
 {
