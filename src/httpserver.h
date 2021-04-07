@@ -1,4 +1,5 @@
 // Copyright (c) 2015 The Bitcoin Core developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -14,7 +15,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/function.hpp>
 
-static const int DEFAULT_HTTP_THREADS=4;
+static const int DEFAULT_HTTP_THREADS=8;
 static const int DEFAULT_HTTP_WORKQUEUE=16;
 static const int DEFAULT_HTTP_SERVER_TIMEOUT=30;
 

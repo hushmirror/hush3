@@ -508,13 +508,10 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 // Changing this requires changing many other things and
 // changes consensus. Have fun -- Duke
 int64_t AveragingWindowTimespan(int32_t height) {
-    int64_t AWT = 2550;
-    /*
-    int32_t forkHeight = 0;
-    if (height >= forkHeight) {
-        AWT = 1275;
-    }
-    */
+    // used in const methods, beware!
+    // This is the correct AWT for 75s blocktime, before block 340k
+    // the correct value was 2550 when the blocktime was 150s
+    int64_t AWT = 1275;
     return AWT;
 }
 
@@ -560,11 +557,11 @@ unsigned int CalculateNextWorkRequired(arith_uint256 bnAvg,
     LogPrint("pow", "AveragingWindowTimespan = %d nActualTimespan = %d\n", AWT, nActualTimespan);
     LogPrint("pow", "Current average: %08x  %s\n", bnAvg.GetCompact(), bnAvg.ToString());
     LogPrint("pow", "After:  %08x  %s\n", bnNew.GetCompact(), bnNew.ToString());
-    //if(fDebug) {
+    if(fDebug) {
     fprintf(stderr, "%s: nbits Current average: %08x  %s\n", __func__, bnAvg.GetCompact(), bnAvg.ToString().c_str());
     fprintf(stderr, "%s: bits After:  %08x  %s\n", __func__, bnNew.GetCompact(), bnNew.ToString().c_str());
     fprintf(stderr,"%s: AWT=%lu ActualTimeSpan=%li MinActual=%li MaxActual=%li\n",__func__, AWT, nActualTimespan, params.MinActualTimespan(), params.MaxActualTimespan());
-    //}
+    }
     return bnNew.GetCompact();
 }
 
