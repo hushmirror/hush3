@@ -1,6 +1,8 @@
-*** Warning: Do not assume Tor support does the correct thing in Hush; better Tor support is a future feature goal. ***
+# Warning
 
-# TOR SUPPORT IN HUSH
+ Do not assume Tor support works perfectly in Hush; better Tor support is currently being worked on.
+
+# Hush + Tor
 
 It is possible to run Hush as a Tor hidden service, and connect to such services.
 
@@ -34,6 +36,11 @@ In a typical situation, this suffices to run behind a Tor proxy:
 
 	./hushd -proxy=127.0.0.1:9050
 
+If using the Tor Browser Bundle:
+
+	./hushd -proxy=127.0.0.1:9150
+
+
 
 2. Run a Hush hidden server
 ----------------------------
@@ -43,11 +50,10 @@ reachable from the Tor network. Add these lines to your /etc/tor/torrc (or equiv
 config file):
 
 	HiddenServiceDir /var/lib/tor/hush-service/
-	HiddenServicePort 7771 127.0.0.1:7771
-	HiddenServicePort 17771 127.0.0.1:17771
+	HiddenServicePort 18030 127.0.0.1:18030
 
 The directory can be different of course, but (both) port numbers should be equal to
-your hushd's P2P listen port (7771 by default).
+your hushd's P2P listen port (18030 by default).
 
 	-externalip=X   You can tell Hush about its publicly reachable address using
 	                this option, and this can be a .onion address. Given the above
@@ -69,10 +75,10 @@ your hushd's P2P listen port (7771 by default).
 
 In a typical situation, where you're only reachable via Tor, this should suffice:
 
-	./hushd -proxy=127.0.0.1:9050 -externalip=zctestseie6wxgio.onion -listen
+	./hushd -proxy=127.0.0.1:9050 -externalip=hushc0de123.onion -listen
 
-(obviously, replace the Onion address with your own). It should be noted that you still
-listen on all devices and another node could establish a clearnet connection, when knowing
+(obviously, replace the Onion address with your own). Currently only v2 HS's are supported.
+It should be noted that you still listen on all devices and another node could establish a clearnet connection, when knowing
 your address. To mitigate this, additionally bind the address of your Tor proxy:
 
 	./hushd ... -bind=127.0.0.1
@@ -82,12 +88,12 @@ as well, use `discover` instead:
 
 	./hushd ... -discover
 
-and open port 7771 on your firewall (or use -upnp).
+and open port 18030 on your firewall.
 
 If you only want to use Tor to reach onion addresses, but not use it as a proxy
 for normal IPv4/IPv6 communication, use:
 
-	./hushd -onion=127.0.0.1:9050 -externalip=zctestseie6wxgio.onion -discover
+	./hushd -onion=127.0.0.1:9050 -externalip=hushc0de123.onion -discover
 
 
 3. Automatically listen on Tor
@@ -135,9 +141,9 @@ Now use hush-cli to verify there is only a single peer connection.
 	[
 	    {
 	        "id" : 1,
-	        "addr" : "zctestseie6wxgio.onion:17770",
+	        "addr" : "zcashhoneypot.onion:18030",
 	        ...
-	        "version" : 170010,
+	        "version" : 1987420,
 	        "subver" : "/GoldenSandtrout:3.6.0/",
 	        ...
 	    }
@@ -145,4 +151,4 @@ Now use hush-cli to verify there is only a single peer connection.
 
 To connect to multiple Tor nodes, use:
 
-	./hushd -onion=127.0.0.1:9050 -addnode=fuckzookoeie6wxgio.onion -dnsseed=0 -onlynet=onion
+	./hushd -onion=127.0.0.1:9050 -addnode=hushbeef123.onion -dnsseed=0 -onlynet=onion
