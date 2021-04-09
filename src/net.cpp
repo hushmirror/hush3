@@ -31,6 +31,7 @@
 #include "ui_interface.h"
 #include "crypto/common.h"
 #include "hush/utiltls.h"
+#include <random.h>
 #ifdef _WIN32
 #include <string.h>
 #else
@@ -1981,16 +1982,30 @@ void RelayTransaction(const CTransaction& tx, const CDataStream& ss)
         vRelayExpiration.push_back(std::make_pair(GetTime() + 15 * 60, inv));
     }
     LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
+
+    auto vRelayNodes = vNodes;
+
+    // We always round down, except when we have only 1 connection
+    auto newSize = (vNodes.size() / 2) == 0 ? 1 : (vNodes.size() / 2);
+
+    random_shuffle( vRelayNodes.begin(), vRelayNodes.end(), GetRandInt );
+
+    vRelayNodes.resize(newSize);
+    fprintf(stderr, "%s: Relaying to %lu peers\n", __func__, newSize);
+
+    // Only relay to randomly chosen 50% of peers
+    BOOST_FOREACH(CNode* pnode, vRelayNodes)
     {
         if(!pnode->fRelayTxes)
             continue;
         LOCK(pnode->cs_filter);
-        if (pnode->pfilter)
-        {
-            if (pnode->pfilter->IsRelevantAndUpdate(tx))
+        if (pnode->pfilter) {
+            if (pnode->pfilter->IsRelevantAndUpdate(tx)) {
                 pnode->PushInventory(inv);
-        } else pnode->PushInventory(inv);
+            }
+        } else {
+            pnode->PushInventory(inv);
+        }
     }
 }
 
@@ -2053,10 +2068,7 @@ void CNode::Fuzz(int nChance)
     Fuzz(2);
 }
 
-//
 // CAddrDB
-//
-
 CAddrDB::CAddrDB()
 {
     pathAddr = GetDataDir() / "peers.dat";
