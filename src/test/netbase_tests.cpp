@@ -5,9 +5,7 @@
 
 #include "netbase.h"
 #include "test/test_bitcoin.h"
-
 #include <string>
-
 #include <boost/assign/list_of.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -23,6 +21,35 @@ BOOST_AUTO_TEST_CASE(netbase_networks)
     BOOST_CHECK(CNetAddr("2001::8888").GetNetwork()                             == NET_IPV6);
     BOOST_CHECK(CNetAddr("FD87:D87E:EB43:edb1:8e4:3588:e546:35ca").GetNetwork() == NET_ONION);
 }
+
+
+/* TODO: port this feeler test
+BOOST_AUTO_TEST_CASE(cnode_simple_test)
+{
+    SOCKET hSocket = INVALID_SOCKET;
+
+    in_addr ipv4Addr;
+    ipv4Addr.s_addr = 0xa0b0c001;
+
+    CAddress addr = CAddress(CService(ipv4Addr, 7777), NODE_NETWORK);
+    std::string pszDest = "";
+    bool fInboundIn = false;
+
+    // Test that fFeeler is false by default.
+    CNode* pnode1 = new CNode(hSocket, addr, pszDest, fInboundIn);
+
+
+    BOOST_CHECK(pnode1->fInbound == false);
+    BOOST_CHECK(pnode1->fFeeler == false);
+
+    fInboundIn = true;
+    CNode* pnode2 = new CNode(hSocket, addr, pszDest, fInboundIn);
+    BOOST_CHECK(pnode2->fInbound == true);
+    BOOST_CHECK(pnode2->fFeeler == false);
+}
+
+*/
+
 
 BOOST_AUTO_TEST_CASE(netbase_properties)
 {

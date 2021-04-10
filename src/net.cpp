@@ -63,6 +63,9 @@ using namespace hush;
 #endif
 #endif
 
+// We add a random period time (0 to 1 seconds) to feeler connections to prevent synchronization.
+#define FEELER_SLEEP_WINDOW 1
+
 #define USE_TLS "encrypted as fuck"
 
 #if defined(USE_TLS) && !defined(TLS1_3_VERSION)
@@ -74,9 +77,9 @@ using namespace hush;
 using namespace std;
 
 namespace {
-    //TODO: Make these CLI args
-    const int MAX_OUTBOUND_CONNECTIONS = 64;
-    const int MAX_INBOUND_FROMIP       = 3;
+    int MAX_OUTBOUND_CONNECTIONS = GetArg("-maxoutboundconnections",64);
+    int MAX_FEELER_CONNECTIONS   = GetArg("-maxfeelerconnections",1);
+    int MAX_INBOUND_FROMIP       = GetArg("-maxinboundfromip",3);
 
     struct ListenSocket {
         SOCKET socket;
@@ -1024,8 +1027,8 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
     socklen_t len = sizeof(sockaddr);
     SOCKET hSocket = accept(hListenSocket.socket, (struct sockaddr*)&sockaddr, &len);
     CAddress addr;
-    int nInbound = 0;
-    int nMaxInbound = nMaxConnections - MAX_OUTBOUND_CONNECTIONS;
+    int nInbound    = 0;
+    int nMaxInbound = nMaxConnections - (MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS);
 
     if (hSocket != INVALID_SOCKET)
         if (!addr.SetSockAddr((const struct sockaddr*)&sockaddr))
@@ -1413,6 +1416,11 @@ void static ProcessOneShot()
     }
 }
 
+int64_t PoissonNextSend(int64_t now, int average_interval_seconds)
+{
+    return now + (int64_t)(log1p(GetRand(1ULL << 48) * -0.0000000000000035527136788 /* -1/2^48 */) * average_interval_seconds * -1000000.0 + 0.5);
+}
+
 void ThreadOpenConnections()
 {
     // Connect to specific addresses
@@ -1438,8 +1446,11 @@ void ThreadOpenConnections()
 
     // Initiate network connections
     int64_t nStart = GetTime();
-    while (true)
-    {
+
+    // Minimum time before next feeler connection (in microseconds).
+    int64_t nNextFeeler = PoissonNextSend(nStart*1000*1000, FEELER_INTERVAL);
+
+    while (true) {
         ProcessOneShot();
 
         MilliSleep(500);
@@ -1452,19 +1463,17 @@ void ThreadOpenConnections()
         if (GetTime() - nStart > 60) {
             static bool done = false;
             if (!done) {
-                // skip DNS seeds for staked chains.
                 LogPrintf("Adding fixed seed nodes.\n");
                 addrman.Add(convertSeed6(Params().FixedSeeds()), CNetAddr("127.0.0.1"));
                 done = true;
             }
         }
 
-
         // Choose an address to connect to based on most recently seen
         CAddress addrConnect;
 
-        // Only connect out to one peer per network group (/16 for IPv4).
-        // Use -asmap for ASN bucketing
+        // Only connect out to one peer per network group. Originally /16 for IPv4, now ASNs via
+        // -asmap for ASN bucketing, which is enabled by default
         // Do this here so we don't have to critsect vNodes inside mapAddresses critsect.
         int nOutbound = 0;
         set<vector<unsigned char> > setConnected;
@@ -1477,20 +1486,46 @@ void ThreadOpenConnections()
                 }
             }
         }
+        assert(nOutbound <= (MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS));
+
+        // "Feeler Connections" as per https://eprint.iacr.org/2015/263.pdf
+        // "Eclipse Attacks on Bitcoin’s Peer-to-Peer Network" by
+        // Ethan Heilman, Alison Kendler, Aviv Zohar, Sharon Goldberg.
+        //
+        // Design goals:
+        //  * Increase the number of connectable addresses in the tried table.
+        //
+        // Method:
+        //  * Choose a random address from new and attempt to connect to it if we can connect
+        //    successfully it is added to tried.
+        //  * Start attempting feeler connections only after node finishes making outbound
+        //    connections.
+        //  * Make feeler connections randomly with 120s average interval via PoissonNextSend.
+        //  Originally from https://github.com/bitcoin/bitcoin/pull/8282
+        //  Modified for API changes by Duke Leto
+        bool fFeeler = false;
+        if (nOutbound >= MAX_OUTBOUND_CONNECTIONS) {
+            int64_t nTime = GetTimeMicros(); // The current time right now (in microseconds).
+            if (nTime > nNextFeeler) {
+                nNextFeeler = PoissonNextSend(nTime, FEELER_INTERVAL);
+                fFeeler = true;
+            } else {
+                continue;
+            }
+        }
+
+        int64_t nNow = GetTime();
+        int nTries   = 0;
 
         addrman.ResolveCollisions();
 
-        int64_t nANow = GetTime();
-        int nTries    = 0;
         while (true) {
             CAddrInfo addr = addrman.SelectTriedCollision();
 
             // SelectTriedCollision returns an invalid address if it is empty.
-            /* TODO: Uncomment when merged with feeler connections
             if (!fFeeler || !addr.IsValid()) {
                 addr = addrman.Select(fFeeler);
             }
-            */
 
             // if we selected an invalid address, restart
             if (!addr.IsValid() || setConnected.count(addr.GetGroup(addrman.m_asmap)) || IsLocal(addr))
@@ -1507,9 +1542,16 @@ void ThreadOpenConnections()
                 continue;
 
             // only consider very recently tried nodes after 30 failed attempts
-            if (nANow - addr.nLastTry < 600 && nTries < 30)
+            if (nNow - addr.nLastTry < 600 && nTries < 30)
                 continue;
 
+            /* TODO: port this code
+            // only consider nodes missing relevant services after 40 failed attempts
+            if ((addr.nServices & nRelevantServices) != nRelevantServices && nTries < 40)
+                continue;
+            */
+
+            //TODO: why is this a good thing?
             // do not allow non-default ports, unless after 50 invalid addresses selected already
             if (addr.GetPort() != Params().GetDefaultPort() && nTries < 50)
                 continue;
@@ -1518,8 +1560,18 @@ void ThreadOpenConnections()
             break;
         }
 
-        if (addrConnect.IsValid())
-            OpenNetworkConnection(addrConnect, &grant);
+        if (addrConnect.IsValid()) {
+            if (fFeeler) {
+                // Add small amount of random noise before connection to avoid synchronization
+                int randsleep = GetRandInt(FEELER_SLEEP_WINDOW * 1000);
+                MilliSleep(randsleep);
+                LogPrint("net", "Making feeler connection to %s\n", addrConnect.ToString().c_str());
+                printf("%s: Making feeler connection to %s\n", __func__, addrConnect.ToString().c_str());
+            }
+
+            //int failures = setConnected.size() >= std::min(nMaxConnections - 1, 2);
+            OpenNetworkConnection(addrConnect,/*failures,*/ &grant, NULL, false, fFeeler);
+        }
     }
 }
 
@@ -1600,7 +1652,7 @@ void ThreadOpenAddedConnections()
 }
 
 // if successful, this moves the passed grant to the constructed node
-bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound, const char *pszDest, bool fOneShot)
+bool OpenNetworkConnection(const CAddress& addrConnect, /* bool fCountFailure, */ CSemaphoreGrant *grantOutbound, const char *pszDest, bool fOneShot, bool fFeeler)
 {
     // Initiate outbound network connection
     boost::this_thread::interruption_point();
@@ -1613,6 +1665,7 @@ bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOu
         return false;
     
     CNode* pnode = ConnectNode(addrConnect, pszDest);
+    //CNode* pnode = ConnectNode(addrConnect, pszDest, fCountFailure);
     boost::this_thread::interruption_point();
     
     if (!pnode)
@@ -1620,8 +1673,11 @@ bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOu
     if (grantOutbound)
         grantOutbound->MoveTo(pnode->grantOutbound);
     pnode->fNetworkNode = true;
+
     if (fOneShot)
         pnode->fOneShot = true;
+    if (fFeeler)
+        pnode->fFeeler = true;
 
     return true;
 }
@@ -1867,7 +1923,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     if (semOutbound == NULL) {
         // initialize semaphore
-        int nMaxOutbound = min(MAX_OUTBOUND_CONNECTIONS, nMaxConnections);
+        int nMaxOutbound = min((MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS), nMaxConnections);
         semOutbound = new CSemaphore(nMaxOutbound);
     }
 
@@ -1916,7 +1972,7 @@ bool StopNode()
 {
     LogPrintf("StopNode()\n");
     if (semOutbound)
-        for (int i=0; i<MAX_OUTBOUND_CONNECTIONS; i++)
+        for (int i=0; i<(MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS); i++)
             semOutbound->post();
 
     if (HUSH_NSPV_FULLNODE && fAddressesInitialized)
@@ -2186,12 +2242,13 @@ CNode::CNode(SOCKET hSocketIn, const CAddress& addrIn, const std::string& addrNa
     nTimeOffset = 0;
     addr = addrIn;
     addrName = addrNameIn == "" ? addr.ToStringIPPort() : addrNameIn;
-    nVersion = 0;
-    strSubVer = "";
+    nVersion     = 0;
+    strSubVer    = "";
     fAllowlisted = false;
-    fOneShot = false;
-    fClient = false; // set by version message
-    fInbound = fInboundIn;
+    fOneShot     = false;
+    fClient      = false; // set by version message
+    fFeeler      = false;
+    fInbound     = fInboundIn;
     fNetworkNode = false;
     fSuccessfullyConnected = false;
     fDisconnect = false;

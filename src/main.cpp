@@ -6780,10 +6780,16 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         return true;
     }
 
-    //fprintf(stderr,"netmsg: %s\n", strCommand.c_str());
+    fprintf(stderr,"%s: netmsg: %s from %s\n", __func__, strCommand.c_str(), pfrom->addr.ToString().c_str() );
 
-    if (strCommand == "version")
-    {
+    if (strCommand == "version") {
+        // Feeler connections exist only to verify if node is online
+        if (pfrom->fFeeler) {
+            assert(pfrom->fInbound == false);
+            pfrom->fDisconnect = true;
+            fprintf(stderr,"%s: disconnecting feelerconn from %s\n", __func__, pfrom->addr.ToString().c_str() );
+        }
+
         // Each connection can only send one version message
         if (pfrom->nVersion != 0)
         {
@@ -6895,15 +6901,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 addrman.Good(addrFrom);
             }
         }
-
-        // Do Not Relay alerts
-        /*
-        {
-            LOCK(cs_mapAlerts);
-            BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
-            item.second.RelayTo(pfrom);
-        }
-        */
 
         pfrom->fSuccessfullyConnected = true;
 

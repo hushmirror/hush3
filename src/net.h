@@ -82,10 +82,13 @@ static const size_t SETASKFOR_MAX_SZ = 2 * MAX_INV_SZ;
 static const unsigned int DEFAULT_MAX_PEER_CONNECTIONS = 384;
 /** The period before a network upgrade activates, where connections to upgrading peers are preferred (in blocks). */
 static const int NETWORK_UPGRADE_PEER_PREFERENCE_BLOCK_PERIOD = 24 * 24 * 3;
+/** Run the feeler connection loop once every 120 seconds. **/
+static const int FEELER_INTERVAL = 120;
 
 unsigned int ReceiveFloodSize();
 unsigned int SendBufferSize();
 
+int64_t PoissonNextSend(int64_t now, int average_interval_seconds);
 void AddOneShot(const std::string& strDest);
 void AddressCurrentlyConnected(const CService& addr);
 CNode* FindNode(const CNetAddr& ip);
@@ -93,7 +96,7 @@ CNode* FindNode(const CSubNet& subNet);
 CNode* FindNode(const std::string& addrName);
 CNode* FindNode(const CService& ip);
 CNode* ConnectNode(CAddress addrConnect, const char *pszDest = NULL);
-bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound = NULL, const char *strDest = NULL, bool fOneShot = false);
+bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant *grantOutbound = NULL, const char *strDest = NULL, bool fOneShot = false, bool fFeeler = false);
 unsigned short GetListenPort();
 bool BindListenPort(const CService &bindAddr, std::string& strError, bool fAllowlisted = false);
 void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler);
@@ -220,7 +223,8 @@ public:
     int nStartingHeight;
     uint64_t nSendBytes;
     uint64_t nRecvBytes;
-    bool fAllowlisted;
+    bool fAllowlisted; // If true this node bypasses DoS ban limits
+    bool fFeeler;      // If true this node is being used as a short lived feeler.
     double dPingTime;
     double dPingWait;
     std::string addrLocal;
@@ -228,7 +232,7 @@ public:
     CAddress addr;
     // Bind address of our side of the connection
     // CAddress addrBind; // https://github.com/bitcoin/bitcoin/commit/a7e3c2814c8e49197889a4679461be42254e5c51
-    uint32_t m_mapped_as;
+    uint32_t m_mapped_as;  // Mapped ASN for this address
 };
 
 
@@ -319,6 +323,7 @@ public:
     bool fOneShot;
     bool fClient;
     bool fInbound;
+    bool fFeeler;
     bool fNetworkNode;
     bool fSuccessfullyConnected;
     bool fDisconnect;
