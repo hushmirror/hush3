@@ -4565,6 +4565,8 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "\nExamples:\n"
             + HelpExampleCli("z_sendmany", "\"RD6GgnrMpPaTSMn8vai6yiGA7mN4QGPV\" '[{\"address\": \"zs14d8tc0hl9q0vg5l28uec5vk6sk34fkj2n8s7jalvw5fxpy6v39yn4s2ga082lymrkjk0x2nqg37\" ,\"amount\": 5.0}]'")
             + HelpExampleRpc("z_sendmany", "\"RD6GgnrMpPaTSMn8vai6yiGA7mN4QGPV\", [{\"address\": \"zs14d8tc0hl9q0vg5l28uec5vk6sk34fkj2n8s7jalvw5fxpy6v39yn4s2ga082lymrkjk0x2nqg37\" ,\"amount\": 5.0}]")
+            + HelpExampleCli("z_sendmany", "\"zs14d8tc0hl9q0vg5l28uec5vk6sk34fkj2n8s7jalvw5fxpy6v39yn4s2ga082lymrkjk0x2nqg37\" '[{\"address\": \"zs14d8tc0hl9q0vg5l28uec5vk6sk34fkj2n8s7jalvw5fxpy6v39yn4s2ga082lymrkjk0x2nqg37\" ,\"amount\": 3.14}]'")
+            + HelpExampleRpc("z_sendmany", "\"zs14d8tc0hl9q0vg5l28uec5vk6sk34fkj2n8s7jalvw5fxpy6v39yn4s2ga082lymrkjk0x2nqg37\", [{\"address\": \"zs14d8tc0hl9q0vg5l28uec5vk6sk34fkj2n8s7jalvw5fxpy6v39yn4s2ga082lymrkjk0x2nqg37\" ,\"amount\": 3.14}]")
         );
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -4802,7 +4804,7 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if(fZdebug)
         LogPrintf("%s: Building the raw ztransaction\n", __FUNCTION__);
 
-    // Builder (used if Sapling addresses are involved)
+    // Sapling Tx Builder
     boost::optional<TransactionBuilder> builder;
     builder = TransactionBuilder(Params().GetConsensus(), nextBlockHeight, pwalletMain);
 
