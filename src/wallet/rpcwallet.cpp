@@ -3636,9 +3636,9 @@ UniValue z_getbalances(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if (!EnsureWalletIsAvailable(fHelp))
         return NullUniValue;
 
-    if (fHelp || params.size() > 1)
+    if (fHelp || params.size() > 0)
         throw runtime_error(
-            "z_getbalances ( minbal )\n"
+            "z_getbalances\n"
             "\nReturns array of addresses with their unspent shielded balances.\n"
             "Optionally filter to only include addresses with at least minbal HUSH.\n"
             "Results are an array of Objects, each of which has:\n"
@@ -3656,8 +3656,7 @@ UniValue z_getbalances(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
             "\nExamples\n"
             + HelpExampleCli("z_getbalances", "")
-            + HelpExampleCli("z_getbalances", "0.1")
-            + HelpExampleRpc("z_getbalances", "555")
+            + HelpExampleRpc("z_getbalances", "")
         );
 
     RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
@@ -3672,16 +3671,37 @@ UniValue z_getbalances(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     UniValue results(UniValue::VARR);
 
-    //for(auto &entry : zaddrs) {
-    for(auto &entry : saplingzaddrs) {
+    int nMinDepth = 1;
+    int nMaxDepth = 9999999;
+    std::vector<SaplingNoteEntry> saplingEntries;
+    pwalletMain->GetFilteredNotes(saplingEntries, zaddrs, nMinDepth);
+
+    std::map<std::string, CAmount> mapBalances;
+
+    for (auto & entry : saplingEntries) {
+        auto zaddr       = EncodePaymentAddress(entry.address);
+        CAmount nBalance = CAmount(entry.note.value());
+        if(mapBalances.count(zaddr)) {
+            mapBalances[zaddr] += nBalance;
+        } else {
+            mapBalances[zaddr] = nBalance;
+        }
+    }
+    std::vector<std::pair<std::string,CAmount>> vec;
+    std::copy(mapBalances.begin(), mapBalances.end(), std::back_inserter<std::vector<std::pair<std::string,CAmount>>>(vec));
+
+    std::sort(vec.begin(), vec.end(), [](const std::pair<std::string, CAmount> &l, const std::pair<std::string,CAmount> &r)
+            {
+                if (l.second != r.second) {
+                    return l.second > r.second;
+                }
+                return l.first > r.first;
+            });
+
+    for (auto & entry : vec) {
         UniValue obj(UniValue::VOBJ);
-        CAmount nBalance = 0;
-        int nMinDepth = 1;
-        //auto zaddr = DecodePaymentAddress(entry);
-        auto zaddr = EncodePaymentAddress(entry);
-        nBalance   = getBalanceZaddr(zaddr, nMinDepth, false);
-        obj.push_back(Pair("address", zaddr));
-        obj.push_back(Pair("balance", nBalance));
+        obj.push_back(Pair("address", entry.first));
+        obj.push_back(Pair("balance", (double) entry.second / (uint64_t) 100000000L ));
         results.push_back(obj);
     }
 
