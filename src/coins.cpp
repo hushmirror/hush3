@@ -191,7 +191,7 @@ void CCoinsViewCache::AbstractPushAnchor(
 
     // We don't want to overwrite an anchor we already have.
     // This occurs when a block doesn't modify mapAnchors at all,
-    // because there are no joinsplits. We could get around this a
+    // because there are no ShieldedSpends. We could get around this a
     // different way (make all blocks modify mapAnchors somehow)
     // but this is simpler to reason about.
     if (currentRoot != newrt) {
@@ -212,6 +212,7 @@ void CCoinsViewCache::AbstractPushAnchor(
 }
 
 //TODO: delete
+/*
 template<> void CCoinsViewCache::PushAnchor(const SproutMerkleTree &tree)
 {
     AbstractPushAnchor<SproutMerkleTree, CAnchorsSproutMap, CAnchorsSproutMap::iterator, CAnchorsSproutCacheEntry>(
@@ -221,6 +222,7 @@ template<> void CCoinsViewCache::PushAnchor(const SproutMerkleTree &tree)
         hashSproutAnchor
     );
 }
+*/
 
 template<> void CCoinsViewCache::PushAnchor(const SaplingMerkleTree &tree)
 {
@@ -614,9 +616,9 @@ double CCoinsViewCache::GetPriority(const CTransaction &tx, int nHeight) const
     // Shielded transfers do not reveal any information about the value or age of a note, so we
     // cannot apply the priority algorithm used for transparent utxos.  Instead, we just
     // use the maximum priority for all (partially or fully) shielded transactions.
-    // (Note that coinbase transactions cannot contain JoinSplits, or Sapling shielded Spends or Outputs.)
+    // (Note that coinbase transactions cannot contain Sapling shielded Spends or Outputs.)
 
-    if (tx.vjoinsplit.size() > 0 || tx.vShieldedSpend.size() > 0 || tx.vShieldedOutput.size() > 0 || tx.IsCoinImport() || tx.IsPegsImport()) {
+    if (tx.vShieldedSpend.size() > 0 || tx.vShieldedOutput.size() > 0 || tx.IsCoinImport() || tx.IsPegsImport()) {
         return MAX_PRIORITY;
     }
 

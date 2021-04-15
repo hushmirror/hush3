@@ -2234,7 +2234,7 @@ UniValue gettransaction(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
             "gettransaction \"txid\" ( includeWatchonly )\n"
-            "\nGet detailed information about in-wallet transaction <txid>\n"
+            "\nGet detailed information about in-wallet transaction <txid>. Also see z_viewtransaction for ztx details\n"
             "\nArguments:\n"
             "1. \"txid\"    (string, required) The transaction id\n"
             "2. \"includeWatchonly\"    (bool, optional, default=false) Whether to include watchonly addresses in balance calculation and details[]\n"
@@ -2255,17 +2255,6 @@ UniValue gettransaction(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "      \"category\" : \"send|receive\",    (string) The category, either 'send' or 'receive'\n"
             "      \"amount\" : x.xxx                  (numeric) The amount in " + strprintf("%s",hush_chainname()) + "\n"
             "      \"vout\" : n,                       (numeric) the vout value\n"
-            "    }\n"
-            "    ,...\n"
-            "  ],\n"
-            "  \"vjoinsplit\" : [\n"
-            "    {\n"
-            "      \"anchor\" : \"treestateref\",          (string) Merkle root of note commitment tree\n"
-            "      \"nullifiers\" : [ string, ... ]      (string) Nullifiers of input notes\n"
-            "      \"commitments\" : [ string, ... ]     (string) Note commitments for note outputs\n"
-            "      \"macs\" : [ string, ... ]            (string) Message authentication tags\n"
-            "      \"vpub_old\" : x.xxx                  (numeric) The amount removed from the transparent value pool\n"
-            "      \"vpub_new\" : x.xxx,                 (numeric) The amount added to the transparent value pool\n"
             "    }\n"
             "    ,...\n"
             "  ],\n"
@@ -4842,7 +4831,7 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
         if (toSapling) {
             mtx.vShieldedOutput.push_back(OutputDescription());
         } else {
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, sprout zaddr not valid");
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, not a Sapling zaddr!");
         }
     }
     CTransaction tx(mtx);
@@ -5123,7 +5112,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
     contextualTx.nLockTime = chainActive.LastTip()->GetHeight();
 
     if (contextualTx.nVersion == 1) {
-        contextualTx.nVersion = 2; // Tx format should support vjoinsplits
+        contextualTx.nVersion = 2; // Tx format should support ztx's
     }
 
     // Create operation and add to global queue

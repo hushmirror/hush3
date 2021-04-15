@@ -1405,8 +1405,7 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
     if (!tx.fOverwintered && tx.nVersion < SPROUT_MIN_TX_VERSION) {
         return state.DoS(100, error("CheckTransaction(): version too low"),
                          REJECT_INVALID, "bad-txns-version-too-low");
-    }
-    else if (tx.fOverwintered) {
+    } else if (tx.fOverwintered) {
         if (tx.nVersion < OVERWINTER_MIN_TX_VERSION) {
             return state.DoS(100, error("CheckTransaction(): overwinter version too low"),
                              REJECT_INVALID, "bad-tx-overwinter-version-too-low");
@@ -1422,16 +1421,13 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
         }
     }
 
-    //TODO: desprout
-    // Transactions containing empty `vin` must have either non-empty
-    // `vjoinsplit` or non-empty `vShieldedSpend`.
-    if (tx.vin.empty() && tx.vjoinsplit.empty() && tx.vShieldedSpend.empty()) 
+    // Transactions containing empty `vin` must have non-empty `vShieldedSpend`.
+    if (tx.vin.empty() && tx.vShieldedSpend.empty())
         return state.DoS(10, error("CheckTransaction(): vin empty"),
                          REJECT_INVALID, "bad-txns-vin-empty");
 
-    // Transactions containing empty `vout` must have either non-empty
-    // `vjoinsplit` or non-empty `vShieldedOutput`.
-    if (tx.vout.empty() && tx.vjoinsplit.empty() && tx.vShieldedOutput.empty())
+    // Transactions containing empty `vout` must have non-empty `vShieldedOutput`.
+    if (tx.vout.empty() && tx.vShieldedOutput.empty())
         return state.DoS(10, error("CheckTransaction(): vout empty"),
                          REJECT_INVALID, "bad-txns-vout-empty");
 
@@ -4434,10 +4430,12 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
         // pool. So we invert the sign here.
         saplingValue += -tx.valueBalance;
 
+        /*
         for (auto js : tx.vjoinsplit) {
             sproutValue += js.vpub_old;
             sproutValue -= js.vpub_new;
         }
+        */
 
         // Ignore following stats unless -zindex enabled
         if (!fZindex)
