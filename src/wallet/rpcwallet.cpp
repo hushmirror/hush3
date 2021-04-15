@@ -3636,7 +3636,7 @@ UniValue z_getbalances(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if (!EnsureWalletIsAvailable(fHelp))
         return NullUniValue;
 
-    if (fHelp || params.size() > 0)
+    if (fHelp || params.size() > 1)
         throw runtime_error(
             "z_getbalances\n"
             "\nReturns array of addresses with their unspent shielded balances.\n"
@@ -3656,12 +3656,19 @@ UniValue z_getbalances(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
             "\nExamples\n"
             + HelpExampleCli("z_getbalances", "")
+            + HelpExampleCli("z_getbalances", "0.01")
             + HelpExampleRpc("z_getbalances", "")
+            + HelpExampleRpc("z_getbalances", "0.42069")
         );
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
+    //RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    // ignore amount=0 zaddrs by default
+    CAmount nMinBal = 1;  // puposhis
+    if (params.size() > 0)
+      nMinBal = AmountFromValue(params[0]);
 
     std::set<libzcash::PaymentAddress> zaddrs = {};
     std::set<libzcash::SaplingPaymentAddress> saplingzaddrs = {};
@@ -3669,15 +3676,11 @@ UniValue z_getbalances(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     zaddrs.insert(saplingzaddrs.begin(), saplingzaddrs.end());
 
-    UniValue results(UniValue::VARR);
-
     int nMinDepth = 1;
-    int nMaxDepth = 9999999;
     std::vector<SaplingNoteEntry> saplingEntries;
     pwalletMain->GetFilteredNotes(saplingEntries, zaddrs, nMinDepth);
 
     std::map<std::string, CAmount> mapBalances;
-
     for (auto & entry : saplingEntries) {
         auto zaddr       = EncodePaymentAddress(entry.address);
         CAmount nBalance = CAmount(entry.note.value());
@@ -3698,11 +3701,15 @@ UniValue z_getbalances(const UniValue& params, bool fHelp, const CPubKey& mypk)
                 return l.first > r.first;
             });
 
+    UniValue results(UniValue::VARR);
     for (auto & entry : vec) {
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("address", entry.first));
-        obj.push_back(Pair("balance", (double) entry.second / (uint64_t) 100000000L ));
-        results.push_back(obj);
+        auto balance = (double) entry.second / (uint64_t) 100000000L;
+        obj.push_back(Pair("balance", balance));
+        if(entry.second >= nMinBal) {
+            results.push_back(obj);
+        }
     }
 
     return results;

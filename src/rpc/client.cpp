@@ -3,7 +3,6 @@
 // Copyright (c) 2016-2020 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -22,10 +21,8 @@
 #include "rpc/client.h"
 #include "rpc/protocol.h"
 #include "util.h"
-
 #include <set>
 #include <stdint.h>
-
 #include <univalue.h>
 
 using namespace std;
@@ -138,8 +135,6 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "z_listunspent", 1 },
     { "z_listunspent", 2 },
     { "z_listunspent", 3 },
-    { "z_getbalances", 0},
-    { "z_getbalances", 1},
     { "z_getbalance", 1},
     { "z_getnotescount", 0},
     { "z_gettotalbalance", 0},
