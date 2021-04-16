@@ -6962,6 +6962,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     } else if (strCommand == "addr") {
         vector<CAddress> vAddr;
         vRecv >> vAddr;
+        fprintf(stderr,"%s: processing add with vAddr.size=%lu\n", __func__, vAddr.size() );
 
         // Don't want addr from older versions unless seeding
         if (pfrom->nVersion < CADDR_TIME_VERSION && addrman.size() > 1000)
@@ -6979,7 +6980,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         BOOST_FOREACH(CAddress& addr, vAddr)
         {
             boost::this_thread::interruption_point();
-            fprintf(stderr,"%s: %s.nTime=%d\n", __func__, pfrom->addr.ToString().c_str(), addr.nTime);
+            fprintf(stderr,"%s: %s.nTime=%d\n", __func__, addr.ToString().c_str(), addr.nTime);
 
             if (addr.nTime <= 100000000 || addr.nTime > nNow + 10 * 60)
                 addr.nTime = nNow - 5 * 24 * 60 * 60;
@@ -7015,17 +7016,18 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 }
             }
             // Do not store addresses outside our network
-            if (fReachable)
+            if (fReachable) {
                 vAddrOk.push_back(addr);
+            } else {
+                fprintf(stderr,"%s: %s with nTime=%d is not reachable\n",__func__,addr.ToString().c_str(), addr.nTime);
+            }
         }
         addrman.Add(vAddrOk, pfrom->addr, 2 * 60 * 60);
         if (vAddr.size() < 1000)
             pfrom->fGetAddr = false;
         if (pfrom->fOneShot)
             pfrom->fDisconnect = true;
-    }
-    else if (strCommand == "ping")
-    {
+    } else if (strCommand == "ping") {
         if (pfrom->nVersion > BIP0031_VERSION)
         {
             uint64_t nonce = 0;
@@ -7043,11 +7045,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             // return very quickly.
             pfrom->PushMessage("pong", nonce);
         }
-    }
-    
-    
-    else if (strCommand == "pong")
-    {
+    } else if (strCommand == "pong") {
         int64_t pingUsecEnd = nTimeReceived;
         uint64_t nonce = 0;
         size_t nAvail = vRecv.in_avail();
@@ -7102,7 +7100,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             pfrom->nPingNonceSent = 0;
         }
     }
-
     // This asymmetric behavior for inbound and outbound connections was introduced
     // to prevent a fingerprinting attack: an attacker can send specific fake addresses
     // to users' AddrMan and later request them by sending getaddr messages.
@@ -7144,6 +7141,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     else if (strCommand == "inv") {
         vector<CInv> vInv;
         vRecv >> vInv;
+        fprintf(stderr,"%s: processing inv with vInv.size=%lu\n", __func__, vInv.size() );
         if (vInv.size() > MAX_INV_SZ)
         {
             Misbehaving(pfrom->GetId(), 20);
@@ -7205,6 +7203,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     } else if (strCommand == "getdata") {
         vector<CInv> vInv;
         vRecv >> vInv;
+        fprintf(stderr,"%s: getdata vInv.size=%lu\n", __func__, vInv.size() );
         if (vInv.size() > MAX_INV_SZ)
         {
             Misbehaving(pfrom->GetId(), 20);
@@ -7535,6 +7534,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
     } else if (strCommand == "mempool") {
         LOCK2(cs_main, pfrom->cs_filter);
+        fprintf(stderr,"%s: mempool\n",__func__);
+        // TODO: limit mempool requests per time and per peer
 
         std::vector<uint256> vtxid;
         mempool.queryHashes(vtxid);
@@ -7556,30 +7557,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         if (vInv.size() > 0)
             pfrom->PushMessage("inv", vInv);
     } else if (fAlerts && strCommand == "alert") {
-        //TODO: probably completely ignore this
-        CAlert alert;
-        vRecv >> alert;
-
-        uint256 alertHash = alert.GetHash();
-        if (pfrom->setKnown.count(alertHash) == 0) {
-            if (alert.ProcessAlert(Params().AlertKey())) {
-                // Relay
-                pfrom->setKnown.insert(alertHash);
-                {
-                    LOCK(cs_vNodes);
-                    BOOST_FOREACH(CNode* pnode, vNodes)
-                    alert.RelayTo(pnode);
-                }
-            } else {
-                // Small DoS penalty so peers that send us lots of
-                // duplicate/expired/invalid-signature/whatever alerts
-                // eventually get banned.
-                // This isn't a Misbehaving(100) (immediate ban) because the
-                // peer might be an older or different implementation with
-                // a different signature key, etc.
-                Misbehaving(pfrom->GetId(), 10);
-            }
-        }
+        // Do not process alert p2p messages and give DoS penalty
+        Misbehaving(pfrom->GetId(), 10);
     } else if (!(nLocalServices & NODE_BLOOM) &&
               (strCommand == "filterload" ||
                strCommand == "filteradd")) {
