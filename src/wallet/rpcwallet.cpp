@@ -4647,48 +4647,108 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
     THROW_IF_SYNCING(HUSH_INSYNC);
 
     // Check that the from address is valid.
-    auto fromaddress = params[0].get_str();
-    bool fromTaddr   = false;
-    bool fromSapling = false;
-
+    auto fromaddress  = params[0].get_str();
+    bool fromTaddr    = false;
+    bool fromSapling  = false;
     uint32_t branchId = CurrentEpochBranchId(chainActive.Height(), Params().GetConsensus());
+    UniValue outputs  = params[1].get_array();
 
-    CTxDestination taddr = DecodeDestination(fromaddress);
+    if (outputs.size()==0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, amounts array is empty.");
+
     // TODO: implement special symbolic fromaddrs
     // TODO: list of (zaddr,amount)
     // "z" => spend from any zaddr
     // "t" => spend from any taddr
     // "*" => spend from any addr, zaddrs first
     if(fromaddress == "z") {
+        // TODO: refactor this and z_getbalances to use common code
+        std::set<libzcash::PaymentAddress> zaddrs = {};
+        std::set<libzcash::SaplingPaymentAddress> saplingzaddrs = {};
+        pwalletMain->GetSaplingPaymentAddresses(saplingzaddrs);
+
+        zaddrs.insert(saplingzaddrs.begin(), saplingzaddrs.end());
+
+        int nMinDepth = 1;
         std::vector<SaplingNoteEntry> saplingEntries;
-        //pwalletMain->GetFilteredNotes(saplingEntries, zaddrs, nMinDepth, nMaxDepth, true, !fIncludeWatchonly, false);
+        pwalletMain->GetFilteredNotes(saplingEntries, zaddrs, nMinDepth);
+
+        std::map<std::string, CAmount> mapBalances;
         for (auto & entry : saplingEntries) {
-            // EncodePaymentAddress(entry.address);
+            auto zaddr       = EncodePaymentAddress(entry.address);
+            CAmount nBalance = CAmount(entry.note.value());
+            if(mapBalances.count(zaddr)) {
+                mapBalances[zaddr] += nBalance;
+            } else {
+                mapBalances[zaddr] = nBalance;
+            }
         }
+        std::vector<std::pair<std::string,CAmount>> vec;
+        std::copy(mapBalances.begin(), mapBalances.end(), std::back_inserter<std::vector<std::pair<std::string,CAmount>>>(vec));
+
+        std::sort(vec.begin(), vec.end(), [](const std::pair<std::string, CAmount> &l, const std::pair<std::string,CAmount> &r)
+            {
+                if (l.second != r.second) {
+                    return l.second > r.second;
+                }
+                return l.first > r.first;
+            });
+
+        //TODO: avoid calculating nTotalOut twice
+        CAmount nTotalOut = 0;
+        for (const UniValue& o : outputs.getValues()) {
+            if (!o.isObject())
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected object");
+
+            UniValue av = find_value(o, "amount");
+            CAmount nAmount = AmountFromValue( av );
+            if (nAmount < 0)
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, amount must be positive");
+
+            nTotalOut += nAmount;
+        }
+
+        //TODO: choose one random address with enough funds
+        CAmount nFee;
+        if (params.size() > 3) {
+            if (params[3].get_real() == 0.0) {
+                nFee = 0;
+            } else {
+                nFee = AmountFromValue( params[3] );
+            }
+        }
+
+        // the total amount needed in a single zaddr to use as fromaddress
+        CAmount nMinBal = nTotalOut + nFee;
+
+        std::vector<std::string> vPotentialAddresses;
+        for (auto & entry : vec) {
+            if(entry.second >= nMinBal) {
+                vPotentialAddresses.push_back(entry.first);
+            }
+        }
+
+        // select a random address with enough confirmed balance
+        fromaddress = vPotentialAddresses[ GetRandInt(vPotentialAddresses.size()) ];
     } else {
-    }
+        CTxDestination taddr     = DecodeDestination(fromaddress);
+        fromTaddr = IsValidDestination(taddr);
+        if (!fromTaddr) {
+            auto res = DecodePaymentAddress(fromaddress);
+            if (!IsValidPaymentAddress(res, branchId)) {
+                // invalid
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid from address, should be a taddr or zaddr.");
+            }
 
-    fromTaddr = IsValidDestination(taddr);
-    if (!fromTaddr) {
-        auto res = DecodePaymentAddress(fromaddress);
-        if (!IsValidPaymentAddress(res, branchId)) {
-            // invalid
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid from address, should be a taddr or zaddr.");
+            // Check that we have the spending key
+            if (!boost::apply_visitor(HaveSpendingKeyForPaymentAddress(pwalletMain), res)) {
+                 throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "From address does not belong to this node, zaddr spending key not found.");
+            }
+
+            // Remember whether this is a Sapling address
+            fromSapling = boost::get<libzcash::SaplingPaymentAddress>(&res) != nullptr;
         }
-
-        // Check that we have the spending key
-        if (!boost::apply_visitor(HaveSpendingKeyForPaymentAddress(pwalletMain), res)) {
-             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "From address does not belong to this node, zaddr spending key not found.");
-        }
-
-        // Remember whether this is a Sapling address
-        fromSapling = boost::get<libzcash::SaplingPaymentAddress>(&res) != nullptr;
     }
-
-    UniValue outputs = params[1].get_array();
-
-    if (outputs.size()==0)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, amounts array is empty.");
 
     // Keep track of addresses to spot duplicates
     set<std::string> setAddress;
