@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -212,8 +212,10 @@ CAddress GetLocalAddress(const CNetAddr *paddrPeer)
     {
         ret = CAddress(addr);
     }
+    //TODO: option to set custom services
     ret.nServices = nLocalServices;
-    ret.nTime = GetTime();
+    // Round to the nearest 5 min window to avoid fingerprinting -- Duke
+    ret.nTime     = GetTime() - (GetTime() % 300);
     return ret;
 }
 
