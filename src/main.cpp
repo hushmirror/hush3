@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -5575,7 +5575,7 @@ FILE* OpenDiskFile(const CDiskBlockPos &pos, const char *prefix, bool fReadOnly)
     }
     if ( pos.nFile < sizeof(didinit)/sizeof(*didinit) && didinit[pos.nFile] == 0 && strcmp(prefix,(char *)"blk") == 0 )
     {
-        komodo_prefetch(file);
+        hush_prefetch(file);
         didinit[pos.nFile] = 1;
     }
     if (pos.nPos) {

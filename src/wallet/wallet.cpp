@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -3993,7 +3993,7 @@ CAmount CWallet::GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarge
 }
 
 
-void komodo_prefetch(FILE *fp);
+void hush_prefetch(FILE *fp);
 
 DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
 {
@@ -4006,7 +4006,7 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
         FILE *fp;
         if ( (fp= fopen(strWalletFile.c_str(),"rb")) != 0 )
         {
-            komodo_prefetch(fp);
+            hush_prefetch(fp);
             fclose(fp);
         }
     }

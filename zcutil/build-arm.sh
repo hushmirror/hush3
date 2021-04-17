@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2019-2020 radix42
-# Copyright (c) 2016-2020 The Hush developers
+# Copyright (c) 2016-2021 The Hush developers
 # Original aarch64 port by radix42. Thank you!
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
