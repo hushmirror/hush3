@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -4708,7 +4708,7 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
             nTotalOut += nAmount;
         }
 
-        //TODO: choose one random address with enough funds
+        //GOAL: choose one random zaddress with enough funds
         CAmount nFee;
         if (params.size() > 3) {
             if (params[3].get_real() == 0.0) {
@@ -4729,7 +4729,14 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
         }
 
         // select a random address with enough confirmed balance
-        fromaddress = vPotentialAddresses[ GetRandInt(vPotentialAddresses.size()) ];
+        auto nPotentials = vPotentialAddresses.size();
+        if (nPotentials > 0) {
+            fprintf(stderr,"%s: Selecting one of %lu potential source zaddrs\n", __func__, nPotentials);
+            fromaddress = vPotentialAddresses[ GetRandInt(nPotentials) ];
+        } else {
+            // Automagic zaddr source election failed, exit honorably
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "No single zaddr currently has enough funds to make that transaction, you may need to wait for confirmations.");
+        }
     } else {
         CTxDestination taddr     = DecodeDestination(fromaddress);
         fromTaddr = IsValidDestination(taddr);
@@ -4898,6 +4905,8 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
     txsize += GetSerializeSize(tx, SER_NETWORK, tx.nVersion);
     if (fromTaddr) {
         txsize += CTXIN_SPEND_DUST_SIZE;
+        //TODO: On HUSH since block 340k there can no longer be taddr change,
+        // so we can likely make a better estimation of max txsize
         txsize += CTXOUT_REGULAR_SIZE;      // There will probably be taddr change
     }
     txsize += CTXOUT_REGULAR_SIZE * taddrRecipients.size();
@@ -4967,7 +4976,6 @@ UniValue z_sendmany(const UniValue& params, bool fHelp, const CPubKey& mypk)
     AsyncRPCOperationId operationId = operation->getId();
     return operationId;
 }
-
 
 /**
 When estimating the number of coinbase utxos we can shield in a single transaction:
@@ -5066,7 +5074,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
     std::vector<ShieldCoinbaseUTXO> inputs;
     CAmount shieldedValue = 0;
     CAmount remainingValue = 0;
-    //TODO: update these estimates
+    //TODO: update these estimates for Sapling SpendDescriptions
     size_t estimatedTxSize = 2000;  // 1802 joinsplit description + tx overhead + wiggle room
 
     #ifdef __LP64__
