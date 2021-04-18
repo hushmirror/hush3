@@ -1457,7 +1457,6 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
             if (iscoinbase == 0 && txout.nValue > 0)
             {
                 // TODO: if we are upgraded to Sapling, we can allow Sprout sourced funds to sit in a transparent address
-                //
                 char destaddr[65];
                 Getscriptaddress(destaddr,txout.scriptPubKey);
                 if ( hush_isnotaryvout(destaddr,tiptime) == 0 )
@@ -6777,15 +6776,18 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         LogPrintf("dropmessagestest DROPPING RECV MESSAGE\n");
         return true;
     }
+    auto p2pdebug = GetArg("-p2pdebug",0);
 
-    fprintf(stderr,"%s: netmsg: %s from %s\n", __func__, strCommand.c_str(), pfrom->addr.ToString().c_str() );
+    if(p2pdebug)
+        fprintf(stderr,"%s: netmsg: %s from %s\n", __func__, strCommand.c_str(), pfrom->addr.ToString().c_str() );
 
     if (strCommand == "version") {
         // Feeler connections exist only to verify if node is online
         if (pfrom->fFeeler) {
             assert(pfrom->fInbound == false);
             pfrom->fDisconnect = true;
-            fprintf(stderr,"%s: disconnecting feelerconn from %s\n", __func__, pfrom->addr.ToString().c_str() );
+            if(p2pdebug)
+                fprintf(stderr,"%s: disconnecting feelerconn from %s\n", __func__, pfrom->addr.ToString().c_str() );
         }
 
         // Each connection can only send one version message
@@ -6962,7 +6964,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     } else if (strCommand == "addr") {
         vector<CAddress> vAddr;
         vRecv >> vAddr;
-        fprintf(stderr,"%s: processing add with vAddr.size=%lu\n", __func__, vAddr.size() );
+        if(p2pdebug)
+            fprintf(stderr,"%s: processing add with vAddr.size=%lu\n", __func__, vAddr.size() );
 
         // Don't want addr from older versions unless seeding
         if (pfrom->nVersion < CADDR_TIME_VERSION && addrman.size() > 1000)
@@ -6980,7 +6983,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         BOOST_FOREACH(CAddress& addr, vAddr)
         {
             boost::this_thread::interruption_point();
-            fprintf(stderr,"%s: %s.nTime=%d\n", __func__, addr.ToString().c_str(), addr.nTime);
+            if(p2pdebug)
+                fprintf(stderr,"%s: %s.nTime=%d\n", __func__, addr.ToString().c_str(), addr.nTime);
 
             if (addr.nTime <= 100000000 || addr.nTime > nNow + 10 * 60)
                 addr.nTime = nNow - 5 * 24 * 60 * 60;
@@ -7019,7 +7023,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             if (fReachable) {
                 vAddrOk.push_back(addr);
             } else {
-                fprintf(stderr,"%s: %s with nTime=%d is not reachable\n",__func__,addr.ToString().c_str(), addr.nTime);
+                if(p2pdebug)
+                    fprintf(stderr,"%s: %s with nTime=%d is not reachable\n",__func__,addr.ToString().c_str(), addr.nTime);
             }
         }
         addrman.Add(vAddrOk, pfrom->addr, 2 * 60 * 60);
@@ -7141,7 +7146,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     else if (strCommand == "inv") {
         vector<CInv> vInv;
         vRecv >> vInv;
-        fprintf(stderr,"%s: processing inv with vInv.size=%lu\n", __func__, vInv.size() );
+        if(p2pdebug)
+            fprintf(stderr,"%s: processing inv with vInv.size=%lu\n", __func__, vInv.size() );
         if (vInv.size() > MAX_INV_SZ)
         {
             Misbehaving(pfrom->GetId(), 20);
@@ -7203,7 +7209,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     } else if (strCommand == "getdata") {
         vector<CInv> vInv;
         vRecv >> vInv;
-        fprintf(stderr,"%s: getdata vInv.size=%lu\n", __func__, vInv.size() );
+        if(p2pdebug)
+            fprintf(stderr,"%s: getdata vInv.size=%lu\n", __func__, vInv.size() );
         if (vInv.size() > MAX_INV_SZ)
         {
             Misbehaving(pfrom->GetId(), 20);
@@ -7534,7 +7541,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
     } else if (strCommand == "mempool") {
         LOCK2(cs_main, pfrom->cs_filter);
-        fprintf(stderr,"%s: mempool\n",__func__);
+        //LogPrintf("%s: mempool request from %s",__func__, pfrom->addr.ToString().c_str());
         // TODO: limit mempool requests per time and per peer
 
         std::vector<uint256> vtxid;
