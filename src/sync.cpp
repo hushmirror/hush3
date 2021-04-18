@@ -1,6 +1,6 @@
 // Copyright (c) 2011-2012 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 /******************************************************************************

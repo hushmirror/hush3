@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020      The Hush developers
+// Copyright (c) 2016-2021      The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -19,7 +19,6 @@
 #include "hush_defs.h"
 #include "hush_cJSON.h"
 
-#define KOMODO_MAINNET_START 178999
 #define HUSH_NOTARIES_HEIGHT1 814000
 
 const char *Notaries_genesis[][2] =

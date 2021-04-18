@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2016-2020 The Hush developers
+# Copyright (c) 2016-2021 The Hush developers
 # Released under the GPLv3
 
 set -e -o pipefail
