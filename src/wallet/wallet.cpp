@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -1084,7 +1084,7 @@ void CWallet::BuildWitnessCache(const CBlockIndex* pindex, bool witnessOnly)
   while (pblockindex) {
 
     if (pblockindex->GetHeight() % 100 == 0 && pblockindex->GetHeight() < height - 5) {
-      LogPrintf("Building Witnesses for block %i %.4f complete\n", pblockindex->GetHeight(), pblockindex->GetHeight() / double(height));
+      LogPrintf("Building Witnesses for block %i %.4f complete, %d remaining\n", pblockindex->GetHeight(), pblockindex->GetHeight() / double(height), height - pblockindex->GetHeight() );
     }
 
     SaplingMerkleTree saplingTree;
@@ -1473,7 +1473,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet, CWalletD
         }
 
         //// debug print
-        LogPrintf("AddToWallet %s  %s%s\n", wtxIn.GetHash().ToString(), (fInsertedNew ? "new" : ""), (fUpdated ? "update" : ""));
+        LogPrintf("AddToWallet %s at height %d %s%s\n", wtxIn.GetHash().ToString(), hush_blockheight(wtxIn.hashBlock), (fInsertedNew ? "new" : ""), (fUpdated ? "update" : ""));
 
         // Write to disk
         if (fInsertedNew || fUpdated)
@@ -3910,9 +3910,7 @@ bool CWallet::CreateTransaction(const vector<CRecipient>& vecSend, CWalletTx& wt
     return true;
 }
 
-/**
- * Call after CreateTransaction unless you want to abort
- */
+// Call after CreateTransaction unless you want to abort
 bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey)
 {
     {
@@ -3995,7 +3993,7 @@ CAmount CWallet::GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarge
 }
 
 
-void komodo_prefetch(FILE *fp);
+void hush_prefetch(FILE *fp);
 
 DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
 {
@@ -4008,7 +4006,7 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
         FILE *fp;
         if ( (fp= fopen(strWalletFile.c_str(),"rb")) != 0 )
         {
-            komodo_prefetch(fp);
+            hush_prefetch(fp);
             fclose(fp);
         }
     }

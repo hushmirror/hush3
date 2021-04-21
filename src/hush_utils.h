@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -2475,7 +2475,7 @@ struct hush_state *hush_stateptr(char *symbol,char *dest)
     return(hush_stateptrget(symbol));
 }
 
-void komodo_prefetch(FILE *fp)
+void hush_prefetch(FILE *fp)
 {
     long fsize,fpos; int32_t incr = 16*1024*1024;
     fpos = ftell(fp);

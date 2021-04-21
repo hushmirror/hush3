@@ -1,9 +1,9 @@
 // Copyright (c) 2015 The Bitcoin Core developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
 #include "httpserver.h"
-
 #include "chainparamsbase.h"
 #include "compat.h"
 #include "util.h"
@@ -12,15 +12,12 @@
 #include "sync.h"
 #include "ui_interface.h"
 #include "utilstrencodings.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <signal.h>
-
 #include <event2/event.h>
 #include <event2/http.h>
 #include <event2/thread.h>
@@ -292,10 +289,11 @@ static void http_request_cb(struct evhttp_request* req, void* arg)
     if (i != iend) {
         std::unique_ptr<HTTPWorkItem> item(new HTTPWorkItem(hreq.release(), path, i->handler));
         assert(workQueue);
-        if (workQueue->Enqueue(item.get()))
+        if (workQueue->Enqueue(item.get())) {
             item.release(); /* if true, queue took ownership */
-        else
-            item->req->WriteReply(HTTP_INTERNAL, "Work queue depth exceeded");
+        } else {
+            item->req->WriteReply(HTTP_INTERNAL, strprintf("Work queue depth %d exceeded", workQueue->Depth() ));
+        }
     } else {
         hreq->WriteReply(HTTP_NOTFOUND);
     }

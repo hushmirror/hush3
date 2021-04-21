@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -1405,8 +1405,7 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
     if (!tx.fOverwintered && tx.nVersion < SPROUT_MIN_TX_VERSION) {
         return state.DoS(100, error("CheckTransaction(): version too low"),
                          REJECT_INVALID, "bad-txns-version-too-low");
-    }
-    else if (tx.fOverwintered) {
+    } else if (tx.fOverwintered) {
         if (tx.nVersion < OVERWINTER_MIN_TX_VERSION) {
             return state.DoS(100, error("CheckTransaction(): overwinter version too low"),
                              REJECT_INVALID, "bad-tx-overwinter-version-too-low");
@@ -1422,16 +1421,13 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
         }
     }
 
-    //TODO: desprout
-    // Transactions containing empty `vin` must have either non-empty
-    // `vjoinsplit` or non-empty `vShieldedSpend`.
-    if (tx.vin.empty() && tx.vjoinsplit.empty() && tx.vShieldedSpend.empty()) 
+    // Transactions containing empty `vin` must have non-empty `vShieldedSpend`.
+    if (tx.vin.empty() && tx.vShieldedSpend.empty())
         return state.DoS(10, error("CheckTransaction(): vin empty"),
                          REJECT_INVALID, "bad-txns-vin-empty");
 
-    // Transactions containing empty `vout` must have either non-empty
-    // `vjoinsplit` or non-empty `vShieldedOutput`.
-    if (tx.vout.empty() && tx.vjoinsplit.empty() && tx.vShieldedOutput.empty())
+    // Transactions containing empty `vout` must have non-empty `vShieldedOutput`.
+    if (tx.vout.empty() && tx.vShieldedOutput.empty())
         return state.DoS(10, error("CheckTransaction(): vout empty"),
                          REJECT_INVALID, "bad-txns-vout-empty");
 
@@ -1461,7 +1457,6 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
             if (iscoinbase == 0 && txout.nValue > 0)
             {
                 // TODO: if we are upgraded to Sapling, we can allow Sprout sourced funds to sit in a transparent address
-                //
                 char destaddr[65];
                 Getscriptaddress(destaddr,txout.scriptPubKey);
                 if ( hush_isnotaryvout(destaddr,tiptime) == 0 )
@@ -3043,77 +3038,12 @@ void ThreadScriptCheck() {
     scriptcheckqueue.Thread();
 }
 
-//
-// Called periodically asynchronously; alerts if it smells like
-// we're being fed a bad chain (blocks being generated much
-// too slowly or too quickly).
-//
-void PartitionCheck(bool (*initialDownloadCheck)(), CCriticalSection& cs, const CBlockIndex *const &bestHeader,
-                    int64_t nPowTargetSpacing)
-{
-    if (bestHeader == NULL || initialDownloadCheck()) return;
 
-    static int64_t lastAlertTime = 0;
-    int64_t now = GetTime();
-    if (lastAlertTime > now-60*60*24) return; // Alert at most once per day
-
-    const int SPAN_HOURS=4;
-    const int SPAN_SECONDS=SPAN_HOURS*60*60;
-    int BLOCKS_EXPECTED = SPAN_SECONDS / nPowTargetSpacing;
-
-    boost::math::poisson_distribution<double> poisson(BLOCKS_EXPECTED);
-
-    std::string strWarning;
-    int64_t startTime = GetTime()-SPAN_SECONDS;
-
-    LOCK(cs);
-    const CBlockIndex* i = bestHeader;
-    int nBlocks = 0;
-    while (i->GetBlockTime() >= startTime) {
-        ++nBlocks;
-        i = i->pprev;
-        if (i == NULL) return; // Ran out of chain, we must not be fully synced
-    }
-
-    // How likely is it to find that many by chance?
-    double p = boost::math::pdf(poisson, nBlocks);
-
-    LogPrint("partitioncheck", "%s : Found %d blocks in the last %d hours\n", __func__, nBlocks, SPAN_HOURS);
-    LogPrint("partitioncheck", "%s : likelihood: %g\n", __func__, p);
-
-    // Aim for one false-positive about every fifty years of normal running:
-    const int FIFTY_YEARS = 50*365*24*60*60;
-    double alertThreshold = 1.0 / (FIFTY_YEARS / SPAN_SECONDS);
-
-    if (bestHeader->GetHeight() > BLOCKS_EXPECTED)
-    {
-        if (p <= alertThreshold && nBlocks < BLOCKS_EXPECTED)
-        {
-            // Many fewer blocks than expected: alert!
-            strWarning = strprintf(_("WARNING: check your network connection, %d blocks received in the last %d hours (%d expected)"),
-                                nBlocks, SPAN_HOURS, BLOCKS_EXPECTED);
-        }
-        else if (p <= alertThreshold && nBlocks > BLOCKS_EXPECTED)
-        {
-            // Many more blocks than expected: alert!
-            strWarning = strprintf(_("WARNING: abnormally high number of blocks generated, %d blocks received in the last %d hours (%d expected)"),
-                                nBlocks, SPAN_HOURS, BLOCKS_EXPECTED);
-        }
-    }
-    if (!strWarning.empty())
-    {
-        strMiscWarning = strWarning;
-        CAlert::Notify(strWarning, true);
-        lastAlertTime = now;
-    }
-}
-
-
-static int64_t nTimeVerify = 0;
-static int64_t nTimeConnect = 0;
-static int64_t nTimeIndex = 0;
+static int64_t nTimeVerify    = 0;
+static int64_t nTimeConnect   = 0;
+static int64_t nTimeIndex     = 0;
 static int64_t nTimeCallbacks = 0;
-static int64_t nTimeTotal = 0;
+static int64_t nTimeTotal     = 0;
 bool FindBlockPos(int32_t tmpflag,CValidationState &state, CDiskBlockPos &pos, unsigned int nAddSize, unsigned int nHeight, uint64_t nTime, bool fKnown = false);
 bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBlockIndex *pindexNew, const CDiskBlockPos& pos);
 
@@ -4499,10 +4429,12 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
         // pool. So we invert the sign here.
         saplingValue += -tx.valueBalance;
 
+        /*
         for (auto js : tx.vjoinsplit) {
             sproutValue += js.vpub_old;
             sproutValue -= js.vpub_new;
         }
+        */
 
         // Ignore following stats unless -zindex enabled
         if (!fZindex)
@@ -5642,7 +5574,7 @@ FILE* OpenDiskFile(const CDiskBlockPos &pos, const char *prefix, bool fReadOnly)
     }
     if ( pos.nFile < sizeof(didinit)/sizeof(*didinit) && didinit[pos.nFile] == 0 && strcmp(prefix,(char *)"blk") == 0 )
     {
-        komodo_prefetch(file);
+        hush_prefetch(file);
         didinit[pos.nFile] = 1;
     }
     if (pos.nPos) {
@@ -6844,11 +6776,20 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         LogPrintf("dropmessagestest DROPPING RECV MESSAGE\n");
         return true;
     }
+    auto p2pdebug = GetArg("-p2pdebug",0);
 
-    //fprintf(stderr,"netmsg: %s\n", strCommand.c_str());
+    if(p2pdebug)
+        fprintf(stderr,"%s: netmsg: %s from %s\n", __func__, strCommand.c_str(), pfrom->addr.ToString().c_str() );
 
-    if (strCommand == "version")
-    {
+    if (strCommand == "version") {
+        // Feeler connections exist only to verify if node is online
+        if (pfrom->fFeeler) {
+            assert(pfrom->fInbound == false);
+            pfrom->fDisconnect = true;
+            if(p2pdebug)
+                fprintf(stderr,"%s: disconnecting feelerconn from %s\n", __func__, pfrom->addr.ToString().c_str() );
+        }
+
         // Each connection can only send one version message
         if (pfrom->nVersion != 0)
         {
@@ -6961,15 +6902,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             }
         }
 
-        // Do Not Relay alerts
-        /*
-        {
-            LOCK(cs_mapAlerts);
-            BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
-            item.second.RelayTo(pfrom);
-        }
-        */
-
         pfrom->fSuccessfullyConnected = true;
 
         string remoteAddr;
@@ -7032,6 +6964,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     } else if (strCommand == "addr") {
         vector<CAddress> vAddr;
         vRecv >> vAddr;
+        if(p2pdebug)
+            fprintf(stderr,"%s: processing add with vAddr.size=%lu\n", __func__, vAddr.size() );
 
         // Don't want addr from older versions unless seeding
         if (pfrom->nVersion < CADDR_TIME_VERSION && addrman.size() > 1000)
@@ -7049,6 +6983,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         BOOST_FOREACH(CAddress& addr, vAddr)
         {
             boost::this_thread::interruption_point();
+            if(p2pdebug)
+                fprintf(stderr,"%s: %s.nTime=%d\n", __func__, addr.ToString().c_str(), addr.nTime);
 
             if (addr.nTime <= 100000000 || addr.nTime > nNow + 10 * 60)
                 addr.nTime = nNow - 5 * 24 * 60 * 60;
@@ -7084,17 +7020,19 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 }
             }
             // Do not store addresses outside our network
-            if (fReachable)
+            if (fReachable) {
                 vAddrOk.push_back(addr);
+            } else {
+                if(p2pdebug)
+                    fprintf(stderr,"%s: %s with nTime=%d is not reachable\n",__func__,addr.ToString().c_str(), addr.nTime);
+            }
         }
         addrman.Add(vAddrOk, pfrom->addr, 2 * 60 * 60);
         if (vAddr.size() < 1000)
             pfrom->fGetAddr = false;
         if (pfrom->fOneShot)
             pfrom->fDisconnect = true;
-    }
-    else if (strCommand == "ping")
-    {
+    } else if (strCommand == "ping") {
         if (pfrom->nVersion > BIP0031_VERSION)
         {
             uint64_t nonce = 0;
@@ -7112,11 +7050,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             // return very quickly.
             pfrom->PushMessage("pong", nonce);
         }
-    }
-    
-    
-    else if (strCommand == "pong")
-    {
+    } else if (strCommand == "pong") {
         int64_t pingUsecEnd = nTimeReceived;
         uint64_t nonce = 0;
         size_t nAvail = vRecv.in_avail();
@@ -7171,7 +7105,6 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             pfrom->nPingNonceSent = 0;
         }
     }
-
     // This asymmetric behavior for inbound and outbound connections was introduced
     // to prevent a fingerprinting attack: an attacker can send specific fake addresses
     // to users' AddrMan and later request them by sending getaddr messages.
@@ -7213,6 +7146,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     else if (strCommand == "inv") {
         vector<CInv> vInv;
         vRecv >> vInv;
+        if(p2pdebug)
+            fprintf(stderr,"%s: processing inv with vInv.size=%lu\n", __func__, vInv.size() );
         if (vInv.size() > MAX_INV_SZ)
         {
             Misbehaving(pfrom->GetId(), 20);
@@ -7274,6 +7209,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     } else if (strCommand == "getdata") {
         vector<CInv> vInv;
         vRecv >> vInv;
+        if(p2pdebug)
+            fprintf(stderr,"%s: getdata vInv.size=%lu\n", __func__, vInv.size() );
         if (vInv.size() > MAX_INV_SZ)
         {
             Misbehaving(pfrom->GetId(), 20);
@@ -7327,10 +7264,15 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
         LOCK(cs_main);
 
-        if (chainActive.LastTip() != 0 && chainActive.LastTip()->GetHeight() > 100000 && IsInitialBlockDownload())
-        {
-            //fprintf(stderr,"dont process getheaders during initial download\n");
-            return true;
+
+        if (chainActive.LastTip() != 0 && chainActive.LastTip()->GetHeight() > 100000 && IsInitialBlockDownload()) {
+            if(pfrom->fAllowlisted) {
+                LogPrint("net", "Allowing getheaders from allowlisted peer=%d during initial block download\n", pfrom->id);
+            } else {
+                LogPrint("net", "Ignoring getheaders from peer=%d because node is in initial block download\n", pfrom->id);
+                //fprintf(stderr,"dont process getheaders during initial download\n");
+                return true;
+            }
         }
         CBlockIndex* pindex = NULL;
         if (locator.IsNull())
@@ -7599,6 +7541,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
     } else if (strCommand == "mempool") {
         LOCK2(cs_main, pfrom->cs_filter);
+        //LogPrintf("%s: mempool request from %s",__func__, pfrom->addr.ToString().c_str());
+        // TODO: limit mempool requests per time and per peer
 
         std::vector<uint256> vtxid;
         mempool.queryHashes(vtxid);
@@ -7620,30 +7564,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         if (vInv.size() > 0)
             pfrom->PushMessage("inv", vInv);
     } else if (fAlerts && strCommand == "alert") {
-        //TODO: probably completely ignore this
-        CAlert alert;
-        vRecv >> alert;
-
-        uint256 alertHash = alert.GetHash();
-        if (pfrom->setKnown.count(alertHash) == 0) {
-            if (alert.ProcessAlert(Params().AlertKey())) {
-                // Relay
-                pfrom->setKnown.insert(alertHash);
-                {
-                    LOCK(cs_vNodes);
-                    BOOST_FOREACH(CNode* pnode, vNodes)
-                    alert.RelayTo(pnode);
-                }
-            } else {
-                // Small DoS penalty so peers that send us lots of
-                // duplicate/expired/invalid-signature/whatever alerts
-                // eventually get banned.
-                // This isn't a Misbehaving(100) (immediate ban) because the
-                // peer might be an older or different implementation with
-                // a different signature key, etc.
-                Misbehaving(pfrom->GetId(), 10);
-            }
-        }
+        // Do not process alert p2p messages and give DoS penalty
+        Misbehaving(pfrom->GetId(), 10);
     } else if (!(nLocalServices & NODE_BLOOM) &&
               (strCommand == "filterload" ||
                strCommand == "filteradd")) {

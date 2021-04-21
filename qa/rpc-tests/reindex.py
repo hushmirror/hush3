@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # Copyright (c) 2014 The Bitcoin Core developers
-# Copyright (c) 2016-2020 The Hush developers
+# Copyright (c) 2016-2021 The Hush developers
 # Released under the GPLv3
 #
 # Test -reindex with CheckBlockIndex

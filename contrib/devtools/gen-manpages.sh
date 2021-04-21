@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2016-2020 The Hush developers
+# Copyright (c) 2016-2021 The Hush developers
 # Released under the GPLv3
 
 TOPDIR=${TOPDIR:-$(git rev-parse --show-toplevel)}
@@ -11,6 +11,17 @@ HUSHCLI=${HUSHCLI:-$SRCDIR/hush-cli}
 HUSHTX=${HUSHTX:-$SRCDIR/hush-tx}
 
 [ ! -x $HUSHD ] && echo "$HUSHD not found or not executable." && exit 1
+
+# TODO: this does not work correctly, when help2man is installed, it still fails
+# Check if help2man is installed
+# If not then display error to user and exit
+#if ! command -v help2man &> /dev/null
+#then
+#    echo "help2man could not be found"
+#    echo "Please install from your Linux package manager and try again"
+#    echo "On Debian-based systems you can do: apt-get install help2man"
+#    exit
+#fi
 
 # use this if hushd is not running
 #HUSHVER="v3.6.2"

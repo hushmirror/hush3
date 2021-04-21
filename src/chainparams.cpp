@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /////////////////////////////////////////////////////////////////////////////////
@@ -763,10 +763,32 @@ void *chainparams_commandline() {
                                 (472000,     uint256S("0x0000001f727ffbe5b1ad17206c060aa77e9b20257f1764f1ac018a0f64f19bd1"))
                                 (473000,     uint256S("0x0000000b7ee1e1d0f6b577c02a924733d2c4d6d5805daa51e44e543eadacba8b"))
                                 (474000,     uint256S("0x0000001260b7935e520244a3591cb6b37de3b36c45dae5318f0bb7eda6847e17"))
-                                (475000,     uint256S("0x0000000db956f0dcecc58ccfc8463f49910d455fc3c223ab36a93c5c468513cc")),
-                                (int64_t)  1617173192, // time of last checkpointed block
-                                (int64_t) 809511,      // total txs
-                                (double)  3228        // txs in the last day before block 475640
+                                (475000,     uint256S("0x0000000db956f0dcecc58ccfc8463f49910d455fc3c223ab36a93c5c468513cc"))
+                                (476000,     uint256S("0x00000014b1ab6d1690231cbda442ba650ef0935b8b4af0729916ecc1c1a2989c"))
+                                (477000,     uint256S("0x0000000c36226af290a2a7744dbcf63b11db9461a7d33b189015b3d751d6acec"))
+                                (478000,     uint256S("0x00000002a5d3126c1b40cce8e8e0cf704a8738a04779e79fc056c67ac581178b"))
+                                (479000,     uint256S("0x0000000c4f9d596db63f21d129b2662cfe557960493ab625791c770ed53cc80e"))
+                                (480000,     uint256S("0x00000009cc852a3483357b3dcecffc2b3beb84c0eec3d884839260d296425d2c"))
+                                (481000,     uint256S("0x00000004d3235fe96cd4081679233c82849864be5125e96b4a9c4c0b48bd6e4f"))
+                                (482000,     uint256S("0x00000015c6231287c336bf35531a1e92e2e987d8b03e0cc1f1bc5beace0fc980"))
+                                (483000,     uint256S("0x0000000a047732481649fce4cdb762cc227963932788ef656ea522d8c719c9c5"))
+                                (484000,     uint256S("0x0000001305ab52bdcf98f484e06d8307d82f29dca0597483961e93035f93419f"))
+                                (485000,     uint256S("0x00000004a70f2cedfcc478b72666ef04f4831d1498bf859c79eec3314d35f373"))
+                                (486000,     uint256S("0x0000000299f0350d0740cd83357be1e9cb9b655169711964dbcf93948e1f1d67"))
+                                (487000,     uint256S("0x00000001b4c71614b8a18f5f4948be6e401026ebf02ddf0126541da4e3fb3772"))
+                                (488000,     uint256S("0x0000003a3d4e5cb180917aba3f8261a149de3bfd6f6b735caeb3d925c3f9a09d"))
+                                (489000,     uint256S("0x00000007be9b81960082d683f138bc12f8d8c4cd16fec1ff35858e57372778bf"))
+                                (490000,     uint256S("0x00000001f5787442f49129b71532a0571c5779bbd47e16e68515146e9084fbc6"))
+                                (491000,     uint256S("0x00000009cf0c34a427174b044d3c6648574d55d1e6fa4f21d3e74df9374b9713"))
+                                (492000,     uint256S("0x00000013bbbff98ddab19a3178a0088a20628791e94963e5d1ea635015dfa9c6"))
+                                (493000,     uint256S("0x00000001ed829c061ba14f6953e79d99577079adf5526f1e43e6dc9d9f9571bf"))
+                                (494000,     uint256S("0x00000018dfeced2d1584a1003fefa4349810239bade096e53b4fa6bbc38a1685"))
+                                (495000,     uint256S("0x0000001816af55724cd49c0bfe02c9eac29b4a73db2b7d868b958218a03e6c94"))
+                                (496000,     uint256S("0x000000007e2019c5246db5a75122c6826822fa154d68a51eee2ff23f54ec668e")),
+                                (int64_t)  1618760194, // time of last checkpointed block
+                                (int64_t) 842496,      // total txs
+                                (double)  1812        // txs in the last day before block 496013
+
                 };
         } else {
             checkpointData = //(Checkpoints::CCheckpointData)
@@ -781,7 +803,7 @@ void *chainparams_commandline() {
     }
 
     pCurrentParams->SetCheckpointData(checkpointData);
-    fprintf(stderr,"%s: Set checkpoint data\n", __func__);
+    fprintf(stderr,"%s: Checkpoint data loaded\n", __func__);
 
     ASSETCHAIN_INIT = 1;
     return(0);
