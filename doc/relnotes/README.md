@@ -22,14 +22,14 @@ This is an OPTIONAL release for average Hush users, but is HIGHLY RECOMMENDED fo
 
   * :tada: More internals code related to unused Sprout transactions was removed, making Hush run and compile faster and use less memory.
   * :smile: We now give a more useful error message when a user attempts to make a tx before the node is synced.
-  * :nerd: `z_sendmany` RPC docs now show an example of a z2z transaction
-  * :unicorn: Various security + privacy improvements to the network Peer To Peer (p2p) layer, including:
+  * :nerd_face: `z_sendmany` RPC docs now show an example of a z2z transaction
+  * :closed_lock_with_key: Various security + privacy improvements to the network Peer To Peer (p2p) layer, including:
     * The deprecated `alert` p2p message is no longer processed and nodes using it will be banned.
     * `try-before-evict` ported from BTC core, which helps protect again Eclipse and Sybil Attacks
     * "Feeler connections" ported from BTC, another technique which makes Eclipse and Sybil Attacks harder and more expensive
     * From the paper "Eclipse Attacks on Bitcoin’s Peer-to-Peer Network" Ethan Heilman, Alison Kendler, Aviv Zohar, Sharon Goldberg. https://eprint.iacr.org/2015/263.pdf
     * Related to https://github.com/bitcoin/bitcoin/pull/8282
-  * :money_mouth: New RPC: `z_getbalances` returns a list of all zaddrs with non-zero balance.
+  * :unicorn: New RPC: `z_getbalances` returns a list of all zaddrs with non-zero balance.
       * An optional paramater can filter addresses to those with a specified minimum balance, such as
           `z_getbalances 0.1` will only show HUSH zaddrs with at least 0.1 HUSH.
   * :rainbow: "Automagic `z_sendmany`" makes the RPC easier to use and also improves privacy
