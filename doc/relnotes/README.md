@@ -10,6 +10,43 @@ and no longer on Github, since they banned Duke Leto and
 also because they censor many people around the world and work with
 evil organizations.
 
+# Hush 3.7.1 "Neologistic Nautilus"
+
+# Hush 3.7.0 "Diffy The DAA Kungfoo Cuckoo"
+
+```
+13 files changed, 102 insertions(+), 91 deletions(-)
+```
+
+This is an OPTIONAL release for most Hush users. It is MANDATORY for miners, specifically solo miners and mining pools. It is not required for POOL miners.
+
+# Hush 3.6.3 "Autonomous Aconite's Aunt"
+
+:rainbow: OPTIONAL but RECOMMENDED release. :rainbow:
+
+This release is mostly the same as 3.6.2 but it fixes some issues in Debian+Arch packages and binaries not being able to find asmap.dat, which did not occur when building from Git source. This release protects all users, by default, from network attacks like the Erebus Attack: https://erebus-attack.comp.nus.edu.sg/
+
+# Hush 3.6.2 "Autonomous Aconite"
+
+:eyes: This is an OPTIONAL but RECOMMENDED Hush Full Node release :eyes:
+
+
+##  Notable changes
+
+  * :robot: Autonomous System Map (asmap) bucketing by default
+    * :tada: HUSH is the first cryptocoin to take this work from BTC Core and turn it on by default for all nodes
+    *  :100: SD 1.1.1 did this itself, and now we push that change into the full node itself.
+    * :metal: The new CLI flag `-asmap` is on by default, and can be turned off with `-asmap=0`
+    * :peach: This setting helps users by having 7.4 million "buckets" for peers instead of only 65000 which the traditional /16 scheme uses. This means all Hush full nodes are more protected against network-layer attacks such as the Erebus Attack: https://erebus-attack.comp.nus.edu.sg/
+  * :wink: debug.log is now shrunk to 15MB instead of 100MB
+  * :nerd_face: The max size of debug.log can now be controlled via `-maxdebugfilesize`
+  * :rainbow: A new document that gives an Overview of Hush:  https://git.hush.is/hush/hush3/src/branch/master/doc/overview.md
+
+```
+30db6e6f0cab9f4ac0a4c4b5968a9db8e04ee6a2eb23fe4ae51e8e6bf76b8044  hush-3.6.2-ubuntu-16.04-amd64.tar.gz
+2393910c224b98213725bd4671dd245c36c19dbe6abb4015b8df181064eb9b64  hush-3.6.2-ubuntu-16.04.deb
+```
+
 # Hush 3.6.1 "Syncopated Sphinx"
 
 :fire: This is an OPTIONAL release, but upgrading is ENCOURAGED. :fire:
