@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Copyright (c) 2016 The Zcash developers
 // Original code from: https://gist.github.com/laanwj/0e689cfa37b52bcbbb44
 // Distributed under the GPLv3 software license, see the accompanying
@@ -56,7 +56,7 @@ the bad alert.
 
 */
 
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include "main.h"

@@ -1,7 +1,7 @@
 #!/bin/bash
 # THIS FILE IS GENERATED FROM run-bitcoind-for-test.sh.in
 # Copyright (c) 2013-2014 The Bitcoin Core developers
-# Copyright (c) 2016-2020 The Hush developers
+# Copyright (c) 2016-2021 The Hush developers
 # Released under the GPLv3
 #
 HUSH_LOAD_TIMEOUT=500

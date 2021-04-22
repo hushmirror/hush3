@@ -22,6 +22,8 @@ There are many ways you can directly contribute to Hush:
 * Extend our software
 * Perform a secure code review of Hush Full Node and other Hush-related software
 
+We have a curated list of projects with details about difficulty level and languages involved: https://git.hush.is/hush/projects
+
 Interested in making a contribution? Read on!
 
 ## Ground rules & expectations

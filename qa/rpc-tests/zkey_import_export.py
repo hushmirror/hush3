@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-# Copyright (c) 2016-2020 The Hush developers
+# Copyright (c) 2016-2021 The Hush developers
 # Copyright (c) 2017 The Zcash developers
 # Distributed under the GPLv3 software license, see the accompanying
 # file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
@@ -58,11 +58,7 @@ class ZkeyImportExportTest (BitcoinTestFramework):
             try:
                 assert_equal(amts, [tx["amount"] for tx in txs])
                 for tx in txs:
-                    # make sure JoinSplit keys exist and have valid values
-                    assert_equal("jsindex" in tx, True)
-                    assert_equal("jsoutindex" in tx, True)
-                    assert_greater_than(tx["jsindex"], -1)
-                    assert_greater_than(tx["jsoutindex"], -1)
+                    # TODO: make sure spend keys exist and have valid values
             except AssertionError:
                 logging.error(
                     'Expected amounts: %r; txs: %r',

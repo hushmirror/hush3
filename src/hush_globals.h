@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The Hush Developers
+// Copyright 2016-2021 The Hush Developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -17,7 +17,7 @@
  ******************************************************************************/
 
 #include "hush_defs.h"
-void komodo_prefetch(FILE *fp);
+void hush_prefetch(FILE *fp);
 uint32_t hush_heightstamp(int32_t height);
 void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotaries,uint8_t notaryid,uint256 txhash,uint64_t voutmask,uint8_t numvouts,uint32_t *pvals,uint8_t numpvals,int32_t kheight,uint32_t ktime,uint64_t opretvalue,uint8_t *opretbuf,uint16_t opretlen,uint16_t vout,uint256 MoM,int32_t MoMdepth);
 void komodo_init(int32_t height);

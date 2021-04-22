@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
@@ -31,6 +31,7 @@
 #include "ui_interface.h"
 #include "crypto/common.h"
 #include "hush/utiltls.h"
+#include <random.h>
 #ifdef _WIN32
 #include <string.h>
 #else
@@ -211,8 +212,10 @@ CAddress GetLocalAddress(const CNetAddr *paddrPeer)
     {
         ret = CAddress(addr);
     }
+    //TODO: option to set custom services
     ret.nServices = nLocalServices;
-    ret.nTime = GetTime();
+    // Round to the nearest 5 min window to avoid fingerprinting -- Duke
+    ret.nTime     = GetTime() - (GetTime() % 300);
     return ret;
 }
 
@@ -2037,16 +2040,30 @@ void RelayTransaction(const CTransaction& tx, const CDataStream& ss)
         vRelayExpiration.push_back(std::make_pair(GetTime() + 15 * 60, inv));
     }
     LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes)
+
+    auto vRelayNodes = vNodes;
+
+    // We always round down, except when we have only 1 connection
+    auto newSize = (vNodes.size() / 2) == 0 ? 1 : (vNodes.size() / 2);
+
+    random_shuffle( vRelayNodes.begin(), vRelayNodes.end(), GetRandInt );
+
+    vRelayNodes.resize(newSize);
+    fprintf(stderr, "%s: Relaying to %lu peers\n", __func__, newSize);
+
+    // Only relay to randomly chosen 50% of peers
+    BOOST_FOREACH(CNode* pnode, vRelayNodes)
     {
         if(!pnode->fRelayTxes)
             continue;
         LOCK(pnode->cs_filter);
-        if (pnode->pfilter)
-        {
-            if (pnode->pfilter->IsRelevantAndUpdate(tx))
+        if (pnode->pfilter) {
+            if (pnode->pfilter->IsRelevantAndUpdate(tx)) {
                 pnode->PushInventory(inv);
-        } else pnode->PushInventory(inv);
+            }
+        } else {
+            pnode->PushInventory(inv);
+        }
     }
 }
 
@@ -2109,10 +2126,7 @@ void CNode::Fuzz(int nChance)
     Fuzz(2);
 }
 
-//
 // CAddrDB
-//
-
 CAddrDB::CAddrDB()
 {
     pathAddr = GetDataDir() / "peers.dat";

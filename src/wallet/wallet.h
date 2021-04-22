@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2016-2020 The Hush developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -946,7 +946,7 @@ public:
      *
      * - GetFilteredNotes can't filter out spent notes.
      *
-     *   - Per the comment in SproutNoteData, we assume that if we don't have a
+     *   - Per the comment in SaplingNoteData, we assume that if we don't have a
      *     cached nullifier, the note is not spent.
      *
      * Another more problematic implication is that the wallet can fail to
@@ -964,7 +964,7 @@ public:
      * linked to us by the fact that they contain notes we spent. If it also
      * sends notes to us, or interacts with our transparent addresses, we will
      * detect the transaction and add it to the wallet (again without caching
-     * nullifiers for new notes). As by default JoinSplits send change back to
+     * nullifiers for new notes). Because SaplingSpends send change back to
      * the origin PaymentAddress, the wallet should rarely miss transactions.
      *
      * To work around these issues, whenever the wallet is unlocked, we scan all
@@ -979,10 +979,7 @@ public:
      * - Restarting the node with -reindex (which operates on a locked wallet
      *   but with the now-cached nullifiers).
      */
-    std::map<uint256, JSOutPoint> mapSproutNullifiersToNotes;
-
     std::map<uint256, SaplingOutPoint> mapSaplingNullifiersToNotes;
-
     std::map<uint256, CWalletTx> mapWallet;
 
     int64_t nOrderPosNext;
@@ -1196,7 +1193,6 @@ public:
     /** Saves witness caches and best block locator to disk. */
     void SetBestChain(const CBlockLocator& loc);
     std::set<std::pair<libzcash::PaymentAddress, uint256>> GetNullifiersForAddresses(const std::set<libzcash::PaymentAddress> & addresses);
-    bool IsNoteSproutChange(const std::set<std::pair<libzcash::PaymentAddress, uint256>> & nullifierSet, const libzcash::PaymentAddress & address, const JSOutPoint & entry);
     bool IsNoteSaplingChange(const std::set<std::pair<libzcash::PaymentAddress, uint256>> & nullifierSet, const libzcash::PaymentAddress & address, const SaplingOutPoint & entry);
 
     DBErrors LoadWallet(bool& fFirstRunRet);

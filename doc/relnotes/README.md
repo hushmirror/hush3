@@ -10,6 +10,70 @@ and no longer on Github, since they banned Duke Leto and
 also because they censor many people around the world and work with
 evil organizations.
 
+# Hush 3.7.1 "Neologistic Nautilus"
+
+```
+638 files changed, 1484 insertions(+), 962 deletions(-)
+```
+
+This is an OPTIONAL release for average Hush users, but is HIGHLY RECOMMENDED for service providers, such as lite wallet server ops, mining pools, exchanges, bots, etc.
+
+## Notable Changes
+
+  * :tada: More internals code related to unused Sprout transactions was removed, making Hush run and compile faster and use less memory.
+  * :smile: We now give a more useful error message when a user attempts to make a tx before the node is synced.
+  * :nerd_face: `z_sendmany` RPC docs now show an example of a z2z transaction
+  * :closed_lock_with_key: Various security + privacy improvements to the network Peer To Peer (p2p) layer, including:
+    * The deprecated `alert` p2p message is no longer processed and nodes using it will be banned.
+    * `try-before-evict` ported from BTC core, which helps protect again Eclipse and Sybil Attacks
+    * "Feeler connections" ported from BTC, another technique which makes Eclipse and Sybil Attacks harder and more expensive
+    * From the paper "Eclipse Attacks on Bitcoin’s Peer-to-Peer Network" Ethan Heilman, Alison Kendler, Aviv Zohar, Sharon Goldberg. https://eprint.iacr.org/2015/263.pdf
+    * Related to https://github.com/bitcoin/bitcoin/pull/8282
+  * :unicorn: New RPC: `z_getbalances` returns a list of all zaddrs with non-zero balance.
+      * An optional paramater can filter addresses to those with a specified minimum balance, such as
+          `z_getbalances 0.1` will only show HUSH zaddrs with at least 0.1 HUSH.
+  * :rainbow: "Automagic `z_sendmany`" makes the RPC easier to use and also improves privacy
+      * The `z_sendmany` RPC now understands a symbolic from address of `z` which means:
+          * Randomly choose any zaddr with enough balance as from address
+      * This means CLI users no longer need to run multiple RPC's to find a zaddr with enough balance and specify it themselves
+      * It also means that CLI shell history and cronjobs or source code does not contain the source zaddr, improving privacy.
+
+
+# Hush 3.7.0 "Diffy The DAA Kungfoo Cuckoo"
+
+```
+13 files changed, 102 insertions(+), 91 deletions(-)
+```
+
+This is an OPTIONAL release for most Hush users. It is MANDATORY for miners, specifically solo miners and mining pools. It is not required for POOL miners.
+
+# Hush 3.6.3 "Autonomous Aconite's Aunt"
+
+:rainbow: OPTIONAL but RECOMMENDED release. :rainbow:
+
+This release is mostly the same as 3.6.2 but it fixes some issues in Debian+Arch packages and binaries not being able to find asmap.dat, which did not occur when building from Git source. This release protects all users, by default, from network attacks like the Erebus Attack: https://erebus-attack.comp.nus.edu.sg/
+
+# Hush 3.6.2 "Autonomous Aconite"
+
+:eyes: This is an OPTIONAL but RECOMMENDED Hush Full Node release :eyes:
+
+
+##  Notable changes
+
+  * :robot: Autonomous System Map (asmap) bucketing by default
+    * :tada: HUSH is the first cryptocoin to take this work from BTC Core and turn it on by default for all nodes
+    *  :100: SD 1.1.1 did this itself, and now we push that change into the full node itself.
+    * :metal: The new CLI flag `-asmap` is on by default, and can be turned off with `-asmap=0`
+    * :peach: This setting helps users by having 7.4 million "buckets" for peers instead of only 65000 which the traditional /16 scheme uses. This means all Hush full nodes are more protected against network-layer attacks such as the Erebus Attack: https://erebus-attack.comp.nus.edu.sg/
+  * :wink: debug.log is now shrunk to 15MB instead of 100MB
+  * :nerd_face: The max size of debug.log can now be controlled via `-maxdebugfilesize`
+  * :rainbow: A new document that gives an Overview of Hush:  https://git.hush.is/hush/hush3/src/branch/master/doc/overview.md
+
+```
+30db6e6f0cab9f4ac0a4c4b5968a9db8e04ee6a2eb23fe4ae51e8e6bf76b8044  hush-3.6.2-ubuntu-16.04-amd64.tar.gz
+2393910c224b98213725bd4671dd245c36c19dbe6abb4015b8df181064eb9b64  hush-3.6.2-ubuntu-16.04.deb
+```
+
 # Hush 3.6.1 "Syncopated Sphinx"
 
 :fire: This is an OPTIONAL release, but upgrading is ENCOURAGED. :fire:

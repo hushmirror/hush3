@@ -1,8 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
+// Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -19,9 +19,7 @@
  ******************************************************************************/
 
 #include <cryptoconditions.h>
-
 #include "interpreter.h"
-
 #include "consensus/upgrades.h"
 #include "primitives/transaction.h"
 #include "cc/eval.h"
@@ -31,8 +29,6 @@
 #include "pubkey.h"
 #include "script/script.h"
 #include "uint256.h"
-
-
 
 using namespace std;
 
