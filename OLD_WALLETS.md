@@ -66,6 +66,3 @@ NOTE: Do not use this wallet except to send funds to a new wallet!
 ### Private Keys
 
 You can also transport funds one address at a time via private keys.
-
-Agama Desktop Wallet WIF-to-WIF Tool can convert between old HUSH and new HUSH3
-private keys.
