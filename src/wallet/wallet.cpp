@@ -480,13 +480,19 @@ void CWallet::ChainTip(const CBlockIndex *pindex,
             pblock->GetBlockTime() > GetTime() - 144*ASSETCHAINS_BLOCKTIME)
         {
             BuildWitnessCache(pindex, false);
-            RunSaplingConsolidation(pindex->GetHeight());
-            DeleteWalletTransactions(pindex);
+            if (fSaplingConsolidationEnabled) {
+                RunSaplingConsolidation(pindex->GetHeight());
+            }
+            if (fTxDeleteEnabled) {
+                DeleteWalletTransactions(pindex);
+            }
         } else {
             //Build initial witnesses on every block
             BuildWitnessCache(pindex, true);
-            if (initialDownloadCheck && pindex->GetHeight() % fDeleteInterval == 0) {
-                DeleteWalletTransactions(pindex);
+            if (fTxDeleteEnabled) {
+                if (initialDownloadCheck && pindex->GetHeight() % fDeleteInterval == 0) {
+                    DeleteWalletTransactions(pindex);
+                }
             }
         }
     } else {
@@ -1122,6 +1128,7 @@ void CWallet::BuildWitnessCache(const CBlockIndex* pindex, bool witnessOnly)
             nd->witnessHeight = pblockindex->GetHeight();
           }
         }
+
       }
     }
 
@@ -2734,8 +2741,10 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
             BuildWitnessCache(pindex, true);
 
             //Delete Transactions
-            if (pindex->GetHeight() % fDeleteInterval == 0)
-              DeleteWalletTransactions(pindex);
+            if (fTxDeleteEnabled) {
+                if (pindex->GetHeight() % fDeleteInterval == 0)
+                   DeleteWalletTransactions(pindex);
+            }
 
             if (GetTime() >= nNow + 60) {
                 nNow = GetTime();
