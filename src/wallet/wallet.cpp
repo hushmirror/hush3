@@ -2385,12 +2385,6 @@ bool CWalletTx::WriteToDisk(CWalletDB *pwalletdb)
     return pwalletdb->WriteTx(GetHash(), *this);
 }
 
-void CWallet::WitnessNoteCommitment(std::vector<uint256> commitments,
-                                    std::vector<boost::optional<SproutWitness>>& witnesses,
-                                    uint256 &final_anchor)
-{
-}
-
 /**
  * Reorder the transactions based on block hieght and block index.
  * Transactions can get out of order when they are deleted and subsequently
