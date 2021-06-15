@@ -950,4 +950,14 @@ std::pair<std::map<CBlockIndex*, std::list<CTransaction>>, uint64_t> DrainRecent
 void SetChainNotifiedSequence(uint64_t recentlyConflictedSequence);
 bool ChainIsFullyNotified();
 
+class CZindexDB
+{
+private:
+    boost::filesystem::path pathAddr;
+public:
+    CZindexDB();
+    bool Write(const CZindexDB& addr);
+    bool Read(CZindexDB& addr);
+};
+
 #endif // HUSH_MAIN_H
