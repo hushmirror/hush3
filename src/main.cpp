@@ -4429,13 +4429,6 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
         // pool. So we invert the sign here.
         saplingValue += -tx.valueBalance;
 
-        /*
-        for (auto js : tx.vjoinsplit) {
-            sproutValue += js.vpub_old;
-            sproutValue -= js.vpub_new;
-        }
-        */
-
         // Ignore following stats unless -zindex enabled
         if (!fZindex)
             continue;
