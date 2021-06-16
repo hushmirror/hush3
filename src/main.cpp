@@ -4664,8 +4664,21 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                 pindex->nChainDeshieldingPayments   = (pindex->pprev ? pindex->pprev->nChainDeshieldingPayments   : 0) + pindex->nDeshieldingPayments;
 
                 // Update in-memory structure that gets serialized to zindex.dat
-                zstats.nHeight              = pindex->GetHeight();
-                zstats.nChainShieldedSpends = pindex->nChainShieldedSpends;
+                zstats.nHeight                     = pindex->GetHeight();
+                zstats.nChainNotarizations         = pindex->nChainNotarizations         ;
+                zstats.nChainShieldedTx            = pindex->nChainShieldedTx            ;
+                zstats.nChainShieldedOutputs       = pindex->nChainShieldedOutputs       ;
+                zstats.nChainShieldedSpends        = pindex->nChainShieldedSpends        ;
+                zstats.nChainFullyShieldedTx       = pindex->nChainFullyShieldedTx       ;
+                zstats.nChainShieldingTx           = pindex->nChainShieldingTx           ;
+                zstats.nChainDeshieldingTx         = pindex->nChainDeshieldingTx         ;
+                zstats.nChainPayments              = pindex->nChainPayments              ;
+                zstats.nChainShieldedPayments      = pindex->nChainShieldedPayments      ;
+                zstats.nChainFullyShieldedPayments = pindex->nChainFullyShieldedPayments ;
+                zstats.nChainShieldingPayments     = pindex->nChainShieldingPayments     ;
+                zstats.nChainDeshieldingPayments   = pindex->nChainDeshieldingPayments   ;
+                fprintf(stderr,"%s: setting zstats with zspends=%li, zouts=%li, anonset=%li\n", __FUNCTION__, zstats.nChainShieldedOutputs, zstats.nChainShieldedSpends, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends);
+
             }
 
             if (pindex->pprev) {
