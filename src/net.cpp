@@ -95,7 +95,6 @@ namespace {
 // Global state variables
 extern uint16_t ASSETCHAINS_P2PPORT;
 extern char SMART_CHAIN_SYMBOL[65];
-
 bool fDiscover = true;
 bool fListen = true;
 uint64_t nLocalServices = NODE_NETWORK | NODE_NSPV;

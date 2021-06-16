@@ -76,6 +76,7 @@ using namespace std;
 CCriticalSection cs_main;
 extern uint8_t NOTARY_PUBKEY33[33];
 extern int32_t HUSH_LOADINGBLOCKS,HUSH_LONGESTCHAIN,HUSH_INSYNC,HUSH_CONNECTING,HUSH_EXTRASATOSHI;
+extern CZindexStats zstats;
 int32_t HUSH_NEWBLOCKS;
 int32_t hush_block2pubkey33(uint8_t *pubkey33,CBlock *block);
 bool Getscriptaddress(char *destaddr,const CScript &scriptPubKey);
@@ -4661,6 +4662,10 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                 pindex->nChainFullyShieldedPayments = (pindex->pprev ? pindex->pprev->nChainFullyShieldedPayments : 0) + pindex->nFullyShieldedPayments;
                 pindex->nChainShieldingPayments     = (pindex->pprev ? pindex->pprev->nChainShieldingPayments     : 0) + pindex->nShieldingPayments;
                 pindex->nChainDeshieldingPayments   = (pindex->pprev ? pindex->pprev->nChainDeshieldingPayments   : 0) + pindex->nDeshieldingPayments;
+
+                // Update in-memory structure that gets serialized to zindex.dat
+                zstats.nHeight              = pindex->GetHeight();
+                zstats.nChainShieldedSpends = pindex->nChainShieldedSpends;
             }
 
             if (pindex->pprev) {
@@ -4699,7 +4704,6 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
         }
     }
 
-    // TODO: Update zindex.dat on disk
 
     if (fZindex)
         fprintf(stderr, "ht.%d, ShieldedPayments=%d, ShieldedTx=%d, ShieldedOutputs=%d, FullyShieldedTx=%d, ntz=%d\n",
