@@ -106,6 +106,7 @@ static CNode* pnodeLocalHost = NULL;
 uint64_t nLocalHostNonce = 0;
 static std::vector<ListenSocket> vhListenSocket;
 CAddrMan addrman;
+CZindexStats zstats;
 int nMaxConnections = DEFAULT_MAX_PEER_CONNECTIONS;
 bool fAddressesInitialized = false;
 std::string strSubVersion;
@@ -1410,7 +1411,7 @@ void DumpZindexStats()
     CZindexDB zdb;
     zdb.Write(zstats);
 
-    LogPrintf("Flushed %d items to zindex.dat  %dms\n", zstats.size(), GetTimeMillis() - nStart);
+    LogPrintf("Flushed stats at height %li to zindex.dat  %dms\n", zstats.Height(), GetTimeMillis() - nStart);
 }
 
 void static ProcessOneShot()
@@ -1934,7 +1935,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
                 // TODO: move invalid files out of the way?
             }
         }
-        LogPrintf("Loaded %i items from zindex.dat  %dms\n", zstats.size(), GetTimeMillis() - nStart);
+        LogPrintf("Loaded stats at height %li from zindex.dat  %dms\n", zstats.Height(), GetTimeMillis() - nStart);
     }
 
     uiInterface.InitMessage(_("Loading addresses..."));
@@ -1995,7 +1996,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     scheduler.scheduleEvery(&DumpAddresses, DUMP_ADDRESSES_INTERVAL);
 
     // Dump zindex stats
-    scheduler.scheduleEvery(&DumpZstats, DUMP_ZINDEX_INTERVAL);
+    scheduler.scheduleEvery(&DumpZindexStats, DUMP_ZINDEX_INTERVAL);
 }
 
 bool StopNode()

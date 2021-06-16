@@ -609,9 +609,9 @@ bool CZindexDB::Read(CZindexStats& zstats)
     CDataStream ssZstats(vchData, SER_DISK, CLIENT_VERSION);
 
     // verify stored checksum matches input data
-    uint256 hashTmp = Hash(ssPeers.begin(), ssPeers.end());
+    uint256 hashTmp = Hash(ssZstats.begin(), ssZstats.end());
     if (hashIn != hashTmp)
-        return error("%s: Checksum mismatch, data corrupted", __func__);
+        return error("%s: zstats Checksum mismatch, data corrupted", __func__);
 
     unsigned char pchMsgTmp[4];
     try {
@@ -622,10 +622,9 @@ bool CZindexDB::Read(CZindexStats& zstats)
         if (memcmp(pchMsgTmp, Params().MessageStart(), sizeof(pchMsgTmp)))
             return error("%s: Invalid network magic number", __func__);
 
-        // de-serialize address data into one CAddrMan object
-        ssZstats >> addr;
-    }
-    catch (const std::exception& e) {
+        // de-serialize data into one CZindexStats object
+        ssZstats >> zstats;
+    } catch (const std::exception& e) {
         return error("%s: Deserialize or I/O error - %s", __func__, e.what());
     }
 
@@ -646,9 +645,16 @@ bool CZindexDB::Write(const CZindexStats& zstats)
     uint256 hash = Hash(ssZstats.begin(), ssZstats.end());
     ssZstats << hash;
 
+    // open temp output file, and associate with CAutoFile
+    boost::filesystem::path pathTmp = GetDataDir() / tmpfn;
+    FILE *file = fopen(pathTmp.string().c_str(), "wb");
+    CAutoFile fileout(file, SER_DISK, CLIENT_VERSION);
+    if (fileout.IsNull())
+        return error("%s: Failed to open file %s", __func__, pathTmp.string());
+
     // Write and commit header, data
     try {
-        fileout << ssPeers;
+        fileout << ssZstats;
     } catch (const std::exception& e) {
         return error("%s: Serialize or I/O error - %s", __func__, e.what());
     }
