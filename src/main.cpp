@@ -4650,6 +4650,36 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                 if (fZdebug) {
                     //fprintf(stderr,"%s: setting blockchain zstats with zspends=%d, zouts=%d\n", __FUNCTION__, nShieldedSpendsInBlock, nShieldedOutputsInBlock );
                 }
+                if (pindex->pprev) {
+                    // If chain stats are zero (such as after restart), load data from zindex.dat
+                    if (pindex->pprev->nChainNotarizations == 0)
+                        pindex->pprev->nChainNotarizations = zstats.nChainNotarizations;
+                    if (pindex->pprev->nChainShieldedTx == 0)
+                        pindex->pprev->nChainShieldedTx = zstats.nChainShieldedTx;
+                    if (pindex->pprev->nChainShieldedOutputs == 0)
+                        pindex->pprev->nChainShieldedOutputs = zstats.nChainShieldedOutputs;
+                    if (pindex->pprev->nChainShieldedSpends == 0) {
+                        pindex->pprev->nChainShieldedSpends = zstats.nChainShieldedSpends;
+                        fprintf(stderr, "%s: loaded anonset=%li from disk\n", __func__, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends);
+                    }
+                    if (pindex->pprev->nChainFullyShieldedTx == 0)
+                        pindex->pprev->nChainFullyShieldedTx = zstats.nChainFullyShieldedTx;
+                    if (pindex->pprev->nChainShieldingTx == 0)
+                        pindex->pprev->nChainShieldingTx = zstats.nChainShieldingTx;
+                    if (pindex->pprev->nChainDeshieldingTx == 0)
+                        pindex->pprev->nChainDeshieldingTx = zstats.nChainDeshieldingTx;
+                    if (pindex->pprev->nChainPayments == 0)
+                        pindex->pprev->nChainPayments = zstats.nChainPayments;
+                    if (pindex->pprev->nChainShieldedPayments == 0)
+                        pindex->pprev->nChainShieldedPayments = zstats.nChainShieldedPayments;
+                    if (pindex->pprev->nChainFullyShieldedPayments == 0)
+                        pindex->pprev->nChainFullyShieldedPayments = zstats.nChainFullyShieldedPayments;
+                    if (pindex->pprev->nChainShieldingPayments == 0)
+                        pindex->pprev->nChainShieldingPayments = zstats.nChainShieldingPayments;
+                    if (pindex->pprev->nChainDeshieldingPayments == 0)
+                        pindex->pprev->nChainDeshieldingPayments = zstats.nChainDeshieldingPayments;
+                }
+
                 pindex->nChainNotarizations         = (pindex->pprev ? pindex->pprev->nChainNotarizations         : 0) + pindex->nNotarizations;
                 pindex->nChainShieldedTx            = (pindex->pprev ? pindex->pprev->nChainShieldedTx            : 0) + pindex->nShieldedTx;
                 pindex->nChainShieldedOutputs       = (pindex->pprev ? pindex->pprev->nChainShieldedOutputs       : 0) + pindex->nShieldedOutputs;
