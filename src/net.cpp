@@ -1922,6 +1922,7 @@ void static Discover(boost::thread_group& threadGroup)
 #endif
 }
 
+//extern CWallet pwalletMain;
 void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
     if (fZindex) {
@@ -1930,11 +1931,26 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
         {
             CZindexDB zdb;
             if (!zdb.Read(zstats)) {
-                LogPrintf("Invalid or missing zindex.dat! Stats may be incorrect!!!\n");
-                // TODO: move invalid files out of the way?
+                // The first time nodes use zindex.dat code, no file will be found
+                // TODO: rescan if invalid only
+                LogPrintf("Invalid or missing zindex.dat! Generating new...\n");
+
+                //bool update = true;
+                //pwalletMain->ScanForWalletTransactions(chainActive.Genesis(),update);
+
+                // We assume this is the first startup with zindex.dat code, and serialize current data to disk.
+                DumpZindexStats();
+
+                // Now read-in the stats we just wrote to disk to memory
+                if(!zdb.Read(zstats)) {
+                    LogPrintf("Invalid or missing zindex.dat! Stats may be corrupt\n");
+                } else {
+                    LogPrintf("Loaded stats at height %li from zindex.dat  %dms\n", zstats.Height(), GetTimeMillis() - nStart);
+                }
+            } else {
+                LogPrintf("Loaded stats at height %li from zindex.dat  %dms\n", zstats.Height(), GetTimeMillis() - nStart);
             }
         }
-        LogPrintf("Loaded stats at height %li from zindex.dat  %dms\n", zstats.Height(), GetTimeMillis() - nStart);
     }
 
     uiInterface.InitMessage(_("Loading addresses..."));
