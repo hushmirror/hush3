@@ -4660,7 +4660,8 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                         pindex->pprev->nChainShieldedOutputs = zstats.nChainShieldedOutputs;
                     if (pindex->pprev->nChainShieldedSpends == 0) {
                         pindex->pprev->nChainShieldedSpends = zstats.nChainShieldedSpends;
-                        fprintf(stderr, "%s: loaded anonset=%li from disk\n", __func__, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends);
+                        // TODO: if zstats.nHeight != chainActive.Height() the stats will be off
+                        fprintf(stderr, "%s: loaded anonset=%li at stats height=%li vs local height=%d from disk\n", __func__, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends, zstats.nHeight, chainActive.Height() );
                     }
                     if (pindex->pprev->nChainFullyShieldedTx == 0)
                         pindex->pprev->nChainFullyShieldedTx = zstats.nChainFullyShieldedTx;
