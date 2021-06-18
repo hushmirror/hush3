@@ -2010,8 +2010,10 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     // Dump network addresses
     scheduler.scheduleEvery(&DumpAddresses, DUMP_ADDRESSES_INTERVAL);
 
-    // Dump zindex stats
-    scheduler.scheduleEvery(&DumpZindexStats, DUMP_ZINDEX_INTERVAL);
+    // Dump zindex stats if -zindex is enabled
+    if (fZindex) {
+        scheduler.scheduleEvery(&DumpZindexStats, DUMP_ZINDEX_INTERVAL);
+    }
 }
 
 bool StopNode()
