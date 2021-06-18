@@ -831,7 +831,7 @@ UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params
             // few RPCs means we can see our addresses and make private key backups
             // while a very long wallet rescan is happening
             if (pcmd->name != "stop" && pcmd->name != "help" && pcmd->name != "z_listaddresses" && pcmd->name != "z_exportkey" &&
-                pcmd->name != "listaddresses" && pcmd->name != "dumpprivkey" ) {
+                pcmd->name != "listaddresses" && pcmd->name != "dumpprivkey" && pcmd->name != "getpeerinfo" ) {
                 throw JSONRPCError(RPC_IN_WARMUP, rpcWarmupStatus);
             }
         }
