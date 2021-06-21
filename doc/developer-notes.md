@@ -1,5 +1,32 @@
-Coding
-====================
+# Testing a Branch
+
+To test a branch called `zindexdb` with a fresh clone
+
+```
+git clone https://git.hush.is/hush/hush3 hush3-testing
+cd hush3-testing
+git checkout zindexdb
+# you need 2GB RAM free per -jN
+./build.sh -j2; make; make; make # this deals with build-system race condition bugs
+
+# we want to test a fresh sync, so backup current data
+mv ~/.komodo/{HUSH3,HUSH3-backup}
+mkdir ~/.komodo/HUSH3
+
+# This is optional but will likely speed up sync time greatly
+cp ~/.komodo/{HUSH3-backup,HUSH3}/peers.dat
+
+echo "zindex=1" >> ~/.komodo/HUSH3/HUSH3.conf
+
+# This log file is helpful for debugging more and will contain a history of the
+# size of the anonset at every block height
+./src/hushd &> hushd.log &
+# to look at the log
+tail -f hushd.log
+```
+
+
+# Coding
 
 Various coding styles have been used during the history of the codebase,
 and the result is not very consistent. However, we're now trying to converge to
