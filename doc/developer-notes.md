@@ -32,7 +32,7 @@ tail -f hushd.log
 
 To get a CSV file of the value of the anonset size for every block height:
 ```
-grep anonset hushd.log | cut -d= -f2
+grep 'setting zstats' hushd.log | cut -d= -f2
 ```
 
 This only needs to be calculated once, if we can verify it's correct. These are historical values that do not change. These values should match on all nodes:
