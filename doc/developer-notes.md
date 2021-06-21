@@ -13,10 +13,13 @@ git checkout zindexdb
 mv ~/.komodo/{HUSH3,HUSH3-backup}
 mkdir ~/.komodo/HUSH3
 
+# Use your previous config as a base
+cp ~/.komodo/{HUSH3,HUSH3-backup}/HUSH3.conf
+# Add zindex to your node
+echo "zindex=1" >> ~/.komodo/HUSH3/HUSH3.conf
+
 # This is optional but will likely speed up sync time greatly
 cp ~/.komodo/{HUSH3-backup,HUSH3}/peers.dat
-
-echo "zindex=1" >> ~/.komodo/HUSH3/HUSH3.conf
 
 # This log file is helpful for debugging more and will contain a history of the
 # size of the anonset at every block height
