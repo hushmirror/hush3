@@ -4708,7 +4708,7 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                 zstats.nChainFullyShieldedPayments = pindex->nChainFullyShieldedPayments ;
                 zstats.nChainShieldingPayments     = pindex->nChainShieldingPayments     ;
                 zstats.nChainDeshieldingPayments   = pindex->nChainDeshieldingPayments   ;
-                fprintf(stderr,"%s: setting zstats with height,zspends,zouts,anonset=%li,%li,%li,%li\n", __FUNCTION__, zstats.nHeight, zstats.nChainShieldedOutputs, zstats.nChainShieldedSpends, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends);
+                fprintf(stderr,"%s: setting zstats with height,zouts,zspends,anonset=%li,%li,%li,%li\n", __FUNCTION__, zstats.nHeight, zstats.nChainShieldedOutputs, zstats.nChainShieldedSpends, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends);
 
             }
 
