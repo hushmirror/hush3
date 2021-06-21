@@ -10,13 +10,15 @@ git checkout zindexdb
 ./build.sh -j2; make; make; make # this deals with build-system race condition bugs
 
 # we want to test a fresh sync, so backup current data
-mv ~/.komodo/{HUSH3,HUSH3-backup}
+TIME=`perl -e "print time"`
+mv ~/.komodo/{HUSH3,HUSH3-backup-$TIME}
 mkdir ~/.komodo/HUSH3
 
 # Use your previous config as a base
-cp ~/.komodo/{HUSH3,HUSH3-backup}/HUSH3.conf
+cp ~/.komodo/{HUSH3-backup-$TIME,HUSH3}/HUSH3.conf
 # Add zindex to your node
 echo "zindex=1" >> ~/.komodo/HUSH3/HUSH3.conf
+
 
 # This is optional but will likely speed up sync time greatly
 cp ~/.komodo/{HUSH3-backup,HUSH3}/peers.dat
