@@ -25,7 +25,27 @@ echo "zindex=1" >> ~/.komodo/HUSH3/HUSH3.conf
 tail -f hushd.log
 ```
 
+To get a CSV file of the value of the anonset size for every block height:
+```
+grep anonset hushd.log | cut -d= -f2
+```
 
+This only needs to be calculated once, if we can verify it's correct. These are historical values that do not change. These values should match on all nodes:
+
+```
+46913,2547,2253,294
+46914,2549,2254,295
+46915,2549,2254,295
+46916,2553,2257,296
+46917,2553,2257,296
+```
+
+We should also check a recent block height to verify it's working correctly. The big "test" for this `zindexdb` branch is: 
+
+  * If you stop a node, and restart, are the stats from `getchaintxtstats` correct, i.e. the anonset stats? For instance, `shielded_pool_size` should be close to 500000, if it's close to or exactly 0, something is wrong.
+  * Is there a new file called `zindex.dat` in `~/.komodo/HUSH3/` ? 
+  * Is `zindex.dat` 149 bytes ?
+  
 # Coding
 
 Various coding styles have been used during the history of the codebase,
