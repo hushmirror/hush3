@@ -1,8 +1,32 @@
-# Testing a Branch
+# Fresh sync
 
-To test a branch called `zindexdb` with a fresh clone
+Many times, you will want to do a "fresh sync" test, to verify code works when syncing from the genesis block, which is a different code path than a "partial sync" which means you already have part of blockchain history and are "catching up" to get in sync.
+
+A "fresh sync" goes thru the Initial Blockchain Download (IBD) optimized codepath and is often faster than than rescanning all of history. Both ways of testing any important change should be done.
+
+One way is:
 
 ```
+cd ~/.komodo/HUSH3
+rm blocks chainstate database notarizations hushstate
+```
+
+If you are using `zindex=1` then you need to also delete zindex.dat
+
+```
+cd ~/.komodo/HUSH3
+rm zindex.dat blocks chainstate database notarizations hushstate
+```
+
+It's possible to confused hush if you ran old code, stop, restart, and then write out zindex.dat that is incorrect, with later hushds will load from disk and believe.
+
+
+# Testing a Branch
+
+To test a branch called `zindexdb` with a fresh clone:
+
+```
+# TODO: this should probably become a script in ./contrib
 git clone https://git.hush.is/hush/hush3 hush3-testing
 cd hush3-testing
 git checkout zindexdb
