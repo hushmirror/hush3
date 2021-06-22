@@ -6,7 +6,7 @@ A "fresh sync" goes thru the Initial Blockchain Download (IBD) optimized codepat
 
 A fresh sync preserves peers.dat, so it will always be faster than a "fresh clone", which has to learn enough p2p peers to being syncing, which can often add many minutes to completing a sync. When code related to peers.dat changes (such in the `p2p` branch) then doing a fresh clone is needed to fully test it.
 
-One way fresh sync is:
+One way to do a fresh sync is:
 
 ```
 cd ~/.komodo/HUSH3
