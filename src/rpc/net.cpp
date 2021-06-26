@@ -180,15 +180,15 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 }
 
 int32_t HUSH_LONGESTCHAIN;
+static int32_t hush_longest_depth = 0;
 int32_t hush_longestchain()
 {
-    static int32_t depth;
     int32_t ht,n=0,num=0,maxheight=0,height = 0;
-    if ( depth < 0 )
-        depth = 0;
-    if ( depth == 0 )
+    if ( hush_longest_depth < 0 )
+        hush_longest_depth = 0;
+    if ( hush_longest_depth == 0 )
     {
-        depth++;
+        hush_longest_depth++;
         vector<CNodeStats> vstats;
         {
             //LOCK(cs_main);
@@ -215,7 +215,7 @@ int32_t hush_longestchain()
             if ( ht > height )
                 height = ht;
         }
-        depth--;
+        hush_longest_depth--;
         if ( num > (n >> 1) )
         {
             if ( 0 && height != HUSH_LONGESTCHAIN )
