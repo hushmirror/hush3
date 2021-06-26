@@ -76,6 +76,7 @@ using namespace std;
 CCriticalSection cs_main;
 extern uint8_t NOTARY_PUBKEY33[33];
 extern int32_t HUSH_LOADINGBLOCKS,HUSH_LONGESTCHAIN,HUSH_INSYNC,HUSH_CONNECTING,HUSH_EXTRASATOSHI;
+extern CZindexStats zstats;
 int32_t HUSH_NEWBLOCKS;
 int32_t hush_block2pubkey33(uint8_t *pubkey33,CBlock *block);
 bool Getscriptaddress(char *destaddr,const CScript &scriptPubKey);
@@ -571,6 +572,102 @@ namespace {
     }
 
 } // anon namespace
+
+// CZindexDB
+CZindexDB::CZindexDB()
+{
+    pathAddr = GetDataDir() / "zindex.dat";
+}
+
+bool CZindexDB::Read(CZindexStats& zstats)
+{
+    // open input file, and associate with CAutoFile
+    FILE *file = fopen(pathAddr.string().c_str(), "rb");
+    CAutoFile filein(file, SER_DISK, CLIENT_VERSION);
+    if (filein.IsNull())
+        return error("%s: Failed to open file %s", __func__, pathAddr.string());
+
+    // use file size to size memory buffer
+    int fileSize = boost::filesystem::file_size(pathAddr);
+    int dataSize = fileSize - sizeof(uint256);
+    // Don't try to resize to a negative number if file is small
+    if (dataSize < 0)
+        dataSize = 0;
+    vector<unsigned char> vchData;
+    vchData.resize(dataSize);
+    uint256 hashIn;
+
+    // read data and checksum from file
+    try {
+        filein.read((char *)&vchData[0], dataSize);
+        filein >> hashIn;
+    }
+    catch (const std::exception& e) {
+        return error("%s: Deserialize or I/O error - %s", __func__, e.what());
+    }
+    filein.fclose();
+
+    CDataStream ssZstats(vchData, SER_DISK, CLIENT_VERSION);
+
+    // verify stored checksum matches input data
+    uint256 hashTmp = Hash(ssZstats.begin(), ssZstats.end());
+    if (hashIn != hashTmp)
+        return error("%s: zstats Checksum mismatch, data corrupted", __func__);
+
+    unsigned char pchMsgTmp[4];
+    try {
+        // de-serialize file header (network specific magic number) and ..
+        ssZstats >> FLATDATA(pchMsgTmp);
+
+        // ... verify the network matches ours
+        if (memcmp(pchMsgTmp, Params().MessageStart(), sizeof(pchMsgTmp)))
+            return error("%s: Invalid network magic number", __func__);
+
+        // de-serialize data into one CZindexStats object
+        ssZstats >> zstats;
+    } catch (const std::exception& e) {
+        return error("%s: Deserialize or I/O error - %s", __func__, e.what());
+    }
+
+    return true;
+}
+
+bool CZindexDB::Write(const CZindexStats& zstats)
+{
+    // Generate random temporary filename
+    unsigned short randv = 0;
+    GetRandBytes((unsigned char*)&randv, sizeof(randv));
+    std::string tmpfn = strprintf("zindex.dat.%04x", randv);
+
+    // serialize zstats, checksum data up to that point, then append checksum
+    CDataStream ssZstats(SER_DISK, CLIENT_VERSION);
+    ssZstats << FLATDATA(Params().MessageStart());
+    ssZstats << zstats;
+    uint256 hash = Hash(ssZstats.begin(), ssZstats.end());
+    ssZstats << hash;
+
+    // open temp output file, and associate with CAutoFile
+    boost::filesystem::path pathTmp = GetDataDir() / tmpfn;
+    FILE *file = fopen(pathTmp.string().c_str(), "wb");
+    CAutoFile fileout(file, SER_DISK, CLIENT_VERSION);
+    if (fileout.IsNull())
+        return error("%s: Failed to open file %s", __func__, pathTmp.string());
+
+    // Write and commit header, data
+    try {
+        fileout << ssZstats;
+    } catch (const std::exception& e) {
+        return error("%s: Serialize or I/O error - %s", __func__, e.what());
+    }
+    FileCommit(fileout.Get());
+    fileout.fclose();
+
+    // replace existing zindex.dat, if any, with new zindex.dat.XXXX
+    if (!RenameOver(pathTmp, pathAddr))
+        return error("%s: Rename-into-place failed", __func__);
+
+    return true;
+}
 
 bool GetNodeStateStats(NodeId nodeid, CNodeStateStats &stats) {
     LOCK(cs_main);
@@ -4553,6 +4650,39 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                 if (fZdebug) {
                     //fprintf(stderr,"%s: setting blockchain zstats with zspends=%d, zouts=%d\n", __FUNCTION__, nShieldedSpendsInBlock, nShieldedOutputsInBlock );
                 }
+                if (pindex->pprev) {
+                    // If chain stats are zero (such as after restart), load data from zindex.dat
+                    if (pindex->pprev->nChainNotarizations == 0)
+                        pindex->pprev->nChainNotarizations = zstats.nChainNotarizations;
+                    if (pindex->pprev->nChainShieldedTx == 0)
+                        pindex->pprev->nChainShieldedTx = zstats.nChainShieldedTx;
+                    if (pindex->pprev->nChainShieldedOutputs == 0)
+                        pindex->pprev->nChainShieldedOutputs = zstats.nChainShieldedOutputs;
+                    if (pindex->pprev->nChainShieldedSpends == 0) {
+                        pindex->pprev->nChainShieldedSpends = zstats.nChainShieldedSpends;
+                        // TODO: if zstats.nHeight != chainActive.Height() the stats will be off
+                        fprintf(stderr, "%s: loaded anonymity set of %li at stats height=%li vs local height=%d from disk\n", __func__, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends, zstats.nHeight, chainActive.Height() );
+                    }
+                    if (pindex->pprev->nChainFullyShieldedTx == 0)
+                        pindex->pprev->nChainFullyShieldedTx = zstats.nChainFullyShieldedTx;
+                    if (pindex->pprev->nChainShieldingTx == 0)
+                        pindex->pprev->nChainShieldingTx = zstats.nChainShieldingTx;
+                    if (pindex->pprev->nChainDeshieldingTx == 0)
+                        pindex->pprev->nChainDeshieldingTx = zstats.nChainDeshieldingTx;
+                    if (pindex->pprev->nChainPayments == 0) {
+                        fprintf(stderr, "%s: setting nChainPayments=%li at height %d\n", __func__, zstats.nChainPayments, chainActive.Height() );
+                        pindex->pprev->nChainPayments = zstats.nChainPayments;
+                    }
+                    if (pindex->pprev->nChainShieldedPayments == 0)
+                        pindex->pprev->nChainShieldedPayments = zstats.nChainShieldedPayments;
+                    if (pindex->pprev->nChainFullyShieldedPayments == 0)
+                        pindex->pprev->nChainFullyShieldedPayments = zstats.nChainFullyShieldedPayments;
+                    if (pindex->pprev->nChainShieldingPayments == 0)
+                        pindex->pprev->nChainShieldingPayments = zstats.nChainShieldingPayments;
+                    if (pindex->pprev->nChainDeshieldingPayments == 0)
+                        pindex->pprev->nChainDeshieldingPayments = zstats.nChainDeshieldingPayments;
+                }
+
                 pindex->nChainNotarizations         = (pindex->pprev ? pindex->pprev->nChainNotarizations         : 0) + pindex->nNotarizations;
                 pindex->nChainShieldedTx            = (pindex->pprev ? pindex->pprev->nChainShieldedTx            : 0) + pindex->nShieldedTx;
                 pindex->nChainShieldedOutputs       = (pindex->pprev ? pindex->pprev->nChainShieldedOutputs       : 0) + pindex->nShieldedOutputs;
@@ -4565,6 +4695,23 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                 pindex->nChainFullyShieldedPayments = (pindex->pprev ? pindex->pprev->nChainFullyShieldedPayments : 0) + pindex->nFullyShieldedPayments;
                 pindex->nChainShieldingPayments     = (pindex->pprev ? pindex->pprev->nChainShieldingPayments     : 0) + pindex->nShieldingPayments;
                 pindex->nChainDeshieldingPayments   = (pindex->pprev ? pindex->pprev->nChainDeshieldingPayments   : 0) + pindex->nDeshieldingPayments;
+
+                // Update in-memory structure that gets serialized to zindex.dat
+                zstats.nHeight                     = pindex->GetHeight();
+                zstats.nChainNotarizations         = pindex->nChainNotarizations         ;
+                zstats.nChainShieldedTx            = pindex->nChainShieldedTx            ;
+                zstats.nChainShieldedOutputs       = pindex->nChainShieldedOutputs       ;
+                zstats.nChainShieldedSpends        = pindex->nChainShieldedSpends        ;
+                zstats.nChainFullyShieldedTx       = pindex->nChainFullyShieldedTx       ;
+                zstats.nChainShieldingTx           = pindex->nChainShieldingTx           ;
+                zstats.nChainDeshieldingTx         = pindex->nChainDeshieldingTx         ;
+                zstats.nChainPayments              = pindex->nChainPayments              ;
+                zstats.nChainShieldedPayments      = pindex->nChainShieldedPayments      ;
+                zstats.nChainFullyShieldedPayments = pindex->nChainFullyShieldedPayments ;
+                zstats.nChainShieldingPayments     = pindex->nChainShieldingPayments     ;
+                zstats.nChainDeshieldingPayments   = pindex->nChainDeshieldingPayments   ;
+                fprintf(stderr,"%s: setting zstats with height,zouts,zspends,anonset=%li,%li,%li,%li\n", __FUNCTION__, zstats.nHeight, zstats.nChainShieldedOutputs, zstats.nChainShieldedSpends, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends);
+
             }
 
             if (pindex->pprev) {
@@ -4602,6 +4749,7 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
             mapBlocksUnlinked.insert(std::make_pair(pindexNew->pprev, pindexNew));
         }
     }
+
 
     if (fZindex)
         fprintf(stderr, "ht.%d, ShieldedPayments=%d, ShieldedTx=%d, ShieldedOutputs=%d, FullyShieldedTx=%d, ntz=%d\n",
