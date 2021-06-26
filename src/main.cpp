@@ -4669,8 +4669,10 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                         pindex->pprev->nChainShieldingTx = zstats.nChainShieldingTx;
                     if (pindex->pprev->nChainDeshieldingTx == 0)
                         pindex->pprev->nChainDeshieldingTx = zstats.nChainDeshieldingTx;
-                    if (pindex->pprev->nChainPayments == 0)
+                    if (pindex->pprev->nChainPayments == 0) {
+                        fprintf(stderr, "%s: setting nChainPayments=%li at height %d\n", __func__, zstats.nChainPayments, chainActive.Height() );
                         pindex->pprev->nChainPayments = zstats.nChainPayments;
+                    }
                     if (pindex->pprev->nChainShieldedPayments == 0)
                         pindex->pprev->nChainShieldedPayments = zstats.nChainShieldedPayments;
                     if (pindex->pprev->nChainFullyShieldedPayments == 0)
