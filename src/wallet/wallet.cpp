@@ -908,12 +908,15 @@ int64_t CWallet::NullifierCount()
 void CWallet::ClearNoteWitnessCache()
 {
     LOCK(cs_wallet);
+    int notes = 0;
     for (std::pair<const uint256, CWalletTx>& wtxItem : mapWallet) {
         for (mapSaplingNoteData_t::value_type& item : wtxItem.second.mapSaplingNoteData) {
             item.second.witnesses.clear();
             item.second.witnessHeight = -1;
+            notes++;
         }
     }
+    LogPrintf("%s: Cleared witness data from %d wallet items and %d SaplingNotes\n", __func__, mapWallet.size(), notes);
 }
 
 void CWallet::DecrementNoteWitnesses(const CBlockIndex* pindex)
