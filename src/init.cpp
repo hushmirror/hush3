@@ -2073,9 +2073,15 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         CBlockIndex *pindexRescan = chainActive.Tip();
         if (clearWitnessCaches || GetBoolArg("-rescan", false))
         {
-            pwalletMain->ClearNoteWitnessCache();
-            pindexRescan = chainActive.Genesis();
             int rescanHeight = GetArg("-rescanheight", 0);
+            //  Must be used with -rescanheight
+            if( GetBoolArg("-keepnotewitnesscache", false) && rescanHeight > 0 ) {
+                LogPrintf("%s: keeping NoteWitnessCache with rescan height=%d\n", __func__, rescanHeight);
+            } else {
+                pwalletMain->ClearNoteWitnessCache();
+            }
+
+            pindexRescan = chainActive.Genesis();
             if (rescanHeight > 0) {
                 if (rescanHeight > chainActive.Tip()->GetHeight()) {
                     pindexRescan = chainActive.Tip();
