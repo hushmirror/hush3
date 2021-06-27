@@ -51,6 +51,8 @@ using namespace hush;
 // This is every 2 blocks, on avg, on HUSH3
 #define DUMP_ZINDEX_INTERVAL 150
 
+#define CHECK_PLZ_STOP_INTERVAL 120
+
 #if !defined(HAVE_MSG_NOSIGNAL) && !defined(MSG_NOSIGNAL)
 #define MSG_NOSIGNAL 0
 #endif
@@ -92,6 +94,7 @@ namespace {
     };
 }
 
+
 // Global state variables
 extern uint16_t ASSETCHAINS_P2PPORT;
 extern char SMART_CHAIN_SYMBOL[65];
@@ -110,6 +113,8 @@ int nMaxConnections = DEFAULT_MAX_PEER_CONNECTIONS;
 bool fAddressesInitialized = false;
 std::string strSubVersion;
 TLSManager tlsmanager = TLSManager();
+
+extern void StartShutdown();
 
 vector<CNode*> vNodes;
 CCriticalSection cs_vNodes;
@@ -1413,6 +1418,18 @@ void DumpZindexStats()
     LogPrintf("Flushed stats at height %li to zindex.dat  %dms\n", zstats.Height(), GetTimeMillis() - nStart);
 }
 
+void CheckIfWeShouldStop()
+{
+    // If the RPC interface is "stuck", such as filling up with deadlocks
+    // and cannot process any more requests, the only option was to kill the full node.
+    // This is a disk-based method where a node can realize it should stop, and which
+    // can help avoid extremely long rescans
+    if(boost::filesystem::exists(GetDataDir() / "plz_stop")) {
+        LogPrintf("%s: Found plz_stop file, shutting down...\n", __func__);
+        StartShutdown();
+    }
+}
+
 void static ProcessOneShot()
 {
     string strDest;
@@ -1925,6 +1942,9 @@ void static Discover(boost::thread_group& threadGroup)
 //extern CWallet pwalletMain;
 void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
+
+    CheckIfWeShouldStop();
+
     if (fZindex) {
         uiInterface.InitMessage(_("Loading zindex stats..."));
         int64_t nStart = GetTimeMillis();
@@ -2014,6 +2034,8 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (fZindex) {
         scheduler.scheduleEvery(&DumpZindexStats, DUMP_ZINDEX_INTERVAL);
     }
+
+    scheduler.scheduleEvery(&CheckIfWeShouldStop, CHECK_PLZ_STOP_INTERVAL);
 }
 
 bool StopNode()
