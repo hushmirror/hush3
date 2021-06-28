@@ -92,6 +92,8 @@ public:
         CAmount value,
         std::array<unsigned char, HUSH_MEMO_SIZE> memo = {{0}});
 
+    void ShuffleOutputs();
+
     // Assumes that the value correctly corresponds to the provided UTXO.
     void AddTransparentInput(COutPoint utxo, CScript scriptPubKey, CAmount value, uint32_t nSequence = 0xffffffff);
 
