@@ -48,6 +48,11 @@ using namespace hush;
 // Satoshi originally used 10 seconds(!), did they know something Peter Wuille didn't?
 #define DUMP_ADDRESSES_INTERVAL 300
 
+// This is every 2 blocks, on avg, on HUSH3
+#define DUMP_ZINDEX_INTERVAL 150
+
+#define CHECK_PLZ_STOP_INTERVAL 120
+
 #if !defined(HAVE_MSG_NOSIGNAL) && !defined(MSG_NOSIGNAL)
 #define MSG_NOSIGNAL 0
 #endif
@@ -89,10 +94,10 @@ namespace {
     };
 }
 
+
 // Global state variables
 extern uint16_t ASSETCHAINS_P2PPORT;
 extern char SMART_CHAIN_SYMBOL[65];
-
 bool fDiscover = true;
 bool fListen = true;
 uint64_t nLocalServices = NODE_NETWORK | NODE_NSPV;
@@ -103,10 +108,13 @@ static CNode* pnodeLocalHost = NULL;
 uint64_t nLocalHostNonce = 0;
 static std::vector<ListenSocket> vhListenSocket;
 CAddrMan addrman;
+CZindexStats zstats;
 int nMaxConnections = DEFAULT_MAX_PEER_CONNECTIONS;
 bool fAddressesInitialized = false;
 std::string strSubVersion;
 TLSManager tlsmanager = TLSManager();
+
+extern void StartShutdown();
 
 vector<CNode*> vNodes;
 CCriticalSection cs_vNodes;
@@ -1400,6 +1408,28 @@ void DumpAddresses()
     LogPrint("net", "Flushed %d addresses to peers.dat  %dms\n", addrman.size(), GetTimeMillis() - nStart);
 }
 
+void DumpZindexStats()
+{
+    int64_t nStart = GetTimeMillis();
+
+    CZindexDB zdb;
+    zdb.Write(zstats);
+
+    LogPrintf("Flushed stats at height %li to zindex.dat  %dms\n", zstats.Height(), GetTimeMillis() - nStart);
+}
+
+void CheckIfWeShouldStop()
+{
+    // If the RPC interface is "stuck", such as filling up with deadlocks
+    // and cannot process any more requests, the only option was to kill the full node.
+    // This is a disk-based method where a node can realize it should stop, and which
+    // can help avoid extremely long rescans
+    if(boost::filesystem::exists(GetDataDir() / "plz_stop")) {
+        LogPrintf("%s: Found plz_stop file, shutting down...\n", __func__);
+        StartShutdown();
+    }
+}
+
 void static ProcessOneShot()
 {
     string strDest;
@@ -1909,8 +1939,40 @@ void static Discover(boost::thread_group& threadGroup)
 #endif
 }
 
+//extern CWallet pwalletMain;
 void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
+
+    CheckIfWeShouldStop();
+
+    if (fZindex) {
+        uiInterface.InitMessage(_("Loading zindex stats..."));
+        int64_t nStart = GetTimeMillis();
+        {
+            CZindexDB zdb;
+            if (!zdb.Read(zstats)) {
+                // The first time nodes use zindex.dat code, no file will be found
+                // TODO: rescan if invalid only
+                LogPrintf("Invalid or missing zindex.dat! Generating new...\n");
+
+                //bool update = true;
+                //pwalletMain->ScanForWalletTransactions(chainActive.Genesis(),update);
+
+                // We assume this is the first startup with zindex.dat code, and serialize current data to disk.
+                DumpZindexStats();
+
+                // Now read-in the stats we just wrote to disk to memory
+                if(!zdb.Read(zstats)) {
+                    LogPrintf("Invalid or missing zindex.dat! Stats may be corrupt\n");
+                } else {
+                    LogPrintf("Loaded stats at height %li from zindex.dat  %dms\n", zstats.Height(), GetTimeMillis() - nStart);
+                }
+            } else {
+                LogPrintf("Loaded stats at height %li from zindex.dat  %dms\n", zstats.Height(), GetTimeMillis() - nStart);
+            }
+        }
+    }
+
     uiInterface.InitMessage(_("Loading addresses..."));
     // Load addresses for peers.dat
     int64_t nStart = GetTimeMillis();
@@ -1919,8 +1981,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
         if (!adb.Read(addrman))
             LogPrintf("Invalid or missing peers.dat! This can happen when upgrading. Whatevz, recreating\n");
     }
-    LogPrintf("Loaded %i addresses from peers.dat  %dms\n",
-           addrman.size(), GetTimeMillis() - nStart);
+    LogPrintf("Loaded %i addresses from peers.dat  %dms\n", addrman.size(), GetTimeMillis() - nStart);
     fAddressesInitialized = true;
 
     if (semOutbound == NULL) {
@@ -1968,6 +2029,13 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     // Dump network addresses
     scheduler.scheduleEvery(&DumpAddresses, DUMP_ADDRESSES_INTERVAL);
+
+    // Dump zindex stats if -zindex is enabled
+    if (fZindex) {
+        scheduler.scheduleEvery(&DumpZindexStats, DUMP_ZINDEX_INTERVAL);
+    }
+
+    scheduler.scheduleEvery(&CheckIfWeShouldStop, CHECK_PLZ_STOP_INTERVAL);
 }
 
 bool StopNode()
@@ -1976,6 +2044,9 @@ bool StopNode()
     if (semOutbound)
         for (int i=0; i<(MAX_OUTBOUND_CONNECTIONS + MAX_FEELER_CONNECTIONS); i++)
             semOutbound->post();
+
+    // persist current zindex stats to disk before we exit
+    DumpZindexStats();
 
     if (HUSH_NSPV_FULLNODE && fAddressesInitialized)
     {

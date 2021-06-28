@@ -1,5 +1,86 @@
-Coding
-====================
+# Fresh sync
+
+Many times, you will want to do a "fresh sync" test, to verify code works when syncing from the genesis block, which is a different code path than a "partial sync" which means you already have part of blockchain history and are "catching up" to get in sync.
+
+A "fresh sync" goes thru the Initial Blockchain Download (IBD) optimized codepath and is often faster than than rescanning all of history. Fresh sync and partial sync testing any important change should be done for all important changes.
+
+A fresh sync preserves peers.dat, so it will always be faster than a "fresh clone", which has to learn enough p2p peers to being syncing, which can often add many minutes to completing a sync. When code related to peers.dat changes (such in the `p2p` branch) then doing a fresh clone is needed to fully test it.
+
+One way to do a fresh sync is:
+
+```
+cd ~/.komodo/HUSH3
+rm blocks chainstate database notarizations hushstate
+```
+
+If you are using `zindex=1` then you need to also delete zindex.dat
+
+```
+cd ~/.komodo/HUSH3
+rm zindex.dat blocks chainstate database notarizations hushstate
+```
+
+It's possible to confused hush if you ran old code, stop, restart, and then write out zindex.dat that is incorrect, with later hushds will load from disk and believe.
+
+
+# Testing a Branch
+
+To test a branch called `zindexdb` with a fresh clone:
+
+```
+# TODO: this should probably become a script in ./contrib
+git clone https://git.hush.is/hush/hush3 hush3-testing
+cd hush3-testing
+git checkout zindexdb
+# you need 2GB RAM free per -jN
+./build.sh -j2; make; make; make # this deals with build-system race condition bugs
+
+# we want to test a fresh sync, so backup current data
+TIME=`perl -e "print time"`
+mv ~/.komodo/{HUSH3,HUSH3-backup-$TIME}
+mkdir ~/.komodo/HUSH3
+
+# Use your previous config as a base
+cp ~/.komodo/{HUSH3-backup-$TIME,HUSH3}/HUSH3.conf
+# Add zindex to your node
+echo "zindex=1" >> ~/.komodo/HUSH3/HUSH3.conf
+
+
+# This is optional but will likely speed up sync time greatly
+cp ~/.komodo/{HUSH3-backup,HUSH3}/peers.dat
+
+# This log file is helpful for debugging more and will contain a history of the
+# size of the anonset at every block height
+./src/hushd &> hushd.log &
+# to look at the log
+tail -f hushd.log
+```
+
+To get a CSV file of the value of the anonset size for every block height:
+```
+grep anonset hushd.log | cut -d= -f2 > anonset.csv
+```
+
+This only needs to be calculated once, if we can verify it's correct. These are historical values that do not change. The goal is a web page with a historical view of the HUSH anonset size.
+
+
+These values should match on all nodes:
+
+```
+46913,2547,2253,294
+46914,2549,2254,295
+46915,2549,2254,295
+46916,2553,2257,296
+46917,2553,2257,296
+```
+
+We should also check a recent block height to verify it's working correctly. The big "test" for this `zindexdb` branch is: 
+
+  * If you stop a node, and restart, are the stats from `getchaintxtstats` correct, i.e. the anonset stats? For instance, `shielded_pool_size` should be close to 500000, if it's close to or exactly 0, something is wrong.
+  * Is there a new file called `zindex.dat` in `~/.komodo/HUSH3/` ? 
+  * Is `zindex.dat` 149 bytes ?
+  
+# Coding
 
 Various coding styles have been used during the history of the codebase,
 and the result is not very consistent. However, we're now trying to converge to
@@ -35,59 +116,6 @@ class Class
 }
 }
 ```
-
-Doxygen comments
------------------
-
-To facilitate the generation of documentation, use doxygen-compatible comment blocks for functions, methods and fields.
-
-For example, to describe a function use:
-```c++
-/**
- * ... text ...
- * @param[in] arg1    A description
- * @param[in] arg2    Another argument description
- * @pre Precondition for function...
- */
-bool function(int arg1, const char *arg2)
-```
-A complete list of `@xxx` commands can be found at http://www.stack.nl/~dimitri/doxygen/manual/commands.html.
-As Doxygen recognizes the comments by the delimiters (`/**` and `*/` in this case), you don't
-*need* to provide any commands for a comment to be valid; just a description text is fine.
-
-To describe a class use the same construct above the class definition:
-```c++
-/**
- * Alerts are for notifying old versions if they become too obsolete and
- * need to upgrade. The message is displayed in the status bar.
- * @see GetWarnings()
- */
-class CAlert
-{
-```
-
-To describe a member or variable use:
-```c++
-int var; //!< Detailed description after the member
-```
-
-Also OK:
-```c++
-///
-/// ... text ...
-///
-bool function2(int arg1, const char *arg2)
-```
-
-Not OK (used plenty in the current source, but not picked up):
-```c++
-//
-// ... text ...
-//
-```
-
-A full list of comment syntaxes picked up by doxygen can be found at http://www.stack.nl/~dimitri/doxygen/manual/docblocks.html,
-but if possible use one of the above styles.
 
 Development tips and tricks
 ---------------------------

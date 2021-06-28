@@ -223,6 +223,7 @@ public:
     int nStartingHeight;
     uint64_t nSendBytes;
     uint64_t nRecvBytes;
+    bool fRelayTxes;
     bool fAllowlisted; // If true this node bypasses DoS ban limits
     bool fFeeler;      // If true this node is being used as a short lived feeler.
     double dPingTime;

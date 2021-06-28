@@ -825,9 +825,13 @@ UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params
     {
         LOCK(cs_rpcWarmup);
         if (fRPCInWarmup) {
-            // hush-cli stop is the only valid RPC command during warmup
-            // We don't know if we have valid blocks or wallet yet, nothing else is safe
-            if (pcmd->name != "stop") {
+            // Most RPCs are unsafe to run during warmup, but stop+help are fine
+            // Others may not have data loaded yet, such as wallet details, but
+            // those RPCs are written defensively to deal with that. Allowing these
+            // few RPCs means we can see our addresses and make private key backups
+            // while a very long wallet rescan is happening
+            if (pcmd->name != "stop" && pcmd->name != "help" && pcmd->name != "z_listaddresses" && pcmd->name != "z_exportkey" &&
+                pcmd->name != "listaddresses" && pcmd->name != "dumpprivkey" && pcmd->name != "getpeerinfo" ) {
                 throw JSONRPCError(RPC_IN_WARMUP, rpcWarmupStatus);
             }
         }

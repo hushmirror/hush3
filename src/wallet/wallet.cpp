@@ -480,13 +480,19 @@ void CWallet::ChainTip(const CBlockIndex *pindex,
             pblock->GetBlockTime() > GetTime() - 144*ASSETCHAINS_BLOCKTIME)
         {
             BuildWitnessCache(pindex, false);
-            RunSaplingConsolidation(pindex->GetHeight());
-            DeleteWalletTransactions(pindex);
+            if (fSaplingConsolidationEnabled) {
+                RunSaplingConsolidation(pindex->GetHeight());
+            }
+            if (fTxDeleteEnabled) {
+                DeleteWalletTransactions(pindex);
+            }
         } else {
             //Build initial witnesses on every block
             BuildWitnessCache(pindex, true);
-            if (initialDownloadCheck && pindex->GetHeight() % fDeleteInterval == 0) {
-                DeleteWalletTransactions(pindex);
+            if (fTxDeleteEnabled) {
+                if (initialDownloadCheck && pindex->GetHeight() % fDeleteInterval == 0) {
+                    DeleteWalletTransactions(pindex);
+                }
             }
         }
     } else {
@@ -902,12 +908,15 @@ int64_t CWallet::NullifierCount()
 void CWallet::ClearNoteWitnessCache()
 {
     LOCK(cs_wallet);
+    int notes = 0;
     for (std::pair<const uint256, CWalletTx>& wtxItem : mapWallet) {
         for (mapSaplingNoteData_t::value_type& item : wtxItem.second.mapSaplingNoteData) {
             item.second.witnesses.clear();
             item.second.witnessHeight = -1;
+            notes++;
         }
     }
+    LogPrintf("%s: Cleared witness data from %d wallet items and %d SaplingNotes\n", __func__, mapWallet.size(), notes);
 }
 
 void CWallet::DecrementNoteWitnesses(const CBlockIndex* pindex)
@@ -1122,6 +1131,7 @@ void CWallet::BuildWitnessCache(const CBlockIndex* pindex, bool witnessOnly)
             nd->witnessHeight = pblockindex->GetHeight();
           }
         }
+
       }
     }
 
@@ -2378,12 +2388,6 @@ bool CWalletTx::WriteToDisk(CWalletDB *pwalletdb)
     return pwalletdb->WriteTx(GetHash(), *this);
 }
 
-void CWallet::WitnessNoteCommitment(std::vector<uint256> commitments,
-                                    std::vector<boost::optional<SproutWitness>>& witnesses,
-                                    uint256 &final_anchor)
-{
-}
-
 /**
  * Reorder the transactions based on block hieght and block index.
  * Transactions can get out of order when they are deleted and subsequently
@@ -2734,8 +2738,10 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
             BuildWitnessCache(pindex, true);
 
             //Delete Transactions
-            if (pindex->GetHeight() % fDeleteInterval == 0)
-              DeleteWalletTransactions(pindex);
+            if (fTxDeleteEnabled) {
+                if (pindex->GetHeight() % fDeleteInterval == 0)
+                   DeleteWalletTransactions(pindex);
+            }
 
             if (GetTime() >= nNow + 60) {
                 nNow = GetTime();
