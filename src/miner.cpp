@@ -857,19 +857,26 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, int32_t nHeight, 
         scriptPubKey = CScript() << ParseHex(HexStr(pubkey)) << OP_CHECKSIG;
     } else {
         {
-            if (!reservekey.GetReservedKey(pubkey))
-            {
-                return NULL;
-            }
-            scriptPubKey.resize(35);
-            ptr = (uint8_t *)pubkey.begin();
-            scriptPubKey[0] = 33;
-            for (i=0; i<33; i++) {
-                scriptPubKey[i+1] = ptr[i];
-            }
-            scriptPubKey[34] = OP_CHECKSIG;
-        }
-    }
+            // Support mining with -disablewallet and minetolocalwallet=0
+            if (!GetBoolArg("-disablewallet", false)) {
+                // wallet enabled
+                if (!reservekey.GetReservedKey(pubkey))
+                    return NULL;
+                scriptPubKey.clear();
+                scriptPubKey = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
+            } else {
+                // wallet disabled
+                CTxDestination dest = DecodeDestination(GetArg("-mineraddress", ""));
+                if (IsValidDestination(dest)) {
+                    // CKeyID keyID = boost::get<CKeyID>(dest);
+                    // scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
+                    scriptPubKey = GetScriptForDestination(dest);
+                } else {
+                    return NULL;
+                }
+             }
+         }
+     }
     return CreateNewBlock(pubkey, scriptPubKey, gpucount, isStake);
 }
 
