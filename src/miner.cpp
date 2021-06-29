@@ -891,29 +891,6 @@ void komodo_sendmessage(int32_t minpeers,int32_t maxpeers,const char *message,st
     }
 }
 
-void komodo_broadcast(CBlock *pblock,int32_t limit)
-{
-    if (IsInitialBlockDownload())
-        return;
-    int32_t n = 1;
-    //fprintf(stderr,"broadcast new block t.%u\n",(uint32_t)time(NULL));
-    {
-        LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-        {
-            if ( pnode->hSocket == INVALID_SOCKET )
-                continue;
-            if ( (rand() % n) == 0 )
-            {
-                pnode->PushMessage("block", *pblock);
-                if ( n++ > limit )
-                    break;
-            }
-        }
-    }
-    //fprintf(stderr,"finished broadcast new block t.%u\n",(uint32_t)time(NULL));
-}
-
 static bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 #else
 static bool ProcessBlockFound(CBlock* pblock)
@@ -968,7 +945,6 @@ static bool ProcessBlockFound(CBlock* pblock)
         return error("HushMiner: ProcessNewBlock, block not accepted");
 
     TrackMinedBlock(pblock->GetHash());
-    //komodo_broadcast(pblock,16);
     return true;
 }
 
