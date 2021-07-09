@@ -21,7 +21,7 @@
 #define HUSH_VERSION_H
 
 // network protocol versioning
-static const int PROTOCOL_VERSION = 1987422;
+static const int PROTOCOL_VERSION = 1987423;
 //! initial proto version, to be increased after version/verack negotiation
 static const int INIT_PROTO_VERSION = 209;
 //! In this version, 'getheaders' was introduced.
