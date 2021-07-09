@@ -10,6 +10,21 @@ and no longer on Github, since they banned Duke Leto and
 also because they censor many people around the world and work with
 evil organizations.
 
+# Hush 3.8.0 "XXX YYY"
+
+This is an OPTIONAL release, but since it contains many privacy improvements, it's HIGHLY RECOMMENDED for all users to upgrade.
+
+    * New Sietch feature: Randomized change output location
+      * Zcash and Pirate always put the change as the last shielded output, which leaks metadata. Hush no longer has this metadata leakage.
+      * This feature improves the `z_sendmany`, `z_mergetoaddress` and `z_shieldtocoinbase` since it's done in the Hush TransactionBuilder.
+    * New Sietch feature: Sitech-ified `z_shieldcoinbase`
+      * This RPC now leaks less metadata by making it hard for blockchain analysts to know which of the three outputs has value.
+      * This also increases Hush's "anonset velocity", which is how fast we increase our anonymity set, or "anonset".
+    * `-keepnotewitnesscache` prevents the Sapling Note Witness cache from being deleted from wallet.dat on shutdown.
+    * `-rescanheight` can be used with `-keepnotewitnesscache` and `-rescan` to do a partial rescan of history and avoid completely rebuilding the Witness Cache.
+    * `-zindex` data is now stored on disk in the new `zindex.dat` file
+      * All nodes that use `-zindex` will now have reliable anonset statistics even after a restart
+
 # Hush 3.7.1 "Neologistic Nautilus"
 
 ```
