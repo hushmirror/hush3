@@ -852,11 +852,33 @@ void *chainparams_commandline() {
 				(561000,     uint256S("0x00000004172d5940c07ec6d493e410fbab8a05dc73e350505e1540d7336eb353"))
 				(562000,     uint256S("0x00000000d9caaf66ad7782046886d3bfdf966c0a015dbae64042cd0c35e516e4"))
 				(563000,     uint256S("0x000000000d953e53c65145bfb41ba544a9ce9e5432c9ed8eabd39873dfcb8ab0"))
-				(564000,     uint256S("0x0000000d49258678c42bc2ea6f9e5d1206c578da8dc564d1a6114ce68bf77817")),
-				(int64_t)  1623979514, // time of last checkpointed block
-				(int64_t) 922687,      // total txs
-				(double)  1219        // txs in the last day before block 564690
-
+				(564000,     uint256S("0x0000000d49258678c42bc2ea6f9e5d1206c578da8dc564d1a6114ce68bf77817"))
+                (565000,     uint256S("0x0000000124077b644281fe8b904a84773cc69ff75cc1a337a7d8b7a8b60f4948"))
+                (566000,     uint256S("0x0000000569218dbcbf107acfa0ee400185a67699cb9ab33ba6342a518548a4bd"))
+                (567000,     uint256S("0x00000003d6b00efbf21aa135d0c05c4e5389d37ca1f0bc27f93ca0ad40df5d7e"))
+                (568000,     uint256S("0x000000075d6bfd54e9f5df8e3e3416f31f7080823d943452a801d6dfe2e009c4"))
+                (569000,     uint256S("0x000000157ae620dfd5a4eda2fae481b38c1c8487d0a08419faaf85dad04e710a"))
+                (570000,     uint256S("0x00000003cb99686983e1298491d554b3b368a65c8f20ff66e5f973cf72c95060"))
+                (571000,     uint256S("0x00000008b76fe3a819ea810206f2c368f04e06e299cf8a00cbc0b419b6f184db"))
+                (572000,     uint256S("0x0000000c20bbb828e25309964ea14c238ff617f2e97de2a0ca1c15b0f18f3496"))
+                (573000,     uint256S("0x00000004b9b9bb2b972d7faf6abb529b4ed5e69efe516ea72c4e202426fbc142"))
+                (574000,     uint256S("0x000000035646917f7350d27d1031a105b373e0009943925c86347c0ac944c8cc"))
+                (575000,     uint256S("0x0000000a6699cfd656d9e1530f497a3258c4ed4bea80f5bcbe3d666d0edf482d"))
+                (576000,     uint256S("0x00000005e0ed2dea3cb2d8666227c0e7375f4da8bd7045e915a087b5662f179b"))
+                (577000,     uint256S("0x00000009009599f27a22da268316f2d20669a8886a1fa3f2e4e7806c03b441a5"))
+                (578000,     uint256S("0x0000000aece28967d3a83a3008e7dec96d525c7cb5eb0d9942e11d81a263e487"))
+                (579000,     uint256S("0x00000000cdae1d8f9ff55f9a0848ee7ed2c9634ef876be74c0136598ab3f11a3"))
+                (580000,     uint256S("0x00000004b8e4f7d23de574ffe97b22334b33fb15a58e91b5689c02a7c024cdc7"))
+                (581000,     uint256S("0x00000003d8e78ee3716bb52274a1ea80228b4014ddff201bc69a4cd200f6fa17"))
+                (582000,     uint256S("0x000000060c8ecbc2535c7a6c88795ee8b4ca35047a2a2c620ff5d1e9c77487d7"))
+                (583000,     uint256S("0x00000004bf3dd01180d59a167e23fdab0ab50e8a9f8ce16542e0a01387c400b6"))
+                (584000,     uint256S("0x0000000720f29b0d72469739e9d94607e67b48eb9957b45c2fd5a34b86df039a"))
+                (585000,     uint256S("0x00000001409c395b2e37e2b88110b320996996241bfb489103db9e17aaf2ddc7"))
+                (586000,     uint256S("0x00000006ff6509d260f66af2fc4fc1769d56394333f3ad5a19bbd10c8c26742b"))
+                (587000,     uint256S("0x00000003866d330ac5448e07eb5e95d2e1860203f2e0ca568161d04ea5c5deb8")),
+                (int64_t)  1625849524, // time of last checkpointed block
+                (int64_t) 0,      // total txs
+                (double)  2304        // txs in the last day before block 587157
                 };
         } else {
             checkpointData = //(Checkpoints::CCheckpointData)
