@@ -20,10 +20,19 @@ This is an OPTIONAL release, but since it contains many privacy improvements, it
     * New Sietch feature: Sitech-ified `z_shieldcoinbase`
       * This RPC now leaks less metadata by making it hard for blockchain analysts to know which of the three outputs has value.
       * This also increases Hush's "anonset velocity", which is how fast we increase our anonymity set, or "anonset".
+    * Previously you could only run `stop` while Hush was in RPC warmup, but now additional RPCs are allowed:
+      * `stop` - Oops, you started hushd on accident a few seconds ago? Now you can stop it without waiting.
+      * `help` - Get help during long rescans, finally!
+      * `z_listaddresses` - See a list of all zaddrs in this wallet, even during a long rescan!
+      * `z_exportkey` - Export a key from this node, even during rescan!
+      * `listaddresses` - See a list of taddrs as soon as we load the wallet.
+      * `dumpprivkey` - Dump the private key of a taddr, even when node isn't fully synced!
+      * `getpeerinfo` - See current peers even before we get enough peers to start syncing or a long rescan!
     * `-keepnotewitnesscache` prevents the Sapling Note Witness cache from being deleted from wallet.dat on shutdown.
     * `-rescanheight` can be used with `-keepnotewitnesscache` and `-rescan` to do a partial rescan of history and avoid completely rebuilding the Witness Cache.
     * `-zindex` data is now stored on disk in the new `zindex.dat` file
       * All nodes that use `-zindex` will now have reliable anonset statistics even after a restart
+    * Improvements to the RPC help documentation
 
 # Hush 3.7.1 "Neologistic Nautilus"
 
