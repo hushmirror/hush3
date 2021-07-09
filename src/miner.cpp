@@ -210,10 +210,6 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
     // Collect memory pool transactions into the block
     CAmount nFees = 0;
 
-    // we will attempt to spend any cheats we see
-    CTransaction cheatTx;
-    boost::optional<CTransaction> cheatSpend;
-
     uint256 cbHash;
     
     boost::this_thread::interruption_point(); // exit thread before entering locks. 
@@ -861,19 +857,26 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, int32_t nHeight, 
         scriptPubKey = CScript() << ParseHex(HexStr(pubkey)) << OP_CHECKSIG;
     } else {
         {
-            if (!reservekey.GetReservedKey(pubkey))
-            {
-                return NULL;
-            }
-            scriptPubKey.resize(35);
-            ptr = (uint8_t *)pubkey.begin();
-            scriptPubKey[0] = 33;
-            for (i=0; i<33; i++) {
-                scriptPubKey[i+1] = ptr[i];
-            }
-            scriptPubKey[34] = OP_CHECKSIG;
-        }
-    }
+            // Support mining with -disablewallet and minetolocalwallet=0
+            if (!GetBoolArg("-disablewallet", false)) {
+                // wallet enabled
+                if (!reservekey.GetReservedKey(pubkey))
+                    return NULL;
+                scriptPubKey.clear();
+                scriptPubKey = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
+            } else {
+                // wallet disabled
+                CTxDestination dest = DecodeDestination(GetArg("-mineraddress", ""));
+                if (IsValidDestination(dest)) {
+                    // CKeyID keyID = boost::get<CKeyID>(dest);
+                    // scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
+                    scriptPubKey = GetScriptForDestination(dest);
+                } else {
+                    return NULL;
+                }
+             }
+         }
+     }
     return CreateNewBlock(pubkey, scriptPubKey, gpucount, isStake);
 }
 
@@ -893,29 +896,6 @@ void komodo_sendmessage(int32_t minpeers,int32_t maxpeers,const char *message,st
                 break;
         }
     }
-}
-
-void komodo_broadcast(CBlock *pblock,int32_t limit)
-{
-    if (IsInitialBlockDownload())
-        return;
-    int32_t n = 1;
-    //fprintf(stderr,"broadcast new block t.%u\n",(uint32_t)time(NULL));
-    {
-        LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-        {
-            if ( pnode->hSocket == INVALID_SOCKET )
-                continue;
-            if ( (rand() % n) == 0 )
-            {
-                pnode->PushMessage("block", *pblock);
-                if ( n++ > limit )
-                    break;
-            }
-        }
-    }
-    //fprintf(stderr,"finished broadcast new block t.%u\n",(uint32_t)time(NULL));
 }
 
 static bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
@@ -972,7 +952,6 @@ static bool ProcessBlockFound(CBlock* pblock)
         return error("HushMiner: ProcessNewBlock, block not accepted");
 
     TrackMinedBlock(pblock->GetHash());
-    //komodo_broadcast(pblock,16);
     return true;
 }
 

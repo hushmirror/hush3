@@ -95,6 +95,7 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "    \"lastrecv\": ttt,           (numeric) The time in seconds since epoch (Jan 1 1970 GMT) of the last receive\n"
             "    \"bytessent\": n,            (numeric) The total bytes sent\n"
             "    \"bytesrecv\": n,            (numeric) The total bytes received\n"
+            "    \"relaytxes\":true|false,    (boolean) Whether peer has asked us to relay transactions to it\n"
             "    \"conntime\": ttt,           (numeric) The connection time in seconds since epoch (Jan 1 1970 GMT)\n"
             "    \"timeoffset\": ttt,         (numeric) The time offset in seconds (deprecated, always 0)\n"
             "    \"pingtime\": n,             (numeric) ping time\n"
@@ -146,6 +147,8 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
         obj.push_back(Pair("lastrecv", stats.nLastRecv));
         obj.push_back(Pair("bytessent", stats.nSendBytes));
         obj.push_back(Pair("bytesrecv", stats.nRecvBytes));
+        obj.push_back(Pair("relaytxes", stats.fRelayTxes));
+
         obj.push_back(Pair("conntime", stats.nTimeConnected));
         obj.push_back(Pair("timeoffset",    0));
         obj.push_back(Pair("pingtime", stats.dPingTime));
@@ -177,15 +180,15 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 }
 
 int32_t HUSH_LONGESTCHAIN;
+static int32_t hush_longest_depth = 0;
 int32_t hush_longestchain()
 {
-    static int32_t depth;
     int32_t ht,n=0,num=0,maxheight=0,height = 0;
-    if ( depth < 0 )
-        depth = 0;
-    if ( depth == 0 )
+    if ( hush_longest_depth < 0 )
+        hush_longest_depth = 0;
+    if ( hush_longest_depth == 0 )
     {
-        depth++;
+        hush_longest_depth++;
         vector<CNodeStats> vstats;
         {
             //LOCK(cs_main);
@@ -212,7 +215,7 @@ int32_t hush_longestchain()
             if ( ht > height )
                 height = ht;
         }
-        depth--;
+        hush_longest_depth--;
         if ( num > (n >> 1) )
         {
             if ( 0 && height != HUSH_LONGESTCHAIN )

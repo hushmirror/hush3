@@ -950,4 +950,114 @@ std::pair<std::map<CBlockIndex*, std::list<CTransaction>>, uint64_t> DrainRecent
 void SetChainNotifiedSequence(uint64_t recentlyConflictedSequence);
 bool ChainIsFullyNotified();
 
+class CZindexStats
+{
+//private:
+public:
+    int64_t nHeight;
+    int64_t nChainTx;
+    int64_t nChainNotarizations;
+    int64_t nChainPayments;
+    int64_t nChainShieldedTx;
+    int64_t nChainShieldedOutputs;
+    int64_t nChainShieldedSpends;
+    int64_t nChainFullyShieldedTx;
+    int64_t nChainShieldingPayments;
+    int64_t nChainShieldedPayments;
+    int64_t nChainFullyShieldedPayments;
+    int64_t nChainDeshieldingTx;
+    int64_t nChainDeshieldingPayments;
+    int64_t nChainShieldingTx;
+
+    size_t Height() const
+    {
+        return nHeight;
+    }
+
+    void Clear()
+    {
+        LOCK(cs_main);
+        nChainTx=0;
+        nChainNotarizations=0;
+        nChainPayments=0;
+        nChainShieldedTx=0;
+        nChainShieldedOutputs=0;
+        nChainShieldedSpends=0;
+        nChainFullyShieldedTx=0;
+        nChainShieldingPayments=0;
+        nChainShieldedPayments=0;
+        nChainFullyShieldedPayments=0;
+        nChainDeshieldingTx=0;
+        nChainDeshieldingPayments=0;
+        nChainShieldingTx=0;
+    }
+
+    CZindexStats()
+    {
+        Clear();
+    }
+
+    ~CZindexStats()
+    {
+    }
+
+    template<typename Stream> void Serialize(Stream &s) const
+    {
+        LOCK(cs_main);
+
+        // So we can detect a new version and force a rescan
+        unsigned char nVersion = 1;
+        s << nVersion;
+        s << nHeight;
+        s << nChainTx;
+        s << nChainNotarizations;
+        s << nChainPayments;
+        s << nChainShieldedTx;
+        s << nChainShieldedOutputs;
+        s << nChainShieldedSpends;
+        s << nChainFullyShieldedTx;
+        s << nChainShieldingPayments;
+        s << nChainShieldedPayments;
+        s << nChainFullyShieldedPayments;
+        s << nChainDeshieldingTx;
+        s << nChainDeshieldingPayments;
+        s << nChainShieldingTx;
+    }
+
+    template<typename Stream> void Unserialize(Stream& s)
+    {
+        LOCK(cs_main);
+
+        Clear();
+        unsigned char nVersion;
+        s >> nVersion;
+        s >> nHeight;
+        s >> nChainTx;
+        s >> nChainNotarizations;
+        s >> nChainPayments;
+        s >> nChainShieldedTx;
+        s >> nChainShieldedOutputs;
+        s >> nChainShieldedSpends;
+        s >> nChainFullyShieldedTx;
+        s >> nChainShieldingPayments;
+        s >> nChainShieldedPayments;
+        s >> nChainFullyShieldedPayments;
+        s >> nChainDeshieldingTx;
+        s >> nChainDeshieldingPayments;
+        s >> nChainShieldingTx;
+    }
+};
+
+// Wrapper for zindex.dat stats
+class CZindexDB
+{
+private:
+    boost::filesystem::path pathAddr;
+public:
+    CZindexDB();
+    bool Write(const CZindexStats& zstats);
+    bool Read(CZindexStats& zstats);
+};
+
+
 #endif // HUSH_MAIN_H

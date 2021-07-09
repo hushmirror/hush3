@@ -201,7 +201,7 @@ UniValue importprivkey(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "3. rescan               (boolean, optional, default=true) Rescan the wallet for transactions\n"
             "4. height               (integer, optional, default=0) start at block height?\n"
             "5. secret_key           (integer, optional, default=188) decimal value used to import WIFs of other coins\n"
-            "\nNote: This call can take minutes to complete if rescan is true.\n"
+            "\nNote: This call can take a long time to complete if rescan is true.\n"
             "\nExamples:\n"
             "\nDump a private key\n"
             + HelpExampleCli("dumpprivkey", "\"myaddress\"") +
@@ -295,7 +295,7 @@ UniValue importaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "1. \"address\"          (string, required) The address\n"
             "2. \"label\"            (string, optional, default=\"\") An optional label\n"
             "3. rescan               (boolean, optional, default=true) Rescan the wallet for transactions\n"
-            "\nNote: This call can take minutes to complete if rescan is true.\n"
+            "\nNote: This call can take a long time to complete if rescan is true.\n"
             "\nExamples:\n"
             "\nImport an address with rescan\n"
             + HelpExampleCli("importaddress", "\"myaddress\"") +
@@ -749,7 +749,7 @@ UniValue z_importkey(const UniValue& params, bool fHelp, const CPubKey& mypk)
             "1. \"zkey\"             (string, required) The zkey (see z_exportkey)\n"
             "2. rescan             (string, optional, default=\"whenkeyisnew\") Rescan the wallet for transactions - can be \"yes\", \"no\" or \"whenkeyisnew\"\n"
             "3. startHeight        (numeric, optional, default=0) Block height to start rescan from\n"
-            "\nNote: This call can take minutes to complete if rescan is true.\n"
+            "\nNote: This call can take a long time to complete if rescan is true.\n"
             "\nExamples:\n"
             "\nExport a zkey\n"
             + HelpExampleCli("z_exportkey", "\"myaddress\"") +
@@ -841,7 +841,7 @@ UniValue z_importviewingkey(const UniValue& params, bool fHelp, const CPubKey& m
             "2. rescan             (string, optional, default=\"whenkeyisnew\") Rescan the wallet for transactions - can be \"yes\", \"no\" or \"whenkeyisnew\"\n"
             "3. startHeight        (numeric, optional, default=0) Block height to start rescan from\n"
             "4. zaddr               (string, optional, default=\"\") zaddr in case of importing viewing key for Sapling\n"
-            "\nNote: This call can take minutes to complete if rescan is true.\n"
+            "\nNote: This call can take a long time to complete if rescan is true.\n"
             "\nExamples:\n"
             "\nImport a viewing key\n"
             + HelpExampleCli("z_importviewingkey", "\"vkey\"") +

@@ -1660,10 +1660,12 @@ UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid block count: should be between 0 and the block's height - 1");
         }
     }
+    LogPrintf("%s: blockcount = %d\n", __func__, blockcount);
 
     const CBlockIndex* pindexPast = pindex->GetAncestor(pindex->GetHeight() - blockcount);
     int nTimeDiff                 = pindex->GetMedianTimePast() - pindexPast->GetMedianTimePast();
     int nTxDiff                   = pindex->nChainTx - pindexPast->nChainTx;
+    LogPrintf("%s: pindexPast.height = %d, pindex.height = %d\n", __func__, pindexPast->GetHeight(), pindex->GetHeight() );
 
     UniValue ret(UniValue::VOBJ);
     ret.pushKV("time", (int64_t)pindex->nTime);
@@ -1695,6 +1697,7 @@ UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk
         ret.pushKV("window_tx_count", nTxDiff);
         ret.pushKV("window_interval", nTimeDiff);
         int64_t nPaymentsDiff              = pindex->nChainPayments - pindexPast->nChainPayments;
+        LogPrintf("%s: pindexPast.nChainPayments = %d, pindex.nChainPayments = %d\n", __func__, pindexPast->nChainPayments, pindex->nChainPayments );
         int64_t nShieldedTxDiff            = pindex->nChainShieldedTx - pindexPast->nChainShieldedTx;
         int64_t nShieldingTxDiff           = pindex->nChainShieldingTx - pindexPast->nChainShieldingTx;
         int64_t nDeshieldingTxDiff         = pindex->nChainDeshieldingTx - pindexPast->nChainDeshieldingTx;

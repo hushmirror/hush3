@@ -466,7 +466,11 @@ std::string HelpMessage(HelpMessageMode mode)
             CURRENCY_UNIT, FormatMoney(CWallet::minTxFee.GetFeePerK())));
     strUsage += HelpMessageOpt("-opretmintxfee=<amt>", strprintf(_("Minimum fee (in %s/kB) to allow for OP_RETURN transactions (default: %s)"), CURRENCY_UNIT, 400000 ));
     strUsage += HelpMessageOpt("-paytxfee=<amt>", strprintf(_("Fee (in %s/kB) to add to transactions you send (default: %s)"), CURRENCY_UNIT, FormatMoney(payTxFee.GetFeePerK())));
+    // If this is used incorrectly (-rescanheight too large), then the local wallet may attempt to spend funds which it does not have witness data about
+    // which will cause a "missing inputs" error when added to the mempool. Rescanning from correct height will fix this.
+    strUsage += HelpMessageOpt("-keepnotewitnesscache", _("Keep partial Sapling Note Witness cache. Must be used with -rescanheight to find missing cache items."));
     strUsage += HelpMessageOpt("-rescan", _("Rescan the block chain for missing wallet transactions") + " " + _("on startup"));
+    strUsage += HelpMessageOpt("-rescanheight", _("Rescan from specified height when rescan=1 on startup"));
     strUsage += HelpMessageOpt("-salvagewallet", _("Attempt to recover private keys from a corrupt wallet.dat") + " " + _("on startup"));
     strUsage += HelpMessageOpt("-sendfreetransactions", strprintf(_("Send transactions as zero-fee transactions if possible (default: %u)"), 0));
     strUsage += HelpMessageOpt("-spendzeroconfchange", strprintf(_("Spend unconfirmed change when sending transactions (default: %u)"), 1));
@@ -2072,8 +2076,22 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         CBlockIndex *pindexRescan = chainActive.Tip();
         if (clearWitnessCaches || GetBoolArg("-rescan", false))
         {
-            pwalletMain->ClearNoteWitnessCache();
+            int rescanHeight = GetArg("-rescanheight", 0);
+            //  Must be used with -rescanheight
+            if( GetBoolArg("-keepnotewitnesscache", false) && rescanHeight > 0 ) {
+                LogPrintf("%s: keeping NoteWitnessCache with rescan height=%d\n", __func__, rescanHeight);
+            } else {
+                pwalletMain->ClearNoteWitnessCache();
+            }
+
             pindexRescan = chainActive.Genesis();
+            if (rescanHeight > 0) {
+                if (rescanHeight > chainActive.Tip()->GetHeight()) {
+                    pindexRescan = chainActive.Tip();
+                } else {
+                    pindexRescan = chainActive[rescanHeight];
+                }
+            }
         } else {
             CWalletDB walletdb(strWalletFile);
             CBlockLocator locator;

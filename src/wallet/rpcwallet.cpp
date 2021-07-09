@@ -1103,7 +1103,7 @@ UniValue cleanwallettransactions(const UniValue& params, bool fHelp, const CPubK
     if (fHelp || params.size() > 1 )
         throw runtime_error(
             "cleanwallettransactions \"txid\"\n"
-            "\nRemove all txs that are spent. You can clear all txs bar one, by specifiying a txid.\n"
+            "\nRemove all transparent UTXOs that are spent. You can clear all transactions bar one, by specifiying a txid.\n"
             "\nPlease backup your wallet.dat before running this command.\n"
             "\nArguments:\n"
             "1. \"txid\"    (string, optional) The transaction id to keep.\n"
@@ -1133,9 +1133,7 @@ UniValue cleanwallettransactions(const UniValue& params, bool fHelp, const CPubK
             if ( !pwalletMain->IsMine(tmp_tx) )
             {
                 throw runtime_error("\nThe transaction is not yours!\n");
-            }
-            else
-            {
+            } else {
                 for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
                 {
                     const CWalletTx& wtx = (*it).second;
@@ -1145,14 +1143,10 @@ UniValue cleanwallettransactions(const UniValue& params, bool fHelp, const CPubK
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             throw runtime_error("\nThe transaction could not be found!\n");
         }
-    }
-    else
-    {
+    } else {
         // get all locked utxos to relock them later.
         vector<COutPoint> vLockedUTXO;
         pwalletMain->ListLockedCoins(vLockedUTXO);
