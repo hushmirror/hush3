@@ -46,6 +46,7 @@
 
 using namespace libzcash;
 extern uint64_t ASSETCHAINS_TIMELOCKGTE;
+extern string randomSietchZaddr();
 
 AsyncRPCOperation_shieldcoinbase::AsyncRPCOperation_shieldcoinbase(
         TransactionBuilder builder,
@@ -228,6 +229,17 @@ bool ShieldToAddress::operator()(const libzcash::SaplingPaymentAddress &zaddr) c
 
     // Send all value to the target z-addr
     m_op->builder_.SendChangeTo(zaddr, ovk);
+
+    // Sietchified Shielding of Coinbase Funds
+    // Add Sietch zouts so it's unclear which zout contains value :)
+    // This reduces metadata leakage of coinbase t=>z tx's
+    CAmount amount     = 0;
+    auto zdust1        = DecodePaymentAddress(randomSietchZaddr());
+    auto zdust2        = DecodePaymentAddress(randomSietchZaddr());
+    auto sietchZout1   = boost::get<libzcash::SaplingPaymentAddress>(zdust1);
+    auto sietchZout2   = boost::get<libzcash::SaplingPaymentAddress>(zdust2);
+    m_op->builder_.AddSaplingOutput(ovk, sietchZout1, amount);
+    m_op->builder_.AddSaplingOutput(ovk, sietchZout2, amount);
 
     // Build the transaction
     auto maybe_tx = m_op->builder_.Build();

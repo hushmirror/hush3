@@ -466,6 +466,9 @@ std::string HelpMessage(HelpMessageMode mode)
             CURRENCY_UNIT, FormatMoney(CWallet::minTxFee.GetFeePerK())));
     strUsage += HelpMessageOpt("-opretmintxfee=<amt>", strprintf(_("Minimum fee (in %s/kB) to allow for OP_RETURN transactions (default: %s)"), CURRENCY_UNIT, 400000 ));
     strUsage += HelpMessageOpt("-paytxfee=<amt>", strprintf(_("Fee (in %s/kB) to add to transactions you send (default: %s)"), CURRENCY_UNIT, FormatMoney(payTxFee.GetFeePerK())));
+    // If this is used incorrectly (-rescanheight too large), then the local wallet may attempt to spend funds which it does not have witness data about
+    // which will cause a "missing inputs" error when added to the mempool. Rescanning from correct height will fix this.
+    strUsage += HelpMessageOpt("-keepnotewitnesscache", _("Keep partial Sapling Note Witness cache. Must be used with -rescanheight to find missing cache items."));
     strUsage += HelpMessageOpt("-rescan", _("Rescan the block chain for missing wallet transactions") + " " + _("on startup"));
     strUsage += HelpMessageOpt("-rescanheight", _("Rescan from specified height when rescan=1 on startup"));
     strUsage += HelpMessageOpt("-salvagewallet", _("Attempt to recover private keys from a corrupt wallet.dat") + " " + _("on startup"));
