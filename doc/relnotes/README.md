@@ -33,6 +33,8 @@ This is an OPTIONAL release, but since it contains many privacy improvements, it
     * `-zindex` data is now stored on disk in the new `zindex.dat` file
       * All nodes that use `-zindex` will now have reliable anonset statistics even after a restart
     * Improvements to the RPC help documentation
+    * `hushd.bat` for Windows now uses the ASN map via `-asmap` and has the latest seed nodes
+    * `hushd-tx.bat` for Windows now exists for making raw transactions on Windows
 
 # Hush 3.7.1 "Neologistic Nautilus"
 
