@@ -1753,10 +1753,10 @@ CScript komodo_mineropret(int32_t nHeight)
 }
 
 /*
- komodo_opretvalidate() is the entire price validation!
+ hush_opretvalidate() is the entire price validation!
  it prints out some useful info for debugging, like the lag from current time and prev block and the prices encoded in the opreturn.
  
- The only way komodo_opretvalidate() doesnt return an error is if maxflag is set or it is within tolerance of both the prior block and the local data. The local data validation only happens if it is a recent block and not a block from the past as the local node is only getting the current price data.
+ The only way hush_opretvalidate() doesnt return an error is if maxflag is set or it is within tolerance of both the prior block and the local data. The local data validation only happens if it is a recent block and not a block from the past as the local node is only getting the current price data.
  
  */
 
@@ -1772,7 +1772,7 @@ void komodo_queuelocalprice(int32_t dir,int32_t height,uint32_t timestamp,uint25
     ExtremePrice.pricebits = pricebits;
 }
 
-int32_t komodo_opretvalidate(const CBlock *block,CBlockIndex * const previndex,int32_t nHeight,CScript scriptPubKey)
+int32_t hush_opretvalidate(const CBlock *block,CBlockIndex * const previndex,int32_t nHeight,CScript scriptPubKey)
 {
     int32_t testchain_exemption = 0;
     std::vector<uint8_t> vopret; char maxflags[HUSH_MAXPRICES]; uint256 bhash; double btcusd,btcgbp,btceur; uint32_t localbits[HUSH_MAXPRICES],pricebits[HUSH_MAXPRICES],prevbits[HUSH_MAXPRICES],newprice; int32_t i,j,prevtime,maxflag,lag,lag2,lag3,n,errflag,iter; uint32_t now;
