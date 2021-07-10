@@ -384,11 +384,11 @@ char *komodo_issuemethod(char *userpass,char *method,char *params,uint16_t port)
     return(retstr2);
 }
 
-int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *kmdnotarized_heightp)
+int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_heightp)
 {
     char *jsonstr,params[256],*userpass; uint16_t port; cJSON *json,*item; int32_t height = 0,txid_height = 0,txid_confirmations = 0;
     params[0] = 0;
-    *kmdnotarized_heightp = 0;
+    *hushnotarized_heightp = 0;
     if ( strcmp(dest,"HUSH3") == 0 ) {
         port     = HUSH3_PORT;
         userpass = HUSHUSERPASS;
@@ -409,7 +409,7 @@ int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *kmdnotarized_heig
                 if ( (item= jobj(json,(char *)"result")) != 0 )
                 {
                     height = jint(item,(char *)"blocks");
-                    *kmdnotarized_heightp = strcmp(dest,"KMD") == 0 ? jint(item,(char *)"notarized") : height;
+                    *hushnotarized_heightp = strcmp(dest,"KMD") == 0 ? jint(item,(char *)"notarized") : height;
                 }
                 free_json(json);
             }

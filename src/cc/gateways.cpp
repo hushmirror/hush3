@@ -612,7 +612,7 @@ bool GatewaysValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &
                             sprintf(validationError,"illegal format %s != Ihh\n",format.c_str());
                             return eval->Invalid(validationError);
                         }
-                        else if (komodo_txnotarizedconfirmed(bindtxid) == false)
+                        else if (hush_txnotarizedconfirmed(bindtxid) == false)
                             return eval->Invalid("gatewaysbind tx is not yet confirmed(notarised)!");
                         else if (myGetTransaction(deposittxid,tmptx,hashblock) == 0)
                             return eval->Invalid("invalid gatewaysdeposittxid!");
@@ -630,7 +630,7 @@ bool GatewaysValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &
                             return eval->Invalid("bindtxid does not match to bindtxid from gatewaysdeposit");                                   
                         else if (tmpamount>totalsupply)
                             return eval->Invalid("deposit amount greater then bind total supply");                        
-                        else if (komodo_txnotarizedconfirmed(deposittxid) == false)
+                        else if (hush_txnotarizedconfirmed(deposittxid) == false)
                             return eval->Invalid("gatewaysdeposit tx is not yet confirmed(notarised)!");
                         else if (tx.vin.size()>0)
                         {
@@ -704,7 +704,7 @@ bool GatewaysValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &
                             return eval->Invalid("invalid marker vout for gatewaysWithdraw!");
                         else if ( ConstrainVout(tmptx.vout[1],1,gatewaystokensaddr,amount)==0)
                             return eval->Invalid("invalid tokens to gateways vout for gatewaysWithdraw!");
-                        else if (komodo_txnotarizedconfirmed(withdrawtxid) == false)
+                        else if (hush_txnotarizedconfirmed(withdrawtxid) == false)
                             return eval->Invalid("gatewayswithdraw tx is not yet confirmed(notarised)!");
                         else if (myGetTransaction(bindtxid,tmptx,hashblock) == 0)
                             return eval->Invalid("invalid gatewaysbind txid!");
@@ -714,7 +714,7 @@ bool GatewaysValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &
                             return eval->Invalid("refcoin different than in bind tx");
                         else if (tmptokenid!=tokenid)
                             return eval->Invalid("tokenid does not match tokenid from gatewaysbind");
-                        else if (komodo_txnotarizedconfirmed(bindtxid) == false)
+                        else if (hush_txnotarizedconfirmed(bindtxid) == false)
                             return eval->Invalid("gatewaysbind tx is not yet confirmed(notarised)!");
                         else if (IsCCInput(tx.vin[0].scriptSig) != 0)
                             return eval->Invalid("vin.0 is normal for gatewayspartialsign!");
@@ -746,7 +746,7 @@ bool GatewaysValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &
                             return eval->Invalid("invalid tokens to gateways vout for gatewaysWithdraw!");
                         else if (tmptx.vout[1].nValue!=amount)
                             return eval->Invalid("amount in opret not matching tx tokens amount!");
-                        else if (komodo_txnotarizedconfirmed(withdrawtxid) == false)
+                        else if (hush_txnotarizedconfirmed(withdrawtxid) == false)
                             return eval->Invalid("gatewayswithdraw tx is not yet confirmed(notarised)!");
                         else if (myGetTransaction(bindtxid,tmptx,hashblock) == 0)
                             return eval->Invalid("invalid gatewaysbind txid!");
@@ -756,7 +756,7 @@ bool GatewaysValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &
                             return eval->Invalid("refcoin different than in bind tx");
                         else if (tmptokenid!=tokenid)
                             return eval->Invalid("tokenid does not match tokenid from gatewaysbind");
-                        else if (komodo_txnotarizedconfirmed(bindtxid) == false)
+                        else if (hush_txnotarizedconfirmed(bindtxid) == false)
                             return eval->Invalid("gatewaysbind tx is not yet confirmed(notarised)!");
                         else if (IsCCInput(tx.vin[0].scriptSig) != 0)
                             return eval->Invalid("vin.0 is normal for gatewayscompletesigning!");
@@ -777,7 +777,7 @@ bool GatewaysValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &
                             return eval->Invalid("invalid gatewayscompletesigning txid!");
                         else if ((numvouts=tmptx.vout.size()) > 0 && DecodeGatewaysCompleteSigningOpRet(tmptx.vout[numvouts-1].scriptPubKey,withdrawtxid,tmprefcoin,K,hex)!='S')
                             return eval->Invalid("invalid gatewayscompletesigning OP_RETURN data!"); 
-                        else if (komodo_txnotarizedconfirmed(completetxid) == false)
+                        else if (hush_txnotarizedconfirmed(completetxid) == false)
                             return eval->Invalid("gatewayscompletesigning tx is not yet confirmed(notarised)!");
                         else if (myGetTransaction(withdrawtxid,tmptx,hashblock) == 0)
                             return eval->Invalid("invalid withdraw txid!");
@@ -785,7 +785,7 @@ bool GatewaysValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &
                             return eval->Invalid("invalid gatewayswithdraw OP_RETURN data!"); 
                         else if (tmprefcoin!=refcoin)
                             return eval->Invalid("refcoin different than in bind tx");
-                        else if (komodo_txnotarizedconfirmed(withdrawtxid) == false)
+                        else if (hush_txnotarizedconfirmed(withdrawtxid) == false)
                             return eval->Invalid("gatewayswithdraw tx is not yet confirmed(notarised)!");
                         else if (myGetTransaction(bindtxid,tmptx,hashblock) == 0)
                             return eval->Invalid("invalid gatewaysbind txid!");
@@ -795,7 +795,7 @@ bool GatewaysValidate(struct CCcontract_info *cp,Eval *eval,const CTransaction &
                             return eval->Invalid("refcoin different than in bind tx");
                         else if (tmptokenid!=tokenid)
                             return eval->Invalid("tokenid does not match tokenid from gatewaysbind");
-                        else if (komodo_txnotarizedconfirmed(bindtxid) == false)
+                        else if (hush_txnotarizedconfirmed(bindtxid) == false)
                             return eval->Invalid("gatewaysbind tx is not yet confirmed(notarised)!");
                         else if ( IsCCInput(tx.vin[0].scriptSig) != 0 )
                             return eval->Invalid("vin.0 is normal for gatewaysmarkdone!");
@@ -946,7 +946,7 @@ UniValue GatewaysDeposit(const CPubKey& pk, uint64_t txfee,uint256 bindtxid,int3
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "cant find bindtxid " << bindtxid.GetHex());
     if ( DecodeGatewaysBindOpRet(depositaddr,tx.vout[numvouts-1].scriptPubKey,tokenid,coin,totalsupply,oracletxid,M,N,pubkeys,taddr,prefix,prefix2,wiftype) != 'B' || refcoin != coin )
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid coin - bindtxid " << bindtxid.GetHex() << " coin." << coin);
-    if (komodo_txnotarizedconfirmed(bindtxid)==false)
+    if (hush_txnotarizedconfirmed(bindtxid)==false)
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "gatewaysbind tx not yet confirmed/notarized");
     n = (int32_t)pubkeys.size();
     merkleroot = zeroid;
@@ -997,13 +997,13 @@ UniValue GatewaysClaim(const CPubKey& pk, uint64_t txfee,uint256 bindtxid,std::s
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "cant find bindtxid " << bindtxid.GetHex());
     if ( DecodeGatewaysBindOpRet(depositaddr,tx.vout[numvouts-1].scriptPubKey,tokenid,coin,totalsupply,oracletxid,M,N,pubkeys,taddr,prefix,prefix2,wiftype) != 'B' || refcoin != coin )
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid coin - bindtxid " << bindtxid.GetHex() << " coin." << coin);
-    if (komodo_txnotarizedconfirmed(bindtxid)==false)
+    if (hush_txnotarizedconfirmed(bindtxid)==false)
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "gatewaysbind tx not yet confirmed/notarized");
     if ( myGetTransaction(deposittxid,tx,hashBlock) == 0 || (numvouts= tx.vout.size()) <= 0 )
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "cant find deposittxid " << bindtxid.GetHex());
     if (DecodeGatewaysDepositOpRet(tx.vout[numvouts-1].scriptPubKey,tmptxid,coin,publishers,txids,height,cointxid,claimvout,deposithex,proof,tmpdestpub,tmpamount) != 'D' || coin != refcoin)
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid coin - deposittxid " << bindtxid.GetHex() << " coin." << coin);
-    if (komodo_txnotarizedconfirmed(deposittxid)==false)
+    if (hush_txnotarizedconfirmed(deposittxid)==false)
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "gatewaysdeposit tx not yet confirmed/notarized");
     if (tmpdestpub!=destpub)
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "different destination pubkey from desdeposit tx");
@@ -1038,7 +1038,7 @@ UniValue GatewaysWithdraw(const CPubKey& pk, uint64_t txfee,uint256 bindtxid,std
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "cant find bindtxid " << bindtxid.GetHex());
     if ( DecodeGatewaysBindOpRet(depositaddr,tx.vout[numvouts-1].scriptPubKey,tokenid,coin,totalsupply,oracletxid,M,N,pubkeys,taddr,prefix,prefix2,wiftype) != 'B' || refcoin != coin )
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid coin - bindtxid " << bindtxid.GetHex() << " coin." << coin);
-    if (komodo_txnotarizedconfirmed(bindtxid)==false)
+    if (hush_txnotarizedconfirmed(bindtxid)==false)
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "gatewaysbind tx not yet confirmed/notarized");
     _GetCCaddress(coinaddr,EVAL_GATEWAYS,gatewayspk);
     SetCCunspents(unspentOutputs,coinaddr,true);
@@ -1097,7 +1097,7 @@ UniValue GatewaysPartialSign(const CPubKey& pk, uint64_t txfee,uint256 lasttxid,
         withdrawtxid=lasttxid;
         if (DecodeGatewaysWithdrawOpRet(tx.vout[numvouts-1].scriptPubKey,tmptokenid,bindtxid,coin,withdrawpub,amount)!='W' || refcoin!=coin)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid withdraw tx " << lasttxid.GetHex());
-        else if (komodo_txnotarizedconfirmed(withdrawtxid)==false)
+        else if (hush_txnotarizedconfirmed(withdrawtxid)==false)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "gatewayswithdraw tx not yet confirmed/notarized");
         else if (myGetTransaction(bindtxid,tmptx,hashBlock)==0 || (numvouts=tmptx.vout.size())<=0)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "can't find bind tx " << bindtxid.GetHex());
@@ -1114,7 +1114,7 @@ UniValue GatewaysPartialSign(const CPubKey& pk, uint64_t txfee,uint256 lasttxid,
         else if (DecodeGatewaysWithdrawOpRet(tmptx.vout[numvouts-1].scriptPubKey,tmptokenid,bindtxid,coin,withdrawpub,amount)!='W'
             || refcoin!=coin)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid withdraw tx " << withdrawtxid.GetHex());
-        else if (komodo_txnotarizedconfirmed(withdrawtxid)==false)
+        else if (hush_txnotarizedconfirmed(withdrawtxid)==false)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "gatewayswithdraw tx not yet confirmed/notarized");
         else if (myGetTransaction(bindtxid,tmptx,hashBlock)==0 || (numvouts=tmptx.vout.size())<=0)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "can't find bind tx " << bindtxid.GetHex());
@@ -1151,7 +1151,7 @@ UniValue GatewaysCompleteSigning(const CPubKey& pk, uint64_t txfee,uint256 lastt
         withdrawtxid=lasttxid;
         if (DecodeGatewaysWithdrawOpRet(tx.vout[numvouts-1].scriptPubKey,tmptokenid,bindtxid,coin,withdrawpub,amount)!='W' || refcoin!=coin)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid withdraw tx " << lasttxid.GetHex());
-        else if (komodo_txnotarizedconfirmed(withdrawtxid)==false)
+        else if (hush_txnotarizedconfirmed(withdrawtxid)==false)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "gatewayswithdraw tx not yet confirmed/notarized");
         else if (myGetTransaction(bindtxid,tmptx,hashBlock)==0 || (numvouts=tmptx.vout.size())<=0)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "can't find bind tx " << bindtxid.GetHex());
@@ -1168,7 +1168,7 @@ UniValue GatewaysCompleteSigning(const CPubKey& pk, uint64_t txfee,uint256 lastt
         else if (DecodeGatewaysWithdrawOpRet(tmptx.vout[numvouts-1].scriptPubKey,tmptokenid,bindtxid,coin,withdrawpub,amount)!='W'
             || refcoin!=coin)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid withdraw tx " << withdrawtxid.GetHex());
-        else if (komodo_txnotarizedconfirmed(withdrawtxid)==false)
+        else if (hush_txnotarizedconfirmed(withdrawtxid)==false)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "gatewayswithdraw tx not yet confirmed/notarized");
         else if (myGetTransaction(bindtxid,tmptx,hashBlock)==0 || (numvouts=tmptx.vout.size())<=0)
             CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "can't find bind tx " << bindtxid.GetHex());
@@ -1200,7 +1200,7 @@ UniValue GatewaysMarkDone(const CPubKey& pk, uint64_t txfee,uint256 completetxid
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid completesigning txid " << completetxid.GetHex());
     else if (DecodeGatewaysCompleteSigningOpRet(tx.vout[numvouts-1].scriptPubKey,withdrawtxid,coin,K,hex)!='S' || refcoin!=coin)
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "cannot decode completesigning tx opret " << completetxid.GetHex());
-    if (komodo_txnotarizedconfirmed(completetxid)==false)
+    if (hush_txnotarizedconfirmed(completetxid)==false)
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "gatewayscompletesigning tx not yet confirmed/notarized");
     else if (myGetTransaction(withdrawtxid,tx,hashBlock)==0 || (numvouts= tx.vout.size())==0)
         CCERR_RESULT("gatewayscc",CCLOG_INFO, stream << "invalid withdraw txid " << withdrawtxid.GetHex());
@@ -1266,7 +1266,7 @@ UniValue GatewaysPendingDeposits(const CPubKey& pk, uint256 bindtxid,std::string
             pub=HexStr(destpub);
             obj.push_back(Pair("claim_pubkey",pub));
             obj.push_back(Pair("amount",(double)amount/COIN));
-            obj.push_back(Pair("confirmed_or_notarized",komodo_txnotarizedconfirmed(txid)));        
+            obj.push_back(Pair("confirmed_or_notarized",hush_txnotarizedconfirmed(txid)));        
             pending.push_back(obj);
         }
     }
@@ -1340,7 +1340,7 @@ UniValue GatewaysPendingWithdraws(const CPubKey& pk, uint256 bindtxid,std::strin
                 obj.push_back(Pair("withdrawaddr",withaddr));
                 sprintf(numstr,"%.8f",(double)tx.vout[1].nValue/COIN);
                 obj.push_back(Pair("amount",numstr));                
-                obj.push_back(Pair("confirmed_or_notarized",komodo_txnotarizedconfirmed(tx.GetHash())));
+                obj.push_back(Pair("confirmed_or_notarized",hush_txnotarizedconfirmed(tx.GetHash())));
                 if ( queueflag != 0 )
                 {
                     obj.push_back(Pair("depositaddr",depositaddr));
@@ -1415,7 +1415,7 @@ UniValue GatewaysProcessedWithdraws(const CPubKey& pk, uint256 bindtxid,std::str
                 obj.push_back(Pair("withdrawtxidaddr",txidaddr));              
                 GetCustomscriptaddress(withaddr,CScript() << ParseHex(HexStr(withdrawpub)) << OP_CHECKSIG,taddr,prefix,prefix2);
                 obj.push_back(Pair("withdrawaddr",withaddr));
-                obj.push_back(Pair("confirmed_or_notarized",komodo_txnotarizedconfirmed(txid)));
+                obj.push_back(Pair("confirmed_or_notarized",hush_txnotarizedconfirmed(txid)));
                 sprintf(numstr,"%.8f",(double)tx.vout[1].nValue/COIN);
                 obj.push_back(Pair("amount",numstr));
                 obj.push_back(Pair("hex",hex));                

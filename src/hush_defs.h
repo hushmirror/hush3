@@ -567,7 +567,7 @@ int32_t hush_nextheight();
 CBlockIndex *hush_blockindex(uint256 hash);
 CBlockIndex *hush_chainactive(int32_t height);
 int32_t hush_blockheight(uint256 hash);
-bool komodo_txnotarizedconfirmed(uint256 txid);
+bool hush_txnotarizedconfirmed(uint256 txid);
 int32_t hush_blockload(CBlock& block, CBlockIndex *pindex);
 uint32_t hush_chainactive_timestamp();
 uint32_t GetLatestTimestamp(int32_t height);
