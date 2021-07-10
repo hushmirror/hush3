@@ -670,7 +670,7 @@ std::string GetWorkUnit(StratumClient& client)
     } */
 
     /* if (!Params().MineBlocksOnDemand() && g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) == 0) {
-        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Komodo is not connected!");
+        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Hush is not connected!");
     } */
 
     bool fvNodesEmpty;
@@ -681,15 +681,15 @@ std::string GetWorkUnit(StratumClient& client)
 
     if (Params().MiningRequiresPeers() && fvNodesEmpty)
     {
-        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Komodo is not connected!");
+        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Hush is not connected!");
     }
 
     if (IsInitialBlockDownload()) {
-        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Komodo is downloading blocks...");
+        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Hush is downloading blocks...");
     }
 
     if (!client.m_authorized && client.m_aux_addr.empty()) {
-        throw JSONRPCError(RPC_INVALID_REQUEST, "Stratum client not authorized.  Use mining.authorize first, with a Komodo address as the username.");
+        throw JSONRPCError(RPC_INVALID_REQUEST, "Stratum client not authorized.  Use mining.authorize first, with a Hush R.. address as the username.");
     }
 
     static CBlockIndex* tip = NULL; // pindexPrev
@@ -798,7 +798,7 @@ std::string GetWorkUnit(StratumClient& client)
         /*
 
         // Targets Table Example: komodo diff and ccminer diff are different (!),
-        // Komodo diff = NiceHash diff, ccminer_diff = Yiimp diff.
+        // Hush diff = NiceHash diff, ccminer_diff = Yiimp diff.
 
         hashTarget.SetCompact(HUSH_MINDIFF_NBITS,&fNegative,&fOverflow); // blkhdr.nBits
         hashTarget = UintToArith256(uint256S("0x0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"));
@@ -1245,7 +1245,7 @@ UniValue stratum_mining_authorize(StratumClient& client, const UniValue& params)
     CBitcoinAddress addr(get_stripped_username(username));
 
     if (!addr.IsValid()) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid Komodo address: %s", username));
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid Hush address: %s", username));
     }
 
     client.m_addr = addr;
