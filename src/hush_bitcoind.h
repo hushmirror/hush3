@@ -543,7 +543,7 @@ int32_t komodo_verifynotarization(char *symbol,char *dest,int32_t height,int32_t
     return(retval);
 }
 
-CScript komodo_makeopret(CBlock *pblock, bool fNew)
+CScript hush_makeopret(CBlock *pblock, bool fNew)
 {
     std::vector<uint256> vLeaves;
     vLeaves.push_back(pblock->hashPrevBlock); 
@@ -673,7 +673,7 @@ uint32_t komodo_txtime2(uint64_t *valuep,uint256 hash,int32_t n,char *destaddr)
 bool hush_checkopret(CBlock *pblock, CScript &merkleroot)
 {
     merkleroot = pblock->vtx.back().vout.back().scriptPubKey;
-    return(merkleroot.IsOpReturn() && merkleroot == komodo_makeopret(pblock, false));
+    return(merkleroot.IsOpReturn() && merkleroot == hush_makeopret(pblock, false));
 }
 
 
