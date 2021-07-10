@@ -10,9 +10,14 @@ and no longer on Github, since they banned Duke Leto and
 also because they censor many people around the world and work with
 evil organizations.
 
-# Hush 3.8.0 "XXX YYY"
+# Hush 3.8.0 "Chuckling Chupacabra"
+
+```
+32 files changed, 712 insertions(+), 183 deletions(-)
+```
 
 This is an OPTIONAL release, but since it contains many privacy improvements, it's HIGHLY RECOMMENDED for all users to upgrade.
+It's VERY HIGHLY RECOMMENDED for mining pools to upgrade, since some improvements affect them.
 
     * New Sietch feature: Randomized change output location
       * Zcash and Pirate always put the change as the last shielded output, which leaks metadata. Hush no longer has this metadata leakage.
@@ -20,6 +25,8 @@ This is an OPTIONAL release, but since it contains many privacy improvements, it
     * New Sietch feature: Sitech-ified `z_shieldcoinbase`
       * This RPC now leaks less metadata by making it hard for blockchain analysts to know which of the three outputs has value.
       * This also increases Hush's "anonset velocity", which is how fast we increase our anonymity set, or "anonset".
+    * Thanks to [LuckPool](https://luckpool.net) for a patch that fixes how the longest chain is calculated.
+      * This bug can prevent mining pools from making payout transactions, which is why this release is HIGHLY RECOMMENDED for mining pools.
     * Previously you could only run `stop` while Hush was in RPC warmup, but now additional RPCs are allowed:
       * `stop` - Oops, you started hushd on accident a few seconds ago? Now you can stop it without waiting.
       * `help` - Get help during long rescans, finally!
@@ -28,10 +35,17 @@ This is an OPTIONAL release, but since it contains many privacy improvements, it
       * `listaddresses` - See a list of taddrs as soon as we load the wallet.
       * `dumpprivkey` - Dump the private key of a taddr, even when node isn't fully synced!
       * `getpeerinfo` - See current peers even before we get enough peers to start syncing or a long rescan!
+    * If the RPC interface is not functioning (such as filled by deadlocks or something else) it can become impossible to shut down hushd correctly!
+      * Doing a `kill` of the process could corrupt wallet.dat and cause a very long rescan.
+      * Now you can create a file called `plz_stop` in the same directory as wallet.dat
+      * `hushd` checks for this file every 120 seconds and will shutdown if it sees it.
     * `-keepnotewitnesscache` prevents the Sapling Note Witness cache from being deleted from wallet.dat on shutdown.
+      * If your hushd crashed or needed to be `kill -9`, do `hushd -keepnotewitnesscache -rescan -rescanheight=XXX` with a height of just before it crashed
+      * This will only rescan the latest part of the blockchain looking for new funds, instead of all of history. Much faster!
     * `-rescanheight` can be used with `-keepnotewitnesscache` and `-rescan` to do a partial rescan of history and avoid completely rebuilding the Witness Cache.
     * `-zindex` data is now stored on disk in the new `zindex.dat` file
       * All nodes that use `-zindex` will now have reliable anonset statistics even after a restart
+    * `getpeerinfo` now returns a `relaytxes` key which says if a remote node is relaying transactions to us
     * Improvements to the RPC help documentation
     * `hushd.bat` for Windows now uses the ASN map via `-asmap` and has the latest seed nodes
     * `hushd-tx.bat` for Windows now exists for making raw transactions on Windows
