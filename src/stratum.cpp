@@ -1111,6 +1111,8 @@ bool SubmitBlock(StratumClient& client, const uint256& job_id, const StratumWork
 
             //if (instance_of_cstratumparams.fstdErrDebugOutput) std::cerr << DateTimeStrPrecise() << "res[2] = " << res << std::endl;
 
+            // we haven't PreciousBlock, so we can't prioritize the block this way for now
+            /*
             if (res) {
                 // LOCK(cs_main);
                 if (!mapBlockIndex.count(hash)) {
@@ -1119,7 +1121,6 @@ bool SubmitBlock(StratumClient& client, const uint256& job_id, const StratumWork
                 {
                     CBlockIndex* block_index = mapBlockIndex.at(hash);
                     CValidationState state;
-                    // we haven't PreciousBlock, so we can't prioritize the block this way for now
 
                     // PreciousBlock(state, Params(), block_index);
                     // if (!state.IsValid()) {
@@ -1127,6 +1128,7 @@ bool SubmitBlock(StratumClient& client, const uint256& job_id, const StratumWork
                     // }
                 }
             }
+            */
         } else {
             LogPrintf("NEW SHARE!!! by %s: %s\n", client.m_addr.ToString(), hash.ToString());
         }
