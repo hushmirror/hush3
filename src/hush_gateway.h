@@ -2228,7 +2228,7 @@ void hush_cbopretupdate(int32_t forceflag)
     if ( Queued_reconsiderblock != zeroid )
     {
         fprintf(stderr,"Queued_reconsiderblock %s\n",Queued_reconsiderblock.GetHex().c_str());
-        komodo_reconsiderblock(Queued_reconsiderblock);
+        hush_reconsiderblock(Queued_reconsiderblock);
         Queued_reconsiderblock = zeroid;
     }
     if ( forceflag != 0 && pending != 0 )

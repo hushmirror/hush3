@@ -43,8 +43,8 @@ struct hush_event *hush_eventadd(struct hush_state *sp,int32_t height,char *symb
 void hush_eventadd_notarized(struct hush_state *sp,char *symbol,int32_t height,char *dest,uint256 notarized_hash,uint256 notarized_desttxid,int32_t notarizedheight,uint256 MoM,int32_t MoMdepth)
 {
     static uint32_t counter; int32_t verified=0; char *coin; struct hush_event_notarized N;
-    coin = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"KMD" : SMART_CHAIN_SYMBOL;
-    if ( IS_HUSH_NOTARY != 0 && (verified= komodo_verifynotarization(symbol,dest,height,notarizedheight,notarized_hash,notarized_desttxid)) < 0 )
+    coin = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"HUSH3" : SMART_CHAIN_SYMBOL;
+    if ( IS_HUSH_NOTARY != 0 && (verified= hush_verifynotarization(symbol,dest,height,notarizedheight,notarized_hash,notarized_desttxid)) < 0 )
     {
         if ( counter++ < 100 )
             printf("[%s] error validating notarization ht.%d notarized_height.%d, if on a pruned %s node this can be ignored\n",SMART_CHAIN_SYMBOL,height,notarizedheight,dest);

@@ -38,7 +38,7 @@ struct NSPV_ntzargs
 int32_t NSPV_notarization_find(struct NSPV_ntzargs *args,int32_t height,int32_t dir)
 {
     int32_t ntzheight = 0; uint256 hashBlock; CTransaction tx; Notarization nota; char *symbol; std::vector<uint8_t> opret;
-    symbol = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"KMD" : SMART_CHAIN_SYMBOL;
+    symbol = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"HUSH3" : SMART_CHAIN_SYMBOL;
     memset(args,0,sizeof(*args));
     if ( dir > 0 )
         height += 10;
