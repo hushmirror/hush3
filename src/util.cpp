@@ -652,15 +652,10 @@ void ClearDatadirCache()
 boost::filesystem::path GetConfigFile()
 {
     char confname[512];
-    if ( SMART_CHAIN_SYMBOL[0] != 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 ) {
         sprintf(confname,"%s.conf",SMART_CHAIN_SYMBOL);
-    else
-    {
-#ifdef __APPLE__
-        strcpy(confname,"Komodo.conf");
-#else
-        strcpy(confname,"komodo.conf");
-#endif
+    } else {
+        strcpy(confname,"HUSH3.conf");
     }
     boost::filesystem::path pathConfigFile(GetArg("-conf",confname));
     if (!pathConfigFile.is_complete())
