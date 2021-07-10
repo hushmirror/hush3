@@ -216,7 +216,7 @@ int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,ui
     if ( height >= 250000 )
         return(-1);
     if ( Pubkeys == 0 )
-        komodo_init(0);
+        hush_init(0);
     htind = height / KOMODO_ELECTION_GAP;
     if ( htind >= HUSH_MAXBLOCKS / KOMODO_ELECTION_GAP )
         htind = (HUSH_MAXBLOCKS / KOMODO_ELECTION_GAP) - 1;
@@ -434,11 +434,11 @@ void komodo_notarized_update(struct hush_state *sp,int32_t nHeight,int32_t notar
     portable_mutex_unlock(&komodo_mutex);
 }
 
-void komodo_init(int32_t height)
+void hush_init(int32_t height)
 {
     static int didinit; uint256 zero; int32_t k,n; uint8_t pubkeys[64][33];
     if ( 0 && height != 0 )
-        printf("komodo_init ht.%d didinit.%d\n",height,didinit);
+        printf("hush_init ht.%d didinit.%d\n",height,didinit);
     memset(&zero,0,sizeof(zero));
     if ( didinit == 0 )
     {

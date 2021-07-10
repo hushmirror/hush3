@@ -818,7 +818,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
         return(0);
     }
     memset(&zero,0,sizeof(zero));
-    komodo_init(pindex->GetHeight());
+    hush_init(pindex->GetHeight());
     HUSH_INITDONE = (uint32_t)time(NULL);
     if ( (sp= hush_stateptr(symbol,dest)) == 0 )
     {

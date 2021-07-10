@@ -699,7 +699,7 @@ void komodo_disconnect(CBlockIndex *pindex,CBlock& block)
 {
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
     //fprintf(stderr,"disconnect ht.%d\n",pindex->GetHeight());
-    komodo_init(pindex->GetHeight());
+    hush_init(pindex->GetHeight());
     if ( (sp= hush_stateptr(symbol,dest)) != 0 )
     {
         //sp->rewinding = pindex->GetHeight();
@@ -754,7 +754,7 @@ int32_t hush_block2height(CBlock *block)
             }
             //printf(" <- coinbase.%d ht.%d\n",(int32_t)block->vtx[0].vin[0].scriptSig.size(),height);
         }
-        //komodo_init(height);
+        //hush_init(height);
     }
     if ( height != height2 )
     {
