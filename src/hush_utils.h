@@ -1761,12 +1761,6 @@ void hush_args(char *argv0)
     {
         HUSH_MININGTHREADS = GetArg("-genproclimit",-1);
     }
-    if ( (GetBoolArg("-exchange", false)) != 0 ) {
-        printf("The KMD-only feature -exchange is not supported by HUSH!\n");
-        printf("jl777 uses this \"feature\" to steal from his own users!\n");
-        printf("Learn more at https://duke.hush.is :)\n");
-        StartShutdown();
-    }
     DONATION_PUBKEY   = GetArg("-donation", "");
     NOTARY_PUBKEY     = GetArg("-pubkey", "");
     HUSH_DEALERNODE = GetArg("-dealer",0);
@@ -1813,7 +1807,7 @@ void hush_args(char *argv0)
     HUSH_STOPAT              = GetArg("-stopat",0);
     MAX_REORG_LENGTH         = GetArg("-maxreorg",MAX_REORG_LENGTH);
     WITNESS_CACHE_SIZE       = MAX_REORG_LENGTH+10;
-    ASSETCHAINS_CC           = GetArg("-ac_cc",2);
+    ASSETCHAINS_CC           = GetArg("-ac_cc",0);
     HUSH_CCACTIVATE          = GetArg("-ac_ccactivate",0);
     ASSETCHAINS_BLOCKTIME    = GetArg("-ac_blocktime",60);
     ASSETCHAINS_PUBLIC       = 0;
@@ -1908,6 +1902,20 @@ void hush_args(char *argv0)
 
         if(ishush3) {
             fprintf(stderr,"%s: Setting custom HUSH3 reward,halving,subsidy chain values...\n",__func__);
+            // Migrated from hushd script
+            ASSETCHAINS_CC           = 2;
+            ASSETCHAINS_BLOCKTIME    = 75;
+            ASSETCHAINS_LASTERA      = 3;
+            ASSETCHAINS_COMMISSION   = 11111111;
+            // 6250000 - (Sprout pool at block 500,000)
+            ASSETCHAINS_SUPPLY       = 6178674;
+            ASSETCHAINS_FOUNDERS     = 1;
+            // this corresponds to FR address RHushEyeDm7XwtaTWtyCbjGQumYyV8vMjn
+            ASSETCHAINS_SCRIPTPUB       = "76a9145eb10cf64f2bab1b457f1f25e658526155928fac88ac";
+
+            Split("128,340000,5422111" , sizeof(ASSETCHAINS_ENDSUBSIDY)/sizeof(*ASSETCHAINS_ENDSUBSIDY),  ASSETCHAINS_ENDSUBSIDY, 0);
+            Split("129,340000,840000", sizeof(ASSETCHAINS_HALVING)/sizeof(*ASSETCHAINS_HALVING),  ASSETCHAINS_HALVING, 0);
+        Split("0,1125000000,562500000" , sizeof(ASSETCHAINS_REWARD)/sizeof(*ASSETCHAINS_REWARD),  ASSETCHAINS_REWARD, 0);
             // Over-ride HUSH3 values from CLI params. Changing our blocktime to 75s changes things
             ASSETCHAINS_REWARD[0]     = 0;
             ASSETCHAINS_REWARD[1]     = 1125000000;
@@ -1992,8 +2000,10 @@ void hush_args(char *argv0)
         if ( ASSETCHAINS_CC != 0 )
         {
             uint8_t prevCCi = 0;
-            ASSETCHAINS_CCLIB = GetArg("-ac_cclib","");
-            Split(GetArg("-ac_ccenable",""), sizeof(ccenables)/sizeof(*ccenables),  ccenables, 0);
+            ASSETCHAINS_CCLIB = GetArg("-ac_cclib","hush3");
+
+            // these are the enabled CCs on HUSH3 mainnet
+            Split(GetArg("-ac_ccenable","228,234,235,236,241"), sizeof(ccenables)/sizeof(*ccenables),  ccenables, 0);
             for (i=nonz=0; i<0x100; i++)
             {
                 if ( ccenables[i] != prevCCi && ccenables[i] != 0 )
