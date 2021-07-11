@@ -1415,14 +1415,14 @@ void hush_configfile(char *symbol,uint16_t rpcport)
 #ifdef _WIN32
     while ( fname[strlen(fname)-1] != '\\' )
         fname[strlen(fname)-1] = 0;
-    strcat(fname,"komodo.conf");
+    strcat(fname,"HUSH3.conf");
 #else
     while ( fname[strlen(fname)-1] != '/' )
         fname[strlen(fname)-1] = 0;
 #ifdef __APPLE__
-    strcat(fname,"Komodo.conf");
+    strcat(fname,"HUSH3.conf");
 #else
-    strcat(fname,"komodo.conf");
+    strcat(fname,"HUSH3.conf");
 #endif
 #endif
     if ( (fp= fopen(fname,"rb")) != 0 )
@@ -1433,7 +1433,7 @@ void hush_configfile(char *symbol,uint16_t rpcport)
         fclose(fp);
         //printf("HUSH.(%s) -> userpass.(%s)\n",fname,HUSHUSERPASS);
     } else {
-        printf("couldnt open.(%s)\n",fname);
+        printf("could not open.(%s)\n",fname);
     }
 }
 
