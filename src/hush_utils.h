@@ -1804,6 +1804,10 @@ void hush_args(char *argv0)
             }
         }
     }
+    vector<string> HUSH_nodes= {"node1.hush.is","node2.hush.is","node3.hush.is",
+                                "node4.hush.is","node5.hush.is","node6.hush.is",
+                                "node7.hush.is","node8.hush.is"};
+    mapMultiArgs["-addnode"] = HUSH_nodes;
     HUSH_STOPAT              = GetArg("-stopat",0);
     MAX_REORG_LENGTH         = GetArg("-maxreorg",MAX_REORG_LENGTH);
     WITNESS_CACHE_SIZE       = MAX_REORG_LENGTH+10;
