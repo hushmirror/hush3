@@ -1763,7 +1763,7 @@ void hush_args(char *argv0)
     }
     DONATION_PUBKEY   = GetArg("-donation", "");
     NOTARY_PUBKEY     = GetArg("-pubkey", "");
-    HUSH_DEALERNODE = GetArg("-dealer",0);
+    HUSH_DEALERNODE   = GetArg("-dealer",0);
     HUSH_TESTNODE     = GetArg("-testnode",0);
 
     if ( strlen(NOTARY_PUBKEY.c_str()) == 66 )
@@ -1789,7 +1789,7 @@ void hush_args(char *argv0)
         }
     }
 
-	name = GetArg("-ac_name","");
+	name = GetArg("-ac_name","HUSH3");
     if ( argv0 != 0 )
     {
         len = (int32_t)strlen(argv0);
@@ -1810,6 +1810,7 @@ void hush_args(char *argv0)
     ASSETCHAINS_CC           = GetArg("-ac_cc",0);
     HUSH_CCACTIVATE          = GetArg("-ac_ccactivate",0);
     ASSETCHAINS_BLOCKTIME    = GetArg("-ac_blocktime",60);
+    // We do not support ac_public=1 chains, Hush is a platform for privacy
     ASSETCHAINS_PUBLIC       = 0;
     ASSETCHAINS_PRIVATE      = GetArg("-ac_private",0);
     HUSH_SNAPSHOT_INTERVAL   = GetArg("-ac_snapshot",0);
