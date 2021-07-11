@@ -1366,7 +1366,7 @@ void hush_statefname(char *fname,char *symbol,char *str)
     //printf("test.(%s) -> [%s] statename.(%s) %s\n",test,SMART_CHAIN_SYMBOL,symbol,fname);
 }
 
-void komodo_configfile(char *symbol,uint16_t rpcport)
+void hush_configfile(char *symbol,uint16_t rpcport)
 {
     static char myusername[512],mypassword[8192];
     FILE *fp; uint16_t kmdport; uint8_t buf2[33]; char fname[512],buf[128],username[512],password[8192]; uint32_t crc,r,r2,i;
@@ -1398,7 +1398,7 @@ void komodo_configfile(char *symbol,uint16_t rpcport)
 #ifndef FROM_CLI
             if ( (fp= fopen(fname,"wb")) != 0 )
             {
-                fprintf(fp,"rpcuser=user%u\nrpcpassword=pass%s\nrpcport=%u\nserver=1\ntxindex=1\nrpcworkqueue=256\nrpcallowip=127.0.0.1\nrpcbind=127.0.0.1\n",crc,password,rpcport);
+                fprintf(fp,"rpcuser=user%u\nrpcpassword=pass%s\nrpcport=%u\nserver=1\ntxindex=1\nrpcworkqueue=512\nrpcallowip=127.0.0.1\nrpcbind=127.0.0.1\n",crc,password,rpcport);
                 fclose(fp);
                 printf("Created (%s)\n",fname);
             } else printf("Couldnt create (%s)\n",fname);
@@ -1432,7 +1432,9 @@ void komodo_configfile(char *symbol,uint16_t rpcport)
         sprintf(HUSHUSERPASS,"%s:%s",username,password);
         fclose(fp);
         //printf("HUSH.(%s) -> userpass.(%s)\n",fname,HUSHUSERPASS);
-    } //else printf("couldnt open.(%s)\n",fname);
+    } else {
+        printf("couldnt open.(%s)\n",fname);
+    }
 }
 
 uint16_t komodo_userpass(char *userpass,char *symbol)
@@ -2344,7 +2346,7 @@ void hush_args(char *argv0)
             }
             if ( (port= komodo_userpass(ASSETCHAINS_USERPASS,SMART_CHAIN_SYMBOL)) != 0 )
                 ASSETCHAINS_RPCPORT = port;
-            else komodo_configfile(SMART_CHAIN_SYMBOL,ASSETCHAINS_P2PPORT + 1);
+            else hush_configfile(SMART_CHAIN_SYMBOL,ASSETCHAINS_P2PPORT + 1);
 
             if (ASSETCHAINS_CBMATURITY != 0)
                 COINBASE_MATURITY = ASSETCHAINS_CBMATURITY;

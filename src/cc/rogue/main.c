@@ -699,15 +699,9 @@ uint16_t komodo_userpass(char *userpass,char *symbol)
 {
     FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[HUSH_SMART_CHAIN_MAXLEN];
     userpass[0] = 0;
-    if ( strcmp("KMD",symbol) == 0 )
-    {
-#ifdef __APPLE__
-        sprintf(confname,"Komodo.conf");
-#else
-        sprintf(confname,"komodo.conf");
-#endif
-    }
-    else sprintf(confname,"%s.conf",symbol);
+
+    sprintf(confname,"%s.conf",symbol);
+
     //hush_statefname(fname,symbol,confname);
     if ( (fp= fopen(confname,"rb")) != 0 )
     {
