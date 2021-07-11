@@ -1915,6 +1915,7 @@ void hush_args(char *argv0)
             // 6250000 - (Sprout pool at block 500,000)
             ASSETCHAINS_SUPPLY       = 6178674;
             ASSETCHAINS_FOUNDERS     = 1;
+            ASSETCHAINS_SAPLING      = 1;
             // this corresponds to FR address RHushEyeDm7XwtaTWtyCbjGQumYyV8vMjn
             ASSETCHAINS_SCRIPTPUB       = "76a9145eb10cf64f2bab1b457f1f25e658526155928fac88ac";
 
@@ -2089,7 +2090,7 @@ void hush_args(char *argv0)
         }
         
         // HUSH will always be The First Pure Sapling Coin, no Sprout JoinSplits in our history! ;)
-        ASSETCHAINS_SAPLING = GetArg("-ac_sapling", -1);
+        ASSETCHAINS_SAPLING = GetArg("-ac_sapling", 1);
         if (ASSETCHAINS_SAPLING == -1)
         {
             ASSETCHAINS_OVERWINTER = GetArg("-ac_overwinter", -1);
