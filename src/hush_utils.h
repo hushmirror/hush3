@@ -811,7 +811,7 @@ char *bitcoin_address(char *coinaddr,uint8_t addrtype,uint8_t *pubkey_or_rmd160,
 
 int32_t komodo_is_issuer()
 {
-    if ( SMART_CHAIN_SYMBOL[0] != 0 && komodo_baseid(SMART_CHAIN_SYMBOL) >= 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 && hush_baseid(SMART_CHAIN_SYMBOL) >= 0 )
         return(1);
     else return(0);
 }
@@ -2304,7 +2304,7 @@ void hush_args(char *argv0)
 
         MAX_MONEY = hush_max_money();
 
-        if ( (baseid = komodo_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
+        if ( (baseid = hush_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
         {
             //komodo_maxallowed(baseid);
             if(fDebug) 
@@ -2338,12 +2338,8 @@ void hush_args(char *argv0)
         //fprintf(stderr,"Got datadir.(%s)\n",dirname);
         if ( SMART_CHAIN_SYMBOL[0] != 0 )
         {
-            int32_t komodo_baseid(char *origbase);
+            int32_t hush_baseid(char *origbase);
             extern int COINBASE_MATURITY;
-            if ( strcmp(SMART_CHAIN_SYMBOL,"KMD") == 0 )
-            {
-                fprintf(stderr,"Oh hellz yezzz\n");
-            }
             if ( (port= hush_userpass(ASSETCHAINS_USERPASS,SMART_CHAIN_SYMBOL)) != 0 )
                 ASSETCHAINS_RPCPORT = port;
             else hush_configfile(SMART_CHAIN_SYMBOL,ASSETCHAINS_P2PPORT + 1);
@@ -2465,7 +2461,7 @@ struct hush_state *hush_stateptrget(char *base)
     int32_t baseid;
     if ( base == 0 || base[0] == 0 || strcmp(base,(char *)"KYCSELLOUTS") == 0 )
         return(&HUSH_STATES[33]);
-    else if ( (baseid= komodo_baseid(base)) >= 0 )
+    else if ( (baseid= hush_baseid(base)) >= 0 )
         return(&HUSH_STATES[baseid+1]);
     else return(&HUSH_STATES[0]);
 }
