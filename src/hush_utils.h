@@ -1295,7 +1295,7 @@ void dragon_initQ(queue_t *Q,char *name)
         free(item);
 }
 
-uint16_t _komodo_userpass(char *username,char *password,FILE *fp)
+uint16_t _hush_userpass(char *username,char *password,FILE *fp)
 {
     char *rpcuser,*rpcpassword,*str,line[8192]; uint16_t port = 0;
     rpcuser = rpcpassword = 0;
@@ -1404,7 +1404,7 @@ void hush_configfile(char *symbol,uint16_t rpcport)
             } else printf("Couldnt create (%s)\n",fname);
 #endif
         } else {
-            _komodo_userpass(myusername,mypassword,fp);
+            _hush_userpass(myusername,mypassword,fp);
             mapArgs["-rpcpassword"] = mypassword;
             mapArgs["-rpcusername"] = myusername;
             //fprintf(stderr,"myusername.(%s)\n",myusername);
@@ -1427,7 +1427,7 @@ void hush_configfile(char *symbol,uint16_t rpcport)
 #endif
     if ( (fp= fopen(fname,"rb")) != 0 )
     {
-        if ( (kmdport= _komodo_userpass(username,password,fp)) != 0 )
+        if ( (kmdport= _hush_userpass(username,password,fp)) != 0 )
             HUSH3_PORT = kmdport;
         sprintf(HUSHUSERPASS,"%s:%s",username,password);
         fclose(fp);
@@ -1437,7 +1437,7 @@ void hush_configfile(char *symbol,uint16_t rpcport)
     }
 }
 
-uint16_t komodo_userpass(char *userpass,char *symbol)
+uint16_t hush_userpass(char *userpass,char *symbol)
 {
     FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[HUSH_SMART_CHAIN_MAXLEN];
     userpass[0] = 0;
@@ -1453,7 +1453,7 @@ uint16_t komodo_userpass(char *userpass,char *symbol)
     hush_statefname(fname,symbol,confname);
     if ( (fp= fopen(fname,"rb")) != 0 )
     {
-        port = _komodo_userpass(username,password,fp);
+        port = _hush_userpass(username,password,fp);
         sprintf(userpass,"%s:%s",username,password);
         if ( strcmp(symbol,SMART_CHAIN_SYMBOL) == 0 )
             strcpy(ASSETCHAINS_USERPASS,userpass);
@@ -2344,7 +2344,7 @@ void hush_args(char *argv0)
             {
                 fprintf(stderr,"Oh hellz yezzz\n");
             }
-            if ( (port= komodo_userpass(ASSETCHAINS_USERPASS,SMART_CHAIN_SYMBOL)) != 0 )
+            if ( (port= hush_userpass(ASSETCHAINS_USERPASS,SMART_CHAIN_SYMBOL)) != 0 )
                 ASSETCHAINS_RPCPORT = port;
             else hush_configfile(SMART_CHAIN_SYMBOL,ASSETCHAINS_P2PPORT + 1);
 
@@ -2421,7 +2421,7 @@ void hush_args(char *argv0)
 #endif
             if ( (fp= fopen(fname,"rb")) != 0 )
             {
-                _komodo_userpass(username,password,fp);
+                _hush_userpass(username,password,fp);
                 sprintf(iter == 0 ? HUSHUSERPASS : BTCUSERPASS,"%s:%s",username,password);
                 fclose(fp);
                 //printf("HUSH.(%s) -> userpass.(%s)\n",fname,HUSHUSERPASS);
