@@ -497,15 +497,30 @@ boost::filesystem::path GetDefaultDataDir()
     if ( SMART_CHAIN_SYMBOL[0] != 0 )
         strcpy(symbol,SMART_CHAIN_SYMBOL);
     else symbol[0] = 0;
+    // OLD NAMES:
     // Windows < Vista: C:\Documents and Settings\Username\Application Data\Komodo
     // Windows >= Vista: C:\Users\Username\AppData\Roaming\Komodo
     // Mac: ~/Library/Application Support/Komodo
     // Unix: ~/.komodo
+
+    // NEW NAMES:
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Hush
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Hush
+    // Mac: ~/Library/Application Support/Hush
+    // Unix: ~/.hush
+
+    // ~/.hush was actually used by the original 1.x version of Hush, but we will
+    // only make subdirectories inside of it, so we won't be able to overwrite
+    // an old wallet.dat from the Ice Ages :)
 #ifdef _WIN32
     // Windows
-    if ( symbol[0] == 0 )
-        return GetSpecialFolderPath(CSIDL_APPDATA) / "Komodo";
-    else return GetSpecialFolderPath(CSIDL_APPDATA) / "Komodo" / symbol;
+    pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Komodo" / symbol;
+    if(fs::is_directory(pathRet)) {
+        // legacy directory, use that
+    } else {
+        pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Hush" / symbol;
+    }
+    return pathRet;
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -517,19 +532,31 @@ boost::filesystem::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectory(pathRet);
-    if ( symbol[0] == 0 )
-        return pathRet / "Komodo";
-    else
-    {
-        pathRet /= "Komodo";
-        TryCreateDirectory(pathRet);
-        return pathRet / symbol;
+    fs::path tmppath;
+    tmppath = pathRet;
+    tmppath /= "Komodo";
+    if(fs::is_directory(pathRet)) {
+        //legacy directory, use that
+        TryCreateDirectory(tmppath);
+        return tmppath / symbol;
+    } else {
+        // New directory :)
+        tmppath = pathRet;
+        tmppath /= "Hush";
+        TryCreateDirectory(tmppath);
+        return tmppath / symbol;
     }
 #else
     // Unix
-    if ( symbol[0] == 0 )
-        return pathRet / ".komodo";
-    else return pathRet / ".komodo" / symbol;
+    fs::path tmppath = pathRet / ".komodo" / symbol;
+    if(fs::is_directory(tmppath)) {
+        // legacy directory, use that for backward compat
+        return tmppath;
+    } else {
+        // New directory :)
+        tmppath = pathRet / ".hush" / symbol;
+        return tmppath;
+    }
 #endif
 #endif
 }
@@ -638,8 +665,6 @@ const boost::filesystem::path &GetDataDir(bool fNetSpecific)
         path /= BaseParams().DataDir();
 
     fs::create_directories(path);
-    //std::string assetpath = path + "/assets";
-    //boost::filesystem::create_directory(assetpath);
     return path;
 }
 

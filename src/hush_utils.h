@@ -1369,7 +1369,7 @@ void hush_statefname(char *fname,char *symbol,char *str)
 void hush_configfile(char *symbol,uint16_t rpcport)
 {
     static char myusername[512],mypassword[8192];
-    FILE *fp; uint16_t kmdport; uint8_t buf2[33]; char fname[512],buf[128],username[512],password[8192]; uint32_t crc,r,r2,i;
+    FILE *fp; uint16_t hushport; uint8_t buf2[33]; char fname[512],buf[128],username[512],password[8192]; uint32_t crc,r,r2,i;
     if ( symbol != 0 && rpcport != 0 )
     {
         r = (uint32_t)time(NULL);
@@ -1427,8 +1427,8 @@ void hush_configfile(char *symbol,uint16_t rpcport)
 #endif
     if ( (fp= fopen(fname,"rb")) != 0 )
     {
-        if ( (kmdport= _hush_userpass(username,password,fp)) != 0 )
-            HUSH3_PORT = kmdport;
+        if ( (hushport= _hush_userpass(username,password,fp)) != 0 )
+            HUSH3_PORT = hushport;
         sprintf(HUSHUSERPASS,"%s:%s",username,password);
         fclose(fp);
         //printf("HUSH.(%s) -> userpass.(%s)\n",fname,HUSHUSERPASS);
@@ -1441,15 +1441,9 @@ uint16_t hush_userpass(char *userpass,char *symbol)
 {
     FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[HUSH_SMART_CHAIN_MAXLEN];
     userpass[0] = 0;
-    if ( strcmp("SPECIAL",symbol) == 0 )
-    {
-#ifdef __APPLE__
-        sprintf(confname,"Something.conf");
-#else
-        sprintf(confname,"Something.conf");
-#endif
-    }
-    else sprintf(confname,"%s.conf",symbol);
+
+    sprintf(confname,"%s.conf",symbol);
+
     hush_statefname(fname,symbol,confname);
     if ( (fp= fopen(fname,"rb")) != 0 )
     {
