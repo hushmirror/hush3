@@ -669,7 +669,7 @@ uint16_t hush_userpass(char *userpass,char *symbol)
 
 #define is_cJSON_True(json) ((json) != 0 && ((json)->type & 0xff) == cJSON_True)
 
-char *komodo_issuemethod(char *userpass,char *method,char *params,uint16_t port)
+char *hush_issuemethod(char *userpass,char *method,char *params,uint16_t port)
 {
     //static void *cHandle;
     char url[512],*retstr=0,*retstr2=0,postdata[8192];
@@ -691,7 +691,7 @@ int32_t games_sendrawtransaction(char *rawtx)
     char *params,*retstr,*hexstr; cJSON *retjson,*resobj; int32_t retval = -1;
     params = (char *)malloc(strlen(rawtx) + 16);
     sprintf(params,"[\"%s\"]",rawtx);
-    if ( (retstr= komodo_issuemethod(USERPASS,(char *)"sendrawtransaction",params,GAMES_PORT)) != 0 )
+    if ( (retstr= hush_issuemethod(USERPASS,(char *)"sendrawtransaction",params,GAMES_PORT)) != 0 )
     {
         if ( 0 ) // causes 4th level crash
         {
@@ -768,7 +768,7 @@ int32_t games_progress(struct games_state *rs,int32_t waitflag,uint64_t seed,gam
         if ( fp == 0 )
             fp = fopen("keystrokes.log","a");
         sprintf(params,"[\"keystrokes\",\"17\",\"[%%22%s%%22,%%22%s%%22]\"]",Gametxidstr,hexstr);
-        if ( (retstr= komodo_issuemethod(USERPASS,(char *)"cclib",params,GAMES_PORT)) != 0 )
+        if ( (retstr= hush_issuemethod(USERPASS,(char *)"cclib",params,GAMES_PORT)) != 0 )
         {
             if ( fp != 0 )
             {
@@ -978,7 +978,7 @@ int32_t games_setplayerdata(struct games_state *rs,char *gametxidstr)
     else
     {
         sprintf(params,"[\"gameinfo\",\"17\",\"[%%22%s%%22]\"]",gametxidstr);
-        filestr = komodo_issuemethod(USERPASS,(char *)"cclib",params,GAMES_PORT);
+        filestr = hush_issuemethod(USERPASS,(char *)"cclib",params,GAMES_PORT);
     }
     if ( filestr != 0 )
     {

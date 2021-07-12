@@ -716,7 +716,7 @@ uint16_t hush_userpass(char *userpass,char *symbol)
 
 #define is_cJSON_True(json) ((json) != 0 && ((json)->type & 0xff) == cJSON_True)
 
-char *komodo_issuemethod(char *userpass,char *method,char *params,uint16_t port)
+char *hush_issuemethod(char *userpass,char *method,char *params,uint16_t port)
 {
     //static void *cHandle;
     char url[512],*retstr=0,*retstr2=0,postdata[8192];
@@ -740,7 +740,7 @@ int32_t rogue_sendrawtransaction(char *rawtx)
     char *params,*retstr,*hexstr; cJSON *retjson,*resobj; int32_t retval = -1;
     params = (char *)malloc(strlen(rawtx) + 16);
     sprintf(params,"[\"%s\"]",rawtx);
-    if ( (retstr= komodo_issuemethod(USERPASS,"sendrawtransaction",params,ROGUE_PORT)) != 0 )
+    if ( (retstr= hush_issuemethod(USERPASS,"sendrawtransaction",params,ROGUE_PORT)) != 0 )
     {
         if ( 0 ) // causes 4th level crash
         {
@@ -805,7 +805,7 @@ int32_t rogue_progress(struct rogue_state *rs,int32_t waitflag,uint64_t seed,cha
         if ( 0 && (pastkeys= rogue_keystrokesload(&numpastkeys,seed,1)) != 0 )
         {
             sprintf(params,"[\"extract\",\"17\",\"[%%22%s%%22]\"]",Gametxidstr);
-            if ( (retstr= komodo_issuemethod(USERPASS,"cclib",params,ROGUE_PORT)) != 0 )
+            if ( (retstr= hush_issuemethod(USERPASS,"cclib",params,ROGUE_PORT)) != 0 )
             {
                 if ( (retjson= cJSON_Parse(retstr)) != 0 )
                 {
@@ -847,7 +847,7 @@ int32_t rogue_progress(struct rogue_state *rs,int32_t waitflag,uint64_t seed,cha
             if ( fp == 0 )
                 fp = fopen("keystrokes.log","a");
             sprintf(params,"[\"keystrokes\",\"17\",\"[%%22%s%%22,%%22%s%%22]\"]",Gametxidstr,hexstr);
-            if ( (retstr= komodo_issuemethod(USERPASS,"cclib",params,ROGUE_PORT)) != 0 )
+            if ( (retstr= hush_issuemethod(USERPASS,"cclib",params,ROGUE_PORT)) != 0 )
             {
                 if ( fp != 0 )
                 {
@@ -905,7 +905,7 @@ int32_t rogue_setplayerdata(struct rogue_state *rs,char *gametxidstr)
     else
     {
         sprintf(params,"[\"gameinfo\",\"17\",\"[%%22%s%%22]\"]",gametxidstr);
-        filestr = komodo_issuemethod(USERPASS,"cclib",params,ROGUE_PORT);
+        filestr = hush_issuemethod(USERPASS,"cclib",params,ROGUE_PORT);
     }
     if ( filestr != 0 )
     {

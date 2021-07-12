@@ -510,7 +510,7 @@ void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotarie
     }
 }
 
-int32_t komodo_validate_chain(uint256 srchash,int32_t notarized_height)
+int32_t hush_validate_chain(uint256 srchash,int32_t notarized_height)
 {
     static int32_t last_rewind; int32_t rewindtarget; CBlockIndex *pindex; struct hush_state *sp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN];
     if ( (sp= hush_stateptr(symbol,dest)) == 0 )
@@ -535,7 +535,7 @@ int32_t komodo_validate_chain(uint256 srchash,int32_t notarized_height)
     } else return(1);
 }
 
-int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryid,uint8_t *scriptbuf,int32_t scriptlen,int32_t height,uint256 txhash,int32_t i,int32_t j,uint64_t *voutmaskp,int32_t *specialtxp,int32_t *notarizedheightp,uint64_t value,int32_t notarized,uint64_t signedmask,uint32_t timestamp)
+int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryid,uint8_t *scriptbuf,int32_t scriptlen,int32_t height,uint256 txhash,int32_t i,int32_t j,uint64_t *voutmaskp,int32_t *specialtxp,int32_t *notarizedheightp,uint64_t value,int32_t notarized,uint64_t signedmask,uint32_t timestamp)
 {
     static uint256 zero; static FILE *signedfp;
     int32_t opretlen,nid,offset,k,MoMdepth,matched,len = 0; uint256 MoM,srchash,desttxid; uint8_t crypto555[33]; struct hush_state *sp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN];
@@ -598,11 +598,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
         matched = 0;
         if ( SMART_CHAIN_SYMBOL[0] == 0 )
         {
-            if ( strcmp("KMD",(char *)&scriptbuf[len+32 * 2 + 4]) == 0 )
-                matched = 1;
-        }
-        else
-        {
+        } else {
             if ( scriptbuf[len] == 'K' )
             {
                 //fprintf(stderr,"i.%d j.%d KV OPRET len.%d %.8f\n",i,j,opretlen,dstr(value));
@@ -631,7 +627,7 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
             if ( matched != 0 )
                 len += dragon_rwbignum(0,&scriptbuf[len],32,(uint8_t *)&desttxid);
             if ( matched != 0 )
-                validated = komodo_validate_chain(srchash,*notarizedheightp);
+                validated = hush_validate_chain(srchash,*notarizedheightp);
             else validated = 1;
             // Any notarization that is matched and has a decodable op_return is enough to pay notaries. Otherwise bugs! 
             if ( fJustCheck && matched != 0 )
@@ -775,12 +771,6 @@ int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notar
     return(notaryid);
 }
 
-/*int32_t komodo_isratify(int32_t isspecial,int32_t numvalid)
-{
-    if ( isspecial != 0 && numvalid >= HUSH_MINRATIFY )
-        return(1);
-    else return(0);
-}*/
 
 // Special tx have vout[0] -> CRYPTO555 address
 // with more than HUSH_MINRATIFY pay2pubkey outputs -> ratify
@@ -938,7 +928,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                 if ( len >= sizeof(uint32_t) && len <= sizeof(scriptbuf) )
                 {
                     memcpy(scriptbuf,(uint8_t *)&block.vtx[i].vout[j].scriptPubKey[0],len);
-                    notaryid = komodo_voutupdate(fJustCheck,&isratification,notaryid,scriptbuf,len,height,txhash,i,j,&voutmask,&specialtx,&notarizedheight,(uint64_t)block.vtx[i].vout[j].nValue,notarized,signedmask,(uint32_t)chainActive.LastTip()->GetBlockTime());
+                    notaryid = hush_voutupdate(fJustCheck,&isratification,notaryid,scriptbuf,len,height,txhash,i,j,&voutmask,&specialtx,&notarizedheight,(uint64_t)block.vtx[i].vout[j].nValue,notarized,signedmask,(uint32_t)chainActive.LastTip()->GetBlockTime());
                     if ( fJustCheck && notaryid == -2 )
                     {
                         // We see a valid notarisation here, save its location.

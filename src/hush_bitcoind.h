@@ -25,8 +25,8 @@
 #include "sietch.h"
 
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
-int32_t komodo_electednotary(int32_t *numnotariesp,uint8_t *pubkey33,int32_t height,uint32_t timestamp);
-int32_t komodo_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryid,uint8_t *scriptbuf,int32_t scriptlen,int32_t height,uint256 txhash,int32_t i,int32_t j,uint64_t *voutmaskp,int32_t *specialtxp,int32_t *notarizedheightp,uint64_t value,int32_t notarized,uint64_t signedmask,uint32_t timestamp);
+int32_t hush_electednotary(int32_t *numnotariesp,uint8_t *pubkey33,int32_t height,uint32_t timestamp);
+int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryid,uint8_t *scriptbuf,int32_t scriptlen,int32_t height,uint256 txhash,int32_t i,int32_t j,uint64_t *voutmaskp,int32_t *specialtxp,int32_t *notarizedheightp,uint64_t value,int32_t notarized,uint64_t signedmask,uint32_t timestamp);
 bool EnsureWalletIsAvailable(bool avoidException);
 extern bool fRequestShutdown;
 extern CScript HUSH_EARLYTXID_SCRIPTPUB;
@@ -367,9 +367,8 @@ char *curl_post(CURL **cHandlep,char *url,char *userpass,char *postfields,char *
     return(chunk.memory);
 }
 
-char *komodo_issuemethod(char *userpass,char *method,char *params,uint16_t port)
+char *hush_issuemethod(char *userpass,char *method,char *params,uint16_t port)
 {
-    //static void *cHandle;
     char url[512],*retstr=0,*retstr2=0,postdata[8192];
     if ( params == 0 || params[0] == 0 )
         params = (char *)"[]";
@@ -401,7 +400,7 @@ int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_hei
     }
     if ( userpass[0] != 0 )
     {
-        if ( (jsonstr= komodo_issuemethod(userpass,(char *)"getinfo",params,port)) != 0 )
+        if ( (jsonstr= hush_issuemethod(userpass,(char *)"getinfo",params,port)) != 0 )
         {
             //printf("(%s)\n",jsonstr);
             if ( (json= cJSON_Parse(jsonstr)) != 0 )
@@ -416,7 +415,7 @@ int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_hei
             free(jsonstr);
         }
         sprintf(params,"[\"%s\", 1]",txidstr);
-        if ( (jsonstr= komodo_issuemethod(userpass,(char *)"getrawtransaction",params,port)) != 0 )
+        if ( (jsonstr= hush_issuemethod(userpass,(char *)"getrawtransaction",params,port)) != 0 )
         {
             //printf("(%s)\n",jsonstr);
             if ( (json= cJSON_Parse(jsonstr)) != 0 )
@@ -437,7 +436,7 @@ int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_hei
     return(txid_height);
 }
 
-int32_t komodo_verifynotarizedscript(int32_t height,uint8_t *script,int32_t len,uint256 NOTARIZED_HASH)
+int32_t hush_verifynotarizedscript(int32_t height,uint8_t *script,int32_t len,uint256 NOTARIZED_HASH)
 {
     int32_t i; uint256 hash; char params[256];
     for (i=0; i<32; i++)
@@ -457,7 +456,7 @@ void hush_reconsiderblock(uint256 blockhash)
 {
     char params[256],*jsonstr,*hexstr;
     sprintf(params,"[\"%s\"]",blockhash.ToString().c_str());
-    if ( (jsonstr= komodo_issuemethod(ASSETCHAINS_USERPASS,(char *)"reconsiderblock",params,ASSETCHAINS_RPCPORT)) != 0 )
+    if ( (jsonstr= hush_issuemethod(ASSETCHAINS_USERPASS,(char *)"reconsiderblock",params,ASSETCHAINS_RPCPORT)) != 0 )
     {
         //fprintf(stderr,"hush_reconsiderblock.(%s) (%s %u) -> (%s)\n",params,ASSETCHAINS_USERPASS,ASSETCHAINS_RPCPORT,jsonstr);
         free(jsonstr);
@@ -475,34 +474,30 @@ int32_t hush_verifynotarization(char *symbol,char *dest,int32_t height,int32_t N
      sprintf(&params[i*2 + 2],"%02x",((uint8_t *)&NOTARIZED_DESTTXID)[31-i]);
      strcat(params,"\", 1]");*/
     sprintf(params,"[\"%s\", 1]",NOTARIZED_DESTTXID.ToString().c_str());
-    if ( strcmp(symbol,SMART_CHAIN_SYMBOL[0]==0?(char *)"KMD":SMART_CHAIN_SYMBOL) != 0 )
+    if ( strcmp(symbol,SMART_CHAIN_SYMBOL[0]==0?(char *)"HUSH3":SMART_CHAIN_SYMBOL) != 0 )
         return(0);
     if ( 0 && SMART_CHAIN_SYMBOL[0] != 0 )
         printf("[%s] src.%s dest.%s params.[%s] ht.%d notarized.%d\n",SMART_CHAIN_SYMBOL,symbol,dest,params,height,NOTARIZED_HEIGHT);
-    if ( strcmp(dest,"KMD") == 0 )
+    if ( strcmp(dest,"HUSH3") == 0 )
     {
         if ( HUSHUSERPASS[0] != 0 )
         {
             if ( SMART_CHAIN_SYMBOL[0] != 0 )
             {
-                jsonstr = komodo_issuemethod(HUSHUSERPASS,(char *)"getrawtransaction",params,HUSH3_PORT);
+                jsonstr = hush_issuemethod(HUSHUSERPASS,(char *)"getrawtransaction",params,HUSH3_PORT);
                 //printf("userpass.(%s) got (%s)\n",HUSHUSERPASS,jsonstr);
             }
         }//else jsonstr = _dex_getrawtransaction();
         else return(0); // need universal way to issue DEX* API, since notaries mine most blocks, this ok
-    }
-    else if ( strcmp(dest,"BTC") == 0 )
-    {
+    } else if ( strcmp(dest,"BTC") == 0 ) {
         if ( BTCUSERPASS[0] != 0 )
         {
             //printf("BTCUSERPASS.(%s)\n",BTCUSERPASS);
-            jsonstr = komodo_issuemethod(BTCUSERPASS,(char *)"getrawtransaction",params,8332);
+            jsonstr = hush_issuemethod(BTCUSERPASS,(char *)"getrawtransaction",params,8332);
         }
         //else jsonstr = _dex_getrawtransaction();
         else return(0);
-    }
-    else
-    {
+    } else {
         printf("[%s] verifynotarization error unexpected dest.(%s)\n",SMART_CHAIN_SYMBOL,dest);
         return(-1);
     }
@@ -532,7 +527,7 @@ int32_t hush_verifynotarization(char *symbol,char *dest,int32_t height,int32_t N
                             script += 2;
                             len -= 2;
                         }
-                        retval = komodo_verifynotarizedscript(height,script,len,NOTARIZED_HASH);
+                        retval = hush_verifynotarizedscript(height,script,len,NOTARIZED_HASH);
                     }
                 }
             }
@@ -560,7 +555,7 @@ CScript hush_makeopret(CBlock *pblock, bool fNew)
  uint256 hash; char params[128],*hexstr,*jsonstr; cJSON *result; int32_t i; uint8_t revbuf[32];
  memset(&hash,0,sizeof(hash));
  sprintf(params,"[%d]",height);
- if ( (jsonstr= komodo_issuemethod(HUSHUSERPASS,(char *)"getblockhash",params,BITCOIND_RPCPORT)) != 0 )
+ if ( (jsonstr= hush_issuemethod(HUSHUSERPASS,(char *)"getblockhash",params,BITCOIND_RPCPORT)) != 0 )
  {
  if ( (result= cJSON_Parse(jsonstr)) != 0 )
  {
@@ -613,7 +608,7 @@ uint64_t komodo_seed(int32_t height)
     return(seed);
 }
 
-uint32_t komodo_txtime(CScript &opret,uint64_t *valuep,uint256 hash, int32_t n, char *destaddr)
+uint32_t hush_txtime(CScript &opret,uint64_t *valuep,uint256 hash, int32_t n, char *destaddr)
 {
     CTxDestination address; CTransaction tx; uint256 hashBlock; int32_t numvouts;
     *valuep = 0;
@@ -642,32 +637,6 @@ CBlockIndex *hush_getblockindex(uint256 hash)
 {
     BlockMap::const_iterator it = mapBlockIndex.find(hash);
     return((it != mapBlockIndex.end()) ? it->second : NULL);
-}
-
-uint32_t komodo_txtime2(uint64_t *valuep,uint256 hash,int32_t n,char *destaddr)
-{
-    CTxDestination address; CBlockIndex *pindex; CTransaction tx; uint256 hashBlock; uint32_t txtime = 0;
-    *valuep = 0;
-    if (!GetTransaction(hash, tx,
-#ifndef HUSH_ZCASH
-                        Params().GetConsensus(),
-#endif
-                        hashBlock, true))
-    {
-        //fprintf(stderr,"ERROR: %s/v%d locktime.%u\n",hash.ToString().c_str(),n,(uint32_t)tx.nLockTime);
-        return(0);
-    }
-    if ( (pindex= hush_getblockindex(hashBlock)) != 0 )
-        txtime = pindex->nTime;
-    else txtime = tx.nLockTime;
-    //fprintf(stderr,"%s/v%d locktime.%u\n",hash.ToString().c_str(),n,(uint32_t)tx.nLockTime);
-    if ( n < tx.vout.size() )
-    {
-        *valuep = tx.vout[n].nValue;
-        if (ExtractDestination(tx.vout[n].scriptPubKey, address))
-            strcpy(destaddr,CBitcoinAddress(address).ToString().c_str());
-    }
-    return(txtime);
 }
 
 bool hush_checkopret(CBlock *pblock, CScript &merkleroot)
@@ -913,7 +882,7 @@ void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height)
         }
     }
     fprintf(stderr,"komodo_minerid height.%d null pindex\n",height);
-    return(komodo_electednotary(&numnotaries,pubkey33,height,timestamp));
+    return(hush_electednotary(&numnotaries,pubkey33,height,timestamp));
 }*/
 
 int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blocktimes[66],int32_t *nonzpkeysp,int32_t height)
@@ -1029,7 +998,7 @@ int32_t hush_checkpoint(int32_t *notarized_heightp,int32_t nHeight,uint256 hash)
     int32_t notarized_height,MoMdepth; uint256 MoM,notarized_hash,notarized_desttxid; CBlockIndex *notary,*pindex;
     if ( (pindex= chainActive.LastTip()) == 0 )
         return(-1);
-    notarized_height   = komodo_notarizeddata(pindex->GetHeight(),&notarized_hash,&notarized_desttxid);
+    notarized_height   = hush_notarizeddata(pindex->GetHeight(),&notarized_hash,&notarized_desttxid);
     *notarized_heightp = notarized_height;
     BlockMap::const_iterator it;
     if ( notarized_height >= 0 && notarized_height <= pindex->GetHeight() && (it = mapBlockIndex.find(notarized_hash)) != mapBlockIndex.end() && (notary = it->second) != NULL )
@@ -1282,7 +1251,7 @@ int8_t hush_segid(int32_t nocache,int32_t height)
             {
                 txid = block.vtx[txn_count-1].vin[0].prevout.hash;
                 vout = block.vtx[txn_count-1].vin[0].prevout.n;
-                txtime = komodo_txtime(opret,&value,txid,vout,destaddr);
+                txtime = hush_txtime(opret,&value,txid,vout,destaddr);
                 if ( ExtractDestination(block.vtx[txn_count-1].vout[0].scriptPubKey,voutaddress) )
                 {
                     strcpy(voutaddr,CBitcoinAddress(voutaddress).ToString().c_str());
@@ -1493,7 +1462,7 @@ int32_t hush_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *scri
     if ( len >= sizeof(uint32_t) && len <= sizeof(scriptbuf) )
     {
         memcpy(scriptbuf,script,len);
-        if ( komodo_voutupdate(true,&isratification,0,scriptbuf,len,height,uint256(),1,1,&voutmask,&specialtx,&notarizedheight,0,1,0,timestamp) != -2 )
+        if ( hush_voutupdate(true,&isratification,0,scriptbuf,len,height,uint256(),1,1,&voutmask,&specialtx,&notarizedheight,0,1,0,timestamp) != -2 )
         {
             fprintf(stderr, "<<<<<<INVALID NOTARIZATION ht.%i\n",notarizedheight);
             return(0);

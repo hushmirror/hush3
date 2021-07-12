@@ -25,7 +25,7 @@ struct hush_event *hush_eventadd(struct hush_state *sp,int32_t height,char *symb
     struct hush_event *ep=0; uint16_t len = (uint16_t)(sizeof(*ep) + datalen);
     if ( sp != 0 && SMART_CHAIN_SYMBOL[0] != 0 )
     {
-        portable_mutex_lock(&komodo_mutex);
+        portable_mutex_lock(&hush_mutex);
         ep = (struct hush_event *)calloc(1,len);
         ep->len = len;
         ep->height = height;
@@ -35,7 +35,7 @@ struct hush_event *hush_eventadd(struct hush_state *sp,int32_t height,char *symb
             memcpy(ep->space,data,datalen);
         sp->Hush_events = (struct hush_event **)realloc(sp->Hush_events,(1 + sp->Hush_numeventss) * sizeof(*sp->Hush_events));
         sp->Hush_events[sp->Hush_numeventss++] = ep;
-        portable_mutex_unlock(&komodo_mutex);
+        portable_mutex_unlock(&hush_mutex);
     }
     return(ep);
 }
@@ -62,7 +62,7 @@ void hush_eventadd_notarized(struct hush_state *sp,char *symbol,int32_t height,c
         strncpy(N.dest,dest,sizeof(N.dest)-1);
         hush_eventadd(sp,height,symbol,HUSH_EVENT_NOTARIZED,(uint8_t *)&N,sizeof(N));
         if ( sp != 0 )
-            komodo_notarized_update(sp,height,notarizedheight,notarized_hash,notarized_desttxid,MoM,MoMdepth);
+            hush_notarized_update(sp,height,notarizedheight,notarized_hash,notarized_desttxid,MoM,MoMdepth);
     }
 }
 
@@ -75,7 +75,7 @@ void hush_eventadd_pubkeys(struct hush_state *sp,char *symbol,int32_t height,uin
     memcpy(P.pubkeys,pubkeys,33 * num);
     hush_eventadd(sp,height,symbol,HUSH_EVENT_RATIFY,(uint8_t *)&P,(int32_t)(sizeof(P.num) + 33 * num));
     if ( sp != 0 )
-        komodo_notarysinit(height,pubkeys,num);
+        hush_notarysinit(height,pubkeys,num);
 }
 
 void hush_eventadd_pricefeed(struct hush_state *sp,char *symbol,int32_t height,uint32_t *prices,uint8_t num)

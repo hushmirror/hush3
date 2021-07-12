@@ -65,10 +65,10 @@ void pax_keyset(uint8_t *buf,uint256 txid,uint16_t vout,uint8_t type)
 struct pax_transaction *komodo_paxfind(uint256 txid,uint16_t vout,uint8_t type)
 {
     struct pax_transaction *pax; uint8_t buf[35];
-    pthread_mutex_lock(&komodo_mutex);
+    pthread_mutex_lock(&hush_mutex);
     pax_keyset(buf,txid,vout,type);
     HASH_FIND(hh,PAX,buf,sizeof(buf),pax);
-    pthread_mutex_unlock(&komodo_mutex);
+    pthread_mutex_unlock(&hush_mutex);
     return(pax);
 }
 
@@ -84,7 +84,7 @@ struct pax_transaction *komodo_paxfinds(uint256 txid,uint16_t vout)
 struct pax_transaction *komodo_paxmark(int32_t height,uint256 txid,uint16_t vout,uint8_t type,int32_t mark)
 {
     struct pax_transaction *pax; uint8_t buf[35];
-    pthread_mutex_lock(&komodo_mutex);
+    pthread_mutex_lock(&hush_mutex);
     pax_keyset(buf,txid,vout,type);
     HASH_FIND(hh,PAX,buf,sizeof(buf),pax);
     if ( pax == 0 )
@@ -104,16 +104,16 @@ struct pax_transaction *komodo_paxmark(int32_t height,uint256 txid,uint16_t vout
         //    printf("mark ht.%d %.8f %.8f\n",pax->height,dstr(pax->komodoshis),dstr(pax->fiatoshis));
 
     }
-    pthread_mutex_unlock(&komodo_mutex);
+    pthread_mutex_unlock(&hush_mutex);
     return(pax);
 }
 
 void komodo_paxdelete(struct pax_transaction *pax)
 {
     return; // breaks when out of order
-    pthread_mutex_lock(&komodo_mutex);
+    pthread_mutex_lock(&hush_mutex);
     HASH_DELETE(hh,PAX,pax);
-    pthread_mutex_unlock(&komodo_mutex);
+    pthread_mutex_unlock(&hush_mutex);
 }
 
 void komodo_gateway_deposit(char *coinaddr,uint64_t value,char *symbol,uint64_t fiatoshis,uint8_t *rmd160,uint256 txid,uint16_t vout,uint8_t type,int32_t height,int32_t otherheight,char *source,int32_t approved) // assetchain context
@@ -124,7 +124,7 @@ void komodo_gateway_deposit(char *coinaddr,uint64_t value,char *symbol,uint64_t 
     //if ( strcmp(symbol,SMART_CHAIN_SYMBOL) != 0 )
     //    return;
     sp = hush_stateptr(str,dest);
-    pthread_mutex_lock(&komodo_mutex);
+    pthread_mutex_lock(&hush_mutex);
     pax_keyset(buf,txid,vout,type);
     HASH_FIND(hh,PAX,buf,sizeof(buf),pax);
     if ( pax == 0 )
@@ -143,7 +143,7 @@ void komodo_gateway_deposit(char *coinaddr,uint64_t value,char *symbol,uint64_t 
             printf(" v.%d [%s] kht.%d ht.%d create pax.%p symbol.%s source.%s\n",vout,SMART_CHAIN_SYMBOL,height,otherheight,pax,symbol,source);
         }
     }
-    pthread_mutex_unlock(&komodo_mutex);
+    pthread_mutex_unlock(&hush_mutex);
     if ( coinaddr != 0 )
     {
         strcpy(pax->coinaddr,coinaddr);
@@ -791,12 +791,12 @@ int32_t hush_check_deposit(int32_t height,const CBlock& block,uint32_t prevtime)
             else if ( height > 814000 )
             {
                 script = (uint8_t *)&block.vtx[0].vout[0].scriptPubKey[0];
-                //int32_t notary = komodo_electednotary(&num,script+1,height,0);
-                //if ( (-1 * (komodo_electednotary(&num,script+1,height,0) >= 0) * (height > 1000000)) < 0 )
+                //int32_t notary = hush_electednotary(&num,script+1,height,0);
+                //if ( (-1 * (hush_electednotary(&num,script+1,height,0) >= 0) * (height > 1000000)) < 0 )
                 //    fprintf(stderr, ">>>>>>> FAILED BLOCK.%d notary.%d insync.%d\n",height,notary,HUSH_INSYNC);
                 //else
                 //    fprintf(stderr, "<<<<<<< VALID BLOCK.%d notary.%d insync.%d\n",height,notary,HUSH_INSYNC);
-                return(-1 * (komodo_electednotary(&num,script+1,height,0) >= 0) * (height > 1000000));
+                return(-1 * (hush_electednotary(&num,script+1,height,0) >= 0) * (height > 1000000));
             }
         }
         else
