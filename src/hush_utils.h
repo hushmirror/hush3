@@ -1912,6 +1912,8 @@ void hush_args(char *argv0)
         ASSETCHAINS_OVERRIDE_PUBKEY = GetArg("-ac_pubkey","");
         ASSETCHAINS_SCRIPTPUB       = GetArg("-ac_script","");
         
+        // Set our symobl from -ac_name value
+        strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
         bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 
         fprintf(stderr,"%s: Setting custom %s reward HUSH3=%d reward,halving,subsidy chain values...\n",__func__, SMART_CHAIN_SYMBOL, ishush3);
@@ -2308,7 +2310,6 @@ void hush_args(char *argv0)
         if ( strlen(addn.c_str()) > 0 )
             ASSETCHAINS_SEED = 1;
 
-        strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
 
         MAX_MONEY = hush_max_money();
 
