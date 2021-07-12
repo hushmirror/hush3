@@ -1903,10 +1903,19 @@ void hush_args(char *argv0)
         Split(GetArg("-ac_halving",""), sizeof(ASSETCHAINS_HALVING)/sizeof(*ASSETCHAINS_HALVING),  ASSETCHAINS_HALVING, 0);
         Split(GetArg("-ac_reward",""), sizeof(ASSETCHAINS_REWARD)/sizeof(*ASSETCHAINS_REWARD),  ASSETCHAINS_REWARD, 0);
 
+        MAX_BLOCK_SIGOPS            = 60000;
+        ASSETCHAINS_TXPOW           = GetArg("-ac_txpow",0) & 3;
+        ASSETCHAINS_FOUNDERS        = GetArg("-ac_founders",0);// & 1;
+		ASSETCHAINS_FOUNDERS_REWARD = GetArg("-ac_founders_reward",0);
+        ASSETCHAINS_SUPPLY          = GetArg("-ac_supply",10);
+        ASSETCHAINS_COMMISSION      = GetArg("-ac_perc",0);
+        ASSETCHAINS_OVERRIDE_PUBKEY = GetArg("-ac_pubkey","");
+        ASSETCHAINS_SCRIPTPUB       = GetArg("-ac_script","");
+        
         bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 
+        fprintf(stderr,"%s: Setting custom %s reward HUSH3=%d reward,halving,subsidy chain values...\n",__func__, SMART_CHAIN_SYMBOL, ishush3);
         if(ishush3) {
-            fprintf(stderr,"%s: Setting custom HUSH3 reward,halving,subsidy chain values...\n",__func__);
             // Migrated from hushd script
             ASSETCHAINS_CC           = 2;
             ASSETCHAINS_BLOCKTIME    = 75;
@@ -1918,7 +1927,6 @@ void hush_args(char *argv0)
             ASSETCHAINS_SAPLING      = 1;
             // this corresponds to FR address RHushEyeDm7XwtaTWtyCbjGQumYyV8vMjn
             ASSETCHAINS_SCRIPTPUB       = "76a9145eb10cf64f2bab1b457f1f25e658526155928fac88ac";
-
             Split("128,340000,5422111" , sizeof(ASSETCHAINS_ENDSUBSIDY)/sizeof(*ASSETCHAINS_ENDSUBSIDY),  ASSETCHAINS_ENDSUBSIDY, 0);
             Split("129,340000,840000", sizeof(ASSETCHAINS_HALVING)/sizeof(*ASSETCHAINS_HALVING),  ASSETCHAINS_HALVING, 0);
         Split("0,1125000000,562500000" , sizeof(ASSETCHAINS_REWARD)/sizeof(*ASSETCHAINS_REWARD),  ASSETCHAINS_REWARD, 0);
@@ -1952,11 +1960,6 @@ void hush_args(char *argv0)
             }
         }
 
-        MAX_BLOCK_SIGOPS            = 60000;
-        ASSETCHAINS_TXPOW           = GetArg("-ac_txpow",0) & 3;
-        ASSETCHAINS_FOUNDERS        = GetArg("-ac_founders",0);// & 1;
-		ASSETCHAINS_FOUNDERS_REWARD = GetArg("-ac_founders_reward",0);
-        ASSETCHAINS_SUPPLY          = GetArg("-ac_supply",10);
         if ( ASSETCHAINS_SUPPLY > (uint64_t)90*1000*1000000 )
         {
             fprintf(stderr,"-ac_supply must be less than 90 billion, derpz\n");
@@ -1965,9 +1968,6 @@ void hush_args(char *argv0)
         if(fDebug)
             fprintf(stderr,"ASSETCHAINS_SUPPLY %llu\n",(long long)ASSETCHAINS_SUPPLY);
         
-        ASSETCHAINS_COMMISSION      = GetArg("-ac_perc",0);
-        ASSETCHAINS_OVERRIDE_PUBKEY = GetArg("-ac_pubkey","");
-        ASSETCHAINS_SCRIPTPUB       = GetArg("-ac_script","");
         ASSETCHAINS_BEAMPORT        = GetArg("-ac_beam",0);
         ASSETCHAINS_CODAPORT        = GetArg("-ac_coda",0);
         ASSETCHAINS_CBOPRET         = GetArg("-ac_cbopret",0);
@@ -2330,6 +2330,9 @@ void hush_args(char *argv0)
         if ( GetArg("-port",0) != 0 )
         {
             ASSETCHAINS_P2PPORT = GetArg("-port",0);
+            if(ishush3) {
+                ASSETCHAINS_P2PPORT = 18030;
+            }
         if(fDebug)
             fprintf(stderr,"set p2pport.%u\n",ASSETCHAINS_P2PPORT);
         } else ASSETCHAINS_P2PPORT = tmpport;
