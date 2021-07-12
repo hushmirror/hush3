@@ -1490,13 +1490,9 @@ uint16_t hush_port(char *symbol,uint64_t supply,uint32_t *magicp,uint8_t *extrap
 {
     if(fDebug)
         fprintf(stderr,"%s: extralen=%d\n",__func__,extralen);
-    if ( strcmp("SPECIAL",symbol) == 0 )
-    {
-        *magicp = 0xdeadbeef;
-        return(6969);
-    }
+
     *magicp = hush_smartmagic(symbol,supply,extraptr,extralen);
-    if(fDebug)
+    //if(fDebug)
         fprintf(stderr,"%s: extralen=%d, supply=%lu\n",__func__,extralen, supply);
 
     return(hush_smartport(*magicp,extralen));
@@ -1879,7 +1875,14 @@ void hush_args(char *argv0)
             printf("ASSETCHAINS_ALGO, %s not supported. using equihash\n", selectedAlgo.c_str());
         }
 
+        // Set our symobl from -ac_name value
+        strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
+        bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
+
         ASSETCHAINS_LASTERA = GetArg("-ac_eras", 1);
+        if(ishush3) {
+            ASSETCHAINS_LASTERA = 3;
+        }
         if ( ASSETCHAINS_LASTERA < 1 || ASSETCHAINS_LASTERA > ASSETCHAINS_MAX_ERAS )
         {
             ASSETCHAINS_LASTERA = 1;
@@ -1912,16 +1915,12 @@ void hush_args(char *argv0)
         ASSETCHAINS_OVERRIDE_PUBKEY = GetArg("-ac_pubkey","");
         ASSETCHAINS_SCRIPTPUB       = GetArg("-ac_script","");
         
-        // Set our symobl from -ac_name value
-        strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
-        bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 
         fprintf(stderr,"%s: Setting custom %s reward HUSH3=%d reward,halving,subsidy chain values...\n",__func__, SMART_CHAIN_SYMBOL, ishush3);
         if(ishush3) {
             // Migrated from hushd script
             ASSETCHAINS_CC           = 2;
-            ASSETCHAINS_BLOCKTIME    = 75;
-            ASSETCHAINS_LASTERA      = 3;
+            ASSETCHAINS_BLOCKTIME    = 150; // this will change to 75 at the correct block
             ASSETCHAINS_COMMISSION   = 11111111;
             // 6250000 - (Sprout pool at block 500,000)
             ASSETCHAINS_SUPPLY       = 6178674;
@@ -1929,9 +1928,7 @@ void hush_args(char *argv0)
             ASSETCHAINS_SAPLING      = 1;
             // this corresponds to FR address RHushEyeDm7XwtaTWtyCbjGQumYyV8vMjn
             ASSETCHAINS_SCRIPTPUB       = "76a9145eb10cf64f2bab1b457f1f25e658526155928fac88ac";
-            Split("128,340000,5422111" , sizeof(ASSETCHAINS_ENDSUBSIDY)/sizeof(*ASSETCHAINS_ENDSUBSIDY),  ASSETCHAINS_ENDSUBSIDY, 0);
-            Split("129,340000,840000", sizeof(ASSETCHAINS_HALVING)/sizeof(*ASSETCHAINS_HALVING),  ASSETCHAINS_HALVING, 0);
-        Split("0,1125000000,562500000" , sizeof(ASSETCHAINS_REWARD)/sizeof(*ASSETCHAINS_REWARD),  ASSETCHAINS_REWARD, 0);
+
             // Over-ride HUSH3 values from CLI params. Changing our blocktime to 75s changes things
             ASSETCHAINS_REWARD[0]     = 0;
             ASSETCHAINS_REWARD[1]     = 1125000000;
