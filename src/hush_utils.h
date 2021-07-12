@@ -1473,7 +1473,14 @@ uint32_t hush_smartmagic(char *symbol,uint64_t supply,uint8_t *extraptr,int32_t 
             fprintf(stderr,"%02x",extraptr[i]);
         fprintf(stderr," extralen=%d crc0=%x\n",extralen,crc0);
     }
-    return(calc_crc32(crc0,buf,len));
+
+    //TODO: why is this needed?
+    bool ishush3 = strncmp(symbol, "HUSH3",5) == 0 ? true : false;
+    if(ishush3) {
+        return HUSH_MAGIC;
+    } else {
+        return(calc_crc32(crc0,buf,len));
+    }
 }
 
 uint16_t hush_smartport(uint32_t magic,int32_t extralen)
