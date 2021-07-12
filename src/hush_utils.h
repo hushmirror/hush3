@@ -2310,7 +2310,6 @@ void hush_args(char *argv0)
         if ( strlen(addn.c_str()) > 0 )
             ASSETCHAINS_SEED = 1;
 
-
         MAX_MONEY = hush_max_money();
 
         if ( (baseid = hush_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
@@ -2332,6 +2331,7 @@ void hush_args(char *argv0)
         {
             ASSETCHAINS_P2PPORT = GetArg("-port",0);
             if(ishush3) {
+                fprintf(stderr,"set HUSH3 p2pport.%u\n",ASSETCHAINS_P2PPORT);
                 ASSETCHAINS_P2PPORT = 18030;
             }
         if(fDebug)

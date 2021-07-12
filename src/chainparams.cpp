@@ -521,11 +521,15 @@ void hush_setactivation(int32_t height)
 
 void *chainparams_commandline() {
     CChainParams::CCheckpointData checkpointData;
-    if(fDebug) {
+    //if(fDebug) {
         fprintf(stderr,"chainparams_commandline called with port=%u\n", ASSETCHAINS_P2PPORT);
-    }
+    //}
     if ( SMART_CHAIN_SYMBOL[0] != 0 )
     {
+        if (strcmp(SMART_CHAIN_SYMBOL,"HUSH3") == 0) {
+            ASSETCHAINS_P2PPORT = 18030;
+        }
+
         if ( ASSETCHAINS_BLOCKTIME != 60 )
         {
             pCurrentParams->consensus.nMaxFutureBlockTime = 7 * ASSETCHAINS_BLOCKTIME; // 7 blocks
