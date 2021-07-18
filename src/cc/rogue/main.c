@@ -837,7 +837,7 @@ int32_t rogue_progress(struct rogue_state *rs,int32_t waitflag,uint64_t seed,cha
         hexstr[i<<1] = 0;
         if ( 0 )
         {
-            sprintf(cmd,"./komodo-cli -ac_name=ROGUE cclib keystrokes 17 \\\"[%%22%s%%22,%%22%s%%22]\\\" >> keystrokes.log",Gametxidstr,hexstr);
+            sprintf(cmd,"./hush-cli -ac_name=ROGUE cclib keystrokes 17 \\\"[%%22%s%%22,%%22%s%%22]\\\" >> keystrokes.log",Gametxidstr,hexstr);
             if ( system(cmd) != 0 )
                 fprintf(stderr,"error issuing (%s)\n",cmd);
         }
@@ -897,7 +897,7 @@ int32_t rogue_setplayerdata(struct rogue_state *rs,char *gametxidstr)
     if ( 0 )
     {
         sprintf(fname,"%s.gameinfo",gametxidstr);
-        sprintf(cmd,"./komodo-cli -ac_name=ROGUE cclib gameinfo 17 \\\"[%%22%s%%22]\\\" > %s",gametxidstr,fname);
+        sprintf(cmd,"./hush-cli -ac_name=ROGUE cclib gameinfo 17 \\\"[%%22%s%%22]\\\" > %s",gametxidstr,fname);
         if ( system(cmd) != 0 )
             fprintf(stderr,"error issuing (%s)\n",cmd);
         else filestr = (char *)OS_fileptr(&allocsize,fname);
@@ -1029,7 +1029,7 @@ int main(int argc, char **argv, char **envp)
             fclose(fp);
         if ( ROGUE_PORT == 0 )
         {
-            printf("you must copy ROGUE.conf from ~/.komodo/ROGUE/ROGUE.conf (or equivalent location) to current dir\n");
+            printf("you must copy ROGUE.conf from ~/.hush/ROGUE/ROGUE.conf (or equivalent location) to current dir\n");
             return(-1);
         }
         return(rogue(argc,argv,envp));
