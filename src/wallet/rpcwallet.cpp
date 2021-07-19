@@ -683,7 +683,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         //for (i=0; i<32; i++)
         //    printf("%02x",((uint8_t *)&sig)[i]);
         //printf(" sig for keylen.%d + valuesize.%d\n",keylen,refvaluesize);
-        ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "KMD" : SMART_CHAIN_SYMBOL)));
+        ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH3" : SMART_CHAIN_SYMBOL)));
         height = chainActive.LastTip()->GetHeight();
         if ( memcmp(&zeroes,&refpubkey,sizeof(refpubkey)) != 0 )
             ret.push_back(Pair("owner",refpubkey.GetHex()));

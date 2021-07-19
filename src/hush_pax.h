@@ -349,12 +349,12 @@ void komodo_pvals(int32_t height,uint32_t *pvals,uint8_t numpvals)
             KMDBTC = ((double)kmdbtc / (1000000000. * 1000.));
             BTCUSD = PAX_BTCUSD(height,btcusd);
             CNYUSD = ((double)cnyusd / 1000000000.);
-            portable_mutex_lock(&komodo_mutex);
+            portable_mutex_lock(&hush_mutex);
             PVALS = (uint32_t *)realloc(PVALS,(NUM_PRICES+1) * sizeof(*PVALS) * 36);
             PVALS[36 * NUM_PRICES] = height;
             memcpy(&PVALS[36 * NUM_PRICES + 1],pvals,sizeof(*pvals) * 35);
             NUM_PRICES++;
-            portable_mutex_unlock(&komodo_mutex);
+            portable_mutex_unlock(&hush_mutex);
             if ( 0 )
                 printf("OP_RETURN.%d KMD %.8f BTC %.6f CNY %.6f NUM_PRICES.%d (%llu %llu %llu)\n",height,KMDBTC,BTCUSD,CNYUSD,NUM_PRICES,(long long)kmdbtc,(long long)btcusd,(long long)cnyusd);
         }
@@ -502,9 +502,9 @@ uint64_t _komodo_paxprice(uint64_t *kmdbtcp,uint64_t *btcusdp,int32_t height,cha
     int32_t baseid=-1,relid=-1,i; uint32_t *ptr,*pvals;
     if ( height > 10 )
         height -= 10;
-    if ( (baseid= komodo_baseid(base)) >= 0 && (relid= komodo_baseid(rel)) >= 0 )
+    if ( (baseid= hush_baseid(base)) >= 0 && (relid= hush_baseid(rel)) >= 0 )
     {
-        //portable_mutex_lock(&komodo_mutex);
+        //portable_mutex_lock(&hush_mutex);
         for (i=NUM_PRICES-1; i>=0; i--)
         {
             ptr = &PVALS[36 * i];
@@ -516,13 +516,13 @@ uint64_t _komodo_paxprice(uint64_t *kmdbtcp,uint64_t *btcusdp,int32_t height,cha
                     *kmdbtcp = pvals[MAX_CURRENCIES] / 539;
                     *btcusdp = pvals[MAX_CURRENCIES + 1] / 539;
                 }
-                //portable_mutex_unlock(&komodo_mutex);
+                //portable_mutex_unlock(&hush_mutex);
                 if ( kmdbtc != 0 && btcusd != 0 )
                     return(komodo_paxcalc(height,pvals,baseid,relid,basevolume,kmdbtc,btcusd));
                 else return(0);
             }
         }
-        //portable_mutex_unlock(&komodo_mutex);
+        //portable_mutex_unlock(&hush_mutex);
     } //else printf("paxprice invalid base.%s %d, rel.%s %d\n",base,baseid,rel,relid);
     return(0);
 }
@@ -607,7 +607,7 @@ uint64_t _komodo_paxpriceB(uint64_t seed,int32_t height,char *base,char *rel,uin
 
 uint64_t komodo_paxpriceB(uint64_t seed,int32_t height,char *base,char *rel,uint64_t basevolume)
 {
-    uint64_t baseusd,basekmd,usdkmd; int32_t baseid = komodo_baseid(base);
+    uint64_t baseusd,basekmd,usdkmd; int32_t baseid = hush_baseid(base);
     if ( height >= 236000 && strcmp(rel,"kmd") == 0 )
     {
         usdkmd = _komodo_paxpriceB(seed,height,(char *)"USD",(char *)"KMD",SATOSHIDEN);
@@ -623,7 +623,7 @@ uint64_t komodo_paxpriceB(uint64_t seed,int32_t height,char *base,char *rel,uint
 
 /*uint64_t komodo_paxpriceB(uint64_t seed,int32_t height,char *base,char *rel,uint64_t basevolume)
 {
-    uint64_t baseusd,basekmd,usdkmd; int32_t baseid = komodo_baseid(base);
+    uint64_t baseusd,basekmd,usdkmd; int32_t baseid = hush_baseid(base);
     //if ( strcmp(rel,"KMD") != 0 || baseid < 0 || MINDENOMS[baseid] == MINDENOMS[USD] )
     //    return(_komodo_paxpriceB(seed,height,base,rel,basevolume));
     //else
@@ -651,7 +651,7 @@ uint64_t komodo_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uin
         return(0);
     }
     *seedp = komodo_seed(height);
-    portable_mutex_lock(&komodo_mutex);
+    portable_mutex_lock(&hush_mutex);
     for (i=0; i<17; i++)
     {
         if ( (price= komodo_paxpriceB(*seedp,height-i,base,rel,basevolume)) != 0 )
@@ -682,7 +682,7 @@ uint64_t komodo_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uin
         if ( height < 165000 || height > 236000 )
             break;
     }
-    portable_mutex_unlock(&komodo_mutex);
+    portable_mutex_unlock(&hush_mutex);
     if ( nonz != 0 )
         sum /= nonz;
     //printf("-> %lld %s/%s i.%d ht.%d\n",(long long)sum,base,rel,i,height);
@@ -692,7 +692,7 @@ uint64_t komodo_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uin
 int32_t komodo_paxprices(int32_t *heights,uint64_t *prices,int32_t max,char *base,char *rel)
 {
     int32_t baseid=-1,relid=-1,i,num = 0; uint32_t *ptr;
-    if ( (baseid= komodo_baseid(base)) >= 0 && (relid= komodo_baseid(rel)) >= 0 )
+    if ( (baseid= hush_baseid(base)) >= 0 && (relid= hush_baseid(rel)) >= 0 )
     {
         for (i=NUM_PRICES-1; i>=0; i--)
         {
@@ -726,7 +726,7 @@ uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pu
 {
     uint8_t shortflag = 0; char base[4]; int32_t i,baseid; uint8_t addrtype,rmd160[20]; int64_t komodoshis = 0;
     *seedp = komodo_seed(height);
-    if ( (baseid= komodo_baseid(origbase)) < 0 || baseid == MAX_CURRENCIES )
+    if ( (baseid= hush_baseid(origbase)) < 0 || baseid == MAX_CURRENCIES )
     {
         if ( 0 && origbase[0] != 0 )
             printf("[%s] PAX_fiatdest illegal base.(%s)\n",SMART_CHAIN_SYMBOL,origbase);

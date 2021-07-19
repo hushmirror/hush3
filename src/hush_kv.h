@@ -104,7 +104,7 @@ void komodo_kvupdate(uint8_t *opretbuf,int32_t opretlen,uint64_t value)
 {
     static uint256 zeroes;
     uint32_t flags; uint256 pubkey,refpubkey,sig; int32_t i,refvaluesize,hassig,coresize,haspubkey,height,kvheight; uint16_t keylen,valuesize,newflag = 0; uint8_t *key,*valueptr,keyvalue[DRAGON_MAXSCRIPTSIZE*8]; struct komodo_kv *ptr; char *transferpubstr,*tstr; uint64_t fee;
-    if ( SMART_CHAIN_SYMBOL[0] == 0 ) // disable KV for KMD
+    if ( SMART_CHAIN_SYMBOL[0] == 0 ) // disable KV
         return;
     dragon_rwnum(0,&opretbuf[1],sizeof(keylen),&keylen);
     dragon_rwnum(0,&opretbuf[3],sizeof(valuesize),&valuesize);

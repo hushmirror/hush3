@@ -811,7 +811,7 @@ char *bitcoin_address(char *coinaddr,uint8_t addrtype,uint8_t *pubkey_or_rmd160,
 
 int32_t komodo_is_issuer()
 {
-    if ( SMART_CHAIN_SYMBOL[0] != 0 && komodo_baseid(SMART_CHAIN_SYMBOL) >= 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 && hush_baseid(SMART_CHAIN_SYMBOL) >= 0 )
         return(1);
     else return(0);
 }
@@ -1295,7 +1295,7 @@ void dragon_initQ(queue_t *Q,char *name)
         free(item);
 }
 
-uint16_t _komodo_userpass(char *username,char *password,FILE *fp)
+uint16_t _hush_userpass(char *username,char *password,FILE *fp)
 {
     char *rpcuser,*rpcpassword,*str,line[8192]; uint16_t port = 0;
     rpcuser = rpcpassword = 0;
@@ -1366,10 +1366,10 @@ void hush_statefname(char *fname,char *symbol,char *str)
     //printf("test.(%s) -> [%s] statename.(%s) %s\n",test,SMART_CHAIN_SYMBOL,symbol,fname);
 }
 
-void komodo_configfile(char *symbol,uint16_t rpcport)
+void hush_configfile(char *symbol,uint16_t rpcport)
 {
     static char myusername[512],mypassword[8192];
-    FILE *fp; uint16_t kmdport; uint8_t buf2[33]; char fname[512],buf[128],username[512],password[8192]; uint32_t crc,r,r2,i;
+    FILE *fp; uint16_t hushport; uint8_t buf2[33]; char fname[512],buf[128],username[512],password[8192]; uint32_t crc,r,r2,i;
     if ( symbol != 0 && rpcport != 0 )
     {
         r = (uint32_t)time(NULL);
@@ -1398,13 +1398,13 @@ void komodo_configfile(char *symbol,uint16_t rpcport)
 #ifndef FROM_CLI
             if ( (fp= fopen(fname,"wb")) != 0 )
             {
-                fprintf(fp,"rpcuser=user%u\nrpcpassword=pass%s\nrpcport=%u\nserver=1\ntxindex=1\nrpcworkqueue=256\nrpcallowip=127.0.0.1\nrpcbind=127.0.0.1\n",crc,password,rpcport);
+                fprintf(fp,"rpcuser=user%u\nrpcpassword=pass%s\nrpcport=%u\nserver=1\ntxindex=1\nrpcworkqueue=4096\nrpcallowip=127.0.0.1\nrpcbind=127.0.0.1\n",crc,password,rpcport);
                 fclose(fp);
                 printf("Created (%s)\n",fname);
             } else printf("Couldnt create (%s)\n",fname);
 #endif
         } else {
-            _komodo_userpass(myusername,mypassword,fp);
+            _hush_userpass(myusername,mypassword,fp);
             mapArgs["-rpcpassword"] = mypassword;
             mapArgs["-rpcusername"] = myusername;
             //fprintf(stderr,"myusername.(%s)\n",myusername);
@@ -1415,43 +1415,39 @@ void komodo_configfile(char *symbol,uint16_t rpcport)
 #ifdef _WIN32
     while ( fname[strlen(fname)-1] != '\\' )
         fname[strlen(fname)-1] = 0;
-    strcat(fname,"komodo.conf");
+    strcat(fname,"HUSH3.conf");
 #else
     while ( fname[strlen(fname)-1] != '/' )
         fname[strlen(fname)-1] = 0;
 #ifdef __APPLE__
-    strcat(fname,"Komodo.conf");
+    strcat(fname,"HUSH3.conf");
 #else
-    strcat(fname,"komodo.conf");
+    strcat(fname,"HUSH3.conf");
 #endif
 #endif
     if ( (fp= fopen(fname,"rb")) != 0 )
     {
-        if ( (kmdport= _komodo_userpass(username,password,fp)) != 0 )
-            HUSH3_PORT = kmdport;
+        if ( (hushport= _hush_userpass(username,password,fp)) != 0 )
+            HUSH3_PORT = hushport;
         sprintf(HUSHUSERPASS,"%s:%s",username,password);
         fclose(fp);
         //printf("HUSH.(%s) -> userpass.(%s)\n",fname,HUSHUSERPASS);
-    } //else printf("couldnt open.(%s)\n",fname);
+    } else {
+        printf("could not open.(%s)\n",fname);
+    }
 }
 
-uint16_t komodo_userpass(char *userpass,char *symbol)
+uint16_t hush_userpass(char *userpass,char *symbol)
 {
     FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[HUSH_SMART_CHAIN_MAXLEN];
     userpass[0] = 0;
-    if ( strcmp("SPECIAL",symbol) == 0 )
-    {
-#ifdef __APPLE__
-        sprintf(confname,"Something.conf");
-#else
-        sprintf(confname,"Something.conf");
-#endif
-    }
-    else sprintf(confname,"%s.conf",symbol);
+
+    sprintf(confname,"%s.conf",symbol);
+
     hush_statefname(fname,symbol,confname);
     if ( (fp= fopen(fname,"rb")) != 0 )
     {
-        port = _komodo_userpass(username,password,fp);
+        port = _hush_userpass(username,password,fp);
         sprintf(userpass,"%s:%s",username,password);
         if ( strcmp(symbol,SMART_CHAIN_SYMBOL) == 0 )
             strcpy(ASSETCHAINS_USERPASS,userpass);
@@ -1477,7 +1473,14 @@ uint32_t hush_smartmagic(char *symbol,uint64_t supply,uint8_t *extraptr,int32_t 
             fprintf(stderr,"%02x",extraptr[i]);
         fprintf(stderr," extralen=%d crc0=%x\n",extralen,crc0);
     }
-    return(calc_crc32(crc0,buf,len));
+
+    //TODO: why is this needed?
+    bool ishush3 = strncmp(symbol, "HUSH3",5) == 0 ? true : false;
+    if(ishush3) {
+        return HUSH_MAGIC;
+    } else {
+        return(calc_crc32(crc0,buf,len));
+    }
 }
 
 uint16_t hush_smartport(uint32_t magic,int32_t extralen)
@@ -1494,13 +1497,9 @@ uint16_t hush_port(char *symbol,uint64_t supply,uint32_t *magicp,uint8_t *extrap
 {
     if(fDebug)
         fprintf(stderr,"%s: extralen=%d\n",__func__,extralen);
-    if ( strcmp("SPECIAL",symbol) == 0 )
-    {
-        *magicp = 0xdeadbeef;
-        return(6969);
-    }
+
     *magicp = hush_smartmagic(symbol,supply,extraptr,extralen);
-    if(fDebug)
+    //if(fDebug)
         fprintf(stderr,"%s: extralen=%d, supply=%lu\n",__func__,extralen, supply);
 
     return(hush_smartport(*magicp,extralen));
@@ -1739,7 +1738,7 @@ int8_t equihash_params_possible(uint64_t n, uint64_t k)
     *  EhBasicSolve
     *  EhOptimisedSolve
     *  EhIsValidSolution
-    * Alternatively change ASSETCHAINS_N and ASSETCHAINS_K in komodo_nk.h for fast testing.
+    * Alternatively change ASSETCHAINS_N and ASSETCHAINS_K in hush_nk.h for fast testing.
     */
     if ( k == 9 && (n == 200 || n == 210) )
         return(0);
@@ -1749,8 +1748,6 @@ int8_t equihash_params_possible(uint64_t n, uint64_t k)
         return(0);
     return(-1);
 }
-
-char *dragonfmtstr = (char *)"curl --url \"http://127.0.0.1:7776\" --data \"{\\\"conf\\\":\\\"%s.conf\\\",\\\"path\\\":\\\"${HOME#\"/\"}/.komodo/%s\\\",\\\"unitval\\\":\\\"20\\\",\\\"zcash\\\":1,\\\"RELAY\\\":-1,\\\"VALIDATE\\\":0,\\\"prefetchlag\\\":-1,\\\"poll\\\":100,\\\"active\\\":1,\\\"agent\\\":\\\"dragon\\\",\\\"method\\\":\\\"addcoin\\\",\\\"startpend\\\":4,\\\"endpend\\\":4,\\\"services\\\":129,\\\"maxpeers\\\":8,\\\"newcoin\\\":\\\"%s\\\",\\\"name\\\":\\\"%s\\\",\\\"hasheaders\\\":1,\\\"useaddmultisig\\\":0,\\\"netmagic\\\":\\\"%s\\\",\\\"p2p\\\":%u,\\\"rpc\\\":%u,\\\"pubval\\\":60,\\\"p2shval\\\":85,\\\"wifval\\\":188,\\\"txfee_satoshis\\\":\\\"10000\\\",\\\"isPoS\\\":0,\\\"minoutput\\\":10000,\\\"minconfirms\\\":2,\\\"genesishash\\\":\\\"027e3758c3a65b12aa1046462b486d0a63bfa1beae327897f56c5cfb7daaae71\\\",\\\"protover\\\":170002,\\\"genesisblock\\\":\\\"0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a000000000000000000000000000000000000000000000000000000000000000029ab5f490f0f0f200b00000000000000000000000000000000000000000000000000000000000000fd4005000d5ba7cda5d473947263bf194285317179d2b0d307119c2e7cc4bd8ac456f0774bd52b0cd9249be9d40718b6397a4c7bbd8f2b3272fed2823cd2af4bd1632200ba4bf796727d6347b225f670f292343274cc35099466f5fb5f0cd1c105121b28213d15db2ed7bdba490b4cedc69742a57b7c25af24485e523aadbb77a0144fc76f79ef73bd8530d42b9f3b9bed1c135ad1fe152923fafe98f95f76f1615e64c4abb1137f4c31b218ba2782bc15534788dda2cc08a0ee2987c8b27ff41bd4e31cd5fb5643dfe862c9a02ca9f90c8c51a6671d681d04ad47e4b53b1518d4befafefe8cadfb912f3d03051b1efbf1dfe37b56e93a741d8dfd80d576ca250bee55fab1311fc7b3255977558cdda6f7d6f875306e43a14413facdaed2f46093e0ef1e8f8a963e1632dcbeebd8e49fd16b57d49b08f9762de89157c65233f60c8e38a1f503a48c555f8ec45dedecd574a37601323c27be597b956343107f8bd80f3a925afaf30811df83c402116bb9c1e5231c70fff899a7c82f73c902ba54da53cc459b7bf1113db65cc8f6914d3618560ea69abd13658fa7b6af92d374d6eca9529f8bd565166e4fcbf2a8dfb3c9b69539d4d2ee2e9321b85b331925df195915f2757637c2805e1d4131e1ad9ef9bc1bb1c732d8dba4738716d351ab30c996c8657bab39567ee3b29c6d054b711495c0d52e1cd5d8e55b4f0f0325b97369280755b46a02afd54be4ddd9f77c22272b8bbb17ff5118fedbae2564524e797bd28b5f74f7079d532ccc059807989f94d267f47e724b3f1ecfe00ec9e6541c961080d8891251b84b4480bc292f6a180bea089fef5bbda56e1e41390d7c0e85ba0ef530f7177413481a226465a36ef6afe1e2bca69d2078712b3912bba1a99b1fbff0d355d6ffe726d2bb6fbc103c4ac5756e5bee6e47e17424ebcbf1b63d8cb90ce2e40198b4f4198689daea254307e52a25562f4c1455340f0ffeb10f9d8e914775e37d0edca019fb1b9c6ef81255ed86bc51c5391e0591480f66e2d88c5f4fd7277697968656a9b113ab97f874fdd5f2465e5559533e01ba13ef4a8f7a21d02c30c8ded68e8c54603ab9c8084ef6d9eb4e92c75b078539e2ae786ebab6dab73a09e0aa9ac575bcefb29e930ae656e58bcb513f7e3c17e079dce4f05b5dbc18c2a872b22509740ebe6a3903e00ad1abc55076441862643f93606e3dc35e8d9f2caef3ee6be14d513b2e062b21d0061de3bd56881713a1a5c17f5ace05e1ec09da53f99442df175a49bd154aa96e4949decd52fed79ccf7ccbce32941419c314e374e4a396ac553e17b5340336a1a25c22f9e42a243ba5404450b650acfc826a6e432971ace776e15719515e1634ceb9a4a35061b668c74998d3dfb5827f6238ec015377e6f9c94f38108768cf6e5c8b132e0303fb5a200368f845ad9d46343035a6ff94031df8d8309415bb3f6cd5ede9c135fdabcc030599858d803c0f85be7661c88984d88faa3d26fb0e9aac0056a53f1b5d0baed713c853c4a2726869a0a124a8a5bbc0fc0ef80c8ae4cb53636aa02503b86a1eb9836fcc259823e2692d921d88e1ffc1e6cb2bde43939ceb3f32a611686f539f8f7c9f0bf00381f743607d40960f06d347d1cd8ac8a51969c25e37150efdf7aa4c2037a2fd0516fb444525ab157a0ed0a7412b2fa69b217fe397263153782c0f64351fbdf2678fa0dc8569912dcd8e3ccad38f34f23bbbce14c6a26ac24911b308b82c7e43062d180baeac4ba7153858365c72c63dcf5f6a5b08070b730adb017aeae925b7d0439979e2679f45ed2f25a7edcfd2fb77a8794630285ccb0a071f5cce410b46dbf9750b0354aae8b65574501cc69efb5b6a43444074fee116641bb29da56c2b4a7f456991fc92b2\\\",\\\"debug\\\":0,\\\"seedipaddr\\\":\\\"%s\\\",\\\"sapling\\\":1,\\\"notarypay\\\":%i}\"";
 
 void hush_args(char *argv0)
 {
@@ -1767,15 +1764,9 @@ void hush_args(char *argv0)
     {
         HUSH_MININGTHREADS = GetArg("-genproclimit",-1);
     }
-    if ( (GetBoolArg("-exchange", false)) != 0 ) {
-        printf("The KMD-only feature -exchange is not supported by HUSH!\n");
-        printf("jl777 uses this \"feature\" to steal from his own users!\n");
-        printf("Learn more at https://duke.hush.is :)\n");
-        StartShutdown();
-    }
     DONATION_PUBKEY   = GetArg("-donation", "");
     NOTARY_PUBKEY     = GetArg("-pubkey", "");
-    HUSH_DEALERNODE = GetArg("-dealer",0);
+    HUSH_DEALERNODE   = GetArg("-dealer",0);
     HUSH_TESTNODE     = GetArg("-testnode",0);
 
     if ( strlen(NOTARY_PUBKEY.c_str()) == 66 )
@@ -1801,7 +1792,7 @@ void hush_args(char *argv0)
         }
     }
 
-	name = GetArg("-ac_name","");
+	name = GetArg("-ac_name","HUSH3");
     if ( argv0 != 0 )
     {
         len = (int32_t)strlen(argv0);
@@ -1816,12 +1807,17 @@ void hush_args(char *argv0)
             }
         }
     }
+    vector<string> HUSH_nodes= {"node1.hush.is","node2.hush.is","node3.hush.is",
+                                "node4.hush.is","node5.hush.is","node6.hush.is",
+                                "node7.hush.is","node8.hush.is"};
+    mapMultiArgs["-addnode"] = HUSH_nodes;
     HUSH_STOPAT              = GetArg("-stopat",0);
     MAX_REORG_LENGTH         = GetArg("-maxreorg",MAX_REORG_LENGTH);
     WITNESS_CACHE_SIZE       = MAX_REORG_LENGTH+10;
     ASSETCHAINS_CC           = GetArg("-ac_cc",0);
     HUSH_CCACTIVATE          = GetArg("-ac_ccactivate",0);
     ASSETCHAINS_BLOCKTIME    = GetArg("-ac_blocktime",60);
+    // We do not support ac_public=1 chains, Hush is a platform for privacy
     ASSETCHAINS_PUBLIC       = 0;
     ASSETCHAINS_PRIVATE      = GetArg("-ac_private",0);
     HUSH_SNAPSHOT_INTERVAL   = GetArg("-ac_snapshot",0);
@@ -1886,7 +1882,14 @@ void hush_args(char *argv0)
             printf("ASSETCHAINS_ALGO, %s not supported. using equihash\n", selectedAlgo.c_str());
         }
 
+        // Set our symobl from -ac_name value
+        strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
+        bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
+
         ASSETCHAINS_LASTERA = GetArg("-ac_eras", 1);
+        if(ishush3) {
+            ASSETCHAINS_LASTERA = 3;
+        }
         if ( ASSETCHAINS_LASTERA < 1 || ASSETCHAINS_LASTERA > ASSETCHAINS_MAX_ERAS )
         {
             ASSETCHAINS_LASTERA = 1;
@@ -1910,10 +1913,29 @@ void hush_args(char *argv0)
         Split(GetArg("-ac_halving",""), sizeof(ASSETCHAINS_HALVING)/sizeof(*ASSETCHAINS_HALVING),  ASSETCHAINS_HALVING, 0);
         Split(GetArg("-ac_reward",""), sizeof(ASSETCHAINS_REWARD)/sizeof(*ASSETCHAINS_REWARD),  ASSETCHAINS_REWARD, 0);
 
-        bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
+        MAX_BLOCK_SIGOPS            = 60000;
+        ASSETCHAINS_TXPOW           = GetArg("-ac_txpow",0) & 3;
+        ASSETCHAINS_FOUNDERS        = GetArg("-ac_founders",0);// & 1;
+		ASSETCHAINS_FOUNDERS_REWARD = GetArg("-ac_founders_reward",0);
+        ASSETCHAINS_SUPPLY          = GetArg("-ac_supply",10);
+        ASSETCHAINS_COMMISSION      = GetArg("-ac_perc",0);
+        ASSETCHAINS_OVERRIDE_PUBKEY = GetArg("-ac_pubkey","");
+        ASSETCHAINS_SCRIPTPUB       = GetArg("-ac_script","");
+        
 
+        fprintf(stderr,"%s: Setting custom %s reward HUSH3=%d reward,halving,subsidy chain values...\n",__func__, SMART_CHAIN_SYMBOL, ishush3);
         if(ishush3) {
-            fprintf(stderr,"%s: Setting custom HUSH3 reward,halving,subsidy chain values...\n",__func__);
+            // Migrated from hushd script
+            ASSETCHAINS_CC           = 2;
+            ASSETCHAINS_BLOCKTIME    = 150; // this will change to 75 at the correct block
+            ASSETCHAINS_COMMISSION   = 11111111;
+            // 6250000 - (Sprout pool at block 500,000)
+            ASSETCHAINS_SUPPLY       = 6178674;
+            ASSETCHAINS_FOUNDERS     = 1;
+            ASSETCHAINS_SAPLING      = 1;
+            // this corresponds to FR address RHushEyeDm7XwtaTWtyCbjGQumYyV8vMjn
+            ASSETCHAINS_SCRIPTPUB       = "76a9145eb10cf64f2bab1b457f1f25e658526155928fac88ac";
+
             // Over-ride HUSH3 values from CLI params. Changing our blocktime to 75s changes things
             ASSETCHAINS_REWARD[0]     = 0;
             ASSETCHAINS_REWARD[1]     = 1125000000;
@@ -1944,11 +1966,6 @@ void hush_args(char *argv0)
             }
         }
 
-        MAX_BLOCK_SIGOPS            = 60000;
-        ASSETCHAINS_TXPOW           = GetArg("-ac_txpow",0) & 3;
-        ASSETCHAINS_FOUNDERS        = GetArg("-ac_founders",0);// & 1;
-		ASSETCHAINS_FOUNDERS_REWARD = GetArg("-ac_founders_reward",0);
-        ASSETCHAINS_SUPPLY          = GetArg("-ac_supply",10);
         if ( ASSETCHAINS_SUPPLY > (uint64_t)90*1000*1000000 )
         {
             fprintf(stderr,"-ac_supply must be less than 90 billion, derpz\n");
@@ -1957,9 +1974,6 @@ void hush_args(char *argv0)
         if(fDebug)
             fprintf(stderr,"ASSETCHAINS_SUPPLY %llu\n",(long long)ASSETCHAINS_SUPPLY);
         
-        ASSETCHAINS_COMMISSION      = GetArg("-ac_perc",0);
-        ASSETCHAINS_OVERRIDE_PUBKEY = GetArg("-ac_pubkey","");
-        ASSETCHAINS_SCRIPTPUB       = GetArg("-ac_script","");
         ASSETCHAINS_BEAMPORT        = GetArg("-ac_beam",0);
         ASSETCHAINS_CODAPORT        = GetArg("-ac_coda",0);
         ASSETCHAINS_CBOPRET         = GetArg("-ac_cbopret",0);
@@ -1998,8 +2012,10 @@ void hush_args(char *argv0)
         if ( ASSETCHAINS_CC != 0 )
         {
             uint8_t prevCCi = 0;
-            ASSETCHAINS_CCLIB = GetArg("-ac_cclib","");
-            Split(GetArg("-ac_ccenable",""), sizeof(ccenables)/sizeof(*ccenables),  ccenables, 0);
+            ASSETCHAINS_CCLIB = GetArg("-ac_cclib","hush3");
+
+            // these are the enabled CCs on HUSH3 mainnet
+            Split(GetArg("-ac_ccenable","228,234,235,236,241"), sizeof(ccenables)/sizeof(*ccenables),  ccenables, 0);
             for (i=nonz=0; i<0x100; i++)
             {
                 if ( ccenables[i] != prevCCi && ccenables[i] != 0 )
@@ -2080,7 +2096,7 @@ void hush_args(char *argv0)
         }
         
         // HUSH will always be The First Pure Sapling Coin, no Sprout JoinSplits in our history! ;)
-        ASSETCHAINS_SAPLING = GetArg("-ac_sapling", -1);
+        ASSETCHAINS_SAPLING = GetArg("-ac_sapling", 1);
         if (ASSETCHAINS_SAPLING == -1)
         {
             ASSETCHAINS_OVERWINTER = GetArg("-ac_overwinter", -1);
@@ -2298,11 +2314,9 @@ void hush_args(char *argv0)
         if ( strlen(addn.c_str()) > 0 )
             ASSETCHAINS_SEED = 1;
 
-        strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
-
         MAX_MONEY = hush_max_money();
 
-        if ( (baseid = komodo_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
+        if ( (baseid = hush_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
         {
             //komodo_maxallowed(baseid);
             if(fDebug) 
@@ -2320,6 +2334,10 @@ void hush_args(char *argv0)
         if ( GetArg("-port",0) != 0 )
         {
             ASSETCHAINS_P2PPORT = GetArg("-port",0);
+            if(ishush3) {
+                fprintf(stderr,"set HUSH3 p2pport.%u\n",ASSETCHAINS_P2PPORT);
+                ASSETCHAINS_P2PPORT = 18030;
+            }
         if(fDebug)
             fprintf(stderr,"set p2pport.%u\n",ASSETCHAINS_P2PPORT);
         } else ASSETCHAINS_P2PPORT = tmpport;
@@ -2336,15 +2354,11 @@ void hush_args(char *argv0)
         //fprintf(stderr,"Got datadir.(%s)\n",dirname);
         if ( SMART_CHAIN_SYMBOL[0] != 0 )
         {
-            int32_t komodo_baseid(char *origbase);
+            int32_t hush_baseid(char *origbase);
             extern int COINBASE_MATURITY;
-            if ( strcmp(SMART_CHAIN_SYMBOL,"KMD") == 0 )
-            {
-                fprintf(stderr,"Oh hellz yezzz\n");
-            }
-            if ( (port= komodo_userpass(ASSETCHAINS_USERPASS,SMART_CHAIN_SYMBOL)) != 0 )
+            if ( (port= hush_userpass(ASSETCHAINS_USERPASS,SMART_CHAIN_SYMBOL)) != 0 )
                 ASSETCHAINS_RPCPORT = port;
-            else komodo_configfile(SMART_CHAIN_SYMBOL,ASSETCHAINS_P2PPORT + 1);
+            else hush_configfile(SMART_CHAIN_SYMBOL,ASSETCHAINS_P2PPORT + 1);
 
             if (ASSETCHAINS_CBMATURITY != 0)
                 COINBASE_MATURITY = ASSETCHAINS_CBMATURITY;
@@ -2365,21 +2379,7 @@ void hush_args(char *argv0)
         for (i=0; i<4; i++)
             sprintf(&magicstr[i<<1],"%02x",magic[i]);
         magicstr[8] = 0;
-#ifndef FROM_CLI
-        /*
-        sprintf(fname,"%s_7776",SMART_CHAIN_SYMBOL);
-        // TODO: why are we doing this again? Most users do not need this
-        if ( (fp= fopen(fname,"wb")) != 0 )
-        {
-            int8_t notarypay = 0;
-            if ( ASSETCHAINS_NOTARY_PAY[0] != 0 )
-                notarypay = 1;
-            fprintf(fp,dragonfmtstr,name.c_str(),name.c_str(),name.c_str(),name.c_str(),magicstr,ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT,"78.47.196.146",notarypay);
-            fclose(fp);
-            //printf("created (%s)\n",fname);
-        } else printf("error creating (%s)\n",fname);
-        */
-#endif
+
         if ( ASSETCHAINS_CC < 2 )
         {
             if ( HUSH_CCACTIVATE != 0 )
@@ -2402,24 +2402,24 @@ void hush_args(char *argv0)
             while ( fname[strlen(fname)-1] != '\\' )
                 fname[strlen(fname)-1] = 0;
             if ( iter == 0 )
-                strcat(fname,"Komodo\\komodo.conf");
+                strcat(fname,"Hush\\HUSH3\\HUSH3.conf");
             else strcat(fname,"Bitcoin\\bitcoin.conf");
 #else
             while ( fname[strlen(fname)-1] != '/' )
                 fname[strlen(fname)-1] = 0;
 #ifdef __APPLE__
             if ( iter == 0 )
-                strcat(fname,"Komodo/Komodo.conf");
+                strcat(fname,"Hush/HUSH3/HUSH3.conf");
             else strcat(fname,"Bitcoin/Bitcoin.conf");
 #else
             if ( iter == 0 )
-                strcat(fname,".komodo/komodo.conf");
+                strcat(fname,".hush/HUSH3/HUSH3.conf");
             else strcat(fname,".bitcoin/bitcoin.conf");
 #endif
 #endif
             if ( (fp= fopen(fname,"rb")) != 0 )
             {
-                _komodo_userpass(username,password,fp);
+                _hush_userpass(username,password,fp);
                 sprintf(iter == 0 ? HUSHUSERPASS : BTCUSERPASS,"%s:%s",username,password);
                 fclose(fp);
                 //printf("HUSH.(%s) -> userpass.(%s)\n",fname,HUSHUSERPASS);
@@ -2463,7 +2463,7 @@ struct hush_state *hush_stateptrget(char *base)
     int32_t baseid;
     if ( base == 0 || base[0] == 0 || strcmp(base,(char *)"KYCSELLOUTS") == 0 )
         return(&HUSH_STATES[33]);
-    else if ( (baseid= komodo_baseid(base)) >= 0 )
+    else if ( (baseid= hush_baseid(base)) >= 0 )
         return(&HUSH_STATES[baseid+1]);
     else return(&HUSH_STATES[0]);
 }

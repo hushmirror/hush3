@@ -674,7 +674,7 @@ int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,ui
 int32_t hush_currentheight();
 void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
 bool hush_checkopret(CBlock *pblock, CScript &merkleroot);
-CScript komodo_makeopret(CBlock *pblock, bool fNew);
+CScript hush_makeopret(CBlock *pblock, bool fNew);
 extern int32_t HUSH_CHOSEN_ONE;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 #define KOMODO_ELECTION_GAP 2000

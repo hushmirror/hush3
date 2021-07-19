@@ -7,18 +7,8 @@ cd $DIR
 DIR="$( cd "$( dirname "$( readlink "${BASH_SOURCE[0]}" )" )" && pwd )"
 cd $DIR
 
-NAME=HUSH3
-CLIENTNAME="GoldenSandtrout"
-DEFAULTS="-ac_sapling=1 -clientname=$CLIENTNAME"
+DEFAULTS=""
 
-# This is a Hush-flavored KMD that allows us to pass in arbitary CLI
-# flags, since hushd is specific to Hush mainnet
-KMD=${KOMODOD:-./komodod}
-if [ -f $KMD ]; then
-   $KMD $DEFAULTS "$@"
-else
-	# We prefix our binary when installed
-	# system wide on Debain system, to prevent clashes
-	KMD=hush-komodod
-    $KMD $DEFAULTS "$@"
-fi
+# People should just use hushd going forward
+HUSH="./hushd"
+$HUSH $DEFAULTS "$@"

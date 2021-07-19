@@ -2283,7 +2283,7 @@ bool CAddrDB::Read(CAddrMan& addr)
 
         // ... verify the network matches ours
         if (memcmp(pchMsgTmp, Params().MessageStart(), sizeof(pchMsgTmp)))
-            return error("%s: Invalid network magic number", __func__);
+            return error("%s: Invalid network magic number in %s", __func__, pathAddr.string());
 
         // de-serialize address data into one CAddrMan object
         ssPeers >> addr;

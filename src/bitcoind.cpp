@@ -109,10 +109,7 @@ void WaitForShutdown(boost::thread_group* threadGroup)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
 // Start
-//
 extern int32_t IS_HUSH_NOTARY,USE_EXTERNAL_PUBKEY;
 extern uint32_t ASSETCHAIN_INIT;
 extern std::string NOTARY_PUBKEY;
