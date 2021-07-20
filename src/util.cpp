@@ -548,13 +548,21 @@ boost::filesystem::path GetDefaultDataDir()
     }
 #else
     // Unix
-    fs::path tmppath = pathRet / ".komodo" / symbol;
+    // New directory :)
+    fs::path tmppath = pathRet / ".hush" / symbol;
+    // Always use .hush/HUSH3, if it exists (even if .komodo/HUSH3 exists)
     if(fs::is_directory(tmppath)) {
-        // legacy directory, use that for backward compat
         return tmppath;
     } else {
-        // New directory :)
-        tmppath = pathRet / ".hush" / symbol;
+        // This is the legacy location
+        tmppath = pathRet / ".komodo" / symbol;
+        if(fs::is_directory(tmppath)) {
+            // existing legacy directory, use that for backward compat
+            return tmppath;
+        } else {
+            // For new clones, use .hush/HUSH3
+            tmppath = pathRet / ".hush" / symbol;
+        }
         return tmppath;
     }
 #endif
