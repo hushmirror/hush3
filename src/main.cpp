@@ -1558,6 +1558,7 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
                 if ( hush_isnotaryvout(destaddr,tiptime) == 0 )
                 {
                     invalid_private_taddr = 1;
+                    fprintf(stderr,"%s: invalid taddr %s on private chain!\n", __func__, destaddr);
                     //return state.DoS(100, error("CheckTransaction(): this is a private chain, no public allowed"),REJECT_INVALID, "bad-txns-acprivacy-chain");
                 }
             }
