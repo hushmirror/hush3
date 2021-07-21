@@ -1553,7 +1553,6 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
             //fprintf(stderr,"private chain nValue %.8f iscoinbase.%d\n",(double)txout.nValue/COIN,iscoinbase);
             if (iscoinbase == 0 && txout.nValue > 0)
             {
-                // TODO: if we are upgraded to Sapling, we can allow Sprout sourced funds to sit in a transparent address
                 char destaddr[65];
                 Getscriptaddress(destaddr,txout.scriptPubKey);
                 if ( hush_isnotaryvout(destaddr,tiptime) == 0 )
