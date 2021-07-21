@@ -514,11 +514,20 @@ boost::filesystem::path GetDefaultDataDir()
     // an old wallet.dat from the Ice Ages :)
 #ifdef _WIN32
     // Windows
-    pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Komodo" / symbol;
+    pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Hush" / symbol;
+    // Always use .hush/HUSH3, if it exists (even if .komodo/HUSH3 exists)
     if(fs::is_directory(pathRet)) {
-        // legacy directory, use that
+        return pathRet;
     } else {
-        pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Hush" / symbol;
+        pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Komodo" / symbol;
+        if(fs::is_directory(pathRet)) {
+            // existing legacy directory, use that for backward compat
+            return pathRet;
+        } else {
+            // For new clones, use Hush/HUSH3
+            pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Hush" / symbol;
+            return pathRet;
+        }
     }
     return pathRet;
 #else
