@@ -57,6 +57,7 @@ strip $DEB_BIN/hush-komodo-tx
 cp $SRC_PATH/src/hushd $DEB_BIN
 cp $SRC_PATH/src/hush-cli $DEB_BIN
 cp $SRC_PATH/src/hush-tx $DEB_BIN
+cp $SRC_PATH/src/hush-smart-chain $DEB_BIN
 #cp $SRC_DEB/changelog $DEB_DOC/changelog.Debian
 cp $SRC_DEB/copyright $DEB_DOC
 cp -r $SRC_DEB/examples $DEB_DOC
