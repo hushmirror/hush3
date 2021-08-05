@@ -512,6 +512,8 @@ boost::filesystem::path GetDefaultDataDir()
     // ~/.hush was actually used by the original 1.x version of Hush, but we will
     // only make subdirectories inside of it, so we won't be able to overwrite
     // an old wallet.dat from the Ice Ages :)
+
+    fs::path pathRet;
 #ifdef _WIN32
     // Windows
     pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Hush" / symbol;
@@ -531,7 +533,6 @@ boost::filesystem::path GetDefaultDataDir()
     }
     return pathRet;
 #else
-    fs::path pathRet;
     char* pszHome = getenv("HOME");
     if (pszHome == NULL || strlen(pszHome) == 0)
         pathRet = fs::path("/");
@@ -543,17 +544,27 @@ boost::filesystem::path GetDefaultDataDir()
     TryCreateDirectory(pathRet);
     fs::path tmppath;
     tmppath = pathRet;
-    tmppath /= "Komodo";
-    if(fs::is_directory(pathRet)) {
-        //legacy directory, use that
-        TryCreateDirectory(tmppath);
+    tmppath /= "Hush";
+
+    // create Library/Application Support/Hush if it doesn't exist
+    TryCreateDirectory(tmppath);
+
+    // Always use Hush/HUSH3 if it exists
+    if(fs::is_directory(tmppath / symbol)) {
         return tmppath / symbol;
     } else {
-        // New directory :)
+        // Check for legacy dir
         tmppath = pathRet;
-        tmppath /= "Hush";
-        TryCreateDirectory(tmppath);
-        return tmppath / symbol;
+        tmppath /= "Komodo";
+        //TryCreateDirectory(tmppath);
+        if(fs::is_directory( tmppath / symbol) {
+            // Found legacy dir, use that
+            return tmppath / symbol;
+        } else {
+            // For new clones, use Hush/HUSH3
+            tmppath = pathRet / "Hush" / HUSH3;
+        }
+        return tmppath;
     }
 #else
     // Unix
