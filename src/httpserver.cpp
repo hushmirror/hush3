@@ -157,6 +157,11 @@ public:
         boost::unique_lock<boost::mutex> lock(cs);
         return queue.size();
     }
+    size_t MaxDepth()
+    {
+        boost::unique_lock<boost::mutex> lock(cs);
+        return maxDepth;
+    }
 };
 
 struct HTTPPathHandler
@@ -185,6 +190,16 @@ static WorkQueue<HTTPClosure>* workQueue = 0;
 std::vector<HTTPPathHandler> pathHandlers;
 //! Bound listening sockets
 std::vector<evhttp_bound_socket *> boundSockets;
+
+
+int getWorkQueueDepth()
+{
+    return workQueue->Depth();
+}
+int getWorkQueueMaxDepth()
+{
+    return workQueue->MaxDepth();
+}
 
 /** Check if a network address is allowed to access the HTTP server */
 static bool ClientAllowed(const CNetAddr& netaddr)

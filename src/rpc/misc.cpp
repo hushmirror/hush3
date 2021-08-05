@@ -178,6 +178,26 @@ UniValue geterablockheights(const UniValue& params, bool fHelp, const CPubKey& m
     return(ret);
 }
 
+extern int getWorkQueueDepth();
+extern int getWorkQueueMaxDepth();
+
+UniValue rpcinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
+{
+    UniValue result(UniValue::VOBJ);
+    if (fHelp || params.size() != 0) {
+        throw runtime_error(
+            "rpcinfo\n"
+            "Returns an object containing various RPC state info.\n"
+        );
+    }
+    LOCK(cs_main);
+    int depth = getWorkQueueDepth();
+
+    result.push_back(Pair("work_queue_depth", depth));
+    result.push_back(Pair("work_queue_max_depth", getWorkQueueMaxDepth() ));
+    return result;
+}
+
 UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     uint256 notarized_hash,notarized_desttxid; int32_t prevMoMheight,notarized_height,longestchain,hushnotarized_height,txid_height;
@@ -1556,6 +1576,7 @@ static const CRPCCommand commands[] =
     { "util",               "z_validateaddress",      &z_validateaddress,      true  }, /* uses wallet if enabled */
     { "util",               "createmultisig",         &createmultisig,         true  },
     { "util",               "verifymessage",          &verifymessage,          true  },
+    { "util",               "rpcinfo",                &rpcinfo,                true  },
 
     /* Not shown in help */
     { "hidden",             "setmocktime",            &setmocktime,            true  },
