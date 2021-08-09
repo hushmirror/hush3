@@ -1810,7 +1810,14 @@ void hush_args(char *argv0)
     vector<string> HUSH_nodes= {"node1.hush.is","node2.hush.is","node3.hush.is",
                                 "node4.hush.is","node5.hush.is","node6.hush.is",
                                 "node7.hush.is","node8.hush.is"};
-    mapMultiArgs["-addnode"] = HUSH_nodes;
+    vector<string> more_nodes = mapMultiArgs["-addnode"];
+    if (more_nodes.size() > 0) {
+        fprintf(stderr,"Adding %d more nodes via custom -addnode arguments", more_nodes.size() );
+    }
+    // Add default HUSH nodes after custom addnodes
+    more_nodes.insert( more_nodes.end(), HUSH_nodes.begin(), HUSH_nodes.end() );
+
+    mapMultiArgs["-addnode"] = more_nodes;
     HUSH_STOPAT              = GetArg("-stopat",0);
     MAX_REORG_LENGTH         = GetArg("-maxreorg",MAX_REORG_LENGTH);
     WITNESS_CACHE_SIZE       = MAX_REORG_LENGTH+10;
