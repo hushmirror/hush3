@@ -98,11 +98,11 @@ noinst_PROGRAMS =
 TESTS =
 
 #if BUILD_BITCOIND
-  bin_PROGRAMS += komodod
+  bin_PROGRAMS += hushd
 #endif
 
 if BUILD_BITCOIN_UTILS
-  bin_PROGRAMS += komodo-cli komodo-tx
+  bin_PROGRAMS += hush-cli hush-tx
 endif
 if ENABLE_WALLET
   bin_PROGRAMS += wallet-utility
@@ -335,7 +335,7 @@ libbitcoin_zmq_a_SOURCES = \
 	zmq/zmqpublishnotifier.cpp
 endif
 
-# wallet: komodod, but only linked when wallet enabled
+# wallet: hushd, but only linked when wallet enabled
 libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_wallet_a_SOURCES = \
@@ -483,17 +483,17 @@ libbitcoin_cli_a_SOURCES = \
 nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# komodod binary #
-komodod_SOURCES = bitcoind.cpp
-komodod_CPPFLAGS = -fPIC $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-komodod_CXXFLAGS = -fPIC $(AM_CXXFLAGS) $(PIE_FLAGS)
-komodod_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# hushd binary #
+hushd_SOURCES = bitcoind.cpp
+hushd_CPPFLAGS = -fPIC $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+hushd_CXXFLAGS = -fPIC $(AM_CXXFLAGS) $(PIE_FLAGS)
+hushd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-komodod_SOURCES += bitcoind-res.rc
+hushd_SOURCES += bitcoind-res.rc
 endif
 
-komodod_LDADD = \
+hushd_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
   $(LIBUNIVALUE) \
@@ -508,10 +508,10 @@ komodod_LDADD = \
   $(LIBCRYPTOCONDITIONS)
 
 if ENABLE_WALLET
-komodod_LDADD += $(LIBBITCOIN_WALLET)
+hushd_LDADD += $(LIBBITCOIN_WALLET)
 endif
 
-komodod_LDADD += \
+hushd_LDADD += \
   $(BOOST_LIBS) \
   $(BDB_LIBS) \
   $(SSL_LIBS) \
@@ -523,27 +523,27 @@ komodod_LDADD += \
   $(LIBZCASH_LIBS)
 
 if TARGET_DARWIN
-komodod_LDADD += libcc.dylib $(LIBSECP256K1)
+hushd_LDADD += libcc.dylib $(LIBSECP256K1)
 endif
 if TARGET_WINDOWS
-komodod_LDADD += libcc.dll $(LIBSECP256K1)
+hushd_LDADD += libcc.dll $(LIBSECP256K1)
 endif
 if TARGET_LINUX
-komodod_LDADD += libcc.so $(LIBSECP256K1)
+hushd_LDADD += libcc.so $(LIBSECP256K1)
 endif
 
 # [+] Decker: use static linking for libstdc++.6.dylib, libgomp.1.dylib, libgcc_s.1.dylib
 if TARGET_DARWIN
-komodod_LDFLAGS += -static-libgcc
+hushd_LDFLAGS += -static-libgcc
 endif
 
-# komodo-cli binary #
-komodo_cli_SOURCES = bitcoin-cli.cpp
-komodo_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
-komodo_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-komodo_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# hush-cli binary #
+hush_cli_SOURCES = bitcoin-cli.cpp
+hush_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
+hush_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+hush_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 if TARGET_DARWIN
-komodo_cli_LDFLAGS += -static-libgcc
+hush_cli_LDFLAGS += -static-libgcc
 endif
 
 # wallet-utility binary #
@@ -555,10 +555,10 @@ wallet_utility_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 endif
 
 if TARGET_WINDOWS
-komodo_cli_SOURCES += bitcoin-cli-res.rc
+hush_cli_SOURCES += bitcoin-cli-res.rc
 endif
 
-komodo_cli_LDADD = \
+hush_cli_LDADD = \
 	$(LIBBITCOIN_CLI) \
 	$(LIBUNIVALUE) \
 	$(LIBBITCOIN_UTIL) \
@@ -586,17 +586,17 @@ wallet_utility_LDADD = \
   $(LIBCRYPTOCONDITIONS)
 endif
 
-# komodo-tx binary #
-komodo_tx_SOURCES = komodo-tx.cpp
-komodo_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-komodo_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-komodo_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# hush-tx binary #
+hush_tx_SOURCES = hush-tx.cpp
+hush_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+hush_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+hush_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-komodo_tx_SOURCES += bitcoin-tx-res.rc
+hush_tx_SOURCES += bitcoin-tx-res.rc
 endif
 
-komodo_tx_LDADD = \
+hush_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UTIL) \
@@ -607,7 +607,7 @@ komodo_tx_LDADD = \
   $(LIBZCASH_LIBS) \
   $(LIBCRYPTOCONDITIONS)
 
-komodo_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
+hush_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 
 # Zcash Protocol Primitives
 libzcash_a_SOURCES = \

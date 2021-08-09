@@ -651,7 +651,7 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp, const CPubKey&
             "      ,...\n"
             "    }\n"
             "3. locktime              (numeric, optional, default=0) Raw locktime. Non-0 value also locktime-activates inputs\n"
-            "4. expiryheight          (numeric, optional, default=" + strprintf("%d", DEFAULT_TX_EXPIRY_DELTA) + ") Expiry height of transaction (if Overwinter is active)\n"
+            "4. expiryheight          (numeric, optional, default=" + strprintf("%d", DEFAULT_TX_EXPIRY_DELTA) + ") Expiry height of transaction\n"
             "\nResult:\n"
             "\"transaction\"            (string) hex string of the transaction\n"
 

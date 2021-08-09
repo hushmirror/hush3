@@ -138,7 +138,7 @@ uint32_t Mining_start,Mining_height;
 int32_t My_notaryid = -1;
 int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
 int32_t komodo_pax_opreturn(int32_t height,uint8_t *opret,int32_t maxsize);
-int32_t komodo_baseid(char *origbase);
+int32_t hush_baseid(char *origbase);
 int32_t hush_longestchain();
 int64_t hush_block_unlocktime(uint32_t nHeight);
 uint64_t the_commission(const CBlock *block,int32_t height);
@@ -955,7 +955,7 @@ static bool ProcessBlockFound(CBlock* pblock)
     return true;
 }
 
-int32_t komodo_baseid(char *origbase);
+int32_t hush_baseid(char *origbase);
 int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t *blocktimes,int32_t *nonzpkeysp,int32_t height);
 arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
 int32_t FOUND_BLOCK,HUSH_MAYBEMINED;
@@ -1055,7 +1055,7 @@ void static BitcoinMiner()
     while ( (ASSETCHAIN_INIT == 0 || HUSH_INITDONE == 0) )
     {
         sleep(1);
-        if ( komodo_baseid(SMART_CHAIN_SYMBOL) < 0 )
+        if ( hush_baseid(SMART_CHAIN_SYMBOL) < 0 )
             break;
     }
     if ( SMART_CHAIN_SYMBOL[0] == 0 )

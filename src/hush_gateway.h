@@ -32,7 +32,7 @@ int32_t pax_fiatstatus(uint64_t *available,uint64_t *deposited,uint64_t *issued,
 {
     int32_t baseid; struct hush_state *sp; int64_t netliability,maxallowed,maxval;
     *available = *deposited = *issued = *withdrawn = *approved = *redeemed = 0;
-    if ( (baseid= komodo_baseid(base)) >= 0 )
+    if ( (baseid= hush_baseid(base)) >= 0 )
     {
         if ( (sp= hush_stateptrget(base)) != 0 )
         {
@@ -65,10 +65,10 @@ void pax_keyset(uint8_t *buf,uint256 txid,uint16_t vout,uint8_t type)
 struct pax_transaction *komodo_paxfind(uint256 txid,uint16_t vout,uint8_t type)
 {
     struct pax_transaction *pax; uint8_t buf[35];
-    pthread_mutex_lock(&komodo_mutex);
+    pthread_mutex_lock(&hush_mutex);
     pax_keyset(buf,txid,vout,type);
     HASH_FIND(hh,PAX,buf,sizeof(buf),pax);
-    pthread_mutex_unlock(&komodo_mutex);
+    pthread_mutex_unlock(&hush_mutex);
     return(pax);
 }
 
@@ -84,7 +84,7 @@ struct pax_transaction *komodo_paxfinds(uint256 txid,uint16_t vout)
 struct pax_transaction *komodo_paxmark(int32_t height,uint256 txid,uint16_t vout,uint8_t type,int32_t mark)
 {
     struct pax_transaction *pax; uint8_t buf[35];
-    pthread_mutex_lock(&komodo_mutex);
+    pthread_mutex_lock(&hush_mutex);
     pax_keyset(buf,txid,vout,type);
     HASH_FIND(hh,PAX,buf,sizeof(buf),pax);
     if ( pax == 0 )
@@ -104,16 +104,16 @@ struct pax_transaction *komodo_paxmark(int32_t height,uint256 txid,uint16_t vout
         //    printf("mark ht.%d %.8f %.8f\n",pax->height,dstr(pax->komodoshis),dstr(pax->fiatoshis));
 
     }
-    pthread_mutex_unlock(&komodo_mutex);
+    pthread_mutex_unlock(&hush_mutex);
     return(pax);
 }
 
 void komodo_paxdelete(struct pax_transaction *pax)
 {
     return; // breaks when out of order
-    pthread_mutex_lock(&komodo_mutex);
+    pthread_mutex_lock(&hush_mutex);
     HASH_DELETE(hh,PAX,pax);
-    pthread_mutex_unlock(&komodo_mutex);
+    pthread_mutex_unlock(&hush_mutex);
 }
 
 void komodo_gateway_deposit(char *coinaddr,uint64_t value,char *symbol,uint64_t fiatoshis,uint8_t *rmd160,uint256 txid,uint16_t vout,uint8_t type,int32_t height,int32_t otherheight,char *source,int32_t approved) // assetchain context
@@ -124,7 +124,7 @@ void komodo_gateway_deposit(char *coinaddr,uint64_t value,char *symbol,uint64_t 
     //if ( strcmp(symbol,SMART_CHAIN_SYMBOL) != 0 )
     //    return;
     sp = hush_stateptr(str,dest);
-    pthread_mutex_lock(&komodo_mutex);
+    pthread_mutex_lock(&hush_mutex);
     pax_keyset(buf,txid,vout,type);
     HASH_FIND(hh,PAX,buf,sizeof(buf),pax);
     if ( pax == 0 )
@@ -143,7 +143,7 @@ void komodo_gateway_deposit(char *coinaddr,uint64_t value,char *symbol,uint64_t 
             printf(" v.%d [%s] kht.%d ht.%d create pax.%p symbol.%s source.%s\n",vout,SMART_CHAIN_SYMBOL,height,otherheight,pax,symbol,source);
         }
     }
-    pthread_mutex_unlock(&komodo_mutex);
+    pthread_mutex_unlock(&hush_mutex);
     if ( coinaddr != 0 )
     {
         strcpy(pax->coinaddr,coinaddr);
@@ -241,7 +241,7 @@ int32_t komodo_issued_opreturn(char *base,uint256 *txids,uint16_t *vouts,int64_t
                     kmdheights[n] = p.height;
                     otherheights[n] = p.otherheight;
                     memcpy(&rmd160s[n * 20],p.rmd160,20);
-                    baseids[n] = komodo_baseid(p.source);
+                    baseids[n] = hush_baseid(p.source);
                     if ( 0 )
                     {
                         char coinaddr[64];
@@ -261,7 +261,7 @@ int32_t komodo_issued_opreturn(char *base,uint256 *txids,uint16_t *vouts,int64_t
                 }
                 vouts[n] = opretbuf[len++];
                 vouts[n] = (opretbuf[len++] << 8) | vouts[n];
-                baseids[n] = komodo_baseid(base);
+                baseids[n] = hush_baseid(base);
                 if ( (pax= komodo_paxfinds(txids[n],vouts[n])) != 0 )
                 {
                     values[n] = (strcmp("KMD",base) == 0) ? pax->komodoshis : pax->fiatoshis;
@@ -483,7 +483,7 @@ int32_t komodo_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t to
     struct hush_state *kmdsp = hush_stateptrget((char *)"KMD");
     sp = hush_stateptr(symbol,dest);
     strcpy(symbol,base);
-    if ( SMART_CHAIN_SYMBOL[0] != 0 && komodo_baseid(SMART_CHAIN_SYMBOL) < 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 && hush_baseid(SMART_CHAIN_SYMBOL) < 0 )
         return(0);
     PENDING_HUSH_TX = 0;
     for (i=0; i<3; i++)
@@ -556,7 +556,7 @@ int32_t komodo_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t to
         {
             if ( kmdsp != 0 )
             {
-                if ( (baseid= komodo_baseid(pax->symbol)) < 0 || ((1LL << baseid) & sp->RTmask) == 0 )
+                if ( (baseid= hush_baseid(pax->symbol)) < 0 || ((1LL << baseid) & sp->RTmask) == 0 )
                 {
                     printf("not RT for (%s) %llx baseid.%d %llx\n",pax->symbol,(long long)sp->RTmask,baseid,(long long)(1LL<<baseid));
                     continue;
@@ -791,12 +791,12 @@ int32_t hush_check_deposit(int32_t height,const CBlock& block,uint32_t prevtime)
             else if ( height > 814000 )
             {
                 script = (uint8_t *)&block.vtx[0].vout[0].scriptPubKey[0];
-                //int32_t notary = komodo_electednotary(&num,script+1,height,0);
-                //if ( (-1 * (komodo_electednotary(&num,script+1,height,0) >= 0) * (height > 1000000)) < 0 )
+                //int32_t notary = hush_electednotary(&num,script+1,height,0);
+                //if ( (-1 * (hush_electednotary(&num,script+1,height,0) >= 0) * (height > 1000000)) < 0 )
                 //    fprintf(stderr, ">>>>>>> FAILED BLOCK.%d notary.%d insync.%d\n",height,notary,HUSH_INSYNC);
                 //else
                 //    fprintf(stderr, "<<<<<<< VALID BLOCK.%d notary.%d insync.%d\n",height,notary,HUSH_INSYNC);
-                return(-1 * (komodo_electednotary(&num,script+1,height,0) >= 0) * (height > 1000000));
+                return(-1 * (hush_electednotary(&num,script+1,height,0) >= 0) * (height > 1000000));
             }
         }
         else
@@ -832,7 +832,7 @@ const char *komodo_opreturn(int32_t height,uint64_t value,uint8_t *opretbuf,int3
 {
     uint8_t rmd160[20],rmd160s[64*20],addrtype,shortflag,pubkey33[33]; int32_t didstats,i,j,n,kvheight,len,tokomodo,kmdheight,otherheights[64],kmdheights[64]; int8_t baseids[64]; char base[4],coinaddr[64],destaddr[64]; uint256 txids[64]; uint16_t vouts[64]; uint64_t convtoshis,seed; int64_t fee,fiatoshis,komodoshis,checktoshis,values[64],srcvalues[64]; struct pax_transaction *pax,*pax2; struct hush_state *basesp; double diff;
     const char *typestr = "unknown";
-    if ( SMART_CHAIN_SYMBOL[0] != 0 && komodo_baseid(SMART_CHAIN_SYMBOL) < 0 && opretbuf[0] != 'K' )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 && hush_baseid(SMART_CHAIN_SYMBOL) < 0 && opretbuf[0] != 'K' )
     {
         //printf("komodo_opreturn skip %s\n",SMART_CHAIN_SYMBOL);
         return("assetchain");
@@ -991,7 +991,7 @@ const char *komodo_opreturn(int32_t height,uint64_t value,uint8_t *opretbuf,int3
     }
     else if ( height < 236000 && opretbuf[0] == 'W' && strncmp(SMART_CHAIN_SYMBOL,(char *)&opretbuf[opretlen-4],3) == 0 )//&& opretlen >= 38 )
     {
-        if ( komodo_baseid((char *)&opretbuf[opretlen-4]) >= 0 && strcmp(SMART_CHAIN_SYMBOL,(char *)&opretbuf[opretlen-4]) == 0 )
+        if ( hush_baseid((char *)&opretbuf[opretlen-4]) >= 0 && strcmp(SMART_CHAIN_SYMBOL,(char *)&opretbuf[opretlen-4]) == 0 )
         {
             for (i=0; i<opretlen; i++)
                 printf("%02x",opretbuf[i]);
@@ -1058,7 +1058,7 @@ const char *komodo_opreturn(int32_t height,uint64_t value,uint8_t *opretbuf,int3
                     //printf("baseids[%d] %d\n",i,baseids[i]);
                     if ( (pax= komodo_paxfind(txids[i],vouts[i],'W')) != 0 || (pax= komodo_paxfind(txids[i],vouts[i],'X')) != 0 )
                     {
-                        baseids[i] = komodo_baseid(pax->symbol);
+                        baseids[i] = hush_baseid(pax->symbol);
                         printf("override neg1 with (%s)\n",pax->symbol);
                     }
                     if ( baseids[i] < 0 )
@@ -1444,7 +1444,7 @@ void hush_passport_iteration()
         limit = 10000000;
     } else {
         limit = 10000000;
-        refid = komodo_baseid(SMART_CHAIN_SYMBOL)+1; // illegal base -> baseid.-1 -> 0
+        refid = hush_baseid(SMART_CHAIN_SYMBOL)+1; // illegal base -> baseid.-1 -> 0
         if ( refid == 0 )
         {
             HUSH_PASSPORT_INITDONE = 1;
@@ -1753,10 +1753,10 @@ CScript komodo_mineropret(int32_t nHeight)
 }
 
 /*
- komodo_opretvalidate() is the entire price validation!
+ hush_opretvalidate() is the entire price validation!
  it prints out some useful info for debugging, like the lag from current time and prev block and the prices encoded in the opreturn.
  
- The only way komodo_opretvalidate() doesnt return an error is if maxflag is set or it is within tolerance of both the prior block and the local data. The local data validation only happens if it is a recent block and not a block from the past as the local node is only getting the current price data.
+ The only way hush_opretvalidate() doesnt return an error is if maxflag is set or it is within tolerance of both the prior block and the local data. The local data validation only happens if it is a recent block and not a block from the past as the local node is only getting the current price data.
  
  */
 
@@ -1772,7 +1772,7 @@ void komodo_queuelocalprice(int32_t dir,int32_t height,uint32_t timestamp,uint25
     ExtremePrice.pricebits = pricebits;
 }
 
-int32_t komodo_opretvalidate(const CBlock *block,CBlockIndex * const previndex,int32_t nHeight,CScript scriptPubKey)
+int32_t hush_opretvalidate(const CBlock *block,CBlockIndex * const previndex,int32_t nHeight,CScript scriptPubKey)
 {
     int32_t testchain_exemption = 0;
     std::vector<uint8_t> vopret; char maxflags[HUSH_MAXPRICES]; uint256 bhash; double btcusd,btcgbp,btceur; uint32_t localbits[HUSH_MAXPRICES],pricebits[HUSH_MAXPRICES],prevbits[HUSH_MAXPRICES],newprice; int32_t i,j,prevtime,maxflag,lag,lag2,lag3,n,errflag,iter; uint32_t now;
@@ -2228,7 +2228,7 @@ void hush_cbopretupdate(int32_t forceflag)
     if ( Queued_reconsiderblock != zeroid )
     {
         fprintf(stderr,"Queued_reconsiderblock %s\n",Queued_reconsiderblock.GetHex().c_str());
-        komodo_reconsiderblock(Queued_reconsiderblock);
+        hush_reconsiderblock(Queued_reconsiderblock);
         Queued_reconsiderblock = zeroid;
     }
     if ( forceflag != 0 && pending != 0 )

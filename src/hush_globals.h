@@ -20,11 +20,11 @@
 void hush_prefetch(FILE *fp);
 uint32_t hush_heightstamp(int32_t height);
 void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotaries,uint8_t notaryid,uint256 txhash,uint64_t voutmask,uint8_t numvouts,uint32_t *pvals,uint8_t numpvals,int32_t kheight,uint32_t ktime,uint64_t opretvalue,uint8_t *opretbuf,uint16_t opretlen,uint16_t vout,uint256 MoM,int32_t MoMdepth);
-void komodo_init(int32_t height);
+void hush_init(int32_t height);
 int32_t hush_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip);
-int32_t komodo_notarizeddata(int32_t nHeight,uint256 *notarized_hashp,uint256 *notarized_desttxidp);
-char *komodo_issuemethod(char *userpass,char *method,char *params,uint16_t port);
-void komodo_init(int32_t height);
+int32_t hush_notarizeddata(int32_t nHeight,uint256 *notarized_hashp,uint256 *notarized_desttxidp);
+char *hush_issuemethod(char *userpass,char *method,char *params,uint16_t port);
+void hush_init(int32_t height);
 int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
 int32_t komodo_isrealtime(int32_t *kmdheightp);
 uint64_t komodo_paxtotal();
@@ -32,7 +32,7 @@ int32_t hush_longestchain();
 uint64_t komodo_maxallowed(int32_t baseid);
 int32_t komodo_bannedset(int32_t *indallvoutsp,uint256 *array,int32_t max);
 int32_t hush_checkvout(int32_t vout,int32_t k,int32_t indallvouts);
-pthread_mutex_t komodo_mutex,staked_mutex;
+pthread_mutex_t hush_mutex;
 
 #define KOMODO_ELECTION_GAP 2000    //((SMART_CHAIN_SYMBOL[0] == 0) ? 2000 : 100)
 #define HUSH_SMART_CHAIN_MAXLEN 65
@@ -111,7 +111,7 @@ char CURRENCIES[][8] = { "USD", "EUR", "JPY", "GBP", "AUD", "CAD", "CHF", "NZD",
     "CNY", "RUB", "MXN", "BRL", "INR", "HKD", "TRY", "ZAR", "PLN", "NOK", "SEK", "DKK", "CZK", "HUF", "ILS", "KRW", "MYR", "PHP", "RON", "SGD", "THB", "BGN", "IDR", "HRK",
     "KMD" };
 
-int32_t komodo_baseid(char *origbase)
+int32_t hush_baseid(char *origbase)
 {
     int32_t i; char base[64];
     for (i=0; origbase[i]!=0&&i<sizeof(base); i++)
@@ -132,7 +132,7 @@ uint64_t hush_current_supply(uint32_t nHeight)
     uint64_t cur_money;
     int32_t baseid;
 
-    //if ( (baseid = komodo_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
+    //if ( (baseid = hush_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
     //    cur_money = ASSETCHAINS_GENESISTXVAL + ASSETCHAINS_SUPPLY + nHeight * ASSETCHAINS_REWARD[0] / SATOSHIDEN;
     //else
     {

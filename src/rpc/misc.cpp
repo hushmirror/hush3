@@ -59,7 +59,7 @@ using namespace std;
 
 int32_t hush_longestchain();
 int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *txidp);
-bool komodo_txnotarizedconfirmed(uint256 txid);
+bool hush_txnotarizedconfirmed(uint256 txid);
 uint32_t hush_chainactive_timestamp();
 int32_t hush_whoami(char *pubkeystr,int32_t height,uint32_t timestamp);
 extern int32_t HUSH_LASTMINED,HUSH_LONGESTCHAIN,IS_HUSH_NOTARY,HUSH_INSYNC;
@@ -178,6 +178,28 @@ UniValue geterablockheights(const UniValue& params, bool fHelp, const CPubKey& m
     return(ret);
 }
 
+extern int getWorkQueueDepth();
+extern int getWorkQueueMaxDepth();
+extern int getWorkQueueNumThreads();
+
+UniValue rpcinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
+{
+    UniValue result(UniValue::VOBJ);
+    if (fHelp || params.size() != 0) {
+        throw runtime_error(
+            "rpcinfo\n"
+            "Returns an object containing various RPC state info.\n"
+        );
+    }
+    LOCK(cs_main);
+    int depth = getWorkQueueDepth();
+
+    result.push_back(Pair("work_queue_depth", depth));
+    result.push_back(Pair("work_queue_max_depth", getWorkQueueMaxDepth() ));
+    result.push_back(Pair("work_queue_num_threads", getWorkQueueNumThreads() ));
+    return result;
+}
+
 UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     uint256 notarized_hash,notarized_desttxid; int32_t prevMoMheight,notarized_height,longestchain,hushnotarized_height,txid_height;
@@ -230,7 +252,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     obj.push_back(Pair("notarizedtxid", notarized_desttxid.ToString()));
     if ( HUSH_NSPV_FULLNODE )
     {
-        txid_height = notarizedtxid_height(SMART_CHAIN_SYMBOL[0] != 0 ? (char *)"HUSH" : (char *)"BTC",(char *)notarized_desttxid.ToString().c_str(),&hushnotarized_height);
+        txid_height = notarizedtxid_height(SMART_CHAIN_SYMBOL[0] != 0 ? (char *)"HUSH3" : (char *)"BTC",(char *)notarized_desttxid.ToString().c_str(),&hushnotarized_height);
         if ( txid_height > 0 )
             obj.push_back(Pair("notarizedtxid_height", txid_height));
         else obj.push_back(Pair("notarizedtxid_height", "mempool"));
@@ -1463,7 +1485,7 @@ UniValue txnotarizedconfirmed(const UniValue& params, bool fHelp, const CPubKey&
     if (fHelp || params.size() < 1 || params.size() > 1)
     {
         string msg = "txnotarizedconfirmed txid\n"
-            "\nReturns true if transaction is notarized on chain that has dPoW or if confirmation number is greater than 60 on chain taht does not have dPoW.\n"
+            "\nReturns true if transaction is notarized on chain that has dPoW or if confirmation number is greater than 60 on chain that does not have dPoW.\n"
 
             "\nArguments:\n"
             "1. txid      (string, required) Transaction id.\n"
@@ -1476,7 +1498,7 @@ UniValue txnotarizedconfirmed(const UniValue& params, bool fHelp, const CPubKey&
         throw runtime_error(msg);
     }
     txid = uint256S((char *)params[0].get_str().c_str());
-    notarizedconfirmed=komodo_txnotarizedconfirmed(txid);
+    notarizedconfirmed=hush_txnotarizedconfirmed(txid);
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("result", notarizedconfirmed));
     return result;
@@ -1556,6 +1578,7 @@ static const CRPCCommand commands[] =
     { "util",               "z_validateaddress",      &z_validateaddress,      true  }, /* uses wallet if enabled */
     { "util",               "createmultisig",         &createmultisig,         true  },
     { "util",               "verifymessage",          &verifymessage,          true  },
+    { "util",               "rpcinfo",                &rpcinfo,                true  },
 
     /* Not shown in help */
     { "hidden",             "setmocktime",            &setmocktime,            true  },

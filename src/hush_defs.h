@@ -556,7 +556,7 @@ uint32_t hush_heightstamp(int32_t height);
 int64_t komodo_pricemult(int32_t ind);
 int32_t komodo_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblocks);
 int32_t hush_currentheight();
-int32_t komodo_notarized_bracket(struct notarized_checkpoint *nps[2],int32_t height);
+int32_t hush_notarized_bracket(struct notarized_checkpoint *nps[2],int32_t height);
 arith_uint256 komodo_adaptivepow_target(int32_t height,arith_uint256 bnTarget,uint32_t nTime);
 bool hush_hardfork_active(uint32_t time);
 
@@ -567,7 +567,7 @@ int32_t hush_nextheight();
 CBlockIndex *hush_blockindex(uint256 hash);
 CBlockIndex *hush_chainactive(int32_t height);
 int32_t hush_blockheight(uint256 hash);
-bool komodo_txnotarizedconfirmed(uint256 txid);
+bool hush_txnotarizedconfirmed(uint256 txid);
 int32_t hush_blockload(CBlock& block, CBlockIndex *pindex);
 uint32_t hush_chainactive_timestamp();
 uint32_t GetLatestTimestamp(int32_t height);

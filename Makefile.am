@@ -1,3 +1,7 @@
+# Copyright 2016-2021 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+
 ACLOCAL_AMFLAGS = -I build-aux/m4
 SUBDIRS = src
 if ENABLE_MAN

@@ -1201,7 +1201,7 @@ bool ContextualCheckCoinbaseTransaction(int32_t slowflag,const CBlock *block,CBl
 {
     if ( slowflag != 0 && ASSETCHAINS_CBOPRET != 0 && validateprices != 0 && nHeight > 0 && tx.vout.size() > 0 )
     {
-        if ( komodo_opretvalidate(block,previndex,nHeight,tx.vout[tx.vout.size()-1].scriptPubKey) < 0 )
+        if ( hush_opretvalidate(block,previndex,nHeight,tx.vout[tx.vout.size()-1].scriptPubKey) < 0 )
             return(false);
     }
     return(true);
@@ -1553,12 +1553,12 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
             //fprintf(stderr,"private chain nValue %.8f iscoinbase.%d\n",(double)txout.nValue/COIN,iscoinbase);
             if (iscoinbase == 0 && txout.nValue > 0)
             {
-                // TODO: if we are upgraded to Sapling, we can allow Sprout sourced funds to sit in a transparent address
                 char destaddr[65];
                 Getscriptaddress(destaddr,txout.scriptPubKey);
                 if ( hush_isnotaryvout(destaddr,tiptime) == 0 )
                 {
                     invalid_private_taddr = 1;
+                    fprintf(stderr,"%s: invalid taddr %s on private chain!\n", __func__, destaddr);
                     //return state.DoS(100, error("CheckTransaction(): this is a private chain, no public allowed"),REJECT_INVALID, "bad-txns-acprivacy-chain");
                 }
             }

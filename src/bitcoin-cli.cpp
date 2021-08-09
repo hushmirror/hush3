@@ -28,8 +28,12 @@
 #include <event2/buffer.h>
 #include <event2/keyvalq_struct.h>
 #include "support/events.h"
-uint16_t BITCOIND_RPCPORT = 7771;
+
+uint16_t ASSETCHAINS_RPCPORT = 18031;
+uint16_t BITCOIND_RPCPORT = 18031;
 char SMART_CHAIN_SYMBOL[65];
+
+extern uint16_t ASSETCHAINS_RPCPORT;
 
 #include <univalue.h>
 
@@ -43,13 +47,13 @@ std::string HelpMessageCli()
     std::string strUsage;
     strUsage += HelpMessageGroup(_("Options:"));
     strUsage += HelpMessageOpt("-?", _("This help message"));
-    strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "komodo.conf"));
+    strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "HUSH3.conf"));
     strUsage += HelpMessageOpt("-datadir=<dir>", _("Specify data directory"));
     strUsage += HelpMessageOpt("-testnet", _("Use the test network"));
     strUsage += HelpMessageOpt("-regtest", _("Enter regression test mode, which uses a special chain in which blocks can be "
                                              "solved instantly. This is intended for regression testing tools and app development."));
     strUsage += HelpMessageOpt("-rpcconnect=<ip>", strprintf(_("Send commands to node running on <ip> (default: %s)"), "127.0.0.1"));
-    strUsage += HelpMessageOpt("-rpcport=<port>", strprintf(_("Connect to JSON-RPC on <port> (default: %u or testnet: %u)"), 8232, 18232));
+    strUsage += HelpMessageOpt("-rpcport=<port>", strprintf(_("Connect to JSON-RPC on <port> (default: %u )"), 18030));
     strUsage += HelpMessageOpt("-rpcwait", _("Wait for RPC server to start"));
     strUsage += HelpMessageOpt("-rpcuser=<user>", _("Username for JSON-RPC connections"));
     strUsage += HelpMessageOpt("-rpcpassword=<pw>", _("Password for JSON-RPC connections"));
@@ -82,7 +86,10 @@ static int AppInitRPC(int argc, char* argv[])
     // Parameters
     ParseParameters(argc, argv);
     std:string name;
-    name = GetArg("-ac_name","");
+
+    // default HSC is HUSH3 itself, which to the internals, is also an HSC
+    name = GetArg("-ac_name","HUSH3");
+
     if ( !name.empty() )
         strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
 
@@ -249,14 +256,16 @@ UniValue CallRPC(const std::string& strMethod, const UniValue& params)
 
     event_base_dispatch(base.get());
 
-    if (response.status == 0)
-        throw CConnectionFailed(strprintf("couldn't connect to server: %s (code %d)\n(make sure server is running and you are connecting to the correct RPC port)", http_errorstring(response.error), response.error));
-    else if (response.status == HTTP_UNAUTHORIZED)
+    if (response.status == 0) {
+        throw CConnectionFailed(strprintf("couldn't connect to server at port %d : %s (code %d)\n(make sure server is running and you are connecting to the correct RPC port)", 
+            ASSETCHAINS_RPCPORT, http_errorstring(response.error), response.error));
+    } else if (response.status == HTTP_UNAUTHORIZED) {
         throw std::runtime_error("incorrect rpcuser or rpcpassword (authorization failed)");
-    else if (response.status >= 400 && response.status != HTTP_BAD_REQUEST && response.status != HTTP_NOT_FOUND && response.status != HTTP_INTERNAL_SERVER_ERROR)
+    } else if (response.status >= 400 && response.status != HTTP_BAD_REQUEST && response.status != HTTP_NOT_FOUND && response.status != HTTP_INTERNAL_SERVER_ERROR) {
         throw std::runtime_error(strprintf("server returned HTTP error %d", response.status));
-    else if (response.body.empty())
-        throw std::runtime_error("no response from server");
+    } else if (response.body.empty()) {
+        throw std::runtime_error(strprintf("no response from server at port %d", ASSETCHAINS_RPCPORT ));
+    }
 
     // Parse reply
     UniValue valReply(UniValue::VSTR);
