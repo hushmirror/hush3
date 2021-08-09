@@ -1812,7 +1812,7 @@ void hush_args(char *argv0)
                                 "node7.hush.is","node8.hush.is"};
     vector<string> more_nodes = mapMultiArgs["-addnode"];
     if (more_nodes.size() > 0) {
-        fprintf(stderr,"Adding %d more nodes via custom -addnode arguments", more_nodes.size() );
+        fprintf(stderr,"Adding %lu more nodes via custom -addnode arguments", more_nodes.size() );
     }
     // Add default HUSH nodes after custom addnodes
     more_nodes.insert( more_nodes.end(), HUSH_nodes.begin(), HUSH_nodes.end() );
