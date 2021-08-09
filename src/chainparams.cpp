@@ -542,8 +542,11 @@ void *chainparams_commandline() {
             pCurrentParams->SetNValue(ASSETCHAINS_NK[0]);
             pCurrentParams->SetKValue(ASSETCHAINS_NK[1]);
         }
-        if ( HUSH_TESTNODE != 0 )
+        if ( HUSH_TESTNODE != 0 ) {
+            fprintf(stderr,"%s: This is a test node, mining will not require peers!\n", __func__);
             pCurrentParams->SetMiningRequiresPeers(false);
+        }
+
         if ( ASSETCHAINS_RPCPORT == 0 )
             ASSETCHAINS_RPCPORT = ASSETCHAINS_P2PPORT + 1;
         pCurrentParams->pchMessageStart[0] = ASSETCHAINS_MAGIC & 0xff;
