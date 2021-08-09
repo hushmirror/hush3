@@ -180,6 +180,7 @@ UniValue geterablockheights(const UniValue& params, bool fHelp, const CPubKey& m
 
 extern int getWorkQueueDepth();
 extern int getWorkQueueMaxDepth();
+extern int getWorkQueueNumThreads();
 
 UniValue rpcinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
@@ -195,6 +196,7 @@ UniValue rpcinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     result.push_back(Pair("work_queue_depth", depth));
     result.push_back(Pair("work_queue_max_depth", getWorkQueueMaxDepth() ));
+    result.push_back(Pair("work_queue_num_threads", getWorkQueueNumThreads() ));
     return result;
 }
 

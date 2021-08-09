@@ -162,6 +162,11 @@ public:
         boost::unique_lock<boost::mutex> lock(cs);
         return maxDepth;
     }
+    int NumThreads()
+    {
+        boost::unique_lock<boost::mutex> lock(cs);
+        return numThreads;
+    }
 };
 
 struct HTTPPathHandler
@@ -196,9 +201,15 @@ int getWorkQueueDepth()
 {
     return workQueue->Depth();
 }
+
 int getWorkQueueMaxDepth()
 {
     return workQueue->MaxDepth();
+}
+
+int getWorkQueueNumThreads()
+{
+    return workQueue->NumThreads();
 }
 
 /** Check if a network address is allowed to access the HTTP server */
