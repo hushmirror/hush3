@@ -1176,7 +1176,7 @@ UniValue stratum_mining_subscribe(StratumClient& client, const UniValue& params)
     // Please note that Stratum use hex encoding, so you have to convert NONCE_1 from hex to binary before.
 
     // ["CONNECT_HOST", CONNECT_PORT, "MINER_USER_AGENT", "SESSION_ID"]
-    // ["NiceHash/1.0.0", null, "stratum3.decker.host", 18776] // ua, session_id, host, port?
+    // ["NiceHash/1.0.0", null, "stratum.hush.is", 28030] // ua, session_id, host, port?
     // ["ccminer/2.3.1"]
 
     UniValue ret(UniValue::VARR);
@@ -1622,7 +1622,7 @@ static bool g_shutdown = false;
 
 void BlockWatcher()
 {
-    RenameThread("blkwatcher");
+    RenameThread("hush-stratum-blkwatcher");
     boost::unique_lock<boost::mutex> lock(csBestBlock);
     boost::system_time checktxtime;
     boost::system_time starttime = boost::get_system_time();
@@ -1735,7 +1735,7 @@ void BlockWatcher()
 
 void SendKeepAlivePackets()
 {
-    RenameThread("sockklv");
+    RenameThread("hush-stratum-keepalive");
     while (true) {
         // Run the notifier on an integer second in the steady clock.
         auto now = std::chrono::steady_clock::now().time_since_epoch();
