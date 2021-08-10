@@ -312,10 +312,10 @@ namespace ccminer {
     /* compute nbits to get the network diff */
     double equi_network_diff(uint32_t nbits)
     {
-        //KMD bits: "1e 015971",
-        //KMD target: "00 00 015971000000000000000000000000000000000000000000000000000000",
-        //KMD bits: "1d 686aaf",
-        //KMD target: "00 0000 686aaf0000000000000000000000000000000000000000000000000000",
+        //HUSH bits: "1e 015971",
+        //HUSH target: "00 00 015971000000000000000000000000000000000000000000000000000000",
+        //HUSH bits: "1d 686aaf",
+        //HUSH target: "00 0000 686aaf0000000000000000000000000000000000000000000000000000",
         // uint32_t nbits = work->data[26];
 
         uint32_t bits = (nbits & 0xffffff);
@@ -1051,11 +1051,11 @@ bool SubmitBlock(StratumClient& client, const uint256& job_id, const StratumWork
             // std::cerr << strprintf("%f ms - %" PRIu64 "", elapsed.count(), shares_accepted_since_last) << std::endl;
         }
 
-        bool fDisplayDiffKMD = true; // otherwise it will display ccminer diff
+        bool fDisplayDiffHUSH = true; // otherwise it will display ccminer diff
 
         std::cerr << DateTimeStrPrecise() <<
                      strprintf("%saccepted: %" PRIu64 "/%" PRIu64 "%s ", ColorTypeNames[cl_WHT], counter_TotalBlocks, counter_TotalShares, ColorTypeNames[cl_N] );
-        if (fDisplayDiffKMD) {
+        if (fDisplayDiffHUSH) {
             /* hushd diff display */
             std::cerr << strprintf("%slocal %g%s ", "\x1B[90m", hush_local_diff, ColorTypeNames[cl_N]) <<
                          strprintf("%s(diff %g, target %g) %s ", ColorTypeNames[cl_WHT], hush_real_diff, hush_target_diff, ColorTypeNames[cl_N]);
@@ -1205,7 +1205,7 @@ UniValue stratum_mining_subscribe(StratumClient& client, const UniValue& params)
     ret.push_back(NullUniValue);
     ret.push_back(sExtraNonce1);
 
-    // On mining.subscribe we don't need ti send anything else, we will send
+    // On mining.subscribe we don't need to send anything else, we will send
     // mining.set_target and mining.notify bit later, inside GetWorkUnit.
     // Scheme is the following:
     // 1. stratum_read_cb(bufferevent * bev, void * ctx)
@@ -1417,7 +1417,6 @@ static void stratum_read_cb(bufferevent *bev, void *ctx)
         free(cstr);
         LogPrint("stratum", "Received stratum request from %s : %s\n", client.GetPeer().ToString(), line);
 
-        //JSONRPCRequest jreq;
         JSONRequest jreq;
 
         std::string reply;
@@ -1426,11 +1425,11 @@ static void stratum_read_cb(bufferevent *bev, void *ctx)
             UniValue valRequest;
             if (!valRequest.read(line)) {
                 // Not JSON; is this even a stratum miner?
-                throw JSONRPCError(RPC_PARSE_ERROR, "Parse error");
+                throw JSONRPCError(RPC_PARSE_ERROR, strprintf("Invalid JSON, Parse error on: %s",line) );
             }
             if (!valRequest.isObject()) {
                 // Not a JSON object; don't know what to do.
-                throw JSONRPCError(RPC_PARSE_ERROR, "Top-level object parse error");
+                throw JSONRPCError(RPC_PARSE_ERROR, "Not a JSON object");
             }
             if (valRequest.exists("result")) {
                 // JSON-RPC reply.  Ignore.
@@ -1809,7 +1808,10 @@ void SendKeepAlivePackets()
 bool InitStratumServer()
 {
     LOCK(cs_stratum);
-    fprintf(stderr,"%s: Starting built-in stratum server\n",__func__);
+
+    int stratumPort = BaseParams().StratumPort();
+    int defaultPort = GetArg("-stratumport", stratumPort);
+    fprintf(stderr,"%s: Starting built-in stratum server on port %d\n",__func__, defaultPort );
 
 
     if (!InitStratumAllowList(stratum_allow_subnets)) {
@@ -1834,14 +1836,12 @@ bool InitStratumServer()
         LogPrint("stratum", "Initialized stratum server\n");
     }
 
-    stratum_method_dispatch["mining.subscribe"] = stratum_mining_subscribe;
-    stratum_method_dispatch["mining.authorize"] = stratum_mining_authorize;
-    stratum_method_dispatch["mining.configure"] = stratum_mining_configure;
-    stratum_method_dispatch["mining.submit"]    = stratum_mining_submit;
-    stratum_method_dispatch["mining.extranonce.subscribe"] =
-        stratum_mining_extranonce_subscribe;
-    stratum_method_dispatch["mining.multi_version"] =
-        stratum_mining_multi_version;
+    stratum_method_dispatch["mining.subscribe"]            = stratum_mining_subscribe;
+    stratum_method_dispatch["mining.authorize"]            = stratum_mining_authorize;
+    stratum_method_dispatch["mining.configure"]            = stratum_mining_configure;
+    stratum_method_dispatch["mining.submit"]               = stratum_mining_submit;
+    stratum_method_dispatch["mining.extranonce.subscribe"] = stratum_mining_extranonce_subscribe;
+    stratum_method_dispatch["mining.multi_version"]        = stratum_mining_multi_version;
 
 
     // Start thread to wait for block notifications and send updated
@@ -1902,7 +1902,6 @@ UniValue rpc_stratum_updatework(const UniValue& params, bool fHelp, const CPubKe
     uint64_t skipped = 0;
 
     // send updated work to miners
-
     // if (cs_stratum.try_lock())
     {
         LOCK(cs_stratum);
@@ -1935,6 +1934,7 @@ UniValue rpc_stratum_updatework(const UniValue& params, bool fHelp, const CPubKe
 
             // Ignore clients that aren't authorized yet.
             if (!client.m_authorized && client.m_aux_addr.empty()) {
+                fprintf(stderr,"%s: Ignoring unauthorized client\n", __func__);
                 continue;
             }
 
