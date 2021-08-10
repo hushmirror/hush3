@@ -1792,7 +1792,10 @@ void hush_args(char *argv0)
         }
     }
 
+
 	name = GetArg("-ac_name","HUSH3");
+    fprintf(stderr,".oO Starting %s Full Node (Extreme Privacy!) with genproc=%d notary=%d\n",name.c_str(),HUSH_MININGTHREADS, IS_HUSH_NOTARY);
+
     if ( argv0 != 0 )
     {
         len = (int32_t)strlen(argv0);
@@ -1807,12 +1810,13 @@ void hush_args(char *argv0)
             }
         }
     }
+
     vector<string> HUSH_nodes= {"node1.hush.is","node2.hush.is","node3.hush.is",
                                 "node4.hush.is","node5.hush.is","node6.hush.is",
                                 "node7.hush.is","node8.hush.is"};
     vector<string> more_nodes = mapMultiArgs["-addnode"];
     if (more_nodes.size() > 0) {
-        fprintf(stderr,"Adding %lu more nodes via custom -addnode arguments", more_nodes.size() );
+        fprintf(stderr,"%s: Adding %lu more nodes via custom -addnode arguments\n", __func__, more_nodes.size() );
     }
     // Add default HUSH nodes after custom addnodes
     more_nodes.insert( more_nodes.end(), HUSH_nodes.begin(), HUSH_nodes.end() );
@@ -1830,7 +1834,6 @@ void hush_args(char *argv0)
     HUSH_SNAPSHOT_INTERVAL   = GetArg("-ac_snapshot",0);
     Split(GetArg("-ac_nk",""), sizeof(ASSETCHAINS_NK)/sizeof(*ASSETCHAINS_NK), ASSETCHAINS_NK, 0);
 
-    fprintf(stderr,".oO Starting HUSH Full Node (Extreme Privacy!) with genproc=%d notary=%d\n",HUSH_MININGTHREADS, IS_HUSH_NOTARY);
     
     // -ac_ccactivateht=evalcode,height,evalcode,height,evalcode,height....
     Split(GetArg("-ac_ccactivateht",""), sizeof(ccEnablesHeight)/sizeof(*ccEnablesHeight), ccEnablesHeight, 0);
