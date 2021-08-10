@@ -65,7 +65,7 @@
 #include <cinttypes>
 
 
-extern uint16_t ASSETCHAINS_RPCPORT; // don't want to include komodo_globals.h
+extern uint16_t ASSETCHAINS_RPCPORT; // don't want to include hush_globals.h
 UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDetails = false); // rpc/blockchain.cpp
 bool DecodeHexTx(CTransaction& tx, const std::string& strHexTx); // src/core_read.cpp
 
@@ -286,7 +286,7 @@ namespace ccminer {
         }
     }
 
-    void kmd_diff_to_target_equi(uint32_t *target, double diff)
+    void hush_diff_to_target_equi(uint32_t *target, double diff)
     {
         uint64_t m;
         int k;
@@ -797,27 +797,27 @@ std::string GetWorkUnit(StratumClient& client)
         arith_uint256 hashTarget; bool fNegative,fOverflow;
         /*
 
-        // Targets Table Example: komodo diff and ccminer diff are different (!),
+        // Targets Table Example: hush diff and ccminer diff are different (!),
         // Hush diff = NiceHash diff, ccminer_diff = Yiimp diff.
 
         hashTarget.SetCompact(HUSH_MINDIFF_NBITS,&fNegative,&fOverflow); // blkhdr.nBits
         hashTarget = UintToArith256(uint256S("0x0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"));
         hashTarget.SetHex("0x0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f");
 
-        hashTarget.SetHex("00ffff0000000000000000000000000000000000000000000000000000000000"); // komodo_diff = 15.0591, ccminer_diff = 1
-        hashTarget.SetHex("003fffc000000000000000000000000000000000000000000000000000000000"); // komodo_diff = 60.2362, ccminer_diff = 4
-        hashTarget.SetHex("0007fff800000000000000000000000000000000000000000000000000000000"); // komodo_diff = 481.89, ccminer_diff = 31.9999
-        hashTarget.SetHex("c7ff3800ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // komodo_diff = 0.0752956, ccminer_diff = 1.00303
-        hashTarget.SetHex("0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"); // komodo_diff = 1, ccminer_diff = 16.9956
+        hashTarget.SetHex("00ffff0000000000000000000000000000000000000000000000000000000000"); // hush_diff = 15.0591, ccminer_diff = 1
+        hashTarget.SetHex("003fffc000000000000000000000000000000000000000000000000000000000"); // hush_diff = 60.2362, ccminer_diff = 4
+        hashTarget.SetHex("0007fff800000000000000000000000000000000000000000000000000000000"); // hush_diff = 481.89, ccminer_diff = 31.9999
+        hashTarget.SetHex("c7ff3800ffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // hush_diff = 0.0752956, ccminer_diff = 1.00303
+        hashTarget.SetHex("0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f"); // hush_diff = 1, ccminer_diff = 16.9956
         */
 
         arith_uint256 aHashTarget = instance_of_cstratumparams.getTarget();
 
         // arith_uint256 aHashTarget = UintToArith256(uint256S("00ffff0000000000000000000000000000000000000000000000000000000000")); // 1.0
-        // aHashTarget = aHashTarget / 8704; // komodo_diff = 131074 (NiceHash), ccminer_diff = 8704 (Yiimp)
+        // aHashTarget = aHashTarget / 8704; // hush_diff = 131074 (NiceHash), ccminer_diff = 8704 (Yiimp)
 
         /* here we can adjust diff by some algo, note that 00ffff0000000000000000000000000000000000000000000000000000000000 / 8704 =
-           0000078780000000000000000000000000000000000000000000000000000000, which is equivalent to komodo_diff = 131074 (NiceHash),
+           0000078780000000000000000000000000000000000000000000000000000000, which is equivalent to hush_diff = 131074 (NiceHash),
            ccminer_diff = 8704 (Yiimp)
         */
 
@@ -827,7 +827,7 @@ std::string GetWorkUnit(StratumClient& client)
 
         if (instance_of_cstratumparams.fstdErrDebugOutput) {
             std::cerr << DateTimeStrPrecise() << __func__ << ": " << __FILE__ << "," << __LINE__ <<
-                    strprintf(" target = %s, komodo_diff = %g, ccminer_diff = %g",
+                    strprintf(" target = %s, hush_diff = %g, ccminer_diff = %g",
                     strTarget, GetDifficultyFromBits(hashTarget.GetCompact(false)), ccminer::equi_stratum_target_to_diff(strTarget)) << std::endl;
         }
     }
@@ -1022,11 +1022,11 @@ bool SubmitBlock(StratumClient& client, const uint256& job_id, const StratumWork
         CBlockIndex tmp_index;
 
         tmp_index.nBits = blkhdr.nBits;
-        double kmd_target_diff = GetDifficulty(&tmp_index); // diff from nbits (target)
+        double hush_target_diff = GetDifficulty(&tmp_index); // diff from nbits (target)
         tmp_index.nBits = UintToArith256(hash).GetCompact();
-        double kmd_real_diff = GetDifficulty(&tmp_index); // real diff (from hash)
+        double hush_real_diff = GetDifficulty(&tmp_index); // real diff (from hash)
         tmp_index.nBits = arith_uint256(current_work.local_diff).GetCompact();
-        double kmd_local_diff = GetDifficulty(&tmp_index); // local diff (from local port diff)
+        double hush_local_diff = GetDifficulty(&tmp_index); // local diff (from local port diff)
 
         double ccminer_real_diff = ccminer::equi_stratum_target_to_diff(hash.ToString());
         double ccminer_target_diff = ccminer::equi_stratum_target_to_diff(arith_uint256().SetCompact(blkhdr.nBits).ToString());
@@ -1040,7 +1040,7 @@ bool SubmitBlock(StratumClient& client, const uint256& job_id, const StratumWork
         // TODO: we need to check hash > local port diff, and if it's true -> throw an exception -> diff too low (!)
         if (!instance_of_cstratumparams.fAllowLowDiffShares)
             if (UintToArith256(blkhdr.GetHash()) > arith_uint256(current_work.local_diff))
-                throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Low diff share (diff %g, local %g)", kmd_real_diff, kmd_local_diff));
+                throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Low diff share (diff %g, local %g)", hush_real_diff, hush_local_diff));
 
         if (finish > start)
         {
@@ -1056,12 +1056,10 @@ bool SubmitBlock(StratumClient& client, const uint256& job_id, const StratumWork
         std::cerr << DateTimeStrPrecise() <<
                      strprintf("%saccepted: %" PRIu64 "/%" PRIu64 "%s ", ColorTypeNames[cl_WHT], counter_TotalBlocks, counter_TotalShares, ColorTypeNames[cl_N] );
         if (fDisplayDiffKMD) {
-            /* komodod diff display */
-            std::cerr << strprintf("%slocal %g%s ", "\x1B[90m", kmd_local_diff, ColorTypeNames[cl_N]) <<
-                         strprintf("%s(diff %g, target %g) %s ", ColorTypeNames[cl_WHT], kmd_real_diff, kmd_target_diff, ColorTypeNames[cl_N]);
-        }
-        else
-        {   /* ccminer diff display */
+            /* hushd diff display */
+            std::cerr << strprintf("%slocal %g%s ", "\x1B[90m", hush_local_diff, ColorTypeNames[cl_N]) <<
+                         strprintf("%s(diff %g, target %g) %s ", ColorTypeNames[cl_WHT], hush_real_diff, hush_target_diff, ColorTypeNames[cl_N]);
+        } else {   /* ccminer diff display */
             std::cerr << strprintf("%slocal %.3f%s ", "\x1B[90m", ccminer_local_diff, ColorTypeNames[cl_N]) <<
                          strprintf("%s(diff %.3f, target %.3f) %s", ColorTypeNames[cl_WHT], ccminer_real_diff, ccminer_target_diff, ColorTypeNames[cl_N]); // ccminer diff
         }
@@ -2005,14 +2003,14 @@ UniValue rpc_stratum_getdifficulty (const UniValue& params, bool fHelp, const CP
 
     CBlockIndex tmp_index;
     tmp_index.nBits = arith_uint256(strTarget).GetCompact();
-    double kmd_diff = GetDifficulty(&tmp_index);
+    double hush_diff = GetDifficulty(&tmp_index);
     double ccminer_diff = ccminer::equi_stratum_target_to_diff(strTarget);
 
     obj.push_back(Pair("target", strTarget));
     obj.push_back(Pair("target_compact", strprintf("%08x",tmp_index.nBits)));
-    obj.push_back(Pair("kmd_diff_str", strprintf("%g",kmd_diff)));
+    obj.push_back(Pair("hush_diff_str", strprintf("%g",hush_diff)));
     obj.push_back(Pair("ccminer_diff_str", strprintf("%g", ccminer_diff)));
-    obj.push_back(Pair("kmd_diff", kmd_diff));
+    obj.push_back(Pair("hush_diff", hush_diff));
     obj.push_back(Pair("ccminer_diff", ccminer_diff));
 
     return obj;
@@ -2035,7 +2033,7 @@ UniValue rpc_stratum_setdifficulty (const UniValue& params, bool fHelp, const CP
             - bits -> difficulty (GetDifficulty() in bitcoin/src/rpc/blockchain.cpp)
             - target -> bits (GetCompact() in bitcoin/src/arith_uint256.cpp)
             - target -> difficulty (same as target -> bits -> difficulty)
-            - difficulty -> bits (not done in bitcoin/src) -> we will use kmd_diff_to_target_equi for that
+            - difficulty -> bits (not done in bitcoin/src) -> we will use hush_diff_to_target_equi for that
             - difficulty -> target (same as difficulty -> bits -> target)
     */
     if (fHelp || params.size() != 1)
@@ -2047,11 +2045,11 @@ UniValue rpc_stratum_setdifficulty (const UniValue& params, bool fHelp, const CP
             + HelpExampleRpc("stratum_setdifficulty", "")
         );
 
-    // diff can be accepted in two ways: as a hex target or as a kmd_diff, both variants assume
+    // diff can be accepted in two ways: as a hex target or as a hush_diff, both variants assume
     // passing a string with 32 bytes hex target or string (!) with a double value, or double
     // value as a double
 
-    double kmd_diff; // calculated value: diff_str -> kmd_diff
+    double hush_diff; // calculated value: diff_str -> hush_diff
     std::string diff_str = instance_of_cstratumparams.getTarget().ToString();
 
     if (params[0].getType() == UniValue::VSTR) {
@@ -2061,24 +2059,24 @@ UniValue rpc_stratum_setdifficulty (const UniValue& params, bool fHelp, const CP
             diff_str = param_str;
 
         } else {
-            if (ParseDouble(param_str, &kmd_diff)) {
+            if (ParseDouble(param_str, &hush_diff)) {
                 // kmd diff as a str passed
 
                 // difficulty = difficulty_1_target / current_target
                 arith_uint256 target;
-                ccminer::kmd_diff_to_target_equi((uint32_t *)&target, kmd_diff);
+                ccminer::hush_diff_to_target_equi((uint32_t *)&target, hush_diff);
                 diff_str = target.ToString();
 
             } else
-                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid difficulty (not hex target, not kmd_diff)");
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid difficulty (not hex target, not hush_diff)");
         }
     } else if (params[0].getType() == UniValue::VNUM) {
         // kmd diff as a num passed
-        kmd_diff = params[0].get_real();
+        hush_diff = params[0].get_real();
 
         // difficulty = difficulty_1_target / current_target
         arith_uint256 target;
-        ccminer::kmd_diff_to_target_equi((uint32_t *)&target, kmd_diff);
+        ccminer::hush_diff_to_target_equi((uint32_t *)&target, hush_diff);
         diff_str = target.ToString();
 
     } else
@@ -2092,9 +2090,9 @@ UniValue rpc_stratum_setdifficulty (const UniValue& params, bool fHelp, const CP
     CBlockIndex tmp_index;
     tmp_index.nBits = arith_uint256(diff_str).GetCompact();
 
-    double new_kmd_diff = GetDifficulty(&tmp_index);
-    obj.push_back(Pair("kmd_diff_str", strprintf("%g",new_kmd_diff)));
-    obj.push_back(Pair("kmd_diff", new_kmd_diff));
+    double new_hush_diff = GetDifficulty(&tmp_index);
+    obj.push_back(Pair("hush_diff_str", strprintf("%g",new_hush_diff)));
+    obj.push_back(Pair("hush_diff", new_hush_diff));
 
     return obj;
 };
