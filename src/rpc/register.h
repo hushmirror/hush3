@@ -1,7 +1,7 @@
+// Copyright (c) 2016-2021 The Hush developers
 // Copyright (c) 2009-2016 The Bitcoin Core developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -38,6 +38,9 @@ void RegisterRawTransactionRPCCommands(CRPCTable &tableRPC);
 /** Register test transaction RPC commands */
 void RegisterTesttransactionsRPCCommands(CRPCTable &tableRPC);
 
+/** Register stratum RPC commands */
+void RegisterStratumRPCCommands(CRPCTable &tableRPC);
+
 
 static inline void RegisterAllCoreRPCCommands(CRPCTable &tableRPC)
 {
@@ -49,6 +52,7 @@ static inline void RegisterAllCoreRPCCommands(CRPCTable &tableRPC)
 #ifdef TESTMODE
     RegisterTesttransactionsRPCCommands(tableRPC);
 #endif
+    RegisterStratumRPCCommands(tableRPC);
 }
 
 #endif

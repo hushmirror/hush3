@@ -36,6 +36,7 @@
 #include "httprpc.h"
 #include "key.h"
 #include "notarizationdb.h"
+#include "stratum.h"
 
 #ifdef ENABLE_MINING
 #include "key_io.h"
@@ -89,6 +90,7 @@
 using namespace std;
 
 #include "hush_defs.h"
+static const bool DEFAULT_STRATUM_ENABLE = false;
 extern void ThreadSendAlert();
 extern bool hush_dailysnapshot(int32_t height);
 extern int32_t HUSH_LOADINGBLOCKS;
@@ -187,6 +189,7 @@ static boost::scoped_ptr<ECCVerifyHandle> globalVerifyHandle;
 
 void Interrupt(boost::thread_group& threadGroup)
 {
+    InterruptStratumServer();
     InterruptHTTPServer();
     InterruptHTTPRPC();
     InterruptRPC();
@@ -218,6 +221,7 @@ void Shutdown()
     StopHTTPRPC();
     StopREST();
     StopRPC();
+    StopStratumServer();
     StopHTTPServer();
 #ifdef ENABLE_WALLET
     if (pwalletMain)
@@ -508,7 +512,7 @@ std::string HelpMessage(HelpMessageMode mode)
         strUsage += HelpMessageOpt("-stopafterblockimport", strprintf("Stop running after importing blocks from disk (default: %u)", 0));
         strUsage += HelpMessageOpt("-nuparams=hexBranchId:activationHeight", "Use given activation height for specified network upgrade (regtest-only)");
     }
-    string debugCategories = "addrman, alert, bench, coindb, db, deletetx, estimatefee, http, libevent, lock, mempool, net, tls, partitioncheck, pow, proxy, prune, rand, reindex, rpc, selectcoins, tor, zmq, zrpc, zrpcunsafe (implies zrpc)"; // Don't translate these
+    string debugCategories = "addrman, alert, bench, coindb, db, deletetx, estimatefee, http, libevent, lock, mempool, net, tls, partitioncheck, pow, proxy, prune, rand, reindex, rpc, selectcoins, stratum, tor, zmq, zrpc, zrpcunsafe (implies zrpc)"; // Don't translate these
     strUsage += HelpMessageOpt("-debug=<category>", strprintf(_("Output debugging information (default: %u, supplying <category> is optional)"), 0) + ". " +
         _("If <category> is not supplied or if <category> = 1, output all debugging information.") + " " + _("<category> can be:") + " " + debugCategories + ".");
     strUsage += HelpMessageOpt("-experimentalfeatures", _("Enable use of experimental features"));
@@ -582,6 +586,13 @@ std::string HelpMessage(HelpMessageMode mode)
         strUsage += HelpMessageOpt("-metricsui", _("Set to 1 for a persistent metrics screen, 0 for sequential metrics output (default: 1 if running in a console, 0 otherwise)"));
         strUsage += HelpMessageOpt("-metricsrefreshtime", strprintf(_("Number of seconds between metrics refreshes (default: %u if running in a console, %u otherwise)"), 1, 600));
     }
+
+    strUsage += HelpMessageGroup(_("Stratum server options:"));
+    strUsage += HelpMessageOpt("-stratum", _("Enable stratum server (default: off)"));
+    strUsage += HelpMessageOpt("-stratumbind=<addr>", _("Bind to given address to listen for Stratum work requests. Use [host]:port notation for IPv6. This option can be specified multiple times (default: bind to all interfaces)"));
+    strUsage += HelpMessageOpt("-stratumport=<port>", strprintf(_("Listen for Stratum work requests on <port> (default: %u or testnet: %u)"), BaseParams().StratumPort(), BaseParams().StratumPort()));
+    strUsage += HelpMessageOpt("-stratumallowip=<ip>", _("Allow Stratum work requests from specified source. Valid for <ip> are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times"));
+
     strUsage += HelpMessageGroup(_("Hush Smart Chain options:"));
     strUsage += HelpMessageOpt("-ac_algo", _("Choose PoW mining algorithm, default is Equihash (200,9)"));
     strUsage += HelpMessageOpt("-ac_blocktime", _("Block time in seconds, default is 60"));
@@ -941,9 +952,12 @@ static void ZC_LoadParams(
 
 bool AppInitServers(boost::thread_group& threadGroup)
 {
+    fprintf(stderr,"%s: start\n",__func__);
     RPCServer::OnStopped(&OnRPCStopped);
     RPCServer::OnPreCommand(&OnRPCPreCommand);
     if (!InitHTTPServer())
+        return false;
+    if (GetBoolArg("-stratum", DEFAULT_STRATUM_ENABLE) && !InitStratumServer())
         return false;
     if (!StartRPC())
         return false;
