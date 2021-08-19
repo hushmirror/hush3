@@ -1567,7 +1567,6 @@ inline CBlockIndex* LookupBlockIndex(const uint256& hash)
 
 UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    THROW_IF_SYNCING(HUSH_INSYNC);
 
     if (fHelp || params.size() > 2)
         throw runtime_error(
@@ -1630,6 +1629,8 @@ UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk
             + HelpExampleCli("getchaintxstats", "")
             + HelpExampleRpc("getchaintxstats", "2016")
         );
+
+    THROW_IF_SYNCING(HUSH_INSYNC);
 
     const CBlockIndex* pindex;
     int blockcount = 30 * 24 * 60 * 60 / Params().GetConsensus().nPowTargetSpacing; // By default: 1 month
