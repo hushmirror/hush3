@@ -1,10 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
 // Copyright (c) 2016-2021 The Hush developers
-
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -80,15 +78,13 @@ const CBlockIndex *CChain::FindFork(const CBlockIndex *pindex) const {
 
 CChainPower::CChainPower(CBlockIndex *pblockIndex)
 {
-     nHeight = pblockIndex->GetHeight();
-     chainStake = arith_uint256(0);
+     nHeight   = pblockIndex->GetHeight();
      chainWork = arith_uint256(0);
 }
 
-CChainPower::CChainPower(CBlockIndex *pblockIndex, const arith_uint256 &stake, const arith_uint256 &work)
+CChainPower::CChainPower(CBlockIndex *pblockIndex, const arith_uint256 &work)
 {
-     nHeight = pblockIndex->GetHeight();
-     chainStake = stake;
+     nHeight   = pblockIndex->GetHeight();
      chainWork = work;
 }
 
@@ -96,37 +92,28 @@ bool operator==(const CChainPower &p1, const CChainPower &p2)
 {
     arith_uint256 bigZero = arith_uint256(0);
     arith_uint256 workDivisor = p1.chainWork > p2.chainWork ? p1.chainWork : (p2.chainWork != bigZero ? p2.chainWork : 1);
-    arith_uint256 stakeDivisor = p1.chainStake > p2.chainStake ? p1.chainStake : (p2.chainStake != bigZero ? p2.chainStake : 1);
 
     // use up 16 bits for precision
-    return ((p1.chainWork << 16) / workDivisor + (p1.chainStake << 16) / stakeDivisor) ==
-            ((p2.chainWork << 16) / workDivisor + (p2.chainStake << 16) / stakeDivisor);
+    return ((p1.chainWork << 16) / workDivisor  == ((p2.chainWork << 16) / workDivisor));
 }
 
 bool operator<(const CChainPower &p1, const CChainPower &p2)
 {
     arith_uint256 bigZero = arith_uint256(0);
     arith_uint256 workDivisor = p1.chainWork > p2.chainWork ? p1.chainWork : (p2.chainWork != bigZero ? p2.chainWork : 1);
-    arith_uint256 stakeDivisor = p1.chainStake > p2.chainStake ? p1.chainStake : (p2.chainStake != bigZero ? p2.chainStake : 1);
 
     // use up 16 bits for precision
-    return ((p1.chainWork << 16) / workDivisor + (p1.chainStake << 16) / stakeDivisor) <
-            ((p2.chainWork << 16) / workDivisor + (p2.chainStake << 16) / stakeDivisor);
+    return ((p1.chainWork << 16) / workDivisor  < ((p2.chainWork << 16) / workDivisor));
 }
 
 bool operator<=(const CChainPower &p1, const CChainPower &p2)
 {
     arith_uint256 bigZero = arith_uint256(0);
     arith_uint256 workDivisor = p1.chainWork > p2.chainWork ? p1.chainWork : (p2.chainWork != bigZero ? p2.chainWork : 1);
-    arith_uint256 stakeDivisor = p1.chainStake > p2.chainStake ? p1.chainStake : (p2.chainStake != bigZero ? p2.chainStake : 1);
 
     // use up 16 bits for precision
-    return ((p1.chainWork << 16) / workDivisor + (p1.chainStake << 16) / stakeDivisor) <=
-            ((p2.chainWork << 16) / workDivisor + (p2.chainStake << 16) / stakeDivisor);
+    return ((p1.chainWork << 16) / workDivisor <= ((p2.chainWork << 16) / workDivisor));
 }
-
-
-
 
 /** Turn the lowest '1' bit in the binary representation of a number into a '0'. */
 int static inline InvertLowestOne(int n) { return n & (n - 1); }

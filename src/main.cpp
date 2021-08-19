@@ -4207,19 +4207,17 @@ static bool ActivateBestChainStep(bool fSkipdpow, CValidationState &state, CBloc
     if ( reorgLength > MAX_REORG_LENGTH)
     {
         auto msg = strprintf(_(
-                               "A block chain reorganization has been detected that would roll back %d blocks! "
+                               "A block chain reorganization has been detected that would roll back %d blocks!!! "
                                "This is larger than the maximum of %d blocks, and so the node is shutting down for your safety."
                                ), reorgLength, MAX_REORG_LENGTH) + "\n\n" +
         _("Reorganization details") + ":\n" +
-        "- " + strprintf(_("Current tip: %s, height %d, work %s\nstake %s"),
-                         pindexOldTip->phashBlock->GetHex(), pindexOldTip->GetHeight(), pindexOldTip->chainPower.chainWork.GetHex(),
-                         pindexOldTip->chainPower.chainStake.GetHex()) + "\n" +
-        "- " + strprintf(_("New tip:     %s, height %d, work %s\nstake %s"),
-                         pindexMostWork->phashBlock->GetHex(), pindexMostWork->GetHeight(), pindexMostWork->chainPower.chainWork.GetHex(),
-                         pindexMostWork->chainPower.chainStake.GetHex()) + "\n" +
+        "- " + strprintf(_("Current tip: %s, height %d, work %s\n"),
+                         pindexOldTip->phashBlock->GetHex(), pindexOldTip->GetHeight(), pindexOldTip->chainPower.chainWork.GetHex()) +  "\n" +
+        "- " + strprintf(_("New tip:     %s, height %d, work %s\n"),
+                         pindexMostWork->phashBlock->GetHex(), pindexMostWork->GetHeight(), pindexMostWork->chainPower.chainWork.GetHex()) + "\n" +
         "- " + strprintf(_("Fork point:  %s %s, height %d"),
                          SMART_CHAIN_SYMBOL,pindexFork->phashBlock->GetHex(), pindexFork->GetHeight()) + "\n\n" +
-        _("Please help, human!");
+        _("Please help me, wise human!");
         LogPrintf("*** %s\nif you launch with -maxreorg=%d it might be able to resolve this automatically", msg,reorgLength+10);
         fprintf(stderr,"*** %s\nif you launch with -maxreorg=%d it might be able to resolve this automatically", msg.c_str(),reorgLength+10);
         uiInterface.ThreadSafeMessageBox(msg, "", CClientUIInterface::MSG_ERROR);

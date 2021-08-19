@@ -127,31 +127,23 @@ static const BlockStatus BLOCK_VALID_CONSENSUS = BLOCK_VALID_SCRIPTS;
 
 class CBlockIndex;
 
-// This class provides an accumulator for both the chainwork and the chainPOS value
-// CChainPower's can be compared, and the comparison ensures that work and proof of stake power
-// are both used equally to determine which chain has the most work. This makes an attack
-// that involves mining in secret completely ineffective, even before dPOW, unless a large part 
-// of the staking supply is also controlled. It also enables a faster deterministic convergence, 
-// aided by both POS and POW.
-// TODO: delete this junk
+// This class provides an accumulator for chainwork
 class CChainPower
 {
     public:
         arith_uint256 chainWork;
-        arith_uint256 chainStake;
         int32_t nHeight;
 
-        CChainPower() : nHeight(0), chainStake(0), chainWork(0) {}
+        CChainPower() : nHeight(0), chainWork(0) {}
         CChainPower(CBlockIndex *pblockIndex);
-        CChainPower(CBlockIndex *pblockIndex, const arith_uint256 &stake, const arith_uint256 &work);
-        CChainPower(int32_t height) : nHeight(height), chainStake(0), chainWork(0) {}
-        CChainPower(int32_t height, const arith_uint256 &stake, const arith_uint256 &work) : 
-                    nHeight(height), chainStake(stake), chainWork(work) {}
+        CChainPower(CBlockIndex *pblockIndex, const arith_uint256 &work);
+        CChainPower(int32_t height) : nHeight(height), chainWork(0) {}
+        CChainPower(int32_t height, const arith_uint256 &work) : 
+                    nHeight(height),  chainWork(work) {}
 
         CChainPower &operator=(const CChainPower &chainPower)
         {
             chainWork = chainPower.chainWork;
-            chainStake = chainPower.chainStake;
             nHeight = chainPower.nHeight;
             return *this;
         }
@@ -159,7 +151,6 @@ class CChainPower
         CChainPower &operator+=(const CChainPower &chainPower)
         {
             this->chainWork += chainPower.chainWork;
-            this->chainStake += chainPower.chainStake;
             return *this;
         }
 
@@ -167,7 +158,6 @@ class CChainPower
         {
             CChainPower result = CChainPower(chainPowerA);
             result.chainWork += chainPowerB.chainWork;
-            result.chainStake += chainPowerB.chainStake;
             return result;
         }
 
@@ -175,7 +165,6 @@ class CChainPower
         {
             CChainPower result = CChainPower(chainPowerA);
             result.chainWork -= chainPowerB.chainWork;
-            result.chainStake -= chainPowerB.chainStake;
             return result;
         }
 
@@ -183,14 +172,7 @@ class CChainPower
         {
             CChainPower result = CChainPower(chainPower);
             result.chainWork *= x;
-            result.chainStake *= x;
             return result;
-        }
-
-        CChainPower &addStake(const arith_uint256 &nChainStake)
-        {
-            chainStake += nChainStake;
-            return *this;
         }
 
         CChainPower &addWork(const arith_uint256 &nChainWork)

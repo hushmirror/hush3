@@ -749,7 +749,7 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
 
 CChainPower GetBlockProof(const CBlockIndex& block)
 {
-    arith_uint256 bnWorkTarget, bnStakeTarget = arith_uint256(0);
+    arith_uint256 bnWorkTarget;
 
     bool fNegative;
     bool fOverflow;
@@ -758,7 +758,7 @@ CChainPower GetBlockProof(const CBlockIndex& block)
     if (fNegative || fOverflow || bnWorkTarget == 0)
         return CChainPower(0);
 
-    return CChainPower(0, bnStakeTarget, (~bnWorkTarget / (bnWorkTarget + 1)) + 1);
+    return CChainPower(0, (~bnWorkTarget / (bnWorkTarget + 1)) + 1);
 }
 
 int64_t GetBlockProofEquivalentTime(const CBlockIndex& to, const CBlockIndex& from, const CBlockIndex& tip, const Consensus::Params& params)
