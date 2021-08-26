@@ -578,7 +578,7 @@ CScript hush_makeopret(CBlock *pblock, bool fNew)
 
  uint256 _hush_getblockhash(int32_t height);*/
 
-uint64_t komodo_seed(int32_t height)
+uint64_t hush_seed(int32_t height)
 {
     uint64_t seed = 0;
     /*if ( 0 ) // problem during init time, seeds are needed for loading blockindex, so null seeds...
@@ -659,7 +659,7 @@ bool hush_hardfork_active(uint32_t time)
     return isactive;
 }
 
-int32_t komodo_isPoS(CBlock *pblock,int32_t height,bool fJustCheck)
+int32_t hush_isPoS(CBlock *pblock,int32_t height,bool fJustCheck)
 {
     return(0);
 }
@@ -1424,7 +1424,7 @@ arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t he
 // lulz
 int32_t komodo_is_PeiceOfShit() { return(1); }
 
-uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount)
+uint64_t hush_notarypayamount(int32_t nHeight, int64_t notarycount)
 {
     int8_t curEra = 0; int64_t ret = 0;
     // if we have an end block in the first era, find our current era
@@ -1441,7 +1441,7 @@ uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount)
     
     if ( notarycount == 0 )
     {
-        fprintf(stderr, "komodo_notarypayamount failed num notaries is 0!\n");
+        fprintf(stderr, "hush_notarypayamount failed num notaries is 0!\n");
         return(0);
     }
     // Because of reorgs we cannot use the notarized height value. 
@@ -1471,7 +1471,7 @@ int32_t hush_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *scri
     return(notarizedheight);
 }
 
-uint64_t komodo_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len)
+uint64_t hush_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len)
 {
     // fetch notary pubkey array.
     uint64_t total = 0, AmountToPay = 0;
@@ -1491,7 +1491,7 @@ uint64_t komodo_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &Notar
     txNew.vout.resize(NotarizationNotaries.size()+1);
     
     // Calcualte the amount to pay according to the current era.
-    AmountToPay = komodo_notarypayamount(height,NotarizationNotaries.size());
+    AmountToPay = hush_notarypayamount(height,NotarizationNotaries.size());
     if ( AmountToPay == 0 )
         return(0);
     
@@ -1566,7 +1566,7 @@ uint64_t hush_checknotarypay(CBlock *pblock,int32_t height)
         {
             // Create the coinbase tx again, using the extracted data, this is the same function the miner uses, with the same data. 
             // This allows us to know exactly that the coinbase is correct.
-            totalsats = komodo_notarypay(txNew, NotarizationNotaries, pblock->nTime, height, script, scriptlen);
+            totalsats = hush_notarypay(txNew, NotarizationNotaries, pblock->nTime, height, script, scriptlen);
         } 
         else 
         {

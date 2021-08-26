@@ -145,7 +145,7 @@ uint64_t the_commission(const CBlock *block,int32_t height);
 int32_t hush_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *ptr);
 int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 int32_t hush_is_notarytx(const CTransaction& tx);
-uint64_t komodo_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len);
+uint64_t hush_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 int32_t hush_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *script, int32_t len);
 CScript komodo_mineropret(int32_t nHeight);
@@ -649,7 +649,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
             int32_t scriptlen = (int32_t)pblock->vtx[1].vout[1].scriptPubKey.size();
             if ( script[0] == OP_RETURN )
             {
-                uint64_t totalsats = komodo_notarypay(txNew, NotarizationNotaries, pblock->nTime, nHeight, script, scriptlen);
+                uint64_t totalsats = hush_notarypay(txNew, NotarizationNotaries, pblock->nTime, nHeight, script, scriptlen);
                 if ( totalsats == 0 )
                 {
                     fprintf(stderr, "Could not create notary payment, trying again.\n");

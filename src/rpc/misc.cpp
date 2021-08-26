@@ -67,7 +67,7 @@ extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
 uint32_t hush_segid32(char *coinaddr);
 int64_t hush_coinsupply(int64_t *zfundsp,int64_t *sproutfundsp,int32_t height);
 int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_heightp);
-uint64_t komodo_notarypayamount(int32_t nHeight, int64_t notarycount);
+uint64_t hush_notarypayamount(int32_t nHeight, int64_t notarycount);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 
 extern uint16_t ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT;
@@ -1211,7 +1211,7 @@ UniValue getnotarypayinfo(const UniValue& params, bool fHelp, const CPubKey& myp
     balance = checkburnaddress(received, TotalNotaryPay, height, "REDVp3ox1pbcWYCzySadfHhk8UU3HM4k5x");
     
     notarycount = hush_notaries(notarypubkeys, height, chainActive[height]->GetBlockTime());
-    NotaryPay   = komodo_notarypayamount(height, notarycount)*notarycount;
+    NotaryPay   = hush_notarypayamount(height, notarycount)*notarycount;
     bool spent  = (received != balance);
     if ( !spent )
     {

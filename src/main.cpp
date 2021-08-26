@@ -3845,7 +3845,7 @@ bool static DisconnectTip(CValidationState &state, bool fBare = false) {
             CValidationState stateDummy;
 
             // don't keep staking or invalid transactions
-            if (tx.IsCoinBase() || ((i == (block.vtx.size() - 1)) && (ASSETCHAINS_STAKED && komodo_isPoS((CBlock *)&block,pindexDelete->GetHeight(),true) != 0)) || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
+            if (tx.IsCoinBase() || ((i == (block.vtx.size() - 1)) && (ASSETCHAINS_STAKED && hush_isPoS((CBlock *)&block,pindexDelete->GetHeight(),true) != 0)) || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
             {
                 mempool.remove(tx, removed, true);
             }

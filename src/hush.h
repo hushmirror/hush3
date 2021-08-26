@@ -780,7 +780,7 @@ int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryi
 
 int32_t gettxout_scriptPubKey(uint8_t *scriptPubKey,int32_t maxsize,uint256 txid,int32_t n);
 
-int32_t komodo_notarycmp(uint8_t *scriptPubKey,int32_t scriptlen,uint8_t pubkeys[64][33],int32_t numnotaries,uint8_t rmd160[20])
+int32_t hush_notarycmp(uint8_t *scriptPubKey,int32_t scriptlen,uint8_t pubkeys[64][33],int32_t numnotaries,uint8_t rmd160[20])
 {
     int32_t i;
     if ( scriptlen == 25 && memcmp(&scriptPubKey[3],rmd160,20) == 0 )
@@ -858,7 +858,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
                     continue;
                 if ( (scriptlen= gettxout_scriptPubKey(scriptPubKey,sizeof(scriptPubKey),block.vtx[i].vin[j].prevout.hash,block.vtx[i].vin[j].prevout.n)) > 0 )
                 {
-                    if ( (k= komodo_notarycmp(scriptPubKey,scriptlen,pubkeys,numnotaries,rmd160)) >= 0 )
+                    if ( (k= hush_notarycmp(scriptPubKey,scriptlen,pubkeys,numnotaries,rmd160)) >= 0 )
                         signedmask |= (1LL << k);
                     else if ( 0 && numvins >= 17 )
                     {
