@@ -2120,7 +2120,7 @@ void RelayTransaction(const CTransaction& tx, const CDataStream& ss)
     random_shuffle( vRelayNodes.begin(), vRelayNodes.end(), GetRandInt );
 
     vRelayNodes.resize(newSize);
-    fprintf(stderr, "%s: Relaying to %lu peers\n", __func__, newSize);
+    fprintf(stderr, "%s: Relaying to %lu of %lu peers\n", __func__, newSize, vNodes.size() );
 
     // Only relay to randomly chosen 50% of peers
     BOOST_FOREACH(CNode* pnode, vRelayNodes)
