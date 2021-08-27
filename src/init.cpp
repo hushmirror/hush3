@@ -589,10 +589,12 @@ std::string HelpMessage(HelpMessageMode mode)
 
     strUsage += HelpMessageGroup(_("Stratum server options:"));
     strUsage += HelpMessageOpt("-stratum", _("Enable stratum server (default: off)"));
-    strUsage += HelpMessageOpt("-stratumbind=<addr>", _("Bind to given address to listen for Stratum work requests. Use [host]:port notation for IPv6. This option can be specified multiple times (default: bind to all interfaces)"));
+    strUsage += HelpMessageOpt("-stratumaddress=<address>", _("Mining address to use when special address of 'x' is sent by miner (default: none)"));
+    strUsage += HelpMessageOpt("-stratumbind=<ipaddr>", _("Bind to given address to listen for Stratum work requests. Use [host]:port notation for IPv6. This option can be specified multiple times (default: bind to all interfaces)"));
     strUsage += HelpMessageOpt("-stratumport=<port>", strprintf(_("Listen for Stratum work requests on <port> (default: %u or testnet: %u)"), BaseParams().StratumPort(), BaseParams().StratumPort()));
     strUsage += HelpMessageOpt("-stratumallowip=<ip>", _("Allow Stratum work requests from specified source. Valid for <ip> are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times"));
 
+    // "ac" stands for "affects consensus"
     strUsage += HelpMessageGroup(_("Hush Smart Chain options:"));
     strUsage += HelpMessageOpt("-ac_algo", _("Choose PoW mining algorithm, default is Equihash (200,9)"));
     strUsage += HelpMessageOpt("-ac_blocktime", _("Block time in seconds, default is 60"));

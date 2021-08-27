@@ -681,15 +681,21 @@ std::string GetWorkUnit(StratumClient& client)
 
     if (Params().MiningRequiresPeers() && fvNodesEmpty)
     {
+        const std::string msg = strprintf("%s: Unable to get work unit, Hush is not connected!", __func__);
+        LogPrint("stratum", "%s\n", msg);
         throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Hush is not connected!");
     }
 
     if (IsInitialBlockDownload()) {
+        const std::string msg = strprintf("%s: Unable to get work unit, Hush is still downloading blocks!", __func__);
+        LogPrint("stratum", "%s\n", msg);
         throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Hush is downloading blocks...");
     }
 
     if (!client.m_authorized && client.m_aux_addr.empty()) {
-        throw JSONRPCError(RPC_INVALID_REQUEST, "Stratum client not authorized.  Use mining.authorize first, with a Hush R.. address as the username.");
+        const std::string msg = strprintf("%s: Unable to get work unit, client not authorized! Use address 'x' to mine to the default address", __func__);
+        LogPrint("stratum", "%s\n", msg);
+        throw JSONRPCError(RPC_INVALID_REQUEST, "Stratum client not authorized.  Use mining.authorize first, with a Hush R.. address as the username or 'x' to mine to the default address.");
     }
 
     static CBlockIndex* tip = NULL; // pindexPrev
@@ -706,7 +712,7 @@ std::string GetWorkUnit(StratumClient& client)
 
         /**
          * We will check script later inside CustomizeWork, if it will be == CScript() << OP_FALSE it will mean
-         * that work need to be customized, and in that case cb.vout[0],scriptPubKey will be set to GetScriptForDestination(addr.Get()) .
+         * that work need to be customized, and in that case cb.vout[0].scriptPubKey will be set to GetScriptForDestination(addr.Get()) .
          * In other words to the address with which stratum client is authorized.
         */
         const CScript scriptDummy = CScript() << OP_FALSE;
@@ -721,6 +727,8 @@ std::string GetWorkUnit(StratumClient& client)
         // DecodeHexTx(new_work->block.vtx[0], "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff03510101ffffffff01aa2ce73b0000000023210325b4ca6736f90679f712be1454c5302050aae6edb51b0d2a051156bc868fec16ac4aabc560");
 
         if (!new_work) {
+            const std::string msg = strprintf("%s: Out of memory!", __func__);
+            LogPrint("stratum", "%s\n", msg);
             throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
         }
 
@@ -1244,15 +1252,27 @@ UniValue stratum_mining_authorize(StratumClient& client, const UniValue& params)
 
     CBitcoinAddress addr(get_stripped_username(username));
 
+    // If given the special address "x", mine to the default address given by -stratumaddress
+    // This means a miner can run a private pool without TLS and not
+    // worry about MITM attacks that change addresses, and leaks less metadata.
+    // It also means many miners can be used and updating their mining address does not
+    // require any changes on each miner, just restart hushd with a new -stratumaddress
+    if(addr.ToString() == "x") {
+        addr = CBitcoinAddress(GetArg("-stratumaddress", ""));
+        const std::string msg = strprintf("%s: Authorized client with default stratum address=%s", __func__, addr.ToString());
+        LogPrint("stratum", "%s\n", msg);
+    }
+
     if (!addr.IsValid()) {
+        const std::string msg = strprintf("%s: Invalid Hush address=%s", __func__, addr.ToString());
+        LogPrint("stratum", "%s\n", msg);
         throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid Hush address: %s", username));
     }
 
-    client.m_addr = addr;
-    client.m_mindiff = mindiff;
+    client.m_addr       = addr;
+    client.m_mindiff    = mindiff;
     client.m_authorized = true;
-
-    client.m_send_work = true;
+    client.m_send_work  = true;
 
     LogPrintf("Authorized stratum miner %s from %s, mindiff=%f\n", addr.ToString(), client.GetPeer().ToString(), mindiff);
 
