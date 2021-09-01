@@ -1343,16 +1343,14 @@ void hush_statefname(char *fname,char *symbol,char *str)
                 printf("unexpected fname.(%s) vs %s [%s] n.%d len.%d (%s)\n",fname,symbol,SMART_CHAIN_SYMBOL,n,len,&fname[len - n]);
             return;
         }
-    }
-    else
-    {
+    } else {
 #ifdef _WIN32
         strcat(fname,"\\");
 #else
         strcat(fname,"/");
 #endif
     }
-    if ( symbol != 0 && symbol[0] != 0 && strcmp("KMD",symbol) != 0 )
+    if ( symbol != 0 && symbol[0] != 0)
     {
         strcat(fname,symbol);
         //printf("statefname.(%s) -> (%s)\n",symbol,fname);
@@ -1515,7 +1513,6 @@ int32_t hush_whoami(char *pubkeystr,int32_t height,uint32_t timestamp)
     return(notaryid);
 }
 
-// TODO: clean up this smoking bath-salts shite from KMD
 char *argv0suffix[] = {
     (char *)"fuckjl777d", (char *)"fuckjl777-cli", (char *)"fuckjl777d.exe", (char *)"fuckjl777-cli.exe", (char *)"btchd", (char *)"btch-cli", (char *)"btchd.exe", (char *)"btch-cli.exe"
 };
