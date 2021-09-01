@@ -610,7 +610,7 @@ int32_t komodo_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t to
         for (i=0; i<len; i++)
             printf("%02x",data[i]);
         printf(" <- data[%d]\n",len);
-        opretlen = komodo_opreturnscript(opret,opcode,data,len);
+        opretlen = hush_opreturnscript(opret,opcode,data,len);
         txNew->vout.resize(numvouts+1);
         txNew->vout[numvouts].nValue = 0;
         txNew->vout[numvouts].scriptPubKey.resize(opretlen);

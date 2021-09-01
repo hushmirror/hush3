@@ -82,9 +82,7 @@ int32_t hush_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *de
     int32_t func,ht,notarized_height,num,matched=0,MoMdepth; uint256 MoM,notarized_hash,notarized_desttxid; uint8_t pubkeys[64][33];
     if ( (func= fgetc(fp)) != EOF )
     {
-        if ( SMART_CHAIN_SYMBOL[0] == 0 && strcmp(symbol,"KMD") == 0 )
-            matched = 1;
-        else matched = (strcmp(symbol,SMART_CHAIN_SYMBOL) == 0);
+        matched = (strcmp(symbol,SMART_CHAIN_SYMBOL) == 0);
         if ( fread(&ht,1,sizeof(ht),fp) != sizeof(ht) )
             errs++;
         if ( 0 && SMART_CHAIN_SYMBOL[0] != 0 && func != 'T' )
@@ -98,7 +96,7 @@ int32_t hush_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *de
                 else
                 {
                     //printf("updated %d pubkeys at %s ht.%d\n",num,symbol,ht);
-                    if ( (HUSH_EXTERNAL_NOTARIES != 0 && matched != 0) || (strcmp(symbol,"KMD") == 0 && HUSH_EXTERNAL_NOTARIES == 0) )
+                    if ( (HUSH_EXTERNAL_NOTARIES != 0 && matched != 0) )
                         hush_eventadd_pubkeys(sp,symbol,ht,num,pubkeys);
                 }
             } else printf("illegal num.%d\n",num);
@@ -228,10 +226,9 @@ int32_t hush_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fp
     int32_t func= -1,ht,notarized_height,MoMdepth,num,matched=0; uint256 MoM,notarized_hash,notarized_desttxid; uint8_t pubkeys[64][33]; long fpos = *fposp;
     if ( fpos < datalen )
     {
-        func = filedata[fpos++];
-        if ( SMART_CHAIN_SYMBOL[0] == 0 && strcmp(symbol,"KMD") == 0 )
-            matched = 1;
-        else matched = (strcmp(symbol,SMART_CHAIN_SYMBOL) == 0);
+        func    = filedata[fpos++];
+        matched = (strcmp(symbol,SMART_CHAIN_SYMBOL) == 0);
+
         if ( memread(&ht,sizeof(ht),filedata,&fpos,datalen) != sizeof(ht) )
             errs++;
         if ( func == 'P' )
@@ -243,7 +240,7 @@ int32_t hush_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fp
                 else
                 {
                     //printf("updated %d pubkeys at %s ht.%d\n",num,symbol,ht);
-                    if ( (HUSH_EXTERNAL_NOTARIES != 0 && matched != 0) || (strcmp(symbol,"KMD") == 0 && HUSH_EXTERNAL_NOTARIES == 0) )
+                    if ( (HUSH_EXTERNAL_NOTARIES != 0 && matched != 0) )
                         hush_eventadd_pubkeys(sp,symbol,ht,num,pubkeys);
                 }
             } else printf("illegal num.%d\n",num);
@@ -353,7 +350,7 @@ int32_t hush_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fp
     return(-1);
 }
 
-void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotaries,uint8_t notaryid,uint256 txhash,uint64_t voutmask,uint8_t numvouts,uint32_t *pvals,uint8_t numpvals,int32_t KMDheight,uint32_t KMDtimestamp,uint64_t opretvalue,uint8_t *opretbuf,uint16_t opretlen,uint16_t vout,uint256 MoM,int32_t MoMdepth)
+void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotaries,uint8_t notaryid,uint256 txhash,uint64_t voutmask,uint8_t numvouts,uint32_t *pvals,uint8_t numpvals,int32_t HUSHheight,uint32_t HUSHtimestamp,uint64_t opretvalue,uint8_t *opretbuf,uint16_t opretlen,uint16_t vout,uint256 MoM,int32_t MoMdepth)
 {
     static FILE *fp; static int32_t errs,didinit; static uint256 zero;
     struct hush_state *sp; char fname[512],symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t retval,ht,func; uint8_t num,pubkeys[64][33];
@@ -394,30 +391,26 @@ void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotarie
     if ( fp != 0 ) // write out funcid, height, other fields, call side effect function
     {
         //printf("fpos.%ld ",ftell(fp));
-        if ( KMDheight != 0 )
+        if ( HUSHheight != 0 )
         {
-            if ( KMDtimestamp != 0 )
+            if ( HUSHtimestamp != 0 )
             {
                 fputc('T',fp);
                 if ( fwrite(&height,1,sizeof(height),fp) != sizeof(height) )
                     errs++;
-                if ( fwrite(&KMDheight,1,sizeof(KMDheight),fp) != sizeof(KMDheight) )
+                if ( fwrite(&HUSHheight,1,sizeof(HUSHheight),fp) != sizeof(HUSHheight) )
                     errs++;
-                if ( fwrite(&KMDtimestamp,1,sizeof(KMDtimestamp),fp) != sizeof(KMDtimestamp) )
+                if ( fwrite(&HUSHtimestamp,1,sizeof(HUSHtimestamp),fp) != sizeof(HUSHtimestamp) )
                     errs++;
-            }
-            else
-            {
+            } else {
                 fputc('K',fp);
                 if ( fwrite(&height,1,sizeof(height),fp) != sizeof(height) )
                     errs++;
-                if ( fwrite(&KMDheight,1,sizeof(KMDheight),fp) != sizeof(KMDheight) )
+                if ( fwrite(&HUSHheight,1,sizeof(HUSHheight),fp) != sizeof(HUSHheight) )
                     errs++;
             }
-            hush_eventadd_kmdheight(sp,symbol,height,KMDheight,KMDtimestamp);
-        }
-        else if ( opretbuf != 0 && opretlen > 0 )
-        {
+            hush_eventadd_kmdheight(sp,symbol,height,HUSHheight,HUSHtimestamp);
+        } else if ( opretbuf != 0 && opretlen > 0 ) {
             uint16_t olen = opretlen;
             fputc('R',fp);
             if ( fwrite(&height,1,sizeof(height),fp) != sizeof(height) )
@@ -432,8 +425,7 @@ void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotarie
                 errs++;
             if ( fwrite(opretbuf,1,olen,fp) != olen )
                 errs++;
-//printf("create ht.%d R opret[%d] sp.%p\n",height,olen,sp);
-            //komodo_opreturn(height,opretvalue,opretbuf,olen,txhash,vout);
+            //printf("create ht.%d R opret[%d] sp.%p\n",height,olen,sp);
             hush_eventadd_opreturn(sp,symbol,height,txhash,opretvalue,vout,opretbuf,olen);
         }
         else if ( notarypubs != 0 && numnotaries > 0 )
@@ -687,7 +679,7 @@ int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryi
                     }
                     else
                     {
-                        komodo_rwccdata(SMART_CHAIN_SYMBOL,1,&ccdata,&MoMoMdata);
+                        hush_rwccdata(SMART_CHAIN_SYMBOL,1,&ccdata,&MoMoMdata);
                         if ( matched != 0 )
                             printf("[%s] matched.%d VALID (%s) MoM.%s [%d] CCid.%u\n",SMART_CHAIN_SYMBOL,matched,ccdata.symbol,MoM.ToString().c_str(),MoMdepth&0xffff,(MoMdepth>>16)&0xffff);
                     }
@@ -696,8 +688,6 @@ int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryi
                     memset(&ccdata,0,sizeof(ccdata));
                     memset(&MoMoMdata,0,sizeof(MoMoMdata));
                 }
-                else if ( SMART_CHAIN_SYMBOL[0] == 0 && matched != 0 && notarized != 0 && validated != 0 )
-                    komodo_rwccdata((char *)"KMD",1,&ccdata,0);
                 
                 if ( matched != 0 && *notarizedheightp > sp->NOTARIZED_HEIGHT && *notarizedheightp < height )
                 {
@@ -711,36 +701,12 @@ int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryi
                     }
                     hush_stateupdate(height,0,0,0,zero,0,0,0,0,0,0,0,0,0,0,sp->MoM,sp->MoMdepth);
                     //if ( SMART_CHAIN_SYMBOL[0] != 0 )
-                        printf("[%s] ht.%d NOTARIZED.%d %s.%s %sTXID.%s lens.(%d %d) MoM.%s %d\n",SMART_CHAIN_SYMBOL,height,sp->NOTARIZED_HEIGHT,SMART_CHAIN_SYMBOL[0]==0?"KMD":SMART_CHAIN_SYMBOL,srchash.ToString().c_str(),SMART_CHAIN_SYMBOL[0]==0?"BTC":"KMD",desttxid.ToString().c_str(),opretlen,len,sp->MoM.ToString().c_str(),sp->MoMdepth);
+                        printf("[%s] ht.%d NOTARIZED.%d %s.%s %sTXID.%s lens.(%d %d) MoM.%s %d\n",SMART_CHAIN_SYMBOL,height,sp->NOTARIZED_HEIGHT,SMART_CHAIN_SYMBOL,srchash.ToString().c_str(),"HUSH",desttxid.ToString().c_str(),opretlen,len,sp->MoM.ToString().c_str(),sp->MoMdepth);
                     
-                    if ( SMART_CHAIN_SYMBOL[0] == 0 )
-                    {
-                        if ( signedfp == 0 )
-                        {
-                            char fname[512];
-                            hush_statefname(fname,SMART_CHAIN_SYMBOL,(char *)"hushsignedmasks");
-                            if ( (signedfp= fopen(fname,"rb+")) == 0 )
-                                signedfp = fopen(fname,"wb");
-                            else fseek(signedfp,0,SEEK_END);
-                        }
-                        if ( signedfp != 0 )
-                        {
-                            fwrite(&height,1,sizeof(height),signedfp);
-                            fwrite(&signedmask,1,sizeof(signedmask),signedfp);
-                            fflush(signedfp);
-                        }
-                        if ( opretlen > len && scriptbuf[len] == 'A' )
-                        {
-                            //for (i=0; i<opretlen-len; i++)
-                            //    printf("%02x",scriptbuf[len+i]);
-                            //printf(" Found extradata.[%d] %d - %d\n",opretlen-len,opretlen,len);
-                            hush_stateupdate(height,0,0,0,txhash,0,0,0,0,0,0,value,&scriptbuf[len],opretlen-len+4+3+(scriptbuf[1] == 0x4d),j,zero,0);
-                        }
-                    }
                 } //else if ( fJustCheck )
                 //    return (-3); // if the notarisation is only invalid because its out of order it cannot be mined in a block with a valid one!
             } else if ( opretlen != 149 && height > 600000 && matched != 0 )
-                printf("%s validated.%d notarized.%d %llx reject ht.%d NOTARIZED.%d prev.%d %s.%s DESTTXID.%s len.%d opretlen.%d\n",ccdata.symbol,validated,notarized,(long long)signedmask,height,*notarizedheightp,sp->NOTARIZED_HEIGHT,SMART_CHAIN_SYMBOL[0]==0?"KMD":SMART_CHAIN_SYMBOL,srchash.ToString().c_str(),desttxid.ToString().c_str(),len,opretlen);
+                printf("%s validated.%d notarized.%d %llx reject ht.%d NOTARIZED.%d prev.%d %s.%s DESTTXID.%s len.%d opretlen.%d\n",ccdata.symbol,validated,notarized,(long long)signedmask,height,*notarizedheightp,sp->NOTARIZED_HEIGHT,SMART_CHAIN_SYMBOL,srchash.ToString().c_str(),desttxid.ToString().c_str(),len,opretlen);
         }
         else if ( matched != 0 && i == 0 && j == 1 && opretlen == 149 )
         {
@@ -752,7 +718,7 @@ int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryi
             //int32_t k; for (k=0; k<scriptlen; k++)
             //    printf("%02x",scriptbuf[k]);
             //printf(" <- script ht.%d i.%d j.%d value %.8f %s\n",height,i,j,dstr(value),SMART_CHAIN_SYMBOL);
-            if ( opretlen >= 32*2+4 && strcmp(SMART_CHAIN_SYMBOL[0]==0?"KMD":SMART_CHAIN_SYMBOL,(char *)&scriptbuf[len+32*2+4]) == 0 )
+            if ( opretlen >= 32*2+4 && strcmp(SMART_CHAIN_SYMBOL,(char *)&scriptbuf[len+32*2+4]) == 0 )
             {
                 for (k=0; k<32; k++)
                     if ( scriptbuf[len+k] != 0 )
@@ -985,7 +951,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
             }
         }
         if ( !fJustCheck && IS_HUSH_NOTARY != 0 && SMART_CHAIN_SYMBOL[0] == 0 )
-            printf("%s ht.%d\n",SMART_CHAIN_SYMBOL[0] == 0 ? "KMD" : SMART_CHAIN_SYMBOL,height);
+            printf("%s ht.%d\n",SMART_CHAIN_SYMBOL,height);
         if ( !fJustCheck && pindex->GetHeight() == hwmheight )
             hush_stateupdate(height,0,0,0,zero,0,0,0,0,height,(uint32_t)pindex->nTime,0,0,0,0,zero,0);
     } 

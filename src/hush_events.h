@@ -69,7 +69,7 @@ void hush_eventadd_notarized(struct hush_state *sp,char *symbol,int32_t height,c
 void hush_eventadd_pubkeys(struct hush_state *sp,char *symbol,int32_t height,uint8_t num,uint8_t pubkeys[64][33])
 {
     struct hush_event_pubkeys P;
-    //printf("eventadd pubkeys ht.%d\n",height);
+    fprintf(stderr, "%s: eventadd pubkeys height=%d\n",__func__,height);
     memset(&P,0,sizeof(P));
     P.num = num;
     memcpy(P.pubkeys,pubkeys,33 * num);

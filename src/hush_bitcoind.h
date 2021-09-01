@@ -15,7 +15,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-// Hush functions that interact with bitcoind C++
+// Hush functions that interact with hushd C++
 #include <curl/curl.h>
 #include <curl/easy.h>
 #include "consensus/params.h"
@@ -408,6 +408,7 @@ int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_hei
                 if ( (item= jobj(json,(char *)"result")) != 0 )
                 {
                     height = jint(item,(char *)"blocks");
+                    //TODO: which key to use?
                     *hushnotarized_heightp = strcmp(dest,"KMD") == 0 ? jint(item,(char *)"notarized") : height;
                 }
                 free_json(json);
@@ -570,7 +571,7 @@ CScript hush_makeopret(CBlock *pblock, bool fNew)
  }
  free_json(result);
  }
- printf("KMD hash.%d (%s) %x\n",height,jsonstr,*(uint32_t *)&hash);
+ printf("HUSH3 hash.%d (%s) %x\n",height,jsonstr,*(uint32_t *)&hash);
  free(jsonstr);
  }
  return(hash);
@@ -1032,7 +1033,7 @@ int32_t hush_nextheight()
 int32_t komodo_isrealtime(int32_t *kmdheightp)
 {
     struct hush_state *sp; CBlockIndex *pindex;
-    if ( (sp= hush_stateptrget((char *)"KMD")) != 0 )
+    if ( (sp= hush_stateptrget((char *)"HUSH3")) != 0 )
         *kmdheightp = sp->CURRENT_HEIGHT;
     else *kmdheightp = 0;
     if ( (pindex= chainActive.LastTip()) != 0 && pindex->GetHeight() >= (int32_t)hush_longestchain() )

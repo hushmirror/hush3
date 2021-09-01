@@ -999,7 +999,7 @@ int32_t komodo_scriptitemlen(int32_t *opretlenp,uint8_t *script)
     return(len);
 }
 
-int32_t komodo_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen)
+int32_t hush_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen)
 {
     int32_t offset = 0;
     script[offset++] = 0x6a;

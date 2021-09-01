@@ -203,7 +203,7 @@ void komodo_purge_ccdata(int32_t height)
 }
 
 // this is just a demo of ccdata processing to create example data for the MoMoM and allMoMs calls
-int32_t komodo_rwccdata(char *thischain,int32_t rwflag,struct hush_ccdata *ccdata,struct hush_ccdataMoMoM *MoMoMdata)
+int32_t hush_rwccdata(char *thischain,int32_t rwflag,struct hush_ccdata *ccdata,struct hush_ccdataMoMoM *MoMoMdata)
 {
     uint256 hash,zero; bits256 tmp; int32_t i,nonz; struct hush_ccdata *ptr; struct notarized_checkpoint *np;
     return(0); // disable this path as libscott method is much better

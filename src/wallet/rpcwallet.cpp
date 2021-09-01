@@ -579,7 +579,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 #define HUSH_KVDURATION 1440
 #define DRAGON_MAXSCRIPTSIZE 10001
 uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pubkey37[37],char *coinaddr,int32_t height,char *base,int64_t fiatoshis);
-int32_t komodo_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen);
+int32_t hush_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen);
 extern int32_t HUSH_PAX;
 int32_t komodo_is_issuer();
 int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
@@ -718,7 +718,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
                 coresize += 32;
             }
         }
-        if ( (opretlen= komodo_opreturnscript(opretbuf,'K',keyvalue,coresize)) == 40 )
+        if ( (opretlen= hush_opreturnscript(opretbuf,'K',keyvalue,coresize)) == 40 )
             opretlen++;
         //for (i=0; i<opretlen; i++)
         //    printf("%02x",opretbuf[i]);
@@ -776,7 +776,7 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( fee < 10000 )
         fee = 10000;
     dragon_rwnum(1,&pubkey37[33],sizeof(height),&height);
-    opretlen = komodo_opreturnscript(opretbuf,'D',pubkey37,37);
+    opretlen = hush_opreturnscript(opretbuf,'D',pubkey37,37);
     SendMoney(address.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,komodoshis);
     return wtx.GetHash().GetHex();
 }
@@ -811,7 +811,7 @@ UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( fee < 10000 )
         fee = 10000;
     dragon_rwnum(1,&pubkey37[33],sizeof(kmdheight),&kmdheight);
-    opretlen = komodo_opreturnscript(opretbuf,'W',pubkey37,37);
+    opretlen = hush_opreturnscript(opretbuf,'W',pubkey37,37);
     SendMoney(destaddress.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,fiatoshis);
     return wtx.GetHash().GetHex();
 }

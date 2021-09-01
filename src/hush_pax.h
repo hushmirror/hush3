@@ -267,7 +267,7 @@ int32_t komodo_pax_opreturn(int32_t height,uint8_t *opret,int32_t maxsize)
                         }
                         if ( timestamp > time(NULL)-600 )
                         {
-                            n = komodo_opreturnscript(opret,'P',data+sizeof(crc32),(int32_t)(fsize-sizeof(crc32)));
+                            n = hush_opreturnscript(opret,'P',data+sizeof(crc32),(int32_t)(fsize-sizeof(crc32)));
                             if ( 0 && lastcrc != crc32 )
                             {
                                 for (i=0; i<n; i++)
