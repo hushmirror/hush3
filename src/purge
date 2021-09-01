@@ -4,7 +4,7 @@
 
 echo "Purging $1"
 
-rm -rf ~/.komodo/$1/chainstate
-rm -rf ~/.komodo/$1/database
-rm -rf ~/.komodo/$1/blocks
-rm -rf ~/.komodo/$1/komodostate
+rm -rf ~/.hush/$1/chainstate
+rm -rf ~/.hush/$1/database
+rm -rf ~/.hush/$1/blocks
+rm -rf ~/.hush/$1/hushstate
