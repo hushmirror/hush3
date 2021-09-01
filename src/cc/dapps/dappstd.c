@@ -970,7 +970,7 @@ int32_t games_setplayerdata(struct games_state *rs,char *gametxidstr)
     if ( 0 )
     {
         sprintf(fname,"%s.gameinfo",gametxidstr);
-        sprintf(cmd,"./komodo-cli -ac_name=%s cclib gameinfo 17 \\\"[%%22%s%%22]\\\" > %s",ASSETCHAINS_SYMBOL,gametxidstr,fname);
+        sprintf(cmd,"./hush-cli -ac_name=%s cclib gameinfo 17 \\\"[%%22%s%%22]\\\" > %s",ASSETCHAINS_SYMBOL,gametxidstr,fname);
         if ( system(cmd) != 0 )
             fprintf(stderr,"error issuing (%s)\n",cmd);
         else filestr = (char *)OS_fileptr(&allocsize,fname);

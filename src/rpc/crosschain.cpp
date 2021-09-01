@@ -670,7 +670,7 @@ UniValue migrate_createnotaryapprovaltransaction(const UniValue& params, bool fH
     if (fHelp || params.size() != 2)
         throw runtime_error("migrate_createnotaryapprovaltransaction burntxid txoutproof\n\n"
             "Creates a tx for destination chain with burn tx proof\n"
-            "txoutproof should be retrieved by komodo-cli migrate_checkburntransactionsource call on the source chain\n" );
+            "txoutproof should be retrieved by hush-cli migrate_checkburntransactionsource call on the source chain\n" );
 
     if (SMART_CHAIN_SYMBOL[0] == 0)
         throw runtime_error("Must be called on asset chain");

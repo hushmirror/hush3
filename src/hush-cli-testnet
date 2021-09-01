@@ -7,5 +7,5 @@ cd $DIR
 
 NAME=HUSH3T
 
-CLI=${KOMODOCLI:-./komodo-cli}
+CLI=${KOMODOCLI:-./hush-cli}
 $CLI -ac_name=$NAME "$@"

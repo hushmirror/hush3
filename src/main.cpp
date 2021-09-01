@@ -4247,7 +4247,7 @@ static bool ActivateBestChainStep(bool fSkipdpow, CValidationState &state, CBloc
             if ( !DisconnectTip(state) )
                 break;
         }
-        fprintf(stderr,"reached rewind.%d, best to do: ./komodo-cli -ac_name=%s stop\n",HUSH_REWIND,SMART_CHAIN_SYMBOL);
+        fprintf(stderr,"reached rewind.%d, best to do: ./hush-cli -ac_name=%s stop\n",HUSH_REWIND,SMART_CHAIN_SYMBOL);
         sleep(20);
         fprintf(stderr,"resuming normal operations\n");
         HUSH_REWIND = 0;

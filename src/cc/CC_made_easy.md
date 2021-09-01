@@ -1,3 +1,4 @@
+// Copyright (c) 2016-2021 The Hush developers
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -711,9 +712,4 @@ gatewayswithdraw bindtxid coin withdrawpub amount
 
 
 And with a bit more magic in the oraclefeed, this is achieved. To be continued...
-
-
-
-
-
 

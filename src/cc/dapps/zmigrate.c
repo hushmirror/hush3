@@ -322,12 +322,12 @@ cJSON *get_komodocli(char *refcoin,char **retstrp,char *acname,char *method,char
     //    acname = refcoin;
     if ( acname[0] != 0 )
     {
-        if ( refcoin[0] != 0 && strcmp(refcoin,"KMD") != 0 )
+        if ( refcoin[0] != 0 && strcmp(refcoin,"HUSH3") != 0 )
             printf("unexpected: refcoin.(%s) acname.(%s)\n",refcoin,acname);
-        sprintf(cmdstr,"./komodo-cli -ac_name=%s %s %s %s %s %s > %s\n",acname,method,arg0,arg1,arg2,arg3,fname);
+        sprintf(cmdstr,"./hush-cli -ac_name=%s %s %s %s %s %s > %s\n",acname,method,arg0,arg1,arg2,arg3,fname);
     }
-    else if ( strcmp(refcoin,"KMD") == 0 )
-        sprintf(cmdstr,"./komodo-cli %s %s %s %s %s > %s\n",method,arg0,arg1,arg2,arg3,fname);
+    else if ( strcmp(refcoin,"HUSH3") == 0 )
+        sprintf(cmdstr,"./hush-cli %s %s %s %s %s > %s\n",method,arg0,arg1,arg2,arg3,fname);
     else if ( REFCOIN_CLI != 0 && REFCOIN_CLI[0] != 0 )
     {
         sprintf(cmdstr,"%s %s %s %s %s %s > %s\n",REFCOIN_CLI,method,arg0,arg1,arg2,arg3,fname);
@@ -1310,26 +1310,20 @@ int32_t main(int32_t argc,char **argv)
         printf("argc needs to be 2: <prog> coin\n");
         return(-1);
     }
-    if ( strcmp(argv[1],"KMD") == 0 )
+    if ( strcmp(argv[1],"HUSH3") == 0 )
     {
-        REFCOIN_CLI = "./komodo-cli";
-        coinstr = clonestr("KMD");
-        acstr = "";
-    }
-    else if ( strcmp(argv[1],"CHIPS") == 0 )
-    {
-        REFCOIN_CLI = "./chips-cli";
-        coinstr = clonestr("CHIPS");
+        REFCOIN_CLI = "./hush-cli";
+        coinstr = clonestr("HUSH3");
         acstr = "";
     }
     else
     {
-        sprintf(buf,"./komodo-cli -ac_name=%s",argv[1]);
+        sprintf(buf,"./hush-cli -ac_name=%s",argv[1]);
         REFCOIN_CLI = clonestr(buf);
         coinstr = clonestr(argv[1]);
         acstr = coinstr;
     }
-    if ( 1 )//strcmp(coinstr,"KMD") == 0 )
+    if ( 1 )
     {
         sprintf(buf,"%s-Claims.csv",coinstr);
         reconcile_claims(coinstr,buf);
@@ -1452,14 +1446,14 @@ int32_t zmigratemain(int32_t argc,char **argv)
         printf("argc needs to be 3\n");
         return(-1);
     }
-    if ( strcmp(argv[1],"KMD") == 0 )
+    if ( strcmp(argv[1],"HUSH3") == 0 )
     {
-        REFCOIN_CLI = "./komodo-cli";
-        coinstr = clonestr("KMD");
+        REFCOIN_CLI = "./hush-cli";
+        coinstr = clonestr("HUSH3");
     }
     else
     {
-        sprintf(buf,"./komodo-cli -ac_name=%s",argv[1]);
+        sprintf(buf,"./hush-cli -ac_name=%s",argv[1]);
         REFCOIN_CLI = clonestr(buf);
         coinstr = clonestr(argv[1]);
     }
