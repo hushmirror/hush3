@@ -10,7 +10,7 @@
  ./makecustom
  ../hush-smart-chain -ac_name=CUSTOM -ac_cclib=custom -ac_cc=2 ...
  
- The above will rebuild komodod and get it running again
+ The above will rebuild hushd and get it running again
  */
 
 CScript custom_opret(uint8_t funcid,CPubKey pk)

@@ -727,7 +727,7 @@ CBlockTreeDB *pblocktree = NULL;
 #define HUSH_ZCASH
 #include "hush.h"
 
-UniValue komodo_snapshot(int top)
+UniValue hush_snapshot(int top)
 {
     LOCK(cs_main);
     int64_t total = -1;
@@ -745,7 +745,7 @@ UniValue komodo_snapshot(int top)
     return(result);
 }
 
-bool komodo_snapshot2(std::map <std::string, CAmount> &addressAmounts)
+bool hush_snapshot2(std::map <std::string, CAmount> &addressAmounts)
 {
     if ( fAddressIndex && pblocktree != 0 ) 
     {
@@ -787,7 +787,7 @@ bool hush_dailysnapshot(int32_t height)
     if ( undo_height == lastSnapShotHeight )
         return true;
     std::map <std::string, int64_t> addressAmounts;
-    if ( !komodo_snapshot2(addressAmounts) )
+    if ( !hush_snapshot2(addressAmounts) )
         return false;
 
     // undo blocks in reverse order

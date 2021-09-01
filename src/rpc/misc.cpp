@@ -1287,7 +1287,7 @@ UniValue getaddressbalance(const UniValue& params, bool fHelp, const CPubKey& my
 
 }
 
-UniValue komodo_snapshot(int top);
+UniValue hush_snapshot(int top);
 
 UniValue getsnapshot(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
@@ -1337,7 +1337,7 @@ UniValue getsnapshot(const UniValue& params, bool fHelp, const CPubKey& mypk)
 			    + HelpExampleRpc("getsnapshot", "1000")
                             );
     }
-    result = komodo_snapshot(top);
+    result = hush_snapshot(top);
     if ( result.size() > 0 ) {
         result.push_back(Pair("end_time", (int) time(NULL)));
     } else {

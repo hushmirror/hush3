@@ -2,16 +2,13 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <gtest/gtest.h>
-
 #include "addrman.h"
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 #include <string>
-
 #include "hash.h"
 #include "random.h"
 #include "util/asmap.h"
-
 #include "netbase.h"
 #include "chainparams.h"
 #include "tinyformat.h"
@@ -51,7 +48,7 @@ class TestCout : public std::stringstream
 
 using namespace std;
 
-/* xxd -i est-komodo/data/asmap.raw | sed 's/unsigned char/static unsigned const char/g' */
+/* xxd -i test-hush/data/asmap.raw | sed 's/unsigned char/static unsigned const char/g' */
 static unsigned const char asmap_raw[] = {
     0xfb, 0x03, 0xec, 0x0f, 0xb0, 0x3f, 0xc0, 0xfe, 0x00, 0xfb, 0x03, 0xec,
     0x0f, 0xb0, 0x3f, 0xc0, 0xfe, 0x00, 0xfb, 0x03, 0xec, 0x0f, 0xb0, 0xff,
