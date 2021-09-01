@@ -831,7 +831,7 @@ UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params
             // few RPCs means we can see our addresses and make private key backups
             // while a very long wallet rescan is happening
             if (pcmd->name != "stop" && pcmd->name != "help" && pcmd->name != "z_listaddresses" && pcmd->name != "z_exportkey" &&
-                pcmd->name != "listaddresses" && pcmd->name != "dumpprivkey" && pcmd->name != "getpeerinfo" ) {
+                pcmd->name != "getaddressesbyaccount" && pcmd->name != "dumpprivkey" && pcmd->name != "getpeerinfo" ) {
                 throw JSONRPCError(RPC_IN_WARMUP, rpcWarmupStatus);
             }
         }
@@ -856,12 +856,10 @@ UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params
 
 std::string HelpExampleCli(const std::string& methodname, const std::string& args)
 {
-    if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
-        return "> komodo-cli " + methodname + " " + args + "\n";
-    } else if ((strncmp(SMART_CHAIN_SYMBOL, "HUSH3", 5) == 0) ) {
+    if ((strncmp(SMART_CHAIN_SYMBOL, "HUSH3", 5) == 0) ) {
         return "> hush-cli " + methodname + " " + args + "\n";
     } else {
-        return "> komodo-cli -ac_name=" + strprintf("%s", SMART_CHAIN_SYMBOL) + " " + methodname + " " + args + "\n";
+        return "> hush-cli -ac_name=" + strprintf("%s", SMART_CHAIN_SYMBOL) + " " + methodname + " " + args + "\n";
     }
 }
 
