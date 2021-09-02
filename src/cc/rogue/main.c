@@ -658,43 +658,6 @@ uint16_t _hush_userpass(char *username, char *password, FILE *fp)
     return(port);
 }
 
-/*void hush_statefname(char *fname,char *symbol,char *str)
-{
-    int32_t n,len;
-    sprintf(fname,"%s",getDataDir());
-    if ( (n= (int32_t)strlen(ASSETCHAINS_SYMBOL)) != 0 )
-    {
-        len = (int32_t)strlen(fname);
-        if ( strcmp(ASSETCHAINS_SYMBOL,&fname[len - n]) == 0 )
-            fname[len - n] = 0;
-        else
-        {
-            printf("unexpected fname.(%s) vs %s [%s] n.%d len.%d (%s)\n",fname,symbol,ASSETCHAINS_SYMBOL,n,len,&fname[len - n]);
-            return;
-        }
-    }
-    else
-    {
-#ifdef _WIN32
-        strcat(fname,"\\");
-#else
-        strcat(fname,"/");
-#endif
-    }
-    if ( symbol != 0 && symbol[0] != 0 && strcmp("KMD",symbol) != 0 )
-    {
-        strcat(fname,symbol);
-        //printf("statefname.(%s) -> (%s)\n",symbol,fname);
-#ifdef _WIN32
-        strcat(fname,"\\");
-#else
-        strcat(fname,"/");
-#endif
-    }
-    strcat(fname,str);
-    //printf("test.(%s) -> [%s] statename.(%s) %s\n",test,ASSETCHAINS_SYMBOL,symbol,fname);
-}*/
-
 uint16_t hush_userpass(char *userpass,char *symbol)
 {
     FILE *fp; uint16_t port = 0; char fname[512],username[512],password[512],confname[HUSH_SMART_CHAIN_MAXLEN];
