@@ -857,34 +857,6 @@ void hush_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height)
     }
 }
 
-/*int8_t komodo_minerid(int32_t height,uint8_t *destpubkey33)
-{
-    int32_t num,i,numnotaries; CBlockIndex *pindex; uint32_t timestamp=0; uint8_t pubkey33[33],pubkeys[64][33];
-    if ( (pindex= chainActive[height]) != 0 )
-    {
-        if ( pindex->didinit != 0 )
-        {
-            if ( destpubkey33 != 0 )
-                memcpy(destpubkey33,pindex->pubkey33,33);
-            return(pindex->notaryid);
-        }
-        hush_index2pubkey33(pubkey33,pindex,height);
-        if ( destpubkey33 != 0 )
-            memcpy(destpubkey33,pindex->pubkey33,33);
-        if ( pindex->didinit != 0 )
-            return(pindex->notaryid);
-        timestamp = pindex->GetBlockTime();
-        if ( (num= hush_notaries(pubkeys,height,timestamp)) > 0 )
-        {
-            for (i=0; i<num; i++)
-                if ( memcmp(pubkeys[i],pubkey33,33) == 0 )
-                    return(i);
-        }
-    }
-    fprintf(stderr,"komodo_minerid height.%d null pindex\n",height);
-    return(hush_electednotary(&numnotaries,pubkey33,height,timestamp));
-}*/
-
 int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blocktimes[66],int32_t *nonzpkeysp,int32_t height)
 {
     // after the season HF block ALL new notaries instantly become elegible. 

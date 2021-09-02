@@ -87,7 +87,7 @@ int32_t getacseason(uint32_t timestamp)
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp)
 {
     int32_t i,htind,n; uint64_t mask = 0; struct knotary_entry *kp,*tmp;
-    static uint8_t kmd_pubkeys[NUM_HUSH_SEASONS][64][33],didinit[NUM_HUSH_SEASONS];
+    static uint8_t hush_pubkeys[NUM_HUSH_SEASONS][64][33],didinit[NUM_HUSH_SEASONS];
     
     if ( timestamp == 0 && SMART_CHAIN_SYMBOL[0] != 0 ) {
         timestamp = hush_heightstamp(height);
@@ -104,16 +104,16 @@ int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp)
         if ( didinit[hush_season-1] == 0 )
         {
             for (i=0; i<NUM_HUSH_NOTARIES; i++)
-                decode_hex(kmd_pubkeys[hush_season-1][i],33,(char *)notaries_elected[hush_season-1][i][1]);
+                decode_hex(hush_pubkeys[hush_season-1][i],33,(char *)notaries_elected[hush_season-1][i][1]);
             if ( ASSETCHAINS_PRIVATE != 0 )
             {
                 // we need to populate the address array for the notary exemptions.
                 for (i = 0; i<NUM_HUSH_NOTARIES; i++)
-                    pubkey2addr((char *)NOTARY_ADDRESSES[hush_season-1][i],(uint8_t *)kmd_pubkeys[hush_season-1][i]);
+                    pubkey2addr((char *)NOTARY_ADDRESSES[hush_season-1][i],(uint8_t *)hush_pubkeys[hush_season-1][i]);
             }
             didinit[hush_season-1] = 1;
         }
-        memcpy(pubkeys,kmd_pubkeys[hush_season-1],NUM_HUSH_NOTARIES * 33);
+        memcpy(pubkeys,hush_pubkeys[hush_season-1],NUM_HUSH_NOTARIES * 33);
         return(NUM_HUSH_NOTARIES);
     }
 
