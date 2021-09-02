@@ -99,6 +99,11 @@ int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp)
     int32_t hush_season = 0;
     bool ishush3        = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
     hush_season         = ishush3 ? gethushseason(height) : getacseason(timestamp);
+
+    if(IS_HUSH_NOTARY) {
+        fprintf(stderr,"%s: [%s] season=%d height=%d time=%d\n", __func__, ishush3 ? "HUSH3" : SMART_CHAIN_SYMBOL, hush_season, height, timestamp);
+    }
+
     if ( hush_season != 0 )
     {
         if ( didinit[hush_season-1] == 0 )

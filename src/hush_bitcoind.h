@@ -676,7 +676,7 @@ int32_t hush_is_notarytx(const CTransaction& tx)
                 decode_hex(crypto555,33,(char *)CRYPTO555_PUBSECPSTR);
             if ( memcmp(ptr+1,crypto555,33) == 0 )
             {
-                //printf("found notarytx\n");
+                fprintf(stderr,"%s: found notarytx\n", __func__);
                 return(1);
             }
         }

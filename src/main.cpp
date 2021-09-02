@@ -1452,8 +1452,12 @@ bool CheckTransaction(uint32_t tiptime,const CTransaction& tx, CValidationState 
     return true;
 }
 
+// This is used only in RPC currently but hush_notaries()/gethushseason/getacseason is consensus
 int32_t hush_isnotaryvout(char *coinaddr,uint32_t tiptime) {
-    int32_t season = getacseason(tiptime);
+    bool ishush3   = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
+    int32_t height = chainActive.LastTip()->GetHeight();
+    int32_t season = ishush3 ? gethushseason(height) : getacseason(tiptime);
+    fprintf(stderr,"%s: season=%d, tiptime=%d\n", __func__, season,tiptime);
     if ( NOTARY_ADDRESSES[season-1][0][0] == 0 ) {
         uint8_t pubkeys[64][33];
         hush_notaries(pubkeys,0,tiptime);
