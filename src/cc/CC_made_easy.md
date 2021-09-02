@@ -14,12 +14,12 @@
  *                                                                            *
  ******************************************************************************/
 
-How to write utxo based CryptoConditions contracts for KMD chains
+How to write utxo based CryptoConditions contracts for HUSH chains
 by jl777
 
 This is not the only smart contracts methodology that is possible to build on top of OP_CHECKCRYPTOCONDITION, just the first one. All the credit for getting OP_CHECKCRYPTOCONDITION working in the Komodo codebase goes to @libscott. I am just hooking into the code that he made and tried to make it just a little easier to make new contracts.
 
-There is probably some fancy marketing name to use, but for now, I will just call it "CC contract" for short, knowing that it is not 100% technically accurate as the CryptoConditions aspect is not really the main attribute. However, the KMD contracts were built to make the CryptoConditions codebase that was integrated into it to be more accessible.
+There is probably some fancy marketing name to use, but for now, I will just call it "CC contract" for short, knowing that it is not 100% technically accurate as the CryptoConditions aspect is not really the main attribute. However, the HUSH contracts were built to make the CryptoConditions codebase that was integrated into it to be more accessible.
 
 Since CC contracts run native C/C++ code, it is turing complete and that means that any contract that is possible to do on any other platform will be possible to create via CC contract.
 
@@ -655,7 +655,7 @@ Yes, blockchains are complicated.
 Chapter 13 - different languages
 The current codebase is integrated into the hushd codebase, which is C/C++. However, it is possible to use different languages and integrate into the C/C++ as zcash has shown by using the rust language for some parts of the zcashd.
 
-I think any language that is compiled and can create a linkable library while being able to call and be called by C/C++ functions can be used. If you are able to make such a language binding for a simple CC contract like faucet, this will be good for a 777 KMD bounty. Of course, you need to be the first to submit a properly working pull request.
+I think any language that is compiled and can create a linkable library while being able to call and be called by C/C++ functions can be used. If you are able to make such a language binding for a simple CC contract like faucet, this will be good for a 777 HUSH bounty. Of course, you need to be the first to submit a properly working pull request.
 
 
 Chapter 14 - runtime bindings

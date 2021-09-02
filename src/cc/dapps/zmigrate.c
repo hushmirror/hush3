@@ -23,6 +23,8 @@
 #include "cJSON.c"
 
 /*
+NOTE: HUSH nor any Hush Smart Chain has any sprout outputs. This code is kept for historical and educational purposes.
+
  z_migrate: the purpose of z_migrate is to make converting of all sprout outputs into sapling. the usage would be for the user to specify a sapling address and call z_migrate zsaddr, until it returns that there is nothing left to be done.
  
  its main functionality is quite similar to a z_mergetoaddress ANY_ZADDR -> onetime_taddr followed by a z_sendmany onetime_taddr -> zsaddr
@@ -318,8 +320,6 @@ cJSON *get_komodocli(char *refcoin,char **retstrp,char *acname,char *method,char
 {
     long fsize; cJSON *retjson = 0; char cmdstr[32768],*jsonstr,fname[256];
     sprintf(fname,"/tmp/zmigrate.%s",method);
-    //if ( (acname == 0 || acname[0] == 0) && strcmp(refcoin,"KMD") != 0 )
-    //    acname = refcoin;
     if ( acname[0] != 0 )
     {
         if ( refcoin[0] != 0 && strcmp(refcoin,"HUSH3") != 0 )
@@ -490,7 +490,7 @@ cJSON *get_rawmempool(char *refcoin,char *acname)
 cJSON *get_addressutxos(char *refcoin,char *acname,char *coinaddr)
 {
     cJSON *retjson; char *retstr,jsonbuf[256];
-    if ( refcoin[0] != 0 && strcmp(refcoin,"KMD") != 0 )
+    if ( refcoin[0] != 0 && strcmp(refcoin,"HUSH3") != 0 )
         printf("warning: assumes %s has addressindex enabled\n",refcoin);
     sprintf(jsonbuf,"{\\\"addresses\\\":[\\\"%s\\\"]}",coinaddr);
     if ( (retjson= get_komodocli(refcoin,&retstr,acname,"getaddressutxos",jsonbuf,"","","")) != 0 )
@@ -1294,7 +1294,7 @@ void reconcile_claims(char *refcoin,char *fname)
                 else fields[n][i++] = *str++;
             }
             printf("%s\n",fields[1]);
-            total += update_claimstats(fields[1],fields[3],fields[5 + (strcmp("KMD",refcoin)==0)],atof(fields[4])*SATOSHIDEN + 0.0000000049);
+            total += update_claimstats(fields[1],fields[3],fields[5 + (strcmp("HUSH3",refcoin)==0)],atof(fields[4])*SATOSHIDEN + 0.0000000049);
             numlines++;
         }
         fclose(fp);
@@ -1358,12 +1358,12 @@ int32_t main(int32_t argc,char **argv)
                             }
                             continue;
                         }
-                        if ( strcmp(coinstr,"KMD") == 0 && verify_vin(coinstr,jbits256(item,"txid"),0,"R9JCEd6xnCxNUSpLrHEWvzPSh7CNXm7z75") < 0 )
+                        if ( strcmp(coinstr,"HUSH3") == 0 && verify_vin(coinstr,jbits256(item,"txid"),0,"R9JCEd6xnCxNUSpLrHEWvzPSh7CNXm7z75") < 0 )
                         {
                             printf("WARNING: imposter dust detected! %s\n",bits256_str(str,jbits256(item,"txid")));
                             continue;
                         }
-                        else if ( strcmp(coinstr,"KMD") != 0 && verify_vin(coinstr,jbits256(item,"txid"),0,"R9MUnxXijovvSeT9sFuUX23TiFtVvZEGjT") < 0 )
+                        else if ( strcmp(coinstr,"HUSH3") != 0 && verify_vin(coinstr,jbits256(item,"txid"),0,"R9MUnxXijovvSeT9sFuUX23TiFtVvZEGjT") < 0 )
                         {
                             printf("WARNING: imposter dust detected! %s\n",bits256_str(str,jbits256(item,"txid")));
                             continue;

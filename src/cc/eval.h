@@ -224,7 +224,7 @@ public:
         if (SMART_CHAIN_SYMBOL[0]) return 1;
         if (s.size() >= 72) {
             if (strcmp("BTC", &s[68]) == 0) return 1;
-            if (strcmp("KMD", &s[68]) == 0) return 1;
+            if (strcmp("HUSH3", &s[68]) == 0) return 1;
         }
         return 0;
     }

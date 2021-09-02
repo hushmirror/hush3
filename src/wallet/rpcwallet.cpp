@@ -423,6 +423,37 @@ UniValue getaccount(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return strAccount;
 }
 
+UniValue listaddresses(const UniValue& params, bool fHelp, const CPubKey& mypk)
+{
+    if (!EnsureWalletIsAvailable(fHelp))
+        return NullUniValue;
+
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "listaddresses\n"
+            "\nResult:\n"
+            "[                     (json array of string)\n"
+            "  \"" + strprintf("%s",hush_chainname()) + "_address\"  (string) a " + strprintf("%s",hush_chainname()) + " address associated with the given account\n"
+            "  ,...\n"
+            "]\n"
+            "\nExamples:\n"
+            + HelpExampleCli("listaddresses", "")
+            + HelpExampleRpc("listaddresses", "")
+        );
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    string strAccount = AccountFromValue(params[0]);
+
+    // Find all taddrs
+    UniValue ret(UniValue::VARR);
+    for (const std::pair<CTxDestination, CAddressBookData>& item : pwalletMain->mapAddressBook) {
+        const CTxDestination& dest = item.first;
+        const std::string& strName = item.second.name;
+        ret.push_back(EncodeDestination(dest));
+    }
+    return ret;
+}
 
 UniValue getaddressesbyaccount(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
@@ -441,8 +472,8 @@ UniValue getaddressesbyaccount(const UniValue& params, bool fHelp, const CPubKey
             "  ,...\n"
             "]\n"
             "\nExamples:\n"
-            + HelpExampleCli("getaddressesbyaccount", "\"tabby\"")
-            + HelpExampleRpc("getaddressesbyaccount", "\"tabby\"")
+            + HelpExampleCli("getaddressesbyaccount", "\"\"")
+            + HelpExampleRpc("getaddressesbyaccount", "\"\"")
         );
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -8277,6 +8308,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "getaccount",               &getaccount,               true  },
     { "wallet",             "getalldata",               &getalldata,               true  },
     { "wallet",             "getaddressesbyaccount",    &getaddressesbyaccount,    true  },
+    { "wallet",             "listaddresses",            &listaddresses        ,    true  },
     { "wallet",             "getbalance",               &getbalance,               false },
     { "wallet",             "getnewaddress",            &getnewaddress,            true  },
     { "wallet",             "getrawchangeaddress",      &getrawchangeaddress,      true  },

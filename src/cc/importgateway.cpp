@@ -19,13 +19,11 @@
 #include "CCImportGateway.h"
 #include "key_io.h"
 #include "../importcoin.h"
-
 // start of consensus code
-
-#define KMD_PUBTYPE 60
-#define KMD_P2SHTYPE 85
-#define KMD_WIFTYPE 188
-#define KMD_TADDR 0
+#define HUSH_PUBTYPE 60
+#define HUSH_P2SHTYPE 85
+#define HUSH_WIFTYPE 188
+#define HUSH_TADDR 0
 #define CC_MARKER_VALUE 10000
 
 extern uint256 HUSH_EARLYTXID;
@@ -46,7 +44,7 @@ uint8_t DecodeImportGatewayBindOpRet(char *burnaddr,const CScript &scriptPubKey,
     burnaddr[0] = 0;
     if ( vopret.size() > 2 && E_UNMARSHAL(vopret,ss >> e; ss >> f; ss >> coin; ss >> oracletxid; ss >> M; ss >> N; ss >> importgatewaypubkeys; ss >> taddr; ss >> prefix; ss >> prefix2; ss >> wiftype) != 0 )
     {
-        if ( prefix == KMD_PUBTYPE && prefix2 == KMD_P2SHTYPE )
+        if ( prefix == HUSH_PUBTYPE && prefix2 == HUSH_P2SHTYPE )
         {
             if ( N > 1 )
             {
@@ -481,12 +479,12 @@ std::string ImportGatewayBind(uint64_t txfee,std::string coin,uint256 oracletxid
 
     cp = CCinit(&C,EVAL_IMPORTGATEWAY);
     cpTokens = CCinit(&CTokens,EVAL_TOKENS);
-    if (coin=="KMD")
+    if (coin=="HUSH")
     {
-        prefix = KMD_PUBTYPE;
-        prefix2 = KMD_P2SHTYPE;
-        wiftype = KMD_WIFTYPE;
-        taddr = KMD_TADDR;
+        prefix = HUSH_PUBTYPE;
+        prefix2 = HUSH_P2SHTYPE;
+        wiftype = HUSH_WIFTYPE;
+        taddr = HUSH_TADDR;
     }
     else
     {

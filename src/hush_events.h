@@ -117,7 +117,7 @@ void hush_event_undo(struct hush_state *sp,struct hush_event *ep)
     {
         case HUSH_EVENT_RATIFY: printf("rewind of ratify, needs to be coded.%d\n",ep->height); break;
         case HUSH_EVENT_NOTARIZED: break;
-        case HUSH_EVENT_KMDHEIGHT:
+        case HUSH_EVENT_HUSHHEIGHT:
             if ( ep->height <= sp->SAVEDHEIGHT )
                 sp->SAVEDHEIGHT = ep->height;
             break;
@@ -175,7 +175,7 @@ void hush_eventadd_kmdheight(struct hush_state *sp,char *symbol,int32_t height,i
     if ( kmdheight > 0 ) {
         buf[0] = (uint32_t)kmdheight;
         buf[1] = timestamp;
-        hush_eventadd(sp,height,symbol,HUSH_EVENT_KMDHEIGHT,(uint8_t *)buf,sizeof(buf));
+        hush_eventadd(sp,height,symbol,HUSH_EVENT_HUSHHEIGHT,(uint8_t *)buf,sizeof(buf));
         if ( sp != 0 )
             komodo_setkmdheight(sp,kmdheight,timestamp);
     } else {

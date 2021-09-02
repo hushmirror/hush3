@@ -639,7 +639,7 @@ cJSON *get_rawmempool(char *refcoin,char *acname)
 cJSON *get_addressutxos(char *refcoin,char *acname,char *coinaddr)
 {
     cJSON *retjson; char *retstr,jsonbuf[256];
-    if ( refcoin[0] != 0 && strcmp(refcoin,"KMD") != 0 )
+    if ( refcoin[0] != 0 && strcmp(refcoin,"HUSH3") != 0 )
         printf("warning: assumes %s has addressindex enabled\n",refcoin);
     sprintf(jsonbuf,"{\\\"addresses\\\":[\\\"%s\\\"]}",coinaddr);
     if ( (retjson= get_hushcli(refcoin,&retstr,acname,"getaddressutxos",jsonbuf,"","","","","","")) != 0 )
