@@ -610,7 +610,7 @@ int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryi
             memset(&MoMoMdata,0,sizeof(MoMoMdata));
             if ( matched == 0 && signedmask != 0 && bitweight(signedmask) >= HUSH_MINRATIFY )
                 notarized = 1;
-            if ( strcmp("PIZZA",ccdata.symbol) == 0 || strncmp("TXSCL",ccdata.symbol,5) == 0 || strcmp("BEER",ccdata.symbol) == 0)
+            if ( strcmp("DPOW",ccdata.symbol) == 0 || strncmp("ZPOW",ccdata.symbol,5) == 0 || strcmp("TUSH",ccdata.symbol) == 0)
                 notarized = 1;
             if ( 0 && opretlen != 149 )
                 printf("[%s].%d (%s) matched.%d i.%d j.%d notarized.%d %llx opretlen.%d len.%d offset.%d opoffset.%d\n",SMART_CHAIN_SYMBOL,height,ccdata.symbol,matched,i,j,notarized,(long long)signedmask,opretlen,len,offset,opoffset);
@@ -726,7 +726,7 @@ int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryi
                 if ( k == 32 )
                 {
                     *isratificationp = 1;
-                    printf("ISRATIFICATION (%s)\n",(char *)&scriptbuf[len+32*2+4]);
+                    printf("%s: ISRATIFICATION (%s)\n",__func__,(char *)&scriptbuf[len+32*2+4]);
                 }
             }
 
@@ -809,7 +809,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
         txn_count = block.vtx.size();
         for (i=0; i<txn_count; i++)
         {
-            // Notary pay chains need notarisation in position 1, ignore the rest on validation. Check notarisation is 1 on check.
+            // Notary pay chains need notarization in position 1, ignore the rest on validation. Check notarization is 1 on check.
             if ( !fJustCheck && i > 1 && ASSETCHAINS_NOTARY_PAY[0] != 0 )
                 break;
             txhash = block.vtx[i].GetHash();

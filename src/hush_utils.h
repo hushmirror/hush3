@@ -809,7 +809,7 @@ char *bitcoin_address(char *coinaddr,uint8_t addrtype,uint8_t *pubkey_or_rmd160,
     return(coinaddr);
 }
 
-int32_t komodo_is_issuer()
+int32_t hush_is_issuer()
 {
     if ( SMART_CHAIN_SYMBOL[0] != 0 && hush_baseid(SMART_CHAIN_SYMBOL) >= 0 )
         return(1);

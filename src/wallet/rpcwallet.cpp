@@ -612,9 +612,9 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pubkey37[37],char *coinaddr,int32_t height,char *base,int64_t fiatoshis);
 int32_t hush_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen);
 extern int32_t HUSH_PAX;
-int32_t komodo_is_issuer();
+int32_t hush_is_issuer();
 int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
-int32_t komodo_isrealtime(int32_t *kmdheightp);
+int32_t hush_isrealtime(int32_t *kmdheightp);
 int32_t pax_fiatstatus(uint64_t *available,uint64_t *deposited,uint64_t *issued,uint64_t *withdrawn,uint64_t *approved,uint64_t *redeemed,char *base);
 int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
 int32_t komodo_kvcmp(uint8_t *refvalue,uint16_t refvaluesize,uint8_t *value,uint16_t valuesize);
@@ -774,7 +774,7 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
     {
         throw runtime_error("paxdeposit disabled without -pax");
     }
-    if ( komodo_is_issuer() != 0 )
+    if ( hush_is_issuer() != 0 )
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "paxdeposit only from KYC");
     if (!EnsureWalletIsAvailable(fHelp))
         throw runtime_error("paxdeposit needs wallet"); //return Value::null;
@@ -822,7 +822,7 @@ UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
     throw runtime_error("paxwithdraw deprecated");
     if (fHelp || params.size() != 2)
         throw runtime_error("paxwithdraw address fiatamount");
-    if ( komodo_isrealtime(&kmdheight) == 0 )
+    if ( hush_isrealtime(&kmdheight) == 0 )
         return(0);
     LOCK2(cs_main, pwalletMain->cs_wallet);
     CBitcoinAddress address(params[0].get_str());

@@ -137,7 +137,6 @@ void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uin
 uint32_t Mining_start,Mining_height;
 int32_t My_notaryid = -1;
 int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
-int32_t komodo_pax_opreturn(int32_t height,uint8_t *opret,int32_t maxsize);
 int32_t hush_baseid(char *origbase);
 int32_t hush_longestchain();
 int64_t hush_block_unlocktime(uint32_t nHeight);

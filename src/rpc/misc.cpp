@@ -252,7 +252,7 @@ UniValue getinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
     obj.push_back(Pair("notarizedtxid", notarized_desttxid.ToString()));
     if ( HUSH_NSPV_FULLNODE )
     {
-        txid_height = notarizedtxid_height(SMART_CHAIN_SYMBOL[0] != 0 ? (char *)"HUSH3" : (char *)"BTC",(char *)notarized_desttxid.ToString().c_str(),&hushnotarized_height);
+        txid_height = notarizedtxid_height( (char *)"HUSH3" ,(char *)notarized_desttxid.ToString().c_str(),&hushnotarized_height);
         if ( txid_height > 0 )
             obj.push_back(Pair("notarizedtxid_height", txid_height));
         else obj.push_back(Pair("notarizedtxid_height", "mempool"));

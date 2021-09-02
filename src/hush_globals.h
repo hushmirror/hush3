@@ -26,7 +26,7 @@ int32_t hush_notarizeddata(int32_t nHeight,uint256 *notarized_hashp,uint256 *not
 char *hush_issuemethod(char *userpass,char *method,char *params,uint16_t port);
 void hush_init(int32_t height);
 int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
-int32_t komodo_isrealtime(int32_t *kmdheightp);
+int32_t hush_isrealtime(int32_t *kmdheightp);
 uint64_t komodo_paxtotal();
 int32_t hush_longestchain();
 uint64_t komodo_maxallowed(int32_t baseid);

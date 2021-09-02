@@ -408,8 +408,7 @@ int32_t notarizedtxid_height(char *dest,char *txidstr,int32_t *hushnotarized_hei
                 if ( (item= jobj(json,(char *)"result")) != 0 )
                 {
                     height = jint(item,(char *)"blocks");
-                    //TODO: which key to use?
-                    *hushnotarized_heightp = strcmp(dest,"KMD") == 0 ? jint(item,(char *)"notarized") : height;
+                    *hushnotarized_heightp = strcmp(dest,"HUSH3") == 0 ? jint(item,(char *)"notarized") : height;
                 }
                 free_json(json);
             }
@@ -1030,7 +1029,7 @@ int32_t hush_nextheight()
     else return(hush_longestchain() + 1);
 }
 
-int32_t komodo_isrealtime(int32_t *kmdheightp)
+int32_t hush_isrealtime(int32_t *kmdheightp)
 {
     struct hush_state *sp; CBlockIndex *pindex;
     if ( (sp= hush_stateptrget((char *)"HUSH3")) != 0 )
