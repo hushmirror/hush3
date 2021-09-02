@@ -4996,7 +4996,7 @@ bool CheckBlockHeader(int32_t *futureblockp,int32_t height,CBlockIndex *pindex, 
             return state.DoS(100, error("CheckBlockHeader(): Equihash solution invalid"),REJECT_INVALID, "invalid-solution");
     }
     // Check proof of work matches claimed amount
-    /*komodo_index2pubkey33(pubkey33,pindex,height);
+    /*hush_index2pubkey33(pubkey33,pindex,height);
      if ( fCheckPOW && !CheckProofOfWork(height,pubkey33,blockhdr.GetHash(), blockhdr.nBits, Params().GetConsensus(),blockhdr.nTime) )
      return state.DoS(50, error("CheckBlockHeader(): proof of work failed"),REJECT_INVALID, "high-hash");*/
     return true;

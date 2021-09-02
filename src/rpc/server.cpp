@@ -872,7 +872,7 @@ std::string HelpExampleRpc(const std::string& methodname, const std::string& arg
 string experimentalDisabledHelpMsg(const string& rpc, const string& enableArg)
 {
     string daemon = "hushd";
-    string ticker = SMART_CHAIN_SYMBOL[0] == 0 ? "komodo" : SMART_CHAIN_SYMBOL;
+    string ticker = SMART_CHAIN_SYMBOL;
 
     return "\nWARNING: " + rpc + " is disabled.\n"
         "To enable it, restart " + daemon + " with the -experimentalfeatures and\n"

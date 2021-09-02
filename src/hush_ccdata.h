@@ -24,7 +24,7 @@ int32_t CC_firstheight;
 
 uint256 BuildMerkleTree(bool* fMutated, const std::vector<uint256> leaves, std::vector<uint256> &vMerkleTree);
 
-uint256 komodo_calcMoM(int32_t height,int32_t MoMdepth)
+uint256 hush_calcMoM(int32_t height,int32_t MoMdepth)
 {
     static uint256 zero; CBlockIndex *pindex; int32_t i; std::vector<uint256> tree, leaves;
     bool fMutated;

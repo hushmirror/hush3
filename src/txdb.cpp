@@ -647,7 +647,7 @@ bool CBlockTreeDB::ReadFlag(const std::string &name, bool &fValue) {
     return true;
 }
 
-void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
+void hush_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
 
 bool CBlockTreeDB::blockOnchainActive(const uint256 &hash) {
     BlockMap::const_iterator it = mapBlockIndex.find(hash);
@@ -723,7 +723,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 if ( 0 ) // POW will be checked before any block is connected
                 {
                     uint8_t pubkey33[33];
-                    komodo_index2pubkey33(pubkey33,pindexNew,pindexNew->GetHeight());
+                    hush_index2pubkey33(pubkey33,pindexNew,pindexNew->GetHeight());
                     if (!CheckProofOfWork(header,pubkey33,pindexNew->GetHeight(),Params().GetConsensus()))
                         return error("LoadBlockIndex(): CheckProofOfWork failed: %s", pindexNew->ToString());
                 }

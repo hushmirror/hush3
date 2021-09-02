@@ -847,7 +847,7 @@ uint32_t hush_heightstamp(int32_t height)
     }
 }*/
 
-void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height)
+void hush_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height)
 {
     int32_t num,i; CBlock block;
     memset(pubkey33,0,33);
@@ -869,7 +869,7 @@ void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height)
                 memcpy(destpubkey33,pindex->pubkey33,33);
             return(pindex->notaryid);
         }
-        komodo_index2pubkey33(pubkey33,pindex,height);
+        hush_index2pubkey33(pubkey33,pindex,height);
         if ( destpubkey33 != 0 )
             memcpy(destpubkey33,pindex->pubkey33,33);
         if ( pindex->didinit != 0 )
