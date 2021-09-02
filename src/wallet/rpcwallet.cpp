@@ -428,12 +428,12 @@ UniValue listaddresses(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if (!EnsureWalletIsAvailable(fHelp))
         return NullUniValue;
 
-    if (fHelp || params.size() != 1)
+    if (fHelp || params.size() != 0)
         throw runtime_error(
             "listaddresses\n"
             "\nResult:\n"
             "[                     (json array of string)\n"
-            "  \"" + strprintf("%s",hush_chainname()) + "_address\"  (string) a " + strprintf("%s",hush_chainname()) + " address associated with the given account\n"
+            "  \"" + strprintf("%s",hush_chainname()) + "_address\"  (string) a " + strprintf("%s",hush_chainname()) + " address\n"
             "  ,...\n"
             "]\n"
             "\nExamples:\n"
