@@ -664,18 +664,6 @@ int32_t hush_isPoS(CBlock *pblock,int32_t height,bool fJustCheck)
     return(0);
 }
 
-void komodo_disconnect(CBlockIndex *pindex,CBlock& block)
-{
-    char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
-    //fprintf(stderr,"disconnect ht.%d\n",pindex->GetHeight());
-    hush_init(pindex->GetHeight());
-    if ( (sp= hush_stateptr(symbol,dest)) != 0 )
-    {
-        //sp->rewinding = pindex->GetHeight();
-        //fprintf(stderr,"-%d ",pindex->GetHeight());
-    } else printf("hush_disconnect: ht.%d cant get hush_state.(%s)\n",pindex->GetHeight(),SMART_CHAIN_SYMBOL);
-}
-
 int32_t hush_is_notarytx(const CTransaction& tx)
 {
     uint8_t *ptr; static uint8_t crypto555[33];
@@ -805,47 +793,6 @@ uint32_t hush_heightstamp(int32_t height)
     return(0);
 }
 
-/*void komodo_pindex_init(CBlockIndex *pindex,int32_t height) gets data corrupted
-{
-    int32_t i,num; uint8_t pubkeys[64][33]; CBlock block;
-    if ( pindex->didinit != 0 )
-        return;
-    //printf("pindex.%d komodo_pindex_init notary.%d from height.%d\n",pindex->GetHeight(),pindex->notaryid,height);
-    if ( pindex->didinit == 0 )
-    {
-        pindex->notaryid = -1;
-        if ( HUSH_LOADINGBLOCKS == 0 )
-            memset(pindex->pubkey33,0xff,33);
-        else memset(pindex->pubkey33,0,33);
-        if ( hush_blockload(block,pindex) == 0 )
-        {
-            hush_block2pubkey33(pindex->pubkey33,&block);
-            //for (i=0; i<33; i++)
-            //    fprintf(stderr,"%02x",pindex->pubkey33[i]);
-            //fprintf(stderr," set pubkey at height %d/%d\n",pindex->GetHeight(),height);
-            //if ( pindex->pubkey33[0] == 2 || pindex->pubkey33[0] == 3 )
-            //    pindex->didinit = (HUSH_LOADINGBLOCKS == 0);
-        } // else fprintf(stderr,"error loading block at %d/%d",pindex->GetHeight(),height);
-    }
-    if ( pindex->didinit != 0 && pindex->GetHeight() >= 0 && (num= hush_notaries(pubkeys,(int32_t)pindex->GetHeight(),(uint32_t)pindex->nTime)) > 0 )
-    {
-        for (i=0; i<num; i++)
-        {
-            if ( memcmp(pubkeys[i],pindex->pubkey33,33) == 0 )
-            {
-                pindex->notaryid = i;
-                break;
-            }
-        }
-        if ( 0 && i == num )
-        {
-            for (i=0; i<33; i++)
-                fprintf(stderr,"%02x",pindex->pubkey33[i]);
-            fprintf(stderr," unmatched pubkey at height %d/%d\n",pindex->GetHeight(),height);
-        }
-    }
-}*/
-
 void hush_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height)
 {
     int32_t num,i; CBlock block;
@@ -857,7 +804,7 @@ void hush_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height)
     }
 }
 
-int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blocktimes[66],int32_t *nonzpkeysp,int32_t height)
+int32_t hush_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blocktimes[66],int32_t *nonzpkeysp,int32_t height)
 {
     // after the season HF block ALL new notaries instantly become elegible. 
     int32_t i,j,n,duplicate; CBlock block; CBlockIndex *pindex; uint8_t notarypubs33[64][33];
@@ -880,7 +827,9 @@ int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blo
                         break;
                     }
                 }
-            } else fprintf(stderr,"couldnt load block.%d\n",height);
+            } else {
+                fprintf(stderr,"%s: couldnt load block height %d\n",__func__,height);
+            }
             if ( mids[0] >= 0 && i > 0 && mids[i] == mids[0] )
                 duplicate++;
         }
@@ -890,7 +839,7 @@ int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blo
     else return(0);
 }
 
-int32_t komodo_minerids(uint8_t *minerids,int32_t height,int32_t width)
+int32_t hush_minerids(uint8_t *minerids,int32_t height,int32_t width)
 {
     int32_t i,j,nonz,numnotaries; CBlock block; CBlockIndex *pindex; uint8_t notarypubs33[64][33],pubkey33[33];
     numnotaries = hush_notaries(notarypubs33,height,0);
