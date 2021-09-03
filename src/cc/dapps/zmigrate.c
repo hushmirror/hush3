@@ -1044,8 +1044,8 @@ int32_t itemvalid(char *refcoin,int64_t *refundedp,int64_t *waitingp,struct clai
     *refundedp = *waitingp = 0;
     if ( item->refundvalue < 0 )
         return(-1);
-    // change "kmd" -> %s, tolowerstr(refcoin)
-    sprintf(url,"https://kmd.explorer.dexstats.info/insight-api-komodo/addr/%s",item->destaddr);
+
+    sprintf(url,"https://explorer.hush.is/api/addr/%s",item->destaddr);
     if ( (retstr= send_curl(url,"/tmp/itemvalid")) != 0 )
     {
         if ( (curljson= cJSON_Parse(retstr)) != 0 )
