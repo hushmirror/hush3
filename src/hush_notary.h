@@ -143,17 +143,17 @@ void hush_notarysinit(int32_t origheight,uint8_t pubkeys[64][33],int32_t num)
     static int32_t hwmheight;
     int32_t k,i,htind,height; struct knotary_entry *kp; struct knotaries_entry N;
     if ( Pubkeys == 0 )
-        Pubkeys = (struct knotaries_entry *)calloc(1 + (HUSH_MAXBLOCKS / KOMODO_ELECTION_GAP),sizeof(*Pubkeys));
+        Pubkeys = (struct knotaries_entry *)calloc(1 + (HUSH_MAXBLOCKS / HUSH_DPOW_GAP),sizeof(*Pubkeys));
     memset(&N,0,sizeof(N));
     if ( origheight > 0 )
     {
-        height = (origheight + KOMODO_ELECTION_GAP/2);
-        height /= KOMODO_ELECTION_GAP;
-        height = ((height + 1) * KOMODO_ELECTION_GAP);
-        htind = (height / KOMODO_ELECTION_GAP);
-        if ( htind >= HUSH_MAXBLOCKS / KOMODO_ELECTION_GAP )
-            htind = (HUSH_MAXBLOCKS / KOMODO_ELECTION_GAP) - 1;
-        //printf("htind.%d activation %d from %d vs %d | hwmheight.%d %s\n",htind,height,origheight,(((origheight+KOMODO_ELECTION_GAP/2)/KOMODO_ELECTION_GAP)+1)*KOMODO_ELECTION_GAP,hwmheight,SMART_CHAIN_SYMBOL);
+        height = (origheight + HUSH_DPOW_GAP/2);
+        height /= HUSH_DPOW_GAP;
+        height = ((height + 1) * HUSH_DPOW_GAP);
+        htind = (height / HUSH_DPOW_GAP);
+        if ( htind >= HUSH_MAXBLOCKS / HUSH_DPOW_GAP )
+            htind = (HUSH_MAXBLOCKS / HUSH_DPOW_GAP) - 1;
+        //printf("htind.%d activation %d from %d vs %d | hwmheight.%d %s\n",htind,height,origheight,(((origheight+HUSH_DPOW_GAP/2)/HUSH_DPOW_GAP)+1)*HUSH_DPOW_GAP,hwmheight,SMART_CHAIN_SYMBOL);
     } else htind = 0;
     pthread_mutex_lock(&hush_mutex);
     for (k=0; k<num; k++)
@@ -166,11 +166,11 @@ void hush_notarysinit(int32_t origheight,uint8_t pubkeys[64][33],int32_t num)
         {
             for (i=0; i<33; i++)
                 printf("%02x",pubkeys[k][i]);
-            printf(" notarypubs.[%d] ht.%d active at %d\n",k,origheight,htind*KOMODO_ELECTION_GAP);
+            printf(" notarypubs.[%d] ht.%d active at %d\n",k,origheight,htind*HUSH_DPOW_GAP);
         }
     }
     N.numnotaries = num;
-    for (i=htind; i<HUSH_MAXBLOCKS / KOMODO_ELECTION_GAP; i++)
+    for (i=htind; i<HUSH_MAXBLOCKS / HUSH_DPOW_GAP; i++)
     {
         if ( Pubkeys[i].height != 0 && origheight < hwmheight )
         {
@@ -178,7 +178,7 @@ void hush_notarysinit(int32_t origheight,uint8_t pubkeys[64][33],int32_t num)
             break;
         }
         Pubkeys[i] = N;
-        Pubkeys[i].height = i * KOMODO_ELECTION_GAP;
+        Pubkeys[i].height = i * HUSH_DPOW_GAP;
     }
     pthread_mutex_unlock(&hush_mutex);
     if ( origheight > hwmheight )
@@ -207,9 +207,9 @@ int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,ui
         return(-1);
     if ( Pubkeys == 0 )
         hush_init(0);
-    htind = height / KOMODO_ELECTION_GAP;
-    if ( htind >= HUSH_MAXBLOCKS / KOMODO_ELECTION_GAP )
-        htind = (HUSH_MAXBLOCKS / KOMODO_ELECTION_GAP) - 1;
+    htind = height / HUSH_DPOW_GAP;
+    if ( htind >= HUSH_MAXBLOCKS / HUSH_DPOW_GAP )
+        htind = (HUSH_MAXBLOCKS / HUSH_DPOW_GAP) - 1;
     pthread_mutex_lock(&hush_mutex);
     HASH_FIND(hh,Pubkeys[htind].Notaries,pubkey33,33,kp);
     pthread_mutex_unlock(&hush_mutex);

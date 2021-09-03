@@ -1183,7 +1183,7 @@ void static BitcoinMiner()
             if ( SMART_CHAIN_SYMBOL[0] == 0 && notaryid >= 0 )
             {
                 j = 65;
-                if ( (Mining_height >= 235300 && Mining_height < 236000) || (Mining_height % KOMODO_ELECTION_GAP) > 64 || (Mining_height % KOMODO_ELECTION_GAP) == 0 || Mining_height > 1000000 )
+                if ( (Mining_height >= 235300 && Mining_height < 236000) || (Mining_height % HUSH_DPOW_GAP) > 64 || (Mining_height % HUSH_DPOW_GAP) == 0 || Mining_height > 1000000 )
                 {
                     int32_t dispflag = 0;
                     if ( notaryid <= 3 || notaryid == 32 || (notaryid >= 43 && notaryid <= 45) || notaryid == 51 || notaryid == 52 || notaryid == 56 || notaryid == 57 )

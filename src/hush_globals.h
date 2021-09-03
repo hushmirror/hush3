@@ -34,7 +34,7 @@ int32_t komodo_bannedset(int32_t *indallvoutsp,uint256 *array,int32_t max);
 int32_t hush_checkvout(int32_t vout,int32_t k,int32_t indallvouts);
 pthread_mutex_t hush_mutex;
 
-#define KOMODO_ELECTION_GAP 2000    //((SMART_CHAIN_SYMBOL[0] == 0) ? 2000 : 100)
+#define HUSH_DPOW_GAP 2000    //((SMART_CHAIN_SYMBOL[0] == 0) ? 2000 : 100)
 #define HUSH_SMART_CHAIN_MAXLEN 65
 
 struct pax_transaction *PAX;
