@@ -846,7 +846,7 @@ const char *komodo_opreturn(int32_t height,uint64_t value,uint8_t *opretbuf,int3
     tokomodo = (hush_is_issuer() == 0);
     if ( opretbuf[0] == 'K' && opretlen != 40 )
     {
-        komodo_kvupdate(opretbuf,opretlen,value);
+        hush_kvupdate(opretbuf,opretlen,value);
         return("kv");
     }
     else if ( SMART_CHAIN_SYMBOL[0] == 0 && HUSH_PAX == 0 )

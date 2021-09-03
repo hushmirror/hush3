@@ -103,7 +103,7 @@ int32_t HUSH_TESTNODE, HUSH_SNAPSHOT_INTERVAL;
 CScript HUSH_EARLYTXID_SCRIPTPUB;
 int32_t ASSETCHAINS_EARLYTXIDCONTRACT;
 std::map <std::int8_t, int32_t> mapHeightEvalActivate;
-struct komodo_kv *HUSH_KV;
+struct hush_kv *HUSH_KV;
 pthread_mutex_t HUSH_KV_mutex,HUSH_CC_mutex;
 
 #define MAX_CURRENCIES 32
