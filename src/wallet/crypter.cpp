@@ -2,7 +2,6 @@
 // Copyright (c) 2016-2021 The Hush developers
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
-
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -17,17 +16,21 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "crypter.h"
-
 #include "script/script.h"
 #include "script/standard.h"
 #include "streams.h"
 #include "util.h"
-
 #include <string>
 #include <vector>
 #include <boost/foreach.hpp>
+// TODO: these are not set correctly by wolfssl for some reason. Ja bless.
+#undef ECC_TIMING_RESISTANT
+#undef TFM_TIMING_RESISTANT
+#define ECC_TIMING_RESISTANT 420
+#define TFM_TIMING_RESISTANT 420
+#undef  WC_RSA_BLINDING
+#define WC_RSA_BLINDING
 #include <wolfssl/openssl/aes.h>
 #include <wolfssl/openssl/evp.h>
 
