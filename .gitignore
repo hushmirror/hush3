@@ -118,6 +118,14 @@ src/komodo-cli.exe
 src/komodod.exe
 src/komodo-tx.exe
 
+src/hush-cli
+src/hushd
+src/hush-tx
+src/hush-test
+src/hush-cli.exe
+src/hushd.exe
+src/hush-tx.exe
+
 #output during builds, symbol tables?
 *.dSYM
 

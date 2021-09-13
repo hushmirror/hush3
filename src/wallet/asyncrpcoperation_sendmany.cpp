@@ -194,9 +194,11 @@ bool AsyncRPCOperation_sendmany::main_impl() {
 
     assert(isfromtaddr_ != isfromzaddr_);
 
+    /* TODO: this needs to allow DPoW addresses. Consensus-time checks do it correctly.
     if(t_outputs_.size() > 0) {
         throw JSONRPCError(RPC_WALLET_ERROR, "Extreme Privacy! You cannot send to a transparent address.");
     }
+    */
 
     bool isSingleZaddrOutput   = (t_outputs_.size()==0 && z_outputs_.size()==1);
     bool isMultipleZaddrOutput = (t_outputs_.size()==0 && z_outputs_.size()>=1);

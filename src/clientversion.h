@@ -29,8 +29,8 @@
 //! These need to be macros, as clientversion.cpp's and bitcoin*-res.rc's voodoo requires it
 // Must be kept in sync with configure.ac , ugh!
 #define CLIENT_VERSION_MAJOR 3
-#define CLIENT_VERSION_MINOR 7
-#define CLIENT_VERSION_REVISION 1
+#define CLIENT_VERSION_MINOR 8
+#define CLIENT_VERSION_REVISION 0
 #define CLIENT_VERSION_BUILD 50
 
 //! Set to true for release, false for prerelease or test build

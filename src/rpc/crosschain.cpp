@@ -59,7 +59,7 @@ bool EnsureWalletIsAvailable(bool avoidException);
 int32_t hush_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip);
 int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height);
 struct hush_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi);
-uint256 komodo_calcMoM(int32_t height,int32_t MoMdepth);
+uint256 hush_calcMoM(int32_t height,int32_t MoMdepth);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 extern std::string ASSETCHAINS_SELFIMPORT;
 
@@ -169,7 +169,7 @@ UniValue calc_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( height <= 0 || MoMdepth <= 0 || MoMdepth >= height )
         throw runtime_error("calc_MoM illegal height or MoMdepth\n");
     //fprintf(stderr,"height_MoM height.%d\n",height);
-    MoM = komodo_calcMoM(height,MoMdepth);
+    MoM = hush_calcMoM(height,MoMdepth);
     ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL)));
     ret.push_back(Pair("height",height));
     ret.push_back(Pair("MoMdepth",MoMdepth));
@@ -670,7 +670,7 @@ UniValue migrate_createnotaryapprovaltransaction(const UniValue& params, bool fH
     if (fHelp || params.size() != 2)
         throw runtime_error("migrate_createnotaryapprovaltransaction burntxid txoutproof\n\n"
             "Creates a tx for destination chain with burn tx proof\n"
-            "txoutproof should be retrieved by komodo-cli migrate_checkburntransactionsource call on the source chain\n" );
+            "txoutproof should be retrieved by hush-cli migrate_checkburntransactionsource call on the source chain\n" );
 
     if (SMART_CHAIN_SYMBOL[0] == 0)
         throw runtime_error("Must be called on asset chain");

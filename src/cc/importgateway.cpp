@@ -19,13 +19,11 @@
 #include "CCImportGateway.h"
 #include "key_io.h"
 #include "../importcoin.h"
-
 // start of consensus code
-
-#define KMD_PUBTYPE 60
-#define KMD_P2SHTYPE 85
-#define KMD_WIFTYPE 188
-#define KMD_TADDR 0
+#define HUSH_PUBTYPE 60
+#define HUSH_P2SHTYPE 85
+#define HUSH_WIFTYPE 188
+#define HUSH_TADDR 0
 #define CC_MARKER_VALUE 10000
 
 extern uint256 HUSH_EARLYTXID;
@@ -46,7 +44,7 @@ uint8_t DecodeImportGatewayBindOpRet(char *burnaddr,const CScript &scriptPubKey,
     burnaddr[0] = 0;
     if ( vopret.size() > 2 && E_UNMARSHAL(vopret,ss >> e; ss >> f; ss >> coin; ss >> oracletxid; ss >> M; ss >> N; ss >> importgatewaypubkeys; ss >> taddr; ss >> prefix; ss >> prefix2; ss >> wiftype) != 0 )
     {
-        if ( prefix == KMD_PUBTYPE && prefix2 == KMD_P2SHTYPE )
+        if ( prefix == HUSH_PUBTYPE && prefix2 == HUSH_P2SHTYPE )
         {
             if ( N > 1 )
             {
@@ -362,7 +360,7 @@ bool ImportGatewayValidate(struct CCcontract_info *cp,Eval *eval,const CTransact
                             return eval->Invalid("invalid tokens to gateways vout for gatewaysWithdraw!");
                         else if (tmptx.vout[1].nValue!=amount)
                             return eval->Invalid("amount in opret not matching tx tokens amount!");
-                        else if (komodo_txnotarizedconfirmed(withdrawtxid) == false)
+                        else if (hush_txnotarizedconfirmed(withdrawtxid) == false)
                             return eval->Invalid("gatewayswithdraw tx is not yet confirmed(notarised)!");
                         else if (myGetTransaction(bindtxid,tmptx,hashblock) == 0)
                             return eval->Invalid("invalid gatewaysbind txid!");
@@ -370,7 +368,7 @@ bool ImportGatewayValidate(struct CCcontract_info *cp,Eval *eval,const CTransact
                             return eval->Invalid("invalid gatewaysbind OP_RETURN data!"); 
                         else if (tmprefcoin!=refcoin)
                             return eval->Invalid("refcoin different than in bind tx");
-                        else if (komodo_txnotarizedconfirmed(bindtxid) == false)
+                        else if (hush_txnotarizedconfirmed(bindtxid) == false)
                             return eval->Invalid("gatewaysbind tx is not yet confirmed(notarised)!");
                         else if (IsCCInput(tx.vin[0].scriptSig) != 0)
                             return eval->Invalid("vin.0 is normal for gatewayspartialsign!");
@@ -404,7 +402,7 @@ bool ImportGatewayValidate(struct CCcontract_info *cp,Eval *eval,const CTransact
                             return eval->Invalid("invalid tokens to gateways vout for gatewaysWithdraw!");
                         else if (tmptx.vout[1].nValue!=amount)
                             return eval->Invalid("amount in opret not matching tx tokens amount!");
-                        else if (komodo_txnotarizedconfirmed(withdrawtxid) == false)
+                        else if (hush_txnotarizedconfirmed(withdrawtxid) == false)
                             return eval->Invalid("gatewayswithdraw tx is not yet confirmed(notarised)!");
                         else if (myGetTransaction(bindtxid,tmptx,hashblock) == 0)
                             return eval->Invalid("invalid gatewaysbind txid!");
@@ -412,7 +410,7 @@ bool ImportGatewayValidate(struct CCcontract_info *cp,Eval *eval,const CTransact
                             return eval->Invalid("invalid gatewaysbind OP_RETURN data!"); 
                         else if (tmprefcoin!=refcoin)
                             return eval->Invalid("refcoin different than in bind tx");
-                        else if (komodo_txnotarizedconfirmed(bindtxid) == false)
+                        else if (hush_txnotarizedconfirmed(bindtxid) == false)
                             return eval->Invalid("gatewaysbind tx is not yet confirmed(notarised)!");
                         else if (IsCCInput(tx.vin[0].scriptSig) != 0)
                             return eval->Invalid("vin.0 is normal for gatewayscompletesigning!");
@@ -433,7 +431,7 @@ bool ImportGatewayValidate(struct CCcontract_info *cp,Eval *eval,const CTransact
                             return eval->Invalid("invalid gatewayscompletesigning txid!");
                         else if ((numvouts=tmptx.vout.size()) > 0 && DecodeImportGatewayCompleteSigningOpRet(tmptx.vout[numvouts-1].scriptPubKey,withdrawtxid,tmprefcoin,K,hex)!='S')
                             return eval->Invalid("invalid gatewayscompletesigning OP_RETURN data!"); 
-                        else if (komodo_txnotarizedconfirmed(completetxid) == false)
+                        else if (hush_txnotarizedconfirmed(completetxid) == false)
                             return eval->Invalid("gatewayscompletesigning tx is not yet confirmed(notarised)!");
                         else if (myGetTransaction(withdrawtxid,tmptx,hashblock) == 0)
                             return eval->Invalid("invalid withdraw txid!");
@@ -441,7 +439,7 @@ bool ImportGatewayValidate(struct CCcontract_info *cp,Eval *eval,const CTransact
                             return eval->Invalid("invalid gatewayswithdraw OP_RETURN data!"); 
                         else if (tmprefcoin!=refcoin)
                             return eval->Invalid("refcoin different than in bind tx");
-                        else if (komodo_txnotarizedconfirmed(withdrawtxid) == false)
+                        else if (hush_txnotarizedconfirmed(withdrawtxid) == false)
                             return eval->Invalid("gatewayswithdraw tx is not yet confirmed(notarised)!");
                         else if (myGetTransaction(bindtxid,tmptx,hashblock) == 0)
                             return eval->Invalid("invalid gatewaysbind txid!");
@@ -449,7 +447,7 @@ bool ImportGatewayValidate(struct CCcontract_info *cp,Eval *eval,const CTransact
                             return eval->Invalid("invalid gatewaysbind OP_RETURN data!"); 
                         else if (tmprefcoin!=refcoin)
                             return eval->Invalid("refcoin different than in bind tx");
-                        else if (komodo_txnotarizedconfirmed(bindtxid) == false)
+                        else if (hush_txnotarizedconfirmed(bindtxid) == false)
                             return eval->Invalid("gatewaysbind tx is not yet confirmed(notarised)!");
                         else if ( IsCCInput(tx.vin[0].scriptSig) != 0 )
                             return eval->Invalid("vin.0 is normal for gatewaysmarkdone!");
@@ -481,12 +479,12 @@ std::string ImportGatewayBind(uint64_t txfee,std::string coin,uint256 oracletxid
 
     cp = CCinit(&C,EVAL_IMPORTGATEWAY);
     cpTokens = CCinit(&CTokens,EVAL_TOKENS);
-    if (coin=="KMD")
+    if (coin=="HUSH")
     {
-        prefix = KMD_PUBTYPE;
-        prefix2 = KMD_P2SHTYPE;
-        wiftype = KMD_WIFTYPE;
-        taddr = KMD_TADDR;
+        prefix = HUSH_PUBTYPE;
+        prefix2 = HUSH_P2SHTYPE;
+        wiftype = HUSH_WIFTYPE;
+        taddr = HUSH_TADDR;
     }
     else
     {
@@ -597,7 +595,7 @@ std::string ImportGatewayDeposit(uint64_t txfee,uint256 bindtxid,int32_t height,
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
         return("");
     }
-    if (komodo_txnotarizedconfirmed(bindtxid)==false)
+    if (hush_txnotarizedconfirmed(bindtxid)==false)
     {
         CCerror = strprintf("gatewaysbind tx not yet confirmed/notarized");
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
@@ -673,7 +671,7 @@ std::string ImportGatewayWithdraw(uint64_t txfee,uint256 bindtxid,std::string re
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
         return("");
     }
-    if (komodo_txnotarizedconfirmed(bindtxid)==false)
+    if (hush_txnotarizedconfirmed(bindtxid)==false)
     {
         CCerror = strprintf("gatewaysbind tx not yet confirmed/notarized");
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
@@ -754,7 +752,7 @@ std::string ImportGatewayPartialSign(uint64_t txfee,uint256 lasttxid,std::string
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
-        else if (komodo_txnotarizedconfirmed(withdrawtxid)==false)
+        else if (hush_txnotarizedconfirmed(withdrawtxid)==false)
         {
             CCerror = strprintf("gatewayswithdraw tx not yet confirmed/notarized");
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
@@ -801,7 +799,7 @@ std::string ImportGatewayPartialSign(uint64_t txfee,uint256 lasttxid,std::string
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
-        else if (komodo_txnotarizedconfirmed(withdrawtxid)==false)
+        else if (hush_txnotarizedconfirmed(withdrawtxid)==false)
         {
             CCerror = strprintf("gatewayswithdraw tx not yet confirmed/notarized");
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
@@ -872,7 +870,7 @@ std::string ImportGatewayCompleteSigning(uint64_t txfee,uint256 lasttxid,std::st
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
-        else if (komodo_txnotarizedconfirmed(withdrawtxid)==false)
+        else if (hush_txnotarizedconfirmed(withdrawtxid)==false)
         {
             CCerror = strprintf("gatewayswithdraw tx not yet confirmed/notarized");
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
@@ -918,7 +916,7 @@ std::string ImportGatewayCompleteSigning(uint64_t txfee,uint256 lasttxid,std::st
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
             return("");
         }
-        else if (komodo_txnotarizedconfirmed(withdrawtxid)==false)
+        else if (hush_txnotarizedconfirmed(withdrawtxid)==false)
         {
             CCerror = strprintf("gatewayswithdraw tx not yet confirmed/notarized");
             LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
@@ -972,7 +970,7 @@ std::string ImportGatewayMarkDone(uint64_t txfee,uint256 completetxid,std::strin
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
         return("");
     }
-    if (komodo_txnotarizedconfirmed(completetxid)==false)
+    if (hush_txnotarizedconfirmed(completetxid)==false)
     {
         CCerror = strprintf("gatewayscompletesigning tx not yet confirmed/notarized");
         LOGSTREAM("importgateway",CCLOG_INFO, stream << CCerror << std::endl);
@@ -1084,7 +1082,7 @@ UniValue ImportGatewayPendingWithdraws(uint256 bindtxid,std::string refcoin)
                 obj.push_back(Pair("withdrawaddr",withaddr));
                 sprintf(numstr,"%.8f",(double)tx.vout[1].nValue/COIN);
                 obj.push_back(Pair("amount",numstr));                
-                obj.push_back(Pair("confirmed_or_notarized",komodo_txnotarizedconfirmed(tx.GetHash())));
+                obj.push_back(Pair("confirmed_or_notarized",hush_txnotarizedconfirmed(tx.GetHash())));
                 if ( queueflag != 0 )
                 {
                     obj.push_back(Pair("depositaddr",burnaddr));
@@ -1159,7 +1157,7 @@ UniValue ImportGatewayProcessedWithdraws(uint256 bindtxid,std::string refcoin)
                 obj.push_back(Pair("withdrawtxidaddr",txidaddr));              
                 GetCustomscriptaddress(withaddr,CScript() << ParseHex(HexStr(withdrawpub)) << OP_CHECKSIG,taddr,prefix,prefix2);
                 obj.push_back(Pair("withdrawaddr",withaddr));
-                obj.push_back(Pair("confirmed_or_notarized",komodo_txnotarizedconfirmed(txid)));
+                obj.push_back(Pair("confirmed_or_notarized",hush_txnotarizedconfirmed(txid)));
                 sprintf(numstr,"%.8f",(double)tx.vout[1].nValue/COIN);
                 obj.push_back(Pair("amount",numstr));
                 obj.push_back(Pair("hex",hex));                

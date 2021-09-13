@@ -395,7 +395,7 @@ int32_t CheckGATEWAYimport(CTransaction importTx,CTransaction burnTx,std::string
         LOGSTREAM("importgateway", CCLOG_INFO, stream << "CheckGATEWAYimport not enough pubkeys for given N " << std::endl);
         return(-1);
     }
-    else if (komodo_txnotarizedconfirmed(bindtxid) == false)
+    else if (hush_txnotarizedconfirmed(bindtxid) == false)
     {
         LOGSTREAM("importgateway", CCLOG_INFO, stream << "CheckGATEWAYimport bindtx not yet confirmed/notarized" << std::endl);
         return(-1);

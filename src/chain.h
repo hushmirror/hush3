@@ -127,31 +127,23 @@ static const BlockStatus BLOCK_VALID_CONSENSUS = BLOCK_VALID_SCRIPTS;
 
 class CBlockIndex;
 
-// This class provides an accumulator for both the chainwork and the chainPOS value
-// CChainPower's can be compared, and the comparison ensures that work and proof of stake power
-// are both used equally to determine which chain has the most work. This makes an attack
-// that involves mining in secret completely ineffective, even before dPOW, unless a large part 
-// of the staking supply is also controlled. It also enables a faster deterministic convergence, 
-// aided by both POS and POW.
-// TODO: delete this junk
+// This class provides an accumulator for chainwork
 class CChainPower
 {
     public:
         arith_uint256 chainWork;
-        arith_uint256 chainStake;
         int32_t nHeight;
 
-        CChainPower() : nHeight(0), chainStake(0), chainWork(0) {}
+        CChainPower() : nHeight(0), chainWork(0) {}
         CChainPower(CBlockIndex *pblockIndex);
-        CChainPower(CBlockIndex *pblockIndex, const arith_uint256 &stake, const arith_uint256 &work);
-        CChainPower(int32_t height) : nHeight(height), chainStake(0), chainWork(0) {}
-        CChainPower(int32_t height, const arith_uint256 &stake, const arith_uint256 &work) : 
-                    nHeight(height), chainStake(stake), chainWork(work) {}
+        CChainPower(CBlockIndex *pblockIndex, const arith_uint256 &work);
+        CChainPower(int32_t height) : nHeight(height), chainWork(0) {}
+        CChainPower(int32_t height, const arith_uint256 &work) : 
+                    nHeight(height),  chainWork(work) {}
 
         CChainPower &operator=(const CChainPower &chainPower)
         {
             chainWork = chainPower.chainWork;
-            chainStake = chainPower.chainStake;
             nHeight = chainPower.nHeight;
             return *this;
         }
@@ -159,7 +151,6 @@ class CChainPower
         CChainPower &operator+=(const CChainPower &chainPower)
         {
             this->chainWork += chainPower.chainWork;
-            this->chainStake += chainPower.chainStake;
             return *this;
         }
 
@@ -167,7 +158,6 @@ class CChainPower
         {
             CChainPower result = CChainPower(chainPowerA);
             result.chainWork += chainPowerB.chainWork;
-            result.chainStake += chainPowerB.chainStake;
             return result;
         }
 
@@ -175,7 +165,6 @@ class CChainPower
         {
             CChainPower result = CChainPower(chainPowerA);
             result.chainWork -= chainPowerB.chainWork;
-            result.chainStake -= chainPowerB.chainStake;
             return result;
         }
 
@@ -183,14 +172,7 @@ class CChainPower
         {
             CChainPower result = CChainPower(chainPower);
             result.chainWork *= x;
-            result.chainStake *= x;
             return result;
-        }
-
-        CChainPower &addStake(const arith_uint256 &nChainStake)
-        {
-            chainStake += nChainStake;
-            return *this;
         }
 
         CChainPower &addWork(const arith_uint256 &nChainWork)
@@ -266,7 +248,7 @@ public:
     int64_t nPayments;
 
     //! (memory only) Number of shielded transactions (of any kind) in the block up to and including this block.
-    //! A shielded transaction is defined as a transaction that contains at least 1 JoinSplit, which includes
+    //! A shielded transaction is defined as a transaction that contains at least 1 ShieldedInput or ShieldedOutput
     //! shielding/de-shielding and other complex transaction possibilties including multiple taddrs/zaddrs as
     //! inputs and outputs.
     int64_t nShieldedTx;
@@ -278,7 +260,7 @@ public:
     int64_t nShieldedSpends;
 
     //! (memory only) Number of fully shielded transactions. A fully shielded transaction is defined
-    //! as a transaction containing JoinSplits and only shielded inputs and outputs, i.e. no transparent
+    //! as a transaction containing only shielded inputs and outputs, i.e. no transparent
     // inputs or outputs: z->z or z->(z,z) or z->(z,z,z,) etc...
     int64_t nFullyShieldedTx;
 
@@ -295,7 +277,7 @@ public:
     int64_t nFullyShieldedPayments;
 
     //! (memory only) Number of deshielding transactions. A deshielding transaction is defined
-    //! as a transaction containing JoinSplits and at least one transparent output.
+    //! as a transaction containing ShieldedInputs and at least one transparent output.
     int64_t nDeshieldingTx;
 
     //! (memory only) Number of deshielding payments. A deshielding payment is defined
@@ -303,7 +285,7 @@ public:
     int64_t nDeshieldingPayments;
 
     //! (memory only) Number of shielding transactions. A shielding transaction is defined
-    //! as a transaction containing JoinSplits and at least one transparent input
+    //! as a transaction containing ShieldedOutputs and at least one transparent input
     // i.e. t->z or t->(z,t) or z->(z,z,t)
     int64_t nShieldingTx;
 
@@ -322,7 +304,7 @@ public:
     int64_t nChainPayments;
 
     //! (memory only) Number of shielded transactions (of any kind) in the chain up to and including this block.
-    //! A shielded transaction is defined as a transaction that contains at least 1 JoinSplit, which includes
+    //! A shielded transaction is defined as a transaction that contains at least 1 ShieldedInput or ShieldedOutput
     //! shielding/de-shielding and other complex transaction possibilties including multiple taddrs/zaddrs as
     //! inputs and outputs.
     int64_t nChainShieldedTx;
@@ -334,7 +316,7 @@ public:
     int64_t nChainShieldedSpends;
 
     //! (memory only) Number of fully shielded transactions. A fully shielded transaction is defined
-    //! as a transaction containing JoinSplits and only shielded inputs and outputs, i.e. no transparent
+    //! as a transaction containing and only shielded inputs and outputs, i.e. no transparent
     // inputs or outputs: z->z or z->(z,z) or z->(z,z,z,) etc...
     int64_t nChainFullyShieldedTx;
 
@@ -351,7 +333,7 @@ public:
     int64_t nChainFullyShieldedPayments;
 
     //! (memory only) Number of deshielding transactions. A deshielding transaction is defined
-    //! as a transaction containing JoinSplits and at least one transparent output.
+    //! as a transaction containing ShieldedInputs and at least one transparent output.
     int64_t nChainDeshieldingTx;
 
     //! (memory only) Number of deshielding payments. A deshielding payment is defined
@@ -359,7 +341,7 @@ public:
     int64_t nChainDeshieldingPayments;
 
     //! (memory only) Number of shielding transactions. A shielding transaction is defined
-    //! as a transaction containing JoinSplits and at least one transparent input
+    //! as a transaction containing ShieldedOutputs and at least one transparent input
     // i.e. t->z or t->(z,t) or z->(z,z,t)
     int64_t nChainShieldingTx;
 

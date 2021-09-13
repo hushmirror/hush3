@@ -23,7 +23,7 @@
 #define HUSH_EARLYTXID_HEIGHT 100
 #define ASSETCHAINS_MINHEIGHT 128
 #define ASSETCHAINS_MAX_ERAS 7
-#define KOMODO_ELECTION_GAP 2000
+#define HUSH_DPOW_GAP 2000
 #define ROUNDROBIN_DELAY 61
 #define HUSH_SMART_CHAIN_MAXLEN 65
 #define HUSH_LIMITED_NETWORKSIZE 4
@@ -538,8 +538,8 @@ uint64_t komodo_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uin
 int32_t komodo_paxprices(int32_t *heights,uint64_t *prices,int32_t max,char *base,char *rel);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 char *bitcoin_address(char *coinaddr,uint8_t addrtype,uint8_t *pubkey_or_rmd160,int32_t len);
-int32_t komodo_minerids(uint8_t *minerids,int32_t height,int32_t width);
-int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
+int32_t hush_minerids(uint8_t *minerids,int32_t height,int32_t width);
+int32_t hush_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
 
 uint32_t hush_blocktime(uint256 hash);
 int32_t hush_longestchain();
@@ -556,7 +556,7 @@ uint32_t hush_heightstamp(int32_t height);
 int64_t komodo_pricemult(int32_t ind);
 int32_t komodo_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblocks);
 int32_t hush_currentheight();
-int32_t komodo_notarized_bracket(struct notarized_checkpoint *nps[2],int32_t height);
+int32_t hush_notarized_bracket(struct notarized_checkpoint *nps[2],int32_t height);
 arith_uint256 komodo_adaptivepow_target(int32_t height,arith_uint256 bnTarget,uint32_t nTime);
 bool hush_hardfork_active(uint32_t time);
 
@@ -567,7 +567,7 @@ int32_t hush_nextheight();
 CBlockIndex *hush_blockindex(uint256 hash);
 CBlockIndex *hush_chainactive(int32_t height);
 int32_t hush_blockheight(uint256 hash);
-bool komodo_txnotarizedconfirmed(uint256 txid);
+bool hush_txnotarizedconfirmed(uint256 txid);
 int32_t hush_blockload(CBlock& block, CBlockIndex *pindex);
 uint32_t hush_chainactive_timestamp();
 uint32_t GetLatestTimestamp(int32_t height);

@@ -480,13 +480,19 @@ void CWallet::ChainTip(const CBlockIndex *pindex,
             pblock->GetBlockTime() > GetTime() - 144*ASSETCHAINS_BLOCKTIME)
         {
             BuildWitnessCache(pindex, false);
-            RunSaplingConsolidation(pindex->GetHeight());
-            DeleteWalletTransactions(pindex);
+            if (fSaplingConsolidationEnabled) {
+                RunSaplingConsolidation(pindex->GetHeight());
+            }
+            if (fTxDeleteEnabled) {
+                DeleteWalletTransactions(pindex);
+            }
         } else {
             //Build initial witnesses on every block
             BuildWitnessCache(pindex, true);
-            if (initialDownloadCheck && pindex->GetHeight() % fDeleteInterval == 0) {
-                DeleteWalletTransactions(pindex);
+            if (fTxDeleteEnabled) {
+                if (initialDownloadCheck && pindex->GetHeight() % fDeleteInterval == 0) {
+                    DeleteWalletTransactions(pindex);
+                }
             }
         }
     } else {
@@ -902,12 +908,15 @@ int64_t CWallet::NullifierCount()
 void CWallet::ClearNoteWitnessCache()
 {
     LOCK(cs_wallet);
+    int notes = 0;
     for (std::pair<const uint256, CWalletTx>& wtxItem : mapWallet) {
         for (mapSaplingNoteData_t::value_type& item : wtxItem.second.mapSaplingNoteData) {
             item.second.witnesses.clear();
             item.second.witnessHeight = -1;
+            notes++;
         }
     }
+    LogPrintf("%s: Cleared witness data from %d wallet items and %d SaplingNotes\n", __func__, mapWallet.size(), notes);
 }
 
 void CWallet::DecrementNoteWitnesses(const CBlockIndex* pindex)
@@ -1122,6 +1131,7 @@ void CWallet::BuildWitnessCache(const CBlockIndex* pindex, bool witnessOnly)
             nd->witnessHeight = pblockindex->GetHeight();
           }
         }
+
       }
     }
 
@@ -2378,12 +2388,6 @@ bool CWalletTx::WriteToDisk(CWalletDB *pwalletdb)
     return pwalletdb->WriteTx(GetHash(), *this);
 }
 
-void CWallet::WitnessNoteCommitment(std::vector<uint256> commitments,
-                                    std::vector<boost::optional<SproutWitness>>& witnesses,
-                                    uint256 &final_anchor)
-{
-}
-
 /**
  * Reorder the transactions based on block hieght and block index.
  * Transactions can get out of order when they are deleted and subsequently
@@ -2713,10 +2717,12 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
                 ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), pindex, false) - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
 
             CBlock block;
+            bool involvesMe = false;
             ReadBlockFromDisk(block, pindex,1);
             BOOST_FOREACH(CTransaction& tx, block.vtx)
             {
                 if (AddToWalletIfInvolvingMe(tx, &block, fUpdate)) {
+                    involvesMe = true;
                     ret++;
                 }
             }
@@ -2730,12 +2736,17 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
                 }
             }
 
-            // Build initial witness caches
-            BuildWitnessCache(pindex, true);
+            // Build initial witness caches for blocks involving one of our addresses
+            if (involvesMe) {
+                LogPrintf("%s: block has one of our transactions, building witness cache\n", __func__);
+                BuildWitnessCache(pindex, true);
+            }
 
             //Delete Transactions
-            if (pindex->GetHeight() % fDeleteInterval == 0)
-              DeleteWalletTransactions(pindex);
+            if (fTxDeleteEnabled) {
+                if (pindex->GetHeight() % fDeleteInterval == 0)
+                   DeleteWalletTransactions(pindex);
+            }
 
             if (GetTime() >= nNow + 60) {
                 nNow = GetTime();
@@ -3050,7 +3061,7 @@ std::vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
 
         if ( (wtx.nLockTime >= LOCKTIME_THRESHOLD && wtx.nLockTime < now-HUSH_MAXMEMPOOLTIME) )
         {
-            //LogPrintf("skip Relaying wtx %s nLockTime %u vs now.%u\n", wtx.GetHash().ToString(),(uint32_t)wtx.nLockTime,now);
+            LogPrintf("%s: skip Relaying wtx %s nLockTime %u vs now.%u\n", __func__, wtx.GetHash().ToString(),(uint32_t)wtx.nLockTime,now);
             //vwtxh.push_back(wtx.GetHash());
             continue;
         }

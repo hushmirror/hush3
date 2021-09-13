@@ -109,14 +109,11 @@ void WaitForShutdown(boost::thread_group* threadGroup)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//
 // Start
-//
 extern int32_t IS_HUSH_NOTARY,USE_EXTERNAL_PUBKEY;
 extern uint32_t ASSETCHAIN_INIT;
 extern std::string NOTARY_PUBKEY;
-int32_t komodo_is_issuer();
+int32_t hush_is_issuer();
 void hush_passport_iteration();
 
 bool AppInit(int argc, char* argv[])
@@ -172,7 +169,7 @@ bool AppInit(int argc, char* argv[])
         {
 			fprintf(stderr, "%s reading config file\n", __FUNCTION__);
             ReadConfigFile(mapArgs, mapMultiArgs);
-        } catch (const missing_zcash_conf& e) {
+        } catch (const missing_hush_conf& e) {
             fprintf(stderr,
                 (_("Before starting hushd, you need to create a configuration file:\n"
                    "%s\n"

@@ -1,3 +1,6 @@
+// Copyright (c) 2016-2021 The Hush developers
+// Distributed under the GPLv3 software license, see the accompanying
+// file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 /******************************************************************************
  * Copyright © 2014-2019 The SuperNET Developers.                             *
  *                                                                            *
@@ -12,9 +15,7 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-
 #include "httprpc.h"
-
 #include "chainparams.h"
 #include "httpserver.h"
 #include "key_io.h"
@@ -25,7 +26,6 @@
 #include "util.h"
 #include "utilstrencodings.h"
 #include "ui_interface.h"
-
 #include <boost/algorithm/string.hpp> // boost::trim
 
 // WWW-Authenticate to present with 401 Unauthorized response

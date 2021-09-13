@@ -487,21 +487,7 @@ std::vector<uint256> CTxMemPool::removeExpired(unsigned int nBlockHeight)
     // Remove expired txs from the mempool
     LOCK(cs);
     list<CTransaction> transactionsToRemove;
-    for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++)
-    {
-        const CTransaction& tx = it->GetTx();
-        tipindex = chainActive.LastTip();
 
-        /*
-        bool fInterestNotValidated = SMART_CHAIN_SYMBOL[0] == 0 && tipindex != 0 && komodo_validate_interest(tx,tipindex->GetHeight()+1,tipindex->GetMedianTimePast() + 777,0) < 0;
-        if (IsExpiredTx(tx, nBlockHeight) || fInterestNotValidated)
-        {
-            if (fInterestNotValidated && tipindex != 0)
-                LogPrintf("Removing interest violate txid.%s nHeight.%d nTime.%u vs locktime.%u\n",tx.GetHash().ToString(),tipindex->GetHeight()+1,tipindex->GetMedianTimePast() + 777,tx.nLockTime);
-            transactionsToRemove.push_back(tx);
-        }
-        */
-    }
     std::vector<uint256> ids;
     for (const CTransaction& tx : transactionsToRemove) {
         list<CTransaction> removed;

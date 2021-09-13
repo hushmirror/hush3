@@ -24,6 +24,10 @@ struct event_base;
 class CService;
 class HTTPRequest;
 
+int getWorkQueueDepth();
+int getWorkQueueMaxDepth();
+int getWorkQueueNumThreads();
+
 /** Initialize HTTP server.
  * Call this before RegisterHTTPHandler or EventBase().
  */

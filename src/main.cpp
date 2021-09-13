@@ -76,6 +76,7 @@ using namespace std;
 CCriticalSection cs_main;
 extern uint8_t NOTARY_PUBKEY33[33];
 extern int32_t HUSH_LOADINGBLOCKS,HUSH_LONGESTCHAIN,HUSH_INSYNC,HUSH_CONNECTING,HUSH_EXTRASATOSHI;
+extern CZindexStats zstats;
 int32_t HUSH_NEWBLOCKS;
 int32_t hush_block2pubkey33(uint8_t *pubkey33,CBlock *block);
 bool Getscriptaddress(char *destaddr,const CScript &scriptPubKey);
@@ -572,6 +573,102 @@ namespace {
 
 } // anon namespace
 
+// CZindexDB
+CZindexDB::CZindexDB()
+{
+    pathAddr = GetDataDir() / "zindex.dat";
+}
+
+bool CZindexDB::Read(CZindexStats& zstats)
+{
+    // open input file, and associate with CAutoFile
+    FILE *file = fopen(pathAddr.string().c_str(), "rb");
+    CAutoFile filein(file, SER_DISK, CLIENT_VERSION);
+    if (filein.IsNull())
+        return error("%s: Failed to open file %s", __func__, pathAddr.string());
+
+    // use file size to size memory buffer
+    int fileSize = boost::filesystem::file_size(pathAddr);
+    int dataSize = fileSize - sizeof(uint256);
+    // Don't try to resize to a negative number if file is small
+    if (dataSize < 0)
+        dataSize = 0;
+    vector<unsigned char> vchData;
+    vchData.resize(dataSize);
+    uint256 hashIn;
+
+    // read data and checksum from file
+    try {
+        filein.read((char *)&vchData[0], dataSize);
+        filein >> hashIn;
+    }
+    catch (const std::exception& e) {
+        return error("%s: Deserialize or I/O error - %s", __func__, e.what());
+    }
+    filein.fclose();
+
+    CDataStream ssZstats(vchData, SER_DISK, CLIENT_VERSION);
+
+    // verify stored checksum matches input data
+    uint256 hashTmp = Hash(ssZstats.begin(), ssZstats.end());
+    if (hashIn != hashTmp)
+        return error("%s: zstats Checksum mismatch, data corrupted", __func__);
+
+    unsigned char pchMsgTmp[4];
+    try {
+        // de-serialize file header (network specific magic number) and ..
+        ssZstats >> FLATDATA(pchMsgTmp);
+
+        // ... verify the network matches ours
+        if (memcmp(pchMsgTmp, Params().MessageStart(), sizeof(pchMsgTmp)))
+            return error("%s: Invalid network magic number", __func__);
+
+        // de-serialize data into one CZindexStats object
+        ssZstats >> zstats;
+    } catch (const std::exception& e) {
+        return error("%s: Deserialize or I/O error - %s", __func__, e.what());
+    }
+
+    return true;
+}
+
+bool CZindexDB::Write(const CZindexStats& zstats)
+{
+    // Generate random temporary filename
+    unsigned short randv = 0;
+    GetRandBytes((unsigned char*)&randv, sizeof(randv));
+    std::string tmpfn = strprintf("zindex.dat.%04x", randv);
+
+    // serialize zstats, checksum data up to that point, then append checksum
+    CDataStream ssZstats(SER_DISK, CLIENT_VERSION);
+    ssZstats << FLATDATA(Params().MessageStart());
+    ssZstats << zstats;
+    uint256 hash = Hash(ssZstats.begin(), ssZstats.end());
+    ssZstats << hash;
+
+    // open temp output file, and associate with CAutoFile
+    boost::filesystem::path pathTmp = GetDataDir() / tmpfn;
+    FILE *file = fopen(pathTmp.string().c_str(), "wb");
+    CAutoFile fileout(file, SER_DISK, CLIENT_VERSION);
+    if (fileout.IsNull())
+        return error("%s: Failed to open file %s", __func__, pathTmp.string());
+
+    // Write and commit header, data
+    try {
+        fileout << ssZstats;
+    } catch (const std::exception& e) {
+        return error("%s: Serialize or I/O error - %s", __func__, e.what());
+    }
+    FileCommit(fileout.Get());
+    fileout.fclose();
+
+    // replace existing zindex.dat, if any, with new zindex.dat.XXXX
+    if (!RenameOver(pathTmp, pathAddr))
+        return error("%s: Rename-into-place failed", __func__);
+
+    return true;
+}
+
 bool GetNodeStateStats(NodeId nodeid, CNodeStateStats &stats) {
     LOCK(cs_main);
     CNodeState *state = State(nodeid);
@@ -630,7 +727,7 @@ CBlockTreeDB *pblocktree = NULL;
 #define HUSH_ZCASH
 #include "hush.h"
 
-UniValue komodo_snapshot(int top)
+UniValue hush_snapshot(int top)
 {
     LOCK(cs_main);
     int64_t total = -1;
@@ -648,7 +745,7 @@ UniValue komodo_snapshot(int top)
     return(result);
 }
 
-bool komodo_snapshot2(std::map <std::string, CAmount> &addressAmounts)
+bool hush_snapshot2(std::map <std::string, CAmount> &addressAmounts)
 {
     if ( fAddressIndex && pblocktree != 0 ) 
     {
@@ -690,7 +787,7 @@ bool hush_dailysnapshot(int32_t height)
     if ( undo_height == lastSnapShotHeight )
         return true;
     std::map <std::string, int64_t> addressAmounts;
-    if ( !komodo_snapshot2(addressAmounts) )
+    if ( !hush_snapshot2(addressAmounts) )
         return false;
 
     // undo blocks in reverse order
@@ -1104,7 +1201,7 @@ bool ContextualCheckCoinbaseTransaction(int32_t slowflag,const CBlock *block,CBl
 {
     if ( slowflag != 0 && ASSETCHAINS_CBOPRET != 0 && validateprices != 0 && nHeight > 0 && tx.vout.size() > 0 )
     {
-        if ( komodo_opretvalidate(block,previndex,nHeight,tx.vout[tx.vout.size()-1].scriptPubKey) < 0 )
+        if ( hush_opretvalidate(block,previndex,nHeight,tx.vout[tx.vout.size()-1].scriptPubKey) < 0 )
             return(false);
     }
     return(true);
@@ -1355,8 +1452,12 @@ bool CheckTransaction(uint32_t tiptime,const CTransaction& tx, CValidationState 
     return true;
 }
 
+// This is used only in RPC currently but hush_notaries()/gethushseason/getacseason is consensus
 int32_t hush_isnotaryvout(char *coinaddr,uint32_t tiptime) {
-    int32_t season = getacseason(tiptime);
+    bool ishush3   = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
+    int32_t height = chainActive.LastTip()->GetHeight();
+    int32_t season = ishush3 ? gethushseason(height) : getacseason(tiptime);
+    fprintf(stderr,"%s: season=%d, tiptime=%d\n", __func__, season,tiptime);
     if ( NOTARY_ADDRESSES[season-1][0][0] == 0 ) {
         uint8_t pubkeys[64][33];
         hush_notaries(pubkeys,0,tiptime);
@@ -1456,12 +1557,12 @@ bool CheckTransactionWithoutProofVerification(uint32_t tiptime,const CTransactio
             //fprintf(stderr,"private chain nValue %.8f iscoinbase.%d\n",(double)txout.nValue/COIN,iscoinbase);
             if (iscoinbase == 0 && txout.nValue > 0)
             {
-                // TODO: if we are upgraded to Sapling, we can allow Sprout sourced funds to sit in a transparent address
                 char destaddr[65];
                 Getscriptaddress(destaddr,txout.scriptPubKey);
                 if ( hush_isnotaryvout(destaddr,tiptime) == 0 )
                 {
                     invalid_private_taddr = 1;
+                    fprintf(stderr,"%s: invalid taddr %s on private chain!\n", __func__, destaddr);
                     //return state.DoS(100, error("CheckTransaction(): this is a private chain, no public allowed"),REJECT_INVALID, "bad-txns-acprivacy-chain");
                 }
             }
@@ -1661,6 +1762,8 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransa
     // Node operator can choose to reject tx by number of transparent inputs
     static_assert(std::numeric_limits<size_t>::max() >= std::numeric_limits<int64_t>::max(), "size_t too small");
     size_t limit = (size_t) GetArg("-mempooltxinputlimit", 0);
+
+    // Limit is ignored if Overwinter is active, which is the case on HUSH3 and all HSC's
     if (NetworkUpgradeActive(nextBlockHeight, Params().GetConsensus(), Consensus::UPGRADE_OVERWINTER)) {
         limit = 0;
     }
@@ -2853,7 +2956,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
         *pfClean = false;
 
     bool fClean = true;
-    //komodo_disconnect(pindex,block); does nothing?
+
     CBlockUndo blockUndo;
     CDiskBlockPos pos = pindex->GetUndoPos();
     if (pos.IsNull())
@@ -3746,7 +3849,7 @@ bool static DisconnectTip(CValidationState &state, bool fBare = false) {
             CValidationState stateDummy;
 
             // don't keep staking or invalid transactions
-            if (tx.IsCoinBase() || ((i == (block.vtx.size() - 1)) && (ASSETCHAINS_STAKED && komodo_isPoS((CBlock *)&block,pindexDelete->GetHeight(),true) != 0)) || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
+            if (tx.IsCoinBase() || ((i == (block.vtx.size() - 1)) && (ASSETCHAINS_STAKED && hush_isPoS((CBlock *)&block,pindexDelete->GetHeight(),true) != 0)) || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
             {
                 mempool.remove(tx, removed, true);
             }
@@ -3928,7 +4031,7 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *
     int64_t nTime6 = GetTimeMicros(); nTimePostConnect += nTime6 - nTime5; nTimeTotal += nTime6 - nTime1;
     LogPrint("bench", "  - Connect postprocess: %.2fms [%.2fs]\n", (nTime6 - nTime5) * 0.001, nTimePostConnect * 0.000001);
     LogPrint("bench", "- Connect block: %.2fms [%.2fs]\n", (nTime6 - nTime1) * 0.001, nTimeTotal * 0.000001);
-    if ( HUSH_LONGESTCHAIN != 0 && (pindexNew->GetHeight() == HUSH_LONGESTCHAIN || pindexNew->GetHeight() == HUSH_LONGESTCHAIN+1) )
+    if ( HUSH_LONGESTCHAIN != 0 && (pindexNew->GetHeight() >= HUSH_LONGESTCHAIN ))
         HUSH_INSYNC = (int32_t)pindexNew->GetHeight();
     else HUSH_INSYNC = 0;
     //fprintf(stderr,"connect.%d insync.%d ASSETCHAINS_SAPLING.%d\n",(int32_t)pindexNew->GetHeight(),HUSH_INSYNC,ASSETCHAINS_SAPLING);
@@ -4110,19 +4213,17 @@ static bool ActivateBestChainStep(bool fSkipdpow, CValidationState &state, CBloc
     if ( reorgLength > MAX_REORG_LENGTH)
     {
         auto msg = strprintf(_(
-                               "A block chain reorganization has been detected that would roll back %d blocks! "
+                               "A block chain reorganization has been detected that would roll back %d blocks!!! "
                                "This is larger than the maximum of %d blocks, and so the node is shutting down for your safety."
                                ), reorgLength, MAX_REORG_LENGTH) + "\n\n" +
         _("Reorganization details") + ":\n" +
-        "- " + strprintf(_("Current tip: %s, height %d, work %s\nstake %s"),
-                         pindexOldTip->phashBlock->GetHex(), pindexOldTip->GetHeight(), pindexOldTip->chainPower.chainWork.GetHex(),
-                         pindexOldTip->chainPower.chainStake.GetHex()) + "\n" +
-        "- " + strprintf(_("New tip:     %s, height %d, work %s\nstake %s"),
-                         pindexMostWork->phashBlock->GetHex(), pindexMostWork->GetHeight(), pindexMostWork->chainPower.chainWork.GetHex(),
-                         pindexMostWork->chainPower.chainStake.GetHex()) + "\n" +
+        "- " + strprintf(_("Current tip: %s, height %d, work %s\n"),
+                         pindexOldTip->phashBlock->GetHex(), pindexOldTip->GetHeight(), pindexOldTip->chainPower.chainWork.GetHex()) +  "\n" +
+        "- " + strprintf(_("New tip:     %s, height %d, work %s\n"),
+                         pindexMostWork->phashBlock->GetHex(), pindexMostWork->GetHeight(), pindexMostWork->chainPower.chainWork.GetHex()) + "\n" +
         "- " + strprintf(_("Fork point:  %s %s, height %d"),
                          SMART_CHAIN_SYMBOL,pindexFork->phashBlock->GetHex(), pindexFork->GetHeight()) + "\n\n" +
-        _("Please help, human!");
+        _("Please help me, wise human!");
         LogPrintf("*** %s\nif you launch with -maxreorg=%d it might be able to resolve this automatically", msg,reorgLength+10);
         fprintf(stderr,"*** %s\nif you launch with -maxreorg=%d it might be able to resolve this automatically", msg.c_str(),reorgLength+10);
         uiInterface.ThreadSafeMessageBox(msg, "", CClientUIInterface::MSG_ERROR);
@@ -4150,7 +4251,7 @@ static bool ActivateBestChainStep(bool fSkipdpow, CValidationState &state, CBloc
             if ( !DisconnectTip(state) )
                 break;
         }
-        fprintf(stderr,"reached rewind.%d, best to do: ./komodo-cli -ac_name=%s stop\n",HUSH_REWIND,SMART_CHAIN_SYMBOL);
+        fprintf(stderr,"reached rewind.%d, best to do: ./hush-cli -ac_name=%s stop\n",HUSH_REWIND,SMART_CHAIN_SYMBOL);
         sleep(20);
         fprintf(stderr,"resuming normal operations\n");
         HUSH_REWIND = 0;
@@ -4429,13 +4530,6 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
         // pool. So we invert the sign here.
         saplingValue += -tx.valueBalance;
 
-        /*
-        for (auto js : tx.vjoinsplit) {
-            sproutValue += js.vpub_old;
-            sproutValue -= js.vpub_new;
-        }
-        */
-
         // Ignore following stats unless -zindex enabled
         if (!fZindex)
             continue;
@@ -4560,6 +4654,39 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                 if (fZdebug) {
                     //fprintf(stderr,"%s: setting blockchain zstats with zspends=%d, zouts=%d\n", __FUNCTION__, nShieldedSpendsInBlock, nShieldedOutputsInBlock );
                 }
+                if (pindex->pprev) {
+                    // If chain stats are zero (such as after restart), load data from zindex.dat
+                    if (pindex->pprev->nChainNotarizations == 0)
+                        pindex->pprev->nChainNotarizations = zstats.nChainNotarizations;
+                    if (pindex->pprev->nChainShieldedTx == 0)
+                        pindex->pprev->nChainShieldedTx = zstats.nChainShieldedTx;
+                    if (pindex->pprev->nChainShieldedOutputs == 0)
+                        pindex->pprev->nChainShieldedOutputs = zstats.nChainShieldedOutputs;
+                    if (pindex->pprev->nChainShieldedSpends == 0) {
+                        pindex->pprev->nChainShieldedSpends = zstats.nChainShieldedSpends;
+                        // TODO: if zstats.nHeight != chainActive.Height() the stats will be off
+                        fprintf(stderr, "%s: loaded anonymity set of %li at stats height=%li vs local height=%d from disk\n", __func__, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends, zstats.nHeight, chainActive.Height() );
+                    }
+                    if (pindex->pprev->nChainFullyShieldedTx == 0)
+                        pindex->pprev->nChainFullyShieldedTx = zstats.nChainFullyShieldedTx;
+                    if (pindex->pprev->nChainShieldingTx == 0)
+                        pindex->pprev->nChainShieldingTx = zstats.nChainShieldingTx;
+                    if (pindex->pprev->nChainDeshieldingTx == 0)
+                        pindex->pprev->nChainDeshieldingTx = zstats.nChainDeshieldingTx;
+                    if (pindex->pprev->nChainPayments == 0) {
+                        fprintf(stderr, "%s: setting nChainPayments=%li at height %d\n", __func__, zstats.nChainPayments, chainActive.Height() );
+                        pindex->pprev->nChainPayments = zstats.nChainPayments;
+                    }
+                    if (pindex->pprev->nChainShieldedPayments == 0)
+                        pindex->pprev->nChainShieldedPayments = zstats.nChainShieldedPayments;
+                    if (pindex->pprev->nChainFullyShieldedPayments == 0)
+                        pindex->pprev->nChainFullyShieldedPayments = zstats.nChainFullyShieldedPayments;
+                    if (pindex->pprev->nChainShieldingPayments == 0)
+                        pindex->pprev->nChainShieldingPayments = zstats.nChainShieldingPayments;
+                    if (pindex->pprev->nChainDeshieldingPayments == 0)
+                        pindex->pprev->nChainDeshieldingPayments = zstats.nChainDeshieldingPayments;
+                }
+
                 pindex->nChainNotarizations         = (pindex->pprev ? pindex->pprev->nChainNotarizations         : 0) + pindex->nNotarizations;
                 pindex->nChainShieldedTx            = (pindex->pprev ? pindex->pprev->nChainShieldedTx            : 0) + pindex->nShieldedTx;
                 pindex->nChainShieldedOutputs       = (pindex->pprev ? pindex->pprev->nChainShieldedOutputs       : 0) + pindex->nShieldedOutputs;
@@ -4572,6 +4699,23 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
                 pindex->nChainFullyShieldedPayments = (pindex->pprev ? pindex->pprev->nChainFullyShieldedPayments : 0) + pindex->nFullyShieldedPayments;
                 pindex->nChainShieldingPayments     = (pindex->pprev ? pindex->pprev->nChainShieldingPayments     : 0) + pindex->nShieldingPayments;
                 pindex->nChainDeshieldingPayments   = (pindex->pprev ? pindex->pprev->nChainDeshieldingPayments   : 0) + pindex->nDeshieldingPayments;
+
+                // Update in-memory structure that gets serialized to zindex.dat
+                zstats.nHeight                     = pindex->GetHeight();
+                zstats.nChainNotarizations         = pindex->nChainNotarizations         ;
+                zstats.nChainShieldedTx            = pindex->nChainShieldedTx            ;
+                zstats.nChainShieldedOutputs       = pindex->nChainShieldedOutputs       ;
+                zstats.nChainShieldedSpends        = pindex->nChainShieldedSpends        ;
+                zstats.nChainFullyShieldedTx       = pindex->nChainFullyShieldedTx       ;
+                zstats.nChainShieldingTx           = pindex->nChainShieldingTx           ;
+                zstats.nChainDeshieldingTx         = pindex->nChainDeshieldingTx         ;
+                zstats.nChainPayments              = pindex->nChainPayments              ;
+                zstats.nChainShieldedPayments      = pindex->nChainShieldedPayments      ;
+                zstats.nChainFullyShieldedPayments = pindex->nChainFullyShieldedPayments ;
+                zstats.nChainShieldingPayments     = pindex->nChainShieldingPayments     ;
+                zstats.nChainDeshieldingPayments   = pindex->nChainDeshieldingPayments   ;
+                fprintf(stderr,"%s: setting zstats with height,zouts,zspends,anonset=%li,%li,%li,%li\n", __FUNCTION__, zstats.nHeight, zstats.nChainShieldedOutputs, zstats.nChainShieldedSpends, zstats.nChainShieldedOutputs - zstats.nChainShieldedSpends);
+
             }
 
             if (pindex->pprev) {
@@ -4609,6 +4753,7 @@ bool ReceivedBlockTransactions(const CBlock &block, CValidationState& state, CBl
             mapBlocksUnlinked.insert(std::make_pair(pindexNew->pprev, pindexNew));
         }
     }
+
 
     if (fZindex)
         fprintf(stderr, "ht.%d, ShieldedPayments=%d, ShieldedTx=%d, ShieldedOutputs=%d, FullyShieldedTx=%d, ntz=%d\n",
@@ -4855,7 +5000,7 @@ bool CheckBlockHeader(int32_t *futureblockp,int32_t height,CBlockIndex *pindex, 
             return state.DoS(100, error("CheckBlockHeader(): Equihash solution invalid"),REJECT_INVALID, "invalid-solution");
     }
     // Check proof of work matches claimed amount
-    /*komodo_index2pubkey33(pubkey33,pindex,height);
+    /*hush_index2pubkey33(pubkey33,pindex,height);
      if ( fCheckPOW && !CheckProofOfWork(height,pubkey33,blockhdr.GetHash(), blockhdr.nBits, Params().GetConsensus(),blockhdr.nTime) )
      return state.DoS(50, error("CheckBlockHeader(): proof of work failed"),REJECT_INVALID, "high-hash");*/
     return true;

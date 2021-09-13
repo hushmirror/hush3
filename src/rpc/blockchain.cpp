@@ -893,7 +893,7 @@ UniValue kvsearch(const UniValue& params, bool fHelp, const CPubKey& mypk)
         if ( keylen < sizeof(key) )
         {
             memcpy(key,params[0].get_str().c_str(),keylen);
-            if ( (valuesize= komodo_kvsearch(&refpubkey,chainActive.LastTip()->GetHeight(),&flags,&height,value,key,keylen)) >= 0 )
+            if ( (valuesize= hush_kvsearch(&refpubkey,chainActive.LastTip()->GetHeight(),&flags,&height,value,key,keylen)) >= 0 )
             {
                 std::string val; char *valuestr;
                 val.resize(valuesize);
@@ -928,7 +928,7 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
         if ( pblockindex != 0 )
             timestamp = pblockindex->GetBlockTime();
     }
-    if ( (n= komodo_minerids(minerids,height,(int32_t)(sizeof(minerids)/sizeof(*minerids)))) > 0 )
+    if ( (n= hush_minerids(minerids,height,(int32_t)(sizeof(minerids)/sizeof(*minerids)))) > 0 )
     {
         memset(tally,0,sizeof(tally));
         numnotaries = hush_notaries(pubkeys,height,timestamp);
@@ -1567,7 +1567,6 @@ inline CBlockIndex* LookupBlockIndex(const uint256& hash)
 
 UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    THROW_IF_SYNCING(HUSH_INSYNC);
 
     if (fHelp || params.size() > 2)
         throw runtime_error(
@@ -1631,6 +1630,8 @@ UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk
             + HelpExampleRpc("getchaintxstats", "2016")
         );
 
+    THROW_IF_SYNCING(HUSH_INSYNC);
+
     const CBlockIndex* pindex;
     int blockcount = 30 * 24 * 60 * 60 / Params().GetConsensus().nPowTargetSpacing; // By default: 1 month
 
@@ -1660,10 +1661,12 @@ UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid block count: should be between 0 and the block's height - 1");
         }
     }
+    LogPrintf("%s: blockcount = %d\n", __func__, blockcount);
 
     const CBlockIndex* pindexPast = pindex->GetAncestor(pindex->GetHeight() - blockcount);
     int nTimeDiff                 = pindex->GetMedianTimePast() - pindexPast->GetMedianTimePast();
     int nTxDiff                   = pindex->nChainTx - pindexPast->nChainTx;
+    LogPrintf("%s: pindexPast.height = %d, pindex.height = %d\n", __func__, pindexPast->GetHeight(), pindex->GetHeight() );
 
     UniValue ret(UniValue::VOBJ);
     ret.pushKV("time", (int64_t)pindex->nTime);
@@ -1695,6 +1698,7 @@ UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk
         ret.pushKV("window_tx_count", nTxDiff);
         ret.pushKV("window_interval", nTimeDiff);
         int64_t nPaymentsDiff              = pindex->nChainPayments - pindexPast->nChainPayments;
+        LogPrintf("%s: pindexPast.nChainPayments = %d, pindex.nChainPayments = %d\n", __func__, pindexPast->nChainPayments, pindex->nChainPayments );
         int64_t nShieldedTxDiff            = pindex->nChainShieldedTx - pindexPast->nChainShieldedTx;
         int64_t nShieldingTxDiff           = pindex->nChainShieldingTx - pindexPast->nChainShieldingTx;
         int64_t nDeshieldingTxDiff         = pindex->nChainDeshieldingTx - pindexPast->nChainDeshieldingTx;

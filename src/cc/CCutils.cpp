@@ -675,7 +675,7 @@ int32_t hush_get_current_height()
     else return chainActive.LastTip()->GetHeight();
 }
 
-bool komodo_txnotarizedconfirmed(uint256 txid)
+bool hush_txnotarizedconfirmed(uint256 txid)
 {
     char str[65];
     int32_t confirms,notarized=0,txheight=0,currentheight=0;;
@@ -688,17 +688,17 @@ bool komodo_txnotarizedconfirmed(uint256 txid)
     {
         if ( NSPV_myGetTransaction(txid,tx,hashBlock,txheight,currentheight) == 0 )
         {
-            fprintf(stderr,"komodo_txnotarizedconfirmed cant find txid %s\n",txid.ToString().c_str());
+            fprintf(stderr,"hush_txnotarizedconfirmed cant find txid %s\n",txid.ToString().c_str());
             return(0);
         }
         else if (txheight<=0)
         {
-            fprintf(stderr,"komodo_txnotarizedconfirmed no txheight.%d for txid %s\n",txheight,txid.ToString().c_str());
+            fprintf(stderr,"hush_txnotarizedconfirmed no txheight.%d for txid %s\n",txheight,txid.ToString().c_str());
             return(0);
         }
         else if (txheight>currentheight)
         {
-            fprintf(stderr,"komodo_txnotarizedconfirmed backwards heights for txid %s hts.(%d %d)\n",txid.ToString().c_str(),txheight,currentheight);
+            fprintf(stderr,"hush_txnotarizedconfirmed backwards heights for txid %s hts.(%d %d)\n",txid.ToString().c_str(),txheight,currentheight);
             return(0);
         }
         confirms=1 + currentheight - txheight;
@@ -707,22 +707,22 @@ bool komodo_txnotarizedconfirmed(uint256 txid)
     {
         if ( myGetTransaction(txid,tx,hashBlock) == 0 )
         {
-            fprintf(stderr,"komodo_txnotarizedconfirmed cant find txid %s\n",txid.ToString().c_str());
+            fprintf(stderr,"hush_txnotarizedconfirmed cant find txid %s\n",txid.ToString().c_str());
             return(0);
         }
         else if ( hashBlock == zeroid )
         {
-            fprintf(stderr,"komodo_txnotarizedconfirmed no hashBlock for txid %s\n",txid.ToString().c_str());
+            fprintf(stderr,"hush_txnotarizedconfirmed no hashBlock for txid %s\n",txid.ToString().c_str());
             return(0);
         }
         else if ( (pindex= hush_blockindex(hashBlock)) == 0 || (txheight= pindex->GetHeight()) <= 0 )
         {
-            fprintf(stderr,"komodo_txnotarizedconfirmed no txheight.%d %p for txid %s\n",txheight,pindex,txid.ToString().c_str());
+            fprintf(stderr,"hush_txnotarizedconfirmed no txheight.%d %p for txid %s\n",txheight,pindex,txid.ToString().c_str());
             return(0);
         }
         else if ( (pindex= chainActive.LastTip()) == 0 || pindex->GetHeight() < txheight )
         {
-            fprintf(stderr,"komodo_txnotarizedconfirmed backwards heights for txid %s hts.(%d %d)\n",txid.ToString().c_str(),txheight,(int32_t)pindex->GetHeight());
+            fprintf(stderr,"hush_txnotarizedconfirmed backwards heights for txid %s hts.(%d %d)\n",txid.ToString().c_str(),txheight,(int32_t)pindex->GetHeight());
             return(0);
         }    
         confirms=1 + pindex->GetHeight() - txheight;

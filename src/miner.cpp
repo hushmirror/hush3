@@ -137,15 +137,14 @@ void vcalc_sha256(char deprecated[(256 >> 3) * 2 + 1],uint8_t hash[256 >> 3],uin
 uint32_t Mining_start,Mining_height;
 int32_t My_notaryid = -1;
 int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
-int32_t komodo_pax_opreturn(int32_t height,uint8_t *opret,int32_t maxsize);
-int32_t komodo_baseid(char *origbase);
+int32_t hush_baseid(char *origbase);
 int32_t hush_longestchain();
 int64_t hush_block_unlocktime(uint32_t nHeight);
 uint64_t the_commission(const CBlock *block,int32_t height);
 int32_t hush_notaryvin(CMutableTransaction &txNew,uint8_t *notarypub33, void *ptr);
 int32_t decode_hex(uint8_t *bytes,int32_t n,char *hex);
 int32_t hush_is_notarytx(const CTransaction& tx);
-uint64_t komodo_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len);
+uint64_t hush_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 int32_t hush_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *script, int32_t len);
 CScript komodo_mineropret(int32_t nHeight);
@@ -209,10 +208,6 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
 
     // Collect memory pool transactions into the block
     CAmount nFees = 0;
-
-    // we will attempt to spend any cheats we see
-    CTransaction cheatTx;
-    boost::optional<CTransaction> cheatSpend;
 
     uint256 cbHash;
     
@@ -587,7 +582,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
         //pblock->nTime = blocktime + 1;
         pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
 
-        LogPrintf("CreateNewBlock(): total size %u blocktime.%u nBits.%08x stake.%i\n", nBlockSize,blocktime,pblock->nBits,isStake);
+        LogPrintf("CreateNewBlock(): total size %u blocktime.%u nBits.%08x\n", nBlockSize,blocktime,pblock->nBits);
         
         // Create coinbase tx
         CMutableTransaction txNew = CreateNewContextualCMutableTransaction(consensusParams, nHeight);
@@ -653,7 +648,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
             int32_t scriptlen = (int32_t)pblock->vtx[1].vout[1].scriptPubKey.size();
             if ( script[0] == OP_RETURN )
             {
-                uint64_t totalsats = komodo_notarypay(txNew, NotarizationNotaries, pblock->nTime, nHeight, script, scriptlen);
+                uint64_t totalsats = hush_notarypay(txNew, NotarizationNotaries, pblock->nTime, nHeight, script, scriptlen);
                 if ( totalsats == 0 )
                 {
                     fprintf(stderr, "Could not create notary payment, trying again.\n");
@@ -861,19 +856,26 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, int32_t nHeight, 
         scriptPubKey = CScript() << ParseHex(HexStr(pubkey)) << OP_CHECKSIG;
     } else {
         {
-            if (!reservekey.GetReservedKey(pubkey))
-            {
-                return NULL;
-            }
-            scriptPubKey.resize(35);
-            ptr = (uint8_t *)pubkey.begin();
-            scriptPubKey[0] = 33;
-            for (i=0; i<33; i++) {
-                scriptPubKey[i+1] = ptr[i];
-            }
-            scriptPubKey[34] = OP_CHECKSIG;
-        }
-    }
+            // Support mining with -disablewallet and minetolocalwallet=0
+            if (!GetBoolArg("-disablewallet", false)) {
+                // wallet enabled
+                if (!reservekey.GetReservedKey(pubkey))
+                    return NULL;
+                scriptPubKey.clear();
+                scriptPubKey = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
+            } else {
+                // wallet disabled
+                CTxDestination dest = DecodeDestination(GetArg("-mineraddress", ""));
+                if (IsValidDestination(dest)) {
+                    // CKeyID keyID = boost::get<CKeyID>(dest);
+                    // scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
+                    scriptPubKey = GetScriptForDestination(dest);
+                } else {
+                    return NULL;
+                }
+             }
+         }
+     }
     return CreateNewBlock(pubkey, scriptPubKey, gpucount, isStake);
 }
 
@@ -893,29 +895,6 @@ void komodo_sendmessage(int32_t minpeers,int32_t maxpeers,const char *message,st
                 break;
         }
     }
-}
-
-void komodo_broadcast(CBlock *pblock,int32_t limit)
-{
-    if (IsInitialBlockDownload())
-        return;
-    int32_t n = 1;
-    //fprintf(stderr,"broadcast new block t.%u\n",(uint32_t)time(NULL));
-    {
-        LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes)
-        {
-            if ( pnode->hSocket == INVALID_SOCKET )
-                continue;
-            if ( (rand() % n) == 0 )
-            {
-                pnode->PushMessage("block", *pblock);
-                if ( n++ > limit )
-                    break;
-            }
-        }
-    }
-    //fprintf(stderr,"finished broadcast new block t.%u\n",(uint32_t)time(NULL));
 }
 
 static bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
@@ -972,12 +951,11 @@ static bool ProcessBlockFound(CBlock* pblock)
         return error("HushMiner: ProcessNewBlock, block not accepted");
 
     TrackMinedBlock(pblock->GetHash());
-    //komodo_broadcast(pblock,16);
     return true;
 }
 
-int32_t komodo_baseid(char *origbase);
-int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t *blocktimes,int32_t *nonzpkeysp,int32_t height);
+int32_t hush_baseid(char *origbase);
+int32_t hush_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t *blocktimes,int32_t *nonzpkeysp,int32_t height);
 arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
 int32_t FOUND_BLOCK,HUSH_MAYBEMINED;
 extern int32_t HUSH_LASTMINED,HUSH_INSYNC;
@@ -1076,7 +1054,7 @@ void static BitcoinMiner()
     while ( (ASSETCHAIN_INIT == 0 || HUSH_INITDONE == 0) )
     {
         sleep(1);
-        if ( komodo_baseid(SMART_CHAIN_SYMBOL) < 0 )
+        if ( hush_baseid(SMART_CHAIN_SYMBOL) < 0 )
             break;
     }
     if ( SMART_CHAIN_SYMBOL[0] == 0 )
@@ -1205,12 +1183,12 @@ void static BitcoinMiner()
             if ( SMART_CHAIN_SYMBOL[0] == 0 && notaryid >= 0 )
             {
                 j = 65;
-                if ( (Mining_height >= 235300 && Mining_height < 236000) || (Mining_height % KOMODO_ELECTION_GAP) > 64 || (Mining_height % KOMODO_ELECTION_GAP) == 0 || Mining_height > 1000000 )
+                if ( (Mining_height >= 235300 && Mining_height < 236000) || (Mining_height % HUSH_DPOW_GAP) > 64 || (Mining_height % HUSH_DPOW_GAP) == 0 || Mining_height > 1000000 )
                 {
                     int32_t dispflag = 0;
                     if ( notaryid <= 3 || notaryid == 32 || (notaryid >= 43 && notaryid <= 45) || notaryid == 51 || notaryid == 52 || notaryid == 56 || notaryid == 57 )
                         dispflag = 1;
-                    komodo_eligiblenotary(pubkeys,mids,blocktimes,&nonzpkeys,pindexPrev->GetHeight());
+                    hush_eligiblenotary(pubkeys,mids,blocktimes,&nonzpkeys,pindexPrev->GetHeight());
                     if ( nonzpkeys > 0 )
                     {
                         for (i=0; i<33; i++)

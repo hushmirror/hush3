@@ -59,6 +59,13 @@ void TransactionBuilder::AddSaplingOutput(
     mtx.valueBalance -= value;
 }
 
+// randomize the order of outputs
+void TransactionBuilder::ShuffleOutputs()
+{
+    LogPrintf("%s: Shuffling %d zouts\n", __func__, outputs.size() );
+    random_shuffle( outputs.begin(), outputs.end(), GetRandInt );
+}
+
 void TransactionBuilder::AddTransparentInput(COutPoint utxo, CScript scriptPubKey, CAmount value, uint32_t _nSequence)
 {
     if (keystore == nullptr) {
@@ -211,6 +218,9 @@ boost::optional<CTransaction> TransactionBuilder::Build()
             LogPrintf("%s: Created cm + nullifier=%s\n", __FUNCTION__, sdesc.nullifier.ToString().c_str() );
         mtx.vShieldedSpend.push_back(sdesc);
     }
+
+    // Prevent leaking metadata about the position of change output
+    ShuffleOutputs();
 
     // Create Sapling OutputDescriptions
     for (auto output : outputs) {

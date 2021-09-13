@@ -204,7 +204,7 @@ public:
 
 #include "equihash.tcc"
 /*
-* Equihash 200,9 (KMD/Zcash)
+* Equihash 200,9 (HUSH/ZEC and other ASIC coins)
 * Equihash 150,5 (beam)
 * Equihash 144,5 (SnowGem)
 * Equihash 96,5 (Minex)
