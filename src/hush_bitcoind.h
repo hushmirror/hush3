@@ -868,18 +868,18 @@ int32_t hush_minerids(uint8_t *minerids,int32_t height,int32_t width)
     return(nonz);
 }
 
-int32_t hush_MoM(int32_t *notarized_heightp,uint256 *MoMp,uint256 *kmdtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip)
+int32_t hush_MoM(int32_t *notarized_heightp,uint256 *MoMp,uint256 *hushtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip)
 {
-    int32_t depth,notarized_ht; uint256 MoM,kmdtxid;
-    depth = hush_MoMdata(&notarized_ht,&MoM,&kmdtxid,nHeight,MoMoMp,MoMoMoffsetp,MoMoMdepthp,kmdstartip,kmdendip);
+    int32_t depth,notarized_ht; uint256 MoM,hushtxid;
+    depth = hush_MoMdata(&notarized_ht,&MoM,&hushtxid,nHeight,MoMoMp,MoMoMoffsetp,MoMoMdepthp,kmdstartip,kmdendip);
     memset(MoMp,0,sizeof(*MoMp));
-    memset(kmdtxidp,0,sizeof(*kmdtxidp));
+    memset(hushtxidp,0,sizeof(*hushtxidp));
     *notarized_heightp = 0;
     if ( depth != 0 && notarized_ht > 0 && nHeight > notarized_ht-depth && nHeight <= notarized_ht )
     {
         *MoMp = MoM;
         *notarized_heightp = notarized_ht;
-        *kmdtxidp = kmdtxid;
+        *hushtxidp = hushtxid;
     }
     return(depth);
 }
