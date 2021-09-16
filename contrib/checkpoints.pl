@@ -37,9 +37,9 @@ while (1) {
 }
 my $time    = qx{$hush getblock $last |grep time|cut -d: -f2| sed 's/,//g'};
 chomp($time);
-# TODO: This is Linux-only
-my $line1       = qx{grep --text height=$prev   ~/.komodo/HUSH3/debug.log};
-my $line2       = qx{grep --text height=$blocks ~/.komodo/HUSH3/debug.log};
+# TODO: This is Linux-only and assumes new (not legacy) dir
+my $line1       = qx{grep --text height=$prev   ~/.hush/HUSH3/debug.log};
+my $line2       = qx{grep --text height=$blocks ~/.hush/HUSH3/debug.log};
 my $txs_per_day = 2 * $perday; # default estimate is 2 txs per block, on average
 my $total_txs   = 0;
 #print "line1: $line1\n";
