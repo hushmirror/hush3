@@ -41,7 +41,7 @@ uint256 hush_calcMoM(int32_t height,int32_t MoMdepth)
     return BuildMerkleTree(&fMutated, leaves, tree);
 }
 
-struct hush_ccdata_entry *hush_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi)
+struct hush_ccdata_entry *hush_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t hushstarti,int32_t hushendi)
 {
     struct hush_ccdata_entry *allMoMs=0; struct hush_ccdata *ccdata,*tmpptr; int32_t i,num,max;
     bool fMutated; std::vector<uint256> tree, leaves;
@@ -49,7 +49,7 @@ struct hush_ccdata_entry *hush_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmd
     portable_mutex_lock(&HUSH_CC_mutex);
     DL_FOREACH_SAFE(CC_data,ccdata,tmpptr)
     {
-        if ( ccdata->MoMdata.height <= kmdendi && ccdata->MoMdata.height >= kmdstarti )
+        if ( ccdata->MoMdata.height <= hushendi && ccdata->MoMdata.height >= hushstarti )
         {
             if ( num >= max )
             {
@@ -63,7 +63,7 @@ struct hush_ccdata_entry *hush_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmd
             strcpy(allMoMs[num].symbol,ccdata->symbol);
             num++;
         }
-        if ( ccdata->MoMdata.height < kmdstarti )
+        if ( ccdata->MoMdata.height < hushstarti )
             break;
     }
     portable_mutex_unlock(&HUSH_CC_mutex);
@@ -116,7 +116,7 @@ int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mda
     {
         if ( ccdata->MoMdata.height < hushheight )
         {
-            //fprintf(stderr,"%s notarized.%d kmd.%d\n",ccdata->symbol,ccdata->MoMdata.notarized_height,ccdata->MoMdata.height);
+            //fprintf(stderr,"%s notarized.%d HUSH3.%d\n",ccdata->symbol,ccdata->MoMdata.notarized_height,ccdata->MoMdata.height);
             if ( strcmp(ccdata->symbol,symbol) == 0 )
             {
                 if ( endi == 0 )
@@ -136,8 +136,8 @@ int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mda
         }
     }
     portable_mutex_unlock(&HUSH_CC_mutex);
-    mdata->kmdstarti = starti;
-    mdata->kmdendi = endi;
+    mdata->hushstarti = starti;
+    mdata->hushendi = endi;
     if ( starti != 0 && endi != 0 && endi >= starti )
     {
         if ( (allMoMs= hush_allMoMs(&depth,&mdata->MoMoM,starti,endi)) != 0 )
@@ -151,8 +151,8 @@ int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mda
             if ( mdata->numpairs > 0 )
             {
                 len += dragon_rwnum(1,&hexdata[len],sizeof(CCid),(uint8_t *)&CCid);
-                len += dragon_rwnum(1,&hexdata[len],sizeof(uint32_t),(uint8_t *)&mdata->kmdstarti);
-                len += dragon_rwnum(1,&hexdata[len],sizeof(uint32_t),(uint8_t *)&mdata->kmdendi);
+                len += dragon_rwnum(1,&hexdata[len],sizeof(uint32_t),(uint8_t *)&mdata->hushstarti);
+                len += dragon_rwnum(1,&hexdata[len],sizeof(uint32_t),(uint8_t *)&mdata->hushendi);
                 len += dragon_rwbignum(1,&hexdata[len],sizeof(mdata->MoMoM),(uint8_t *)&mdata->MoMoM);
                 len += dragon_rwnum(1,&hexdata[len],sizeof(uint32_t),(uint8_t *)&mdata->MoMoMdepth);
                 len += dragon_rwnum(1,&hexdata[len],sizeof(uint32_t),(uint8_t *)&mdata->numpairs);
@@ -255,12 +255,12 @@ int32_t hush_rwccdata(char *thischain,int32_t rwflag,struct hush_ccdata *ccdata,
                         np->MoMoM = MoMoMdata->MoMoM;
                         np->MoMoMdepth = MoMoMdata->MoMoMdepth;
                         np->MoMoMoffset = MoMoMdata->MoMoMoffset;
-                        np->kmdstarti = MoMoMdata->kmdstarti;
-                        np->kmdendi = MoMoMdata->kmdendi;
+                        np->hushstarti = MoMoMdata->hushstarti;
+                        np->hushendi = MoMoMdata->hushendi;
                     }
-                    else if ( memcmp(&np->MoMoM,&MoMoMdata->MoMoM,sizeof(np->MoMoM)) != 0 || np->MoMoMdepth != MoMoMdata->MoMoMdepth || np->MoMoMoffset != MoMoMdata->MoMoMoffset || np->kmdstarti != MoMoMdata->kmdstarti || np->kmdendi != MoMoMdata->kmdendi )
+                    else if ( memcmp(&np->MoMoM,&MoMoMdata->MoMoM,sizeof(np->MoMoM)) != 0 || np->MoMoMdepth != MoMoMdata->MoMoMdepth || np->MoMoMoffset != MoMoMdata->MoMoMoffset || np->hushstarti != MoMoMdata->hushstarti || np->hushendi != MoMoMdata->hushendi )
                     {
-                        fprintf(stderr,"preexisting MoMoM mismatch: %s (%d %d %d %d) vs %s (%d %d %d %d)\n",np->MoMoM.ToString().c_str(),np->MoMoMdepth,np->MoMoMoffset,np->kmdstarti,np->kmdendi,MoMoMdata->MoMoM.ToString().c_str(),MoMoMdata->MoMoMdepth,MoMoMdata->MoMoMoffset,MoMoMdata->kmdstarti,MoMoMdata->kmdendi);
+                        fprintf(stderr,"preexisting MoMoM mismatch: %s (%d %d %d %d) vs %s (%d %d %d %d)\n",np->MoMoM.ToString().c_str(),np->MoMoMdepth,np->MoMoMoffset,np->hushstarti,np->hushendi,MoMoMdata->MoMoM.ToString().c_str(),MoMoMdata->MoMoMdepth,MoMoMdata->MoMoMoffset,MoMoMdata->hushstarti,MoMoMdata->hushendi);
                     }
                 }
             }

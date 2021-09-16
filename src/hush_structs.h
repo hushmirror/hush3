@@ -88,7 +88,7 @@ struct knotaries_entry { int32_t height,numnotaries; struct knotary_entry *Notar
 struct notarized_checkpoint
 {
     uint256 notarized_hash,notarized_desttxid,MoM,MoMoM;
-    int32_t nHeight,notarized_height,MoMdepth,MoMoMdepth,MoMoMoffset,kmdstarti,kmdendi;
+    int32_t nHeight,notarized_height,MoMdepth,MoMoMdepth,MoMoMoffset,hushstarti,hushendi;
 };
 
 struct hush_ccdataMoM
@@ -103,7 +103,7 @@ struct hush_ccdatapair { int32_t notarized_height,MoMoMoffset; };
 struct hush_ccdataMoMoM
 {
     uint256 MoMoM;
-    int32_t kmdstarti,kmdendi,MoMoMoffset,MoMoMdepth,numpairs,len;
+    int32_t hushstarti,hushendi,MoMoMoffset,MoMoMdepth,numpairs,len;
     struct hush_ccdatapair *pairs;
 };
 

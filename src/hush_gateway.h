@@ -350,7 +350,7 @@ uint64_t hush_paxtotal()
                             //int32_t j; for (j=0; j<32; j++)
                             //    printf("%02x",((uint8_t *)&pax->txid)[j]);
                             //if ( strcmp(str,SMART_CHAIN_SYMBOL) == 0 )
-                            //    printf(" v%d %p got WITHDRAW.%s kmd.%d ht.%d %.8f -> %.8f/%.8f\n",pax->vout,pax,pax->source,pax->height,pax->otherheight,dstr(pax->fiatoshis),dstr(pax->puposhis),dstr(checktoshis));
+                            //    printf(" v%d %p got WITHDRAW.%s HUSH3.%d ht.%d %.8f -> %.8f/%.8f\n",pax->vout,pax,pax->source,pax->height,pax->otherheight,dstr(pax->fiatoshis),dstr(pax->puposhis),dstr(checktoshis));
                         }
                     }
                 }
@@ -453,7 +453,7 @@ int32_t hush_pending_withdraws(char *opretstr) // todo: enforce deterministic or
                     paxes[n++] = pax;
                     //int32_t j; for (j=0; j<32; j++)
                     //    printf("%02x",((uint8_t *)&pax->txid)[j]);
-                    //printf(" %s.(kmdht.%d ht.%d marked.%u approved.%d validated %.8f) %.8f\n",pax->source,pax->height,pax->otherheight,pax->marked,pax->approved,dstr(pax->validated),dstr(pax->puposhis));
+                    //printf(" %s.(ht.%d ht.%d marked.%u approved.%d validated %.8f) %.8f\n",pax->source,pax->height,pax->otherheight,pax->marked,pax->approved,dstr(pax->validated),dstr(pax->puposhis));
                 }
             }
         }
@@ -480,7 +480,7 @@ int32_t hush_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t toko
     struct pax_transaction *pax,*tmp; char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; uint8_t *script,opcode,opret[16384*4],data[16384*4]; int32_t i,baseid,ht,len=0,opretlen=0,numvouts=1; struct hush_state *sp; uint64_t available,deposited,issued,withdrawn,approved,redeemed,mask,sum = 0;
     if ( HUSH_PASSPORT_INITDONE == 0 )//HUSH_PAX == 0 ||
         return(0);
-    struct hush_state *kmdsp = hush_stateptrget((char *)"HUSH3");
+    struct hush_state *hushsp = hush_stateptrget((char *)"HUSH3");
     sp = hush_stateptr(symbol,dest);
     strcpy(symbol,base);
     if ( SMART_CHAIN_SYMBOL[0] != 0 && hush_baseid(SMART_CHAIN_SYMBOL) < 0 )
@@ -516,14 +516,14 @@ int32_t hush_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t toko
 #ifdef HUSH_SMART_CHAINS_WAITNOTARIZE
             if ( pax->height > 236000 )
             {
-                if ( kmdsp != 0 && kmdsp->NOTARIZED_HEIGHT >= pax->height )
+                if ( hushsp != 0 && hushsp->NOTARIZED_HEIGHT >= pax->height )
                     pax->validated = pax->puposhis;
-                else if ( kmdsp->CURRENT_HEIGHT > pax->height+30 )
+                else if ( hushsp->CURRENT_HEIGHT > pax->height+30 )
                     pax->validated = pax->ready = 0;
             }
             else
             {
-                if ( kmdsp != 0 && (kmdsp->NOTARIZED_HEIGHT >= pax->height || kmdsp->CURRENT_HEIGHT > pax->height+30) ) // assumes same chain as notarize
+                if ( hushsp != 0 && (hushsp->NOTARIZED_HEIGHT >= pax->height || hushsp->CURRENT_HEIGHT > pax->height+30) ) // assumes same chain as notarize
                     pax->validated = pax->puposhis;
                 else pax->validated = pax->ready = 0;
             }
@@ -546,7 +546,7 @@ int32_t hush_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t toko
         if ( SMART_CHAIN_SYMBOL[0] != 0 && (strcmp(pax->symbol,symbol) != 0 || pax->validated == 0 || pax->ready == 0) )
         {
             if ( strcmp(pax->symbol,SMART_CHAIN_SYMBOL) == 0 )
-                printf("pax->symbol.%s != %s or null pax->validated %.8f ready.%d ht.(%d %d)\n",pax->symbol,symbol,dstr(pax->validated),pax->ready,kmdsp->CURRENT_HEIGHT,pax->height);
+                printf("pax->symbol.%s != %s or null pax->validated %.8f ready.%d ht.(%d %d)\n",pax->symbol,symbol,dstr(pax->validated),pax->ready,hushsp->CURRENT_HEIGHT,pax->height);
             pax->marked = pax->height;
             continue;
         }
@@ -554,7 +554,7 @@ int32_t hush_gateway_deposits(CMutableTransaction *txNew,char *base,int32_t toko
             continue;
         if ( pax->type == 'A' && SMART_CHAIN_SYMBOL[0] == 0 )
         {
-            if ( kmdsp != 0 )
+            if ( hushsp != 0 )
             {
                 if ( (baseid= hush_baseid(pax->symbol)) < 0 || ((1LL << baseid) & sp->RTmask) == 0 )
                 {
@@ -1019,7 +1019,7 @@ const char *hush_opreturn(int32_t height,uint64_t value,uint8_t *opretbuf,int32_
                         printf("########### %p withdrawn %s += %.8f check %.8f\n",basesp,base,dstr(value),dstr(checktoshis));
                 }
                 if ( 0 && strcmp(base,"RUB") == 0 && (pax == 0 || pax->approved == 0) )
-                    printf("notarize %s %.8f -> %.8f kmd.%d other.%d\n",SMART_CHAIN_SYMBOL,dstr(value),dstr(puposhis),hushheight,height);
+                    printf("notarize %s %.8f -> %.8f HUSH3.%d other.%d\n",SMART_CHAIN_SYMBOL,dstr(value),dstr(puposhis),hushheight,height);
             }
             hush_gateway_deposit(coinaddr,0,(char *)"HUSH3",value,rmd160,txid,vout,'W',hushheight,height,source,0);
             if ( (pax= hush_paxfind(txid,vout,'W')) != 0 )

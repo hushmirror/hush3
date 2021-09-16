@@ -942,18 +942,18 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
             }
             for (i=0; i<64; i++)
             {
-                UniValue item(UniValue::VOBJ); std::string hex,hushaddress; char *hexstr,kmdaddr[64],*ptr; int32_t m;
+                UniValue item(UniValue::VOBJ); std::string hex,hushaddress; char *hexstr,hushaddr[64],*ptr; int32_t m;
                 hex.resize(66);
                 hexstr = (char *)hex.data();
                 for (j=0; j<33; j++)
                     sprintf(&hexstr[j*2],"%02x",pubkeys[i][j]);
                 item.push_back(Pair("notaryid", i));
 
-                bitcoin_address(kmdaddr,60,pubkeys[i],33);
-                m = (int32_t)strlen(kmdaddr);
+                bitcoin_address(hushaddr,60,pubkeys[i],33);
+                m = (int32_t)strlen(hushaddr);
                 hushaddress.resize(m);
                 ptr = (char *)hushaddress.data();
-                memcpy(ptr,kmdaddr,m);
+                memcpy(ptr,hushaddr,m);
                 item.push_back(Pair("HUSHaddress", hushaddress));
 
                 item.push_back(Pair("pubkey", hex));
@@ -973,7 +973,7 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
 UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    UniValue a(UniValue::VARR); uint32_t timestamp=0; UniValue ret(UniValue::VOBJ); int32_t i,j,n,m; char *hexstr;  uint8_t pubkeys[64][33]; char btcaddr[64],kmdaddr[64],*ptr;
+    UniValue a(UniValue::VARR); uint32_t timestamp=0; UniValue ret(UniValue::VOBJ); int32_t i,j,n,m; char *hexstr;  uint8_t pubkeys[64][33]; char btcaddr[64],hushaddr[64],*ptr;
     if ( fHelp || (params.size() != 1 && params.size() != 2) )
         throw runtime_error("notaries height timestamp\n");
     LOCK(cs_main);
@@ -1011,11 +1011,11 @@ UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
             memcpy(ptr,btcaddr,m);
             item.push_back(Pair("BTCaddress", btcaddress));
 
-            bitcoin_address(kmdaddr,60,pubkeys[i],33);
-            m = (int32_t)strlen(kmdaddr);
+            bitcoin_address(hushaddr,60,pubkeys[i],33);
+            m = (int32_t)strlen(hushaddr);
             hushaddress.resize(m);
             ptr = (char *)hushaddress.data();
-            memcpy(ptr,kmdaddr,m);
+            memcpy(ptr,hushaddr,m);
             item.push_back(Pair("HUSHaddress", hushaddress));
             a.push_back(item);
         }

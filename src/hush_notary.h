@@ -339,7 +339,7 @@ int32_t hush_dpowconfs(int32_t txheight,int32_t numconfs)
     return(numconfs);
 }
 
-int32_t hush_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *hushtxidp,int32_t height,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip)
+int32_t hush_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *hushtxidp,int32_t height,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *hushstartip,int32_t *hushendip)
 {
     struct notarized_checkpoint *np = 0;
     if ( (np= hush_npptr(height)) != 0 )
@@ -350,11 +350,11 @@ int32_t hush_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *hushtxidp,int
         *MoMoMp = np->MoMoM;
         *MoMoMoffsetp = np->MoMoMoffset;
         *MoMoMdepthp = np->MoMoMdepth;
-        *kmdstartip = np->kmdstarti;
-        *kmdendip = np->kmdendi;
+        *hushstartip = np->hushstarti;
+        *hushendip = np->hushendi;
         return(np->MoMdepth & 0xffff);
     }
-    *notarized_htp = *MoMoMoffsetp = *MoMoMdepthp = *kmdstartip = *kmdendip = 0;
+    *notarized_htp = *MoMoMoffsetp = *MoMoMdepthp = *hushstartip = *hushendip = 0;
     memset(MoMp,0,sizeof(*MoMp));
     memset(MoMoMp,0,sizeof(*MoMoMp));
     memset(hushtxidp,0,sizeof(*hushtxidp));

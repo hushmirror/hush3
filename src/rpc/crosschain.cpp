@@ -56,9 +56,9 @@ int32_t ensure_CCrequirements(uint8_t evalcode);
 bool EnsureWalletIsAvailable(bool avoidException);
 
 
-int32_t hush_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *hushtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip);
+int32_t hush_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *hushtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *hushstartip,int32_t *hushendip);
 int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mdata,char *symbol,int32_t hushheight,int32_t notarized_height);
-struct hush_ccdata_entry *hush_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi);
+struct hush_ccdata_entry *hush_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t hushstarti,int32_t hushendi);
 uint256 hush_calcMoM(int32_t height,int32_t MoMdepth);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 extern std::string ASSETCHAINS_SELFIMPORT;
@@ -93,7 +93,7 @@ UniValue crosschainproof(const UniValue& params, bool fHelp, const CPubKey& mypk
 
 UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    int32_t height,depth,notarized_height,MoMoMdepth,MoMoMoffset,kmdstarti,kmdendi; uint256 MoM,MoMoM,hushtxid; uint32_t timestamp = 0; UniValue ret(UniValue::VOBJ); UniValue a(UniValue::VARR);
+    int32_t height,depth,notarized_height,MoMoMdepth,MoMoMoffset,hushstarti,hushendi; uint256 MoM,MoMoM,hushtxid; uint32_t timestamp = 0; UniValue ret(UniValue::VOBJ); UniValue a(UniValue::VARR);
     if ( fHelp || params.size() != 1 )
         throw runtime_error("height_MoM height\n");
     LOCK(cs_main);
@@ -108,7 +108,7 @@ UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
         height = chainActive.Tip()->GetHeight();
     }
     //fprintf(stderr,"height_MoM height.%d\n",height);
-    depth = hush_MoM(&notarized_height,&MoM,&hushtxid,height,&MoMoM,&MoMoMoffset,&MoMoMdepth,&kmdstarti,&kmdendi);
+    depth = hush_MoM(&notarized_height,&MoM,&hushtxid,height,&MoMoM,&MoMoMoffset,&MoMoMdepth,&hushstarti,&hushendi);
     ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL)));
     ret.push_back(Pair("height",height));
     ret.push_back(Pair("timestamp",(uint64_t)timestamp));
@@ -123,8 +123,8 @@ UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
             ret.push_back(Pair("MoMoM",MoMoM.GetHex()));
             ret.push_back(Pair("MoMoMoffset",MoMoMoffset));
             ret.push_back(Pair("MoMoMdepth",MoMoMdepth));
-            ret.push_back(Pair("kmdstarti",kmdstarti));
-            ret.push_back(Pair("kmdendi",kmdendi));
+            ret.push_back(Pair("hushstarti",hushstarti));
+            ret.push_back(Pair("hushendi",hushendi));
         }
     } else ret.push_back(Pair("error",(char *)"no MoM for height"));
 

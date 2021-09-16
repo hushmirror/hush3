@@ -2080,8 +2080,7 @@ UniValue rpc_stratum_setdifficulty (const UniValue& params, bool fHelp, const CP
 
         } else {
             if (ParseDouble(param_str, &hush_diff)) {
-                // kmd diff as a str passed
-
+                // hush diff as a str passed
                 // difficulty = difficulty_1_target / current_target
                 arith_uint256 target;
                 ccminer::hush_diff_to_target_equi((uint32_t *)&target, hush_diff);
@@ -2091,7 +2090,7 @@ UniValue rpc_stratum_setdifficulty (const UniValue& params, bool fHelp, const CP
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid difficulty (not hex target, not hush_diff)");
         }
     } else if (params[0].getType() == UniValue::VNUM) {
-        // kmd diff as a num passed
+        // hush diff as a num passed
         hush_diff = params[0].get_real();
 
         // difficulty = difficulty_1_target / current_target

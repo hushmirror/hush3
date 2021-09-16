@@ -868,10 +868,10 @@ int32_t hush_minerids(uint8_t *minerids,int32_t height,int32_t width)
     return(nonz);
 }
 
-int32_t hush_MoM(int32_t *notarized_heightp,uint256 *MoMp,uint256 *hushtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip)
+int32_t hush_MoM(int32_t *notarized_heightp,uint256 *MoMp,uint256 *hushtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *hushstartip,int32_t *hushendip)
 {
     int32_t depth,notarized_ht; uint256 MoM,hushtxid;
-    depth = hush_MoMdata(&notarized_ht,&MoM,&hushtxid,nHeight,MoMoMp,MoMoMoffsetp,MoMoMdepthp,kmdstartip,kmdendip);
+    depth = hush_MoMdata(&notarized_ht,&MoM,&hushtxid,nHeight,MoMoMp,MoMoMoffsetp,MoMoMdepthp,hushstartip,hushendip);
     memset(MoMp,0,sizeof(*MoMp));
     memset(hushtxidp,0,sizeof(*hushtxidp));
     *notarized_heightp = 0;
