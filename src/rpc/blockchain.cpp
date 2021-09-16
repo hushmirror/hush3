@@ -1027,7 +1027,7 @@ UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return ret;
 }
 
-int32_t komodo_pending_withdraws(char *opretstr);
+int32_t hush_pending_withdraws(char *opretstr);
 int32_t pax_fiatstatus(uint64_t *available,uint64_t *deposited,uint64_t *issued,uint64_t *withdrawn,uint64_t *approved,uint64_t *redeemed,char *base);
 extern char CURRENCIES[][8];
 
@@ -1037,7 +1037,7 @@ UniValue paxpending(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( fHelp || params.size() != 0 )
         throw runtime_error("paxpending needs no args\n");
     LOCK(cs_main);
-    if ( (opretlen= komodo_pending_withdraws(opretbuf)) > 0 )
+    if ( (opretlen= hush_pending_withdraws(opretbuf)) > 0 )
         ret.push_back(Pair("withdraws", opretbuf));
     else ret.push_back(Pair("withdraws", (char *)""));
     for (baseid=0; baseid<32; baseid++)
@@ -1076,7 +1076,7 @@ UniValue paxprice(const UniValue& params, bool fHelp, const CPubKey& mypk)
     else height = atoi(params[2].get_str().c_str());
     //if ( params.size() == 3 || (basevolume= COIN * atof(params[3].get_str().c_str())) == 0 )
         basevolume = 100000;
-    relvolume = komodo_paxprice(&seed,height,(char *)base.c_str(),(char *)rel.c_str(),basevolume);
+    relvolume = hush_paxprice(&seed,height,(char *)base.c_str(),(char *)rel.c_str(),basevolume);
     ret.push_back(Pair("base", base));
     ret.push_back(Pair("rel", rel));
     ret.push_back(Pair("height", height));

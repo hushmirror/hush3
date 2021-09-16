@@ -23,7 +23,7 @@
 #include "hush_defs.h"
 #include "CCinclude.h"
 
-int32_t komodo_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblocks);
+int32_t hush_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblocks);
 extern void GetHushEarlytxidScriptPub();
 extern CScript HUSH_EARLYTXID_SCRIPTPUB;
 

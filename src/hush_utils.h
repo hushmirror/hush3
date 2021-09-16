@@ -980,7 +980,7 @@ int32_t dragon_rwbignum(int32_t rwflag,uint8_t *serialized,int32_t len,uint8_t *
     return(len);
 }
 
-int32_t komodo_scriptitemlen(int32_t *opretlenp,uint8_t *script)
+int32_t hush_scriptitemlen(int32_t *opretlenp,uint8_t *script)
 {
     int32_t opretlen,len = 0;
     if ( (opretlen= script[len++]) >= 0x4c )
@@ -2292,7 +2292,7 @@ void hush_args(char *argv0)
                         extralen += symbol.size();
                     }
                 }
-                //komodo_pricesinit();
+                //hush_pricesinit();
                 hush_cbopretupdate(1); // will set Mineropret
                 fprintf(stderr,"This blockchain uses data produced from CoinDesk Bitcoin Price Index\n");
             }
@@ -2325,7 +2325,7 @@ void hush_args(char *argv0)
 
         if ( (baseid = hush_baseid(SMART_CHAIN_SYMBOL)) >= 0 && baseid < 32 )
         {
-            //komodo_maxallowed(baseid);
+            //hush_maxallowed(baseid);
             if(fDebug) 
                 printf("baseid.%d MAX_MONEY.%s %.8f\n",baseid,SMART_CHAIN_SYMBOL,(double)MAX_MONEY/SATOSHIDEN);
         }
@@ -2381,7 +2381,7 @@ void hush_args(char *argv0)
         if ( ASSETCHAINS_RPCPORT == 0 )
             ASSETCHAINS_RPCPORT = ASSETCHAINS_P2PPORT + 1;
         //ASSETCHAINS_NOTARIES = GetArg("-ac_notaries","");
-        //komodo_assetchain_pubkeys((char *)ASSETCHAINS_NOTARIES.c_str());
+        //hush_assetchain_pubkeys((char *)ASSETCHAINS_NOTARIES.c_str());
         dragon_rwnum(1,magic,sizeof(ASSETCHAINS_MAGIC),(void *)&ASSETCHAINS_MAGIC);
         for (i=0; i<4; i++)
             sprintf(&magicstr[i<<1],"%02x",magic[i]);

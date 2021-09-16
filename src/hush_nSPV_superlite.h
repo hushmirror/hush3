@@ -128,9 +128,9 @@ struct NSPV_ntzsproofresp *NSPV_ntzsproof_add(struct NSPV_ntzsproofresp *ptr)
     return(&NSPV_ntzsproofresp_cache[i]);
 }
 
-// komodo_nSPVresp is called from async message processing
+// hush_nSPVresp is called from async message processing
 
-void komodo_nSPVresp(CNode *pfrom,std::vector<uint8_t> response) // received a response
+void hush_nSPVresp(CNode *pfrom,std::vector<uint8_t> response) // received a response
 {
     struct NSPV_inforesp I; int32_t len; uint32_t timestamp = (uint32_t)time(NULL);
     strncpy(NSPV_lastpeer,pfrom->addr.ToString().c_str(),sizeof(NSPV_lastpeer)-1);
@@ -274,9 +274,9 @@ UniValue NSPV_logout()
     return(result);
 }
 
-// komodo_nSPV from main polling loop (really this belongs in its own file, but it is so small, it ended up here)
+// hush_nSPV from main polling loop (really this belongs in its own file, but it is so small, it ended up here)
 
-void komodo_nSPV(CNode *pto) // polling loop from SendMessages
+void hush_nSPV(CNode *pto) // polling loop from SendMessages
 {
     uint8_t msg[256]; int32_t i,len=0; uint32_t timestamp = (uint32_t)time(NULL);
     if ( NSPV_logintime != 0 && timestamp > NSPV_logintime+NSPV_AUTOLOGOUT )

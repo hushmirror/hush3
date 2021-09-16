@@ -69,7 +69,7 @@ void WaitForShutdown(boost::thread_group* threadGroup)
     // Tell the main threads to shutdown.
 
     if ( ASSETCHAINS_CBOPRET != 0 ) {
-        komodo_pricesinit();
+        hush_pricesinit();
 	}
 
     while (!fShutdown)

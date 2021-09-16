@@ -246,7 +246,7 @@ int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,ui
 
 //struct hush_state *hush_stateptr(char *symbol,char *dest);
 
-struct notarized_checkpoint *komodo_npptr_for_height(int32_t height, int *idx)
+struct notarized_checkpoint *hush_npptr_for_height(int32_t height, int *idx)
 {
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t i; struct hush_state *sp; struct notarized_checkpoint *np = 0;
     if ( (sp= hush_stateptr(symbol,dest)) != 0 )
@@ -263,13 +263,13 @@ struct notarized_checkpoint *komodo_npptr_for_height(int32_t height, int *idx)
     return(0);
 }
 
-struct notarized_checkpoint *komodo_npptr(int32_t height)
+struct notarized_checkpoint *hush_npptr(int32_t height)
 {
     int idx;
-    return komodo_npptr_for_height(height, &idx);
+    return hush_npptr_for_height(height, &idx);
 }
 
-struct notarized_checkpoint *komodo_npptr_at(int idx)
+struct notarized_checkpoint *hush_npptr_at(int idx)
 {
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
     if ( (sp= hush_stateptr(symbol,dest)) != 0 )
@@ -278,7 +278,7 @@ struct notarized_checkpoint *komodo_npptr_at(int idx)
     return(0);
 }
 
-int32_t komodo_prevMoMheight()
+int32_t hush_prevMoMheight()
 {
     static uint256 zero;
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t i; struct hush_state *sp; struct notarized_checkpoint *np = 0;
@@ -314,7 +314,7 @@ int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *tx
         {
             *hashp = sp->NOTARIZED_HASH;
             *txidp = sp->NOTARIZED_DESTTXID;
-            *prevMoMheightp = komodo_prevMoMheight();
+            *prevMoMheightp = hush_prevMoMheight();
         }
         return(sp->NOTARIZED_HEIGHT);
     } else return(0);
@@ -342,7 +342,7 @@ int32_t hush_dpowconfs(int32_t txheight,int32_t numconfs)
 int32_t hush_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *hushtxidp,int32_t height,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip)
 {
     struct notarized_checkpoint *np = 0;
-    if ( (np= komodo_npptr(height)) != 0 )
+    if ( (np= hush_npptr(height)) != 0 )
     {
         *notarized_htp = np->notarized_height;
         *MoMp = np->MoM;

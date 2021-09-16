@@ -57,8 +57,8 @@ bool EnsureWalletIsAvailable(bool avoidException);
 
 
 int32_t hush_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *hushtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip);
-int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height);
-struct hush_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi);
+int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mdata,char *symbol,int32_t hushheight,int32_t notarized_height);
+struct hush_ccdata_entry *hush_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi);
 uint256 hush_calcMoM(int32_t height,int32_t MoMdepth);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 extern std::string ASSETCHAINS_SELFIMPORT;

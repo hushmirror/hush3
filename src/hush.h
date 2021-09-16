@@ -146,7 +146,7 @@ int32_t hush_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *de
                 errs++;
             //if ( matched != 0 ) global independent states -> inside *sp
             //printf("%s.%d load[%s] ht.%d\n",SMART_CHAIN_SYMBOL,ht,symbol,kheight);
-            hush_eventadd_kmdheight(sp,symbol,ht,kheight,0);
+            hush_eventadd_hushheight(sp,symbol,ht,kheight,0);
         }
         else if ( func == 'T' )
         {
@@ -157,7 +157,7 @@ int32_t hush_parsestatefile(struct hush_state *sp,FILE *fp,char *symbol,char *de
                 errs++;
             //if ( matched != 0 ) global independent states -> inside *sp
             //printf("%s.%d load[%s] ht.%d t.%u\n",SMART_CHAIN_SYMBOL,ht,symbol,kheight,ktimestamp);
-            hush_eventadd_kmdheight(sp,symbol,ht,kheight,ktimestamp);
+            hush_eventadd_hushheight(sp,symbol,ht,kheight,ktimestamp);
         }
         else if ( func == 'R' )
         {
@@ -285,7 +285,7 @@ int32_t hush_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fp
             int32_t kheight;
             if ( memread(&kheight,sizeof(kheight),filedata,&fpos,datalen) != sizeof(kheight) )
                 errs++;
-             hush_eventadd_kmdheight(sp,symbol,ht,kheight,0);
+             hush_eventadd_hushheight(sp,symbol,ht,kheight,0);
         }
         else if ( func == 'T' )
         {
@@ -296,7 +296,7 @@ int32_t hush_parsestatefiledata(struct hush_state *sp,uint8_t *filedata,long *fp
                 errs++;
             //if ( matched != 0 ) global independent states -> inside *sp
             //printf("%s.%d load[%s] ht.%d t.%u\n",SMART_CHAIN_SYMBOL,ht,symbol,kheight,ktimestamp);
-            hush_eventadd_kmdheight(sp,symbol,ht,kheight,ktimestamp);
+            hush_eventadd_hushheight(sp,symbol,ht,kheight,ktimestamp);
         }
         else if ( func == 'R' )
         {
@@ -409,7 +409,7 @@ void hush_stateupdate(int32_t height,uint8_t notarypubs[][33],uint8_t numnotarie
                 if ( fwrite(&HUSHheight,1,sizeof(HUSHheight),fp) != sizeof(HUSHheight) )
                     errs++;
             }
-            hush_eventadd_kmdheight(sp,symbol,height,HUSHheight,HUSHtimestamp);
+            hush_eventadd_hushheight(sp,symbol,height,HUSHheight,HUSHtimestamp);
         } else if ( opretbuf != 0 && opretlen > 0 ) {
             uint16_t olen = opretlen;
             fputc('R',fp);
@@ -711,7 +711,7 @@ int32_t hush_voutupdate(bool fJustCheck,int32_t *isratificationp,int32_t notaryi
         else if ( matched != 0 && i == 0 && j == 1 && opretlen == 149 )
         {
             if ( notaryid >= 0 && notaryid < 64 )
-                komodo_paxpricefeed(height,&scriptbuf[len],opretlen);
+                hush_paxpricefeed(height,&scriptbuf[len],opretlen);
         }
         else if ( matched != 0 )
         {
@@ -792,7 +792,7 @@ int32_t hush_connectblock(bool fJustCheck, CBlockIndex *pindex,CBlock& block)
         if ( pindex->GetHeight() != hwmheight )
         {
             printf("%s hwmheight.%d vs pindex->GetHeight().%d t.%u reorg.%d\n",SMART_CHAIN_SYMBOL,hwmheight,pindex->GetHeight(),(uint32_t)pindex->nTime,hwmheight-pindex->GetHeight());
-            komodo_purge_ccdata((int32_t)pindex->GetHeight());
+            hush_purge_ccdata((int32_t)pindex->GetHeight());
             hwmheight = pindex->GetHeight();
         }
         if (!fJustCheck)

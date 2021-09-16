@@ -594,7 +594,7 @@ extern int32_t ASSETCHAINS_EARLYTXIDCONTRACT;
 int tx_height( const uint256 &hash );
 extern std::vector<std::string> vAllowListAddress;
 extern std::map <std::int8_t, int32_t> mapHeightEvalActivate;
-void komodo_netevent(std::vector<uint8_t> payload);
+void hush_netevent(std::vector<uint8_t> payload);
 int32_t getacseason(uint32_t timestamp);
 int32_t gethushseason(int32_t height);
 
@@ -603,8 +603,8 @@ int32_t gethushseason(int32_t height);
 #define HUSH_KVBINARY 2
 #define PRICES_SMOOTHWIDTH 1
 #define PRICES_MAXDATAPOINTS 8
-uint64_t komodo_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uint64_t basevolume);
-int32_t komodo_paxprices(int32_t *heights,uint64_t *prices,int32_t max,char *base,char *rel);
+uint64_t hush_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uint64_t basevolume);
+int32_t hush_paxprices(int32_t *heights,uint64_t *prices,int32_t max,char *base,char *rel);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 char *bitcoin_address(char *coinaddr,uint8_t addrtype,uint8_t *pubkey_or_rmd160,int32_t len);
 int32_t hush_minerids(uint8_t *minerids,int32_t height,int32_t width);
@@ -615,22 +615,22 @@ int32_t hush_longestchain();
 int32_t hush_dpowconfs(int32_t height,int32_t numconfs);
 int8_t hush_segid(int32_t nocache,int32_t height);
 int32_t hush_heightpricebits(uint64_t *seedp,uint32_t *heightbits,int32_t nHeight);
-char *komodo_pricename(char *name,int32_t ind);
-int32_t komodo_priceind(const char *symbol);
-int32_t komodo_pricesinit();
-int64_t komodo_priceave(int64_t *tmpbuf,int64_t *correlated,int32_t cskip);
-int64_t komodo_pricecorrelated(uint64_t seed,int32_t ind,uint32_t *rawprices,int32_t rawskip,uint32_t *nonzprices,int32_t smoothwidth);
+char *hush_pricename(char *name,int32_t ind);
+int32_t hush_priceind(const char *symbol);
+int32_t hush_pricesinit();
+int64_t hush_priceave(int64_t *tmpbuf,int64_t *correlated,int32_t cskip);
+int64_t hush_pricecorrelated(uint64_t seed,int32_t ind,uint32_t *rawprices,int32_t rawskip,uint32_t *nonzprices,int32_t smoothwidth);
 int32_t hush_nextheight();
 uint32_t hush_heightstamp(int32_t height);
-int64_t komodo_pricemult(int32_t ind);
-int32_t komodo_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblocks);
+int64_t hush_pricemult(int32_t ind);
+int32_t hush_priceget(int64_t *buf64,int32_t ind,int32_t height,int32_t numblocks);
 int32_t hush_currentheight();
 int32_t hush_notarized_bracket(struct notarized_checkpoint *nps[2],int32_t height);
-arith_uint256 komodo_adaptivepow_target(int32_t height,arith_uint256 bnTarget,uint32_t nTime);
+arith_uint256 hush_adaptivepow_target(int32_t height,arith_uint256 bnTarget,uint32_t nTime);
 bool hush_hardfork_active(uint32_t time);
 
 uint256 Parseuint256(const char *hexstr);
-void komodo_sendmessage(int32_t minpeers, int32_t maxpeers, const char *message, std::vector<uint8_t> payload);
+void hush_sendmessage(int32_t minpeers, int32_t maxpeers, const char *message, std::vector<uint8_t> payload);
 CBlockIndex *hush_getblockindex(uint256 hash);
 int32_t hush_nextheight();
 CBlockIndex *hush_blockindex(uint256 hash);

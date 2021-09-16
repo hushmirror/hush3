@@ -479,7 +479,7 @@ int32_t games_event(uint32_t timestamp,uint256 gametxid,int32_t eventid,std::vec
     {
         GetOpReturnData(games_eventopret(timestamp,mypk,sig,payload),vopret);
         games_payloadrecv(mypk,timestamp,payload);
-        komodo_sendmessage(4,8,"events",vopret);
+        hush_sendmessage(4,8,"events",vopret);
         return(0);
     }
     fprintf(stderr,"games_eventsign error\n");
@@ -539,7 +539,7 @@ UniValue games_events(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
     return(result);
 }
 
-void komodo_netevent(std::vector<uint8_t> message)
+void hush_netevent(std::vector<uint8_t> message)
 {
     int32_t i,retval,lag,lagerr=0; uint32_t timestamp,now; CPubKey pk; std::vector<uint8_t> sig,payload; char str[67];
     if ( games_eventdecode(timestamp,pk,sig,payload,message) == 'E' )
@@ -560,7 +560,7 @@ void komodo_netevent(std::vector<uint8_t> message)
                 if ( (rand() % 10) == 0 )
                 {
                     //fprintf(stderr,"relay message.[%d]\n",(int32_t)message.size());
-                    komodo_sendmessage(2,2,"events",message);
+                    hush_sendmessage(2,2,"events",message);
                 }
             }
         }

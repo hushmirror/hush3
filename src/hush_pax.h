@@ -133,7 +133,7 @@ uint64_t peggy_smooth_coeffs[sizeof(Peggy_inds)/sizeof(*Peggy_inds)] =	// numpri
     1, 1, 1, 1, 1, 1, 0, 0, // isum 100000000000
 };
 
-uint64_t komodo_maxallowed(int32_t baseid)
+uint64_t hush_maxallowed(int32_t baseid)
 {
     uint64_t mult,val = COIN * (uint64_t)10000;
     if ( baseid < 0 || baseid >= 32 )
@@ -144,7 +144,7 @@ uint64_t komodo_maxallowed(int32_t baseid)
     return(mult * val);
 }
 
-uint64_t komodo_paxvol(uint64_t volume,uint64_t price)
+uint64_t hush_paxvol(uint64_t volume,uint64_t price)
 {
     if ( volume < 10000000000 )
         return((volume * price) / 1000000000);
@@ -170,7 +170,7 @@ void pax_rank(uint64_t *ranked,uint32_t *pvals)
     int32_t i; uint64_t vals[32],sum = 0;
     for (i=0; i<32; i++)
     {
-        vals[i] = komodo_paxvol(M1SUPPLY[i] / MINDENOMS[i],pvals[i]);
+        vals[i] = hush_paxvol(M1SUPPLY[i] / MINDENOMS[i],pvals[i]);
         sum += vals[i];
     }
     for (i=0; i<32; i++)
@@ -228,11 +228,11 @@ double PAX_val(uint32_t pval,int32_t baseid)
     return(0.);
 }
 
-void komodo_pvals(int32_t height,uint32_t *pvals,uint8_t numpvals)
+void hush_pvals(int32_t height,uint32_t *pvals,uint8_t numpvals)
 {
 }
 
-uint64_t komodo_paxcorrelation(uint64_t *votes,int32_t numvotes,uint64_t seed)
+uint64_t hush_paxcorrelation(uint64_t *votes,int32_t numvotes,uint64_t seed)
 {
     int32_t i,j,k,ind,zeroes,wt,nonz; int64_t delta; uint64_t lastprice,tolerance,den,densum,sum=0;
     for (sum=i=zeroes=nonz=0; i<numvotes; i++)
@@ -294,22 +294,22 @@ uint64_t komodo_paxcorrelation(uint64_t *votes,int32_t numvotes,uint64_t seed)
     return(sum);
 }
 
-uint64_t komodo_paxpriceB(uint64_t seed,int32_t height,char *base,char *rel,uint64_t basevolume)
+uint64_t hush_paxpriceB(uint64_t seed,int32_t height,char *base,char *rel,uint64_t basevolume)
 {
     return 0;
 }
 
-uint64_t komodo_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uint64_t basevolume)
+uint64_t hush_paxprice(uint64_t *seedp,int32_t height,char *base,char *rel,uint64_t basevolume)
 {
     return 0;
 }
 
-int32_t komodo_paxprices(int32_t *heights,uint64_t *prices,int32_t max,char *base,char *rel)
+int32_t hush_paxprices(int32_t *heights,uint64_t *prices,int32_t max,char *base,char *rel)
 {
     return 0;
 }
 
-void komodo_paxpricefeed(int32_t height,uint8_t *pricefeed,int32_t opretlen)
+void hush_paxpricefeed(int32_t height,uint8_t *pricefeed,int32_t opretlen)
 {
 }
 
