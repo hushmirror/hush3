@@ -29,7 +29,7 @@ It's possible to confused hush if you ran old code, stop, restart, and then writ
   * Update version in configure.ac and src/clientversion.h
   * Run ./contrib/devtools/gen-manpages.sh, commit + push results
   * Update checkpoints
-  * Update protocol version if necessary
+  * Update protocol version in src/version.h if necessary
   * Make Gitea release
   * Make Git Tag (Gitea can do this)
 
@@ -146,8 +146,9 @@ on all categories (and give you a very large debug.log file).
 
 **testnet and regtest modes**
 
-Run with the -testnet option to run with "play zcash" on the test network, if you
-are testing multi-machine code that needs to operate across the internet.
+Run with the -testnet option to run with "play HUSH" on the test network, if you
+are testing multi-machine code that needs to operate across the internet. You can
+also make a Hush Smart Chain "testcoin" with a single command: `hushd -ac_name=COIN ...`
 
 If you are testing something that can run on one machine, run with the -regtest option.
 In regression test mode, blocks can be created on-demand; see qa/rpc-tests/ for tests
