@@ -677,7 +677,7 @@ bool hush_checkopret(CBlock *pblock, CScript &merkleroot);
 CScript hush_makeopret(CBlock *pblock, bool fNew);
 extern int32_t HUSH_CHOSEN_ONE;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
-#define KOMODO_ELECTION_GAP 2000
+#define HUSH_DPOW_GAP 2000
 
 int32_t hush_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blocktimes[66],int32_t *nonzpkeysp,int32_t height);
 int32_t HUSH_LOADINGBLOCKS = 1;

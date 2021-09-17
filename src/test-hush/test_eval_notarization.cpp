@@ -3,7 +3,6 @@
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <cryptoconditions.h>
 #include <gtest/gtest.h>
-
 #include "cc/betprotocol.h"
 #include "cc/eval.h"
 #include "base58.h"
@@ -14,15 +13,11 @@
 #include "primitives/transaction.h"
 #include "script/interpreter.h"
 #include "script/serverchecker.h"
-
 #include "testutils.h"
-
 
 extern int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 
-
 namespace TestEvalNotarization {
-
 
     class EvalMock : public Eval
     {
@@ -86,7 +81,6 @@ namespace TestEvalNotarization {
         }
 
 
-    // https://kmd.explorer.supernet.org/tx/5b8055d37cff745a404d1ae45e21ffdba62da7b28ed6533c67468d7379b20bae
     // inputs have been dropped
     static auto rawNotaryTx = "01000000000290460100000000002321020e46e79a2a8d12b9b5d12c7a91adb4e454edfae43c0a0cb805427d2ac7613fd9ac0000000000000000506a4c4dae8e0f3e6e5de498a072f5967f3c418c4faba5d56ac8ce17f472d029ef3000008f2e0100424f545300050ba773f0bc31da5839fc7cb9bd7b87f3b765ca608e5cf66785a466659b28880500000000000000";
     CTransaction notaryTx;
@@ -200,7 +194,5 @@ TEST(TestEvalNotarization, testInvalidNotarizationInputNotCheckSig)
     NotarizationData data(0);
     ASSERT_FALSE(eval.GetNotarizationData(notary.GetHash(), data));
 }
-
-
 
 } /* namespace TestEvalNotarization */

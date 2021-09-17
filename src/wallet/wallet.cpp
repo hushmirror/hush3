@@ -2738,7 +2738,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 
             // Build initial witness caches for blocks involving one of our addresses
             if (involvesMe) {
-                LogPrintf("%s: block has one of our transactions, building witness cache", __func__);
+                LogPrintf("%s: block has one of our transactions, building witness cache\n", __func__);
                 BuildWitnessCache(pindex, true);
             }
 

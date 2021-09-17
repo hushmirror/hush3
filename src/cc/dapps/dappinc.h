@@ -384,7 +384,7 @@ cJSON *hushdex_cli(char *clistr,char **retstrp,char *method,char *arg0,char *arg
     return(retjson);
 }
 
-bits256 komodobroadcast(char *refcoin,char *acname,cJSON *hexjson)
+bits256 hushbroadcast(char *refcoin,char *acname,cJSON *hexjson)
 {
     char *hexstr,*retstr,str[65]; cJSON *retjson; bits256 txid;
     memset(txid.bytes,0,sizeof(txid));
@@ -439,7 +439,7 @@ bits256 tokentransfer(char *refcoin,char *acname,char *tokenid,char *destpub,int
     sprintf(numstr,"%llu",(long long)units);
     if ( (retjson= get_hushcli(refcoin,&retstr,acname,"tokentransfer",tokenid,destpub,numstr,"","","","")) != 0 )
     {
-        txid = komodobroadcast(refcoin,acname,retjson);
+        txid = hushbroadcast(refcoin,acname,retjson);
         fprintf(stderr,"tokentransfer returned (%s)\n",jprint(retjson,0));
         free_json(retjson);
     }

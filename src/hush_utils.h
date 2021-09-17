@@ -1810,7 +1810,7 @@ void hush_args(char *argv0)
 
     vector<string> HUSH_nodes= {"node1.hush.is","node2.hush.is","node3.hush.is",
                                 "node4.hush.is","node5.hush.is","node6.hush.is",
-                                "node7.hush.is","node8.hush.is"};
+                                "node7.hush.is","node8.hush.is","node1.hush.land", "node2.hush.land"};
     vector<string> more_nodes = mapMultiArgs["-addnode"];
     if (more_nodes.size() > 0) {
         fprintf(stderr,"%s: Adding %lu more nodes via custom -addnode arguments\n", __func__, more_nodes.size() );
