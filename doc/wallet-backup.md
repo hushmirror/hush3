@@ -16,7 +16,7 @@ These instructions are specific for the officially supported Hush Linux client. 
 
 There are multiple ways to make sure you have at least one other copy of the private keys needed to spend your HUSH and view your shielded HUSH.
 
-For all methods, you will need to include an export directory setting in your config file (`HUSH3.conf` located in the data directory which is `~/.komodo/HUSH3` unless it's been overridden with `datadir=` setting):
+For all methods, you will need to include an export directory setting in your config file (`HUSH3.conf` located in the data directory which is `~/.hush/HUSH3` or `~/.komodo/HUSH3` (Legacy Location) unless it's been overridden with `datadir=` setting):
 
 `exportdir=path/to/chosen/export/directory`
 
