@@ -9,18 +9,27 @@ A fresh sync preserves peers.dat, so it will always be faster than a "fresh clon
 One way to do a fresh sync is:
 
 ```
-cd ~/.komodo/HUSH3
+cd ~/.hush/HUSH3
 rm blocks chainstate database notarizations hushstate
 ```
+
+NOTE: The legacy directory is ~/.komodo/HUSH3 and hushd will use data from either, or ~/.hush/HUSH3 if both exist.
 
 If you are using `zindex=1` then you need to also delete zindex.dat
 
 ```
-cd ~/.komodo/HUSH3
+cd ~/.hush/HUSH3
 rm zindex.dat blocks chainstate database notarizations hushstate
 ```
 
 It's possible to confused hush if you ran old code, stop, restart, and then write out zindex.dat that is incorrect, with later hushds will load from disk and believe.
+
+# Making a new release of Hush
+
+  * Update version in configure.ac and src/clientversion.h
+  * Run ./contrib/devtools/gen-manpages.sh, commit + push results
+  * Update checkpoints
+  * Update protocol version if necessary
 
 
 # Testing a Branch
@@ -37,17 +46,17 @@ git checkout zindexdb
 
 # we want to test a fresh sync, so backup current data
 TIME=`perl -e "print time"`
-mv ~/.komodo/{HUSH3,HUSH3-backup-$TIME}
-mkdir ~/.komodo/HUSH3
+mv ~/.hush/{HUSH3,HUSH3-backup-$TIME}
+mkdir ~/.hush/HUSH3
 
 # Use your previous config as a base
-cp ~/.komodo/{HUSH3-backup-$TIME,HUSH3}/HUSH3.conf
+cp ~/.hush/{HUSH3-backup-$TIME,HUSH3}/HUSH3.conf
 # Add zindex to your node
-echo "zindex=1" >> ~/.komodo/HUSH3/HUSH3.conf
+echo "zindex=1" >> ~/.hush/HUSH3/HUSH3.conf
 
 
 # This is optional but will likely speed up sync time greatly
-cp ~/.komodo/{HUSH3-backup,HUSH3}/peers.dat
+cp ~/.hush/{HUSH3-backup,HUSH3}/peers.dat
 
 # This log file is helpful for debugging more and will contain a history of the
 # size of the anonset at every block height
@@ -77,7 +86,7 @@ These values should match on all nodes:
 We should also check a recent block height to verify it's working correctly. The big "test" for this `zindexdb` branch is: 
 
   * If you stop a node, and restart, are the stats from `getchaintxtstats` correct, i.e. the anonset stats? For instance, `shielded_pool_size` should be close to 500000, if it's close to or exactly 0, something is wrong.
-  * Is there a new file called `zindex.dat` in `~/.komodo/HUSH3/` ? 
+  * Is there a new file called `zindex.dat` in `~/.hush/HUSH3/` ? 
   * Is `zindex.dat` 149 bytes ?
   
 # Coding
