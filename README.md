@@ -22,7 +22,7 @@ coin takes over 24 hours to sync their full nodes because of Sprout Transactions
 In working on this release, Duke Leto was suspended from Github, which gave Hush developers
 the impetus to completely leave that racist and censorship-loving platform.
 
-Hush now has it's own <a href="https://git.hush.is/hush">git.hush.is</a> Gitea instance,
+Hush now has it's own [git.hush.is](https://git.hush.is/hush) Gitea instance,
 because we will not be silenced by Microsoft.
 
 All Hush software will be released from git.hush.is and hush.is, downloads from any other
@@ -32,7 +32,11 @@ domains should be assumed to be backdoored.
 
 ## Installing
 
-See [INSTALL.md](https://git.hush.is/hush/hush3/src/branch/master/INSTALL.md)
+You can either compile it yourself or you can install a binary which was compiled by us.
+Please refer to the instructions which apply to you below:
+
+* See [INSTALL.md](INSTALL.md) to compile from source on Linux and to cross-compile for Windows
+* See [INSTALL-BIN.md](INSTALL-BIN.md) to install pre-compiled binary on Linux
 
 ### Claiming Funds From Old Hush Wallets
 
