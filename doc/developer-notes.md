@@ -30,6 +30,8 @@ It's possible to confused hush if you ran old code, stop, restart, and then writ
   * Run ./contrib/devtools/gen-manpages.sh, commit + push results
   * Update checkpoints
   * Update protocol version if necessary
+  * Make Gitea release
+  * Make Git Tag (Gitea can do this)
 
 
 # Testing a Branch
