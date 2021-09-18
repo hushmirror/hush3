@@ -147,8 +147,8 @@ int32_t hush_is_notarytx(const CTransaction& tx);
 uint64_t hush_notarypay(CMutableTransaction &txNew, std::vector<int8_t> &NotarizationNotaries, uint32_t timestamp, int32_t height, uint8_t *script, int32_t len);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 int32_t hush_getnotarizedheight(uint32_t timestamp,int32_t height, uint8_t *script, int32_t len);
-CScript komodo_mineropret(int32_t nHeight);
-bool komodo_appendACscriptpub();
+CScript hush_mineropret(int32_t nHeight);
+bool hush_appendACscriptpub();
 
 CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32_t gpucount, bool isStake)
 {
@@ -167,7 +167,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
         }
     } else pk = _pk;
 
-    uint64_t deposits,voutsum=0; int32_t isrealtime,kmdheight; uint32_t blocktime; const CChainParams& chainparams = Params();
+    uint64_t deposits,voutsum=0; int32_t isrealtime,hushheight; uint32_t blocktime; const CChainParams& chainparams = Params();
     bool fNotarizationBlock = false; std::vector<int8_t> NotarizationNotaries;
     
     //fprintf(stderr,"create new block\n");
@@ -612,7 +612,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
             if ( ASSETCHAINS_SCRIPTPUB.size() > 1 )
             {
                 static bool didinit = false;
-                if ( !didinit && nHeight > HUSH_EARLYTXID_HEIGHT && HUSH_EARLYTXID != zeroid && komodo_appendACscriptpub() )
+                if ( !didinit && nHeight > HUSH_EARLYTXID_HEIGHT && HUSH_EARLYTXID != zeroid && hush_appendACscriptpub() )
                 {
                     fprintf(stderr, "appended ccopreturn to ASSETCHAINS_SCRIPTPUB.%s\n", ASSETCHAINS_SCRIPTPUB.c_str());
                     didinit = true;
@@ -667,7 +667,7 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
             int32_t numv = (int32_t)txNew.vout.size();
             txNew.vout.resize(numv+1);
             txNew.vout[numv].nValue = 0;
-            txNew.vout[numv].scriptPubKey = komodo_mineropret(nHeight);
+            txNew.vout[numv].scriptPubKey = hush_mineropret(nHeight);
             //printf("autocreate commision/cbopret.%lld vout[%d]\n",(long long)ASSETCHAINS_CBOPRET,(int32_t)txNew.vout.size());
         }
         pblock->vtx[0] = txNew;
@@ -879,7 +879,7 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, int32_t nHeight, 
     return CreateNewBlock(pubkey, scriptPubKey, gpucount, isStake);
 }
 
-void komodo_sendmessage(int32_t minpeers,int32_t maxpeers,const char *message,std::vector<uint8_t> payload)
+void hush_sendmessage(int32_t minpeers,int32_t maxpeers,const char *message,std::vector<uint8_t> payload)
 {
     int32_t numsent = 0;
     LOCK(cs_vNodes);
@@ -956,7 +956,7 @@ static bool ProcessBlockFound(CBlock* pblock)
 
 int32_t hush_baseid(char *origbase);
 int32_t hush_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t *blocktimes,int32_t *nonzpkeysp,int32_t height);
-arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
+arith_uint256 hush_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
 int32_t FOUND_BLOCK,HUSH_MAYBEMINED;
 extern int32_t HUSH_LASTMINED,HUSH_INSYNC;
 int32_t roundrobin_delay;
@@ -1237,7 +1237,7 @@ void static BitcoinMiner()
             } else Mining_start = 0;
 
             //else if ( ASSETCHAINS_ADAPTIVEPOW > 0 )
-            //    HASHTarget_POW = komodo_adaptivepow_target(Mining_height,HASHTarget,pblock->nTime);
+            //    HASHTarget_POW = hush_adaptivepow_target(Mining_height,HASHTarget,pblock->nTime);
             gotinvalid = 0;
             while (true)
             {
@@ -1462,7 +1462,7 @@ void static BitcoinMiner()
                         HASHTarget.SetCompact(pblock->nBits);
                         hashTarget = HASHTarget;
                         savebits = pblock->nBits;
-                        //hashTarget = HASHTarget_POW = komodo_adaptivepow_target(Mining_height,HASHTarget,pblock->nTime);
+                        //hashTarget = HASHTarget_POW = hush_adaptivepow_target(Mining_height,HASHTarget,pblock->nTime);
                     }
                     /*if ( NOTARY_PUBKEY33[0] == 0 )
                     {
@@ -1472,7 +1472,7 @@ void static BitcoinMiner()
                         {
                             // Changing pblock->nTime can change work required on testnet:
                             HASHTarget.SetCompact(pblock->nBits);
-                            HASHTarget_POW = komodo_PoWtarget(&percPoS,HASHTarget,Mining_height,ASSETCHAINS_STAKED);
+                            HASHTarget_POW = hush_PoWtarget(&percPoS,HASHTarget,Mining_height,ASSETCHAINS_STAKED);
                         }
                     }*/
                 }

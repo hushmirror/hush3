@@ -4,10 +4,8 @@
 #include "JoinSplit.hpp"
 #include "prf.h"
 #include "sodium.h"
-
 #include <memory>
 #include <fstream>
-
 #include "librustzcash.h"
 
 namespace libzcash {

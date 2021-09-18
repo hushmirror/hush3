@@ -19,12 +19,9 @@
  ******************************************************************************/
 
 #include "sync.h"
-
 #include "util.h"
 #include "utilstrencodings.h"
-
 #include <stdio.h>
-
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
 

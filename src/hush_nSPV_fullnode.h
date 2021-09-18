@@ -863,7 +863,7 @@ int32_t NSPV_getspentinfo(struct NSPV_spentinfo *ptr,uint256 txid,int32_t vout)
     return(len);
 }
 
-void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a request
+void hush_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a request
 {
     int32_t len,slen,ind,reqheight,n; std::vector<uint8_t> response; uint32_t timestamp = (uint32_t)time(NULL);
     if ( (len= request.size()) > 0 )

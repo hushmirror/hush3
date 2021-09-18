@@ -88,7 +88,7 @@ void hush_eventadd_pricefeed(struct hush_state *sp,char *symbol,int32_t height,u
         memcpy(F.prices,prices,sizeof(*F.prices) * num);
         hush_eventadd(sp,height,symbol,HUSH_EVENT_PRICEFEED,(uint8_t *)&F,(int32_t)(sizeof(F.num) + sizeof(*F.prices) * num));
         if ( sp != 0 )
-            komodo_pvals(height,prices,num);
+            hush_pvals(height,prices,num);
     } //else fprintf(stderr,"skip pricefeed[%d]\n",num);
 }
 
@@ -107,7 +107,7 @@ void hush_eventadd_opreturn(struct hush_state *sp,char *symbol,int32_t height,ui
         hush_eventadd(sp,height,symbol,HUSH_EVENT_OPRETURN,opret,O.oplen);
         free(opret);
         if ( sp != 0 )
-            komodo_opreturn(height,value,buf,opretlen,txid,vout,symbol);
+            hush_opreturn(height,value,buf,opretlen,txid,vout,symbol);
     }
 }
 
@@ -155,32 +155,32 @@ void hush_event_rewind(struct hush_state *sp,char *symbol,int32_t height)
     }
 }
 
-void komodo_setkmdheight(struct hush_state *sp,int32_t kmdheight,uint32_t timestamp)
+void hush_sethushheight(struct hush_state *sp,int32_t hushheight,uint32_t timestamp)
 {
     if ( sp != 0 )
     {
-        if ( kmdheight > sp->SAVEDHEIGHT )
+        if ( hushheight > sp->SAVEDHEIGHT )
         {
-            sp->SAVEDHEIGHT = kmdheight;
+            sp->SAVEDHEIGHT = hushheight;
             sp->SAVEDTIMESTAMP = timestamp;
         }
-        if ( kmdheight > sp->CURRENT_HEIGHT )
-            sp->CURRENT_HEIGHT = kmdheight;
+        if ( hushheight > sp->CURRENT_HEIGHT )
+            sp->CURRENT_HEIGHT = hushheight;
     }
 }
 
-void hush_eventadd_kmdheight(struct hush_state *sp,char *symbol,int32_t height,int32_t kmdheight,uint32_t timestamp)
+void hush_eventadd_hushheight(struct hush_state *sp,char *symbol,int32_t height,int32_t hushheight,uint32_t timestamp)
 {
     uint32_t buf[2];
-    if ( kmdheight > 0 ) {
-        buf[0] = (uint32_t)kmdheight;
+    if ( hushheight > 0 ) {
+        buf[0] = (uint32_t)hushheight;
         buf[1] = timestamp;
         hush_eventadd(sp,height,symbol,HUSH_EVENT_HUSHHEIGHT,(uint8_t *)buf,sizeof(buf));
         if ( sp != 0 )
-            komodo_setkmdheight(sp,kmdheight,timestamp);
+            hush_sethushheight(sp,hushheight,timestamp);
     } else {
-        //fprintf(stderr,"REWIND kmdheight.%d\n",kmdheight);
-        kmdheight = -kmdheight;
+        //fprintf(stderr,"REWIND hushheight.%d\n",hushheight);
+        hushheight = -hushheight;
         hush_eventadd(sp,height,symbol,HUSH_EVENT_REWIND,(uint8_t *)&height,sizeof(height));
         if ( sp != 0 )
             hush_event_rewind(sp,symbol,height);

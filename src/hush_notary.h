@@ -62,6 +62,19 @@ const char *Notaries_genesis[][2] =
 
 int32_t gethushseason(int32_t height)
 {
+    bool istush = strncmp(SMART_CHAIN_SYMBOL, "TUSH",4) == 0 ? true : false;
+    if ( istush ) {
+        // TUSH is always Season 7 DPoW notaries from genblock
+        return 7;
+    }
+
+    // It is season 7 until a new consensus code change, instead
+    // of the old way, which requires a new code release before
+    // the last season block height or nodes stop working correctly
+    if ( height > nHushHardforkHeight3 ) {
+        return 7;
+    }
+
     if ( height <= HUSH_SEASON_HEIGHTS[0] )
         return(1);
     for (int32_t i = 1; i < NUM_HUSH_SEASONS; i++)
@@ -89,6 +102,7 @@ int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp)
     int32_t i,htind,n; uint64_t mask = 0; struct knotary_entry *kp,*tmp;
     static uint8_t hush_pubkeys[NUM_HUSH_SEASONS][64][33],didinit[NUM_HUSH_SEASONS];
     
+    //HUSH3+TUSH use block heights, HSCs use timestamps
     if ( timestamp == 0 && SMART_CHAIN_SYMBOL[0] != 0 ) {
         timestamp = hush_heightstamp(height);
     } else if ( SMART_CHAIN_SYMBOL[0] == 0 ) {
@@ -98,7 +112,9 @@ int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp)
     // Find the correct DPoW Notary pubkeys for this season
     int32_t hush_season = 0;
     bool ishush3        = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
-    hush_season         = ishush3 ? gethushseason(height) : getacseason(timestamp);
+    bool istush         = strncmp(SMART_CHAIN_SYMBOL, "TUSH",4) == 0 ? true : false;
+    // TUSH uses height activation like HUSH3, other HSCs use timestamps
+    hush_season         = (ishush3 || istush) ? gethushseason(height) : getacseason(timestamp);
 
     if(IS_HUSH_NOTARY) {
         fprintf(stderr,"%s: [%s] season=%d height=%d time=%d\n", __func__, ishush3 ? "HUSH3" : SMART_CHAIN_SYMBOL, hush_season, height, timestamp);
@@ -230,7 +246,7 @@ int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,ui
 
 //struct hush_state *hush_stateptr(char *symbol,char *dest);
 
-struct notarized_checkpoint *komodo_npptr_for_height(int32_t height, int *idx)
+struct notarized_checkpoint *hush_npptr_for_height(int32_t height, int *idx)
 {
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t i; struct hush_state *sp; struct notarized_checkpoint *np = 0;
     if ( (sp= hush_stateptr(symbol,dest)) != 0 )
@@ -247,13 +263,13 @@ struct notarized_checkpoint *komodo_npptr_for_height(int32_t height, int *idx)
     return(0);
 }
 
-struct notarized_checkpoint *komodo_npptr(int32_t height)
+struct notarized_checkpoint *hush_npptr(int32_t height)
 {
     int idx;
-    return komodo_npptr_for_height(height, &idx);
+    return hush_npptr_for_height(height, &idx);
 }
 
-struct notarized_checkpoint *komodo_npptr_at(int idx)
+struct notarized_checkpoint *hush_npptr_at(int idx)
 {
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; struct hush_state *sp;
     if ( (sp= hush_stateptr(symbol,dest)) != 0 )
@@ -262,7 +278,7 @@ struct notarized_checkpoint *komodo_npptr_at(int idx)
     return(0);
 }
 
-int32_t komodo_prevMoMheight()
+int32_t hush_prevMoMheight()
 {
     static uint256 zero;
     char symbol[HUSH_SMART_CHAIN_MAXLEN],dest[HUSH_SMART_CHAIN_MAXLEN]; int32_t i; struct hush_state *sp; struct notarized_checkpoint *np = 0;
@@ -298,7 +314,7 @@ int32_t hush_notarized_height(int32_t *prevMoMheightp,uint256 *hashp,uint256 *tx
         {
             *hashp = sp->NOTARIZED_HASH;
             *txidp = sp->NOTARIZED_DESTTXID;
-            *prevMoMheightp = komodo_prevMoMheight();
+            *prevMoMheightp = hush_prevMoMheight();
         }
         return(sp->NOTARIZED_HEIGHT);
     } else return(0);
@@ -323,25 +339,25 @@ int32_t hush_dpowconfs(int32_t txheight,int32_t numconfs)
     return(numconfs);
 }
 
-int32_t hush_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t height,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip)
+int32_t hush_MoMdata(int32_t *notarized_htp,uint256 *MoMp,uint256 *hushtxidp,int32_t height,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *hushstartip,int32_t *hushendip)
 {
     struct notarized_checkpoint *np = 0;
-    if ( (np= komodo_npptr(height)) != 0 )
+    if ( (np= hush_npptr(height)) != 0 )
     {
         *notarized_htp = np->notarized_height;
         *MoMp = np->MoM;
-        *kmdtxidp = np->notarized_desttxid;
+        *hushtxidp = np->notarized_desttxid;
         *MoMoMp = np->MoMoM;
         *MoMoMoffsetp = np->MoMoMoffset;
         *MoMoMdepthp = np->MoMoMdepth;
-        *kmdstartip = np->kmdstarti;
-        *kmdendip = np->kmdendi;
+        *hushstartip = np->hushstarti;
+        *hushendip = np->hushendi;
         return(np->MoMdepth & 0xffff);
     }
-    *notarized_htp = *MoMoMoffsetp = *MoMoMdepthp = *kmdstartip = *kmdendip = 0;
+    *notarized_htp = *MoMoMoffsetp = *MoMoMdepthp = *hushstartip = *hushendip = 0;
     memset(MoMp,0,sizeof(*MoMp));
     memset(MoMoMp,0,sizeof(*MoMoMp));
-    memset(kmdtxidp,0,sizeof(*kmdtxidp));
+    memset(hushtxidp,0,sizeof(*hushtxidp));
     return(0);
 }
 

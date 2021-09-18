@@ -77,7 +77,7 @@ struct pax_transaction
 {
     UT_hash_handle hh;
     uint256 txid;
-    uint64_t komodoshis,fiatoshis,validated;
+    uint64_t puposhis,fiatoshis,validated;
     int32_t marked,height,otherheight,approved,didstats,ready;
     uint16_t vout;
     char symbol[HUSH_SMART_CHAIN_MAXLEN],source[HUSH_SMART_CHAIN_MAXLEN],coinaddr[64]; uint8_t rmd160[20],type,buf[35];
@@ -88,7 +88,7 @@ struct knotaries_entry { int32_t height,numnotaries; struct knotary_entry *Notar
 struct notarized_checkpoint
 {
     uint256 notarized_hash,notarized_desttxid,MoM,MoMoM;
-    int32_t nHeight,notarized_height,MoMdepth,MoMoMdepth,MoMoMoffset,kmdstarti,kmdendi;
+    int32_t nHeight,notarized_height,MoMdepth,MoMoMdepth,MoMoMoffset,hushstarti,hushendi;
 };
 
 struct hush_ccdataMoM
@@ -97,13 +97,13 @@ struct hush_ccdataMoM
     int32_t MoMdepth,notarized_height,height,txi;
 };
 
-struct hush_ccdata_entry { uint256 MoM; int32_t notarized_height,kmdheight,txi; char symbol[65]; };
+struct hush_ccdata_entry { uint256 MoM; int32_t notarized_height,hushheight,txi; char symbol[65]; };
 struct hush_ccdatapair { int32_t notarized_height,MoMoMoffset; };
 
 struct hush_ccdataMoMoM
 {
     uint256 MoMoM;
-    int32_t kmdstarti,kmdendi,MoMoMoffset,MoMoMdepth,numpairs,len;
+    int32_t hushstarti,hushendi,MoMoMoffset,MoMoMdepth,numpairs,len;
     struct hush_ccdatapair *pairs;
 };
 

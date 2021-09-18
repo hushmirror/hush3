@@ -868,18 +868,18 @@ int32_t hush_minerids(uint8_t *minerids,int32_t height,int32_t width)
     return(nonz);
 }
 
-int32_t hush_MoM(int32_t *notarized_heightp,uint256 *MoMp,uint256 *kmdtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip)
+int32_t hush_MoM(int32_t *notarized_heightp,uint256 *MoMp,uint256 *hushtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *hushstartip,int32_t *hushendip)
 {
-    int32_t depth,notarized_ht; uint256 MoM,kmdtxid;
-    depth = hush_MoMdata(&notarized_ht,&MoM,&kmdtxid,nHeight,MoMoMp,MoMoMoffsetp,MoMoMdepthp,kmdstartip,kmdendip);
+    int32_t depth,notarized_ht; uint256 MoM,hushtxid;
+    depth = hush_MoMdata(&notarized_ht,&MoM,&hushtxid,nHeight,MoMoMp,MoMoMoffsetp,MoMoMdepthp,hushstartip,hushendip);
     memset(MoMp,0,sizeof(*MoMp));
-    memset(kmdtxidp,0,sizeof(*kmdtxidp));
+    memset(hushtxidp,0,sizeof(*hushtxidp));
     *notarized_heightp = 0;
     if ( depth != 0 && notarized_ht > 0 && nHeight > notarized_ht-depth && nHeight <= notarized_ht )
     {
         *MoMp = MoM;
         *notarized_heightp = notarized_ht;
-        *kmdtxidp = kmdtxid;
+        *hushtxidp = hushtxid;
     }
     return(depth);
 }
@@ -950,12 +950,12 @@ int32_t hush_nextheight()
     else return(hush_longestchain() + 1);
 }
 
-int32_t hush_isrealtime(int32_t *kmdheightp)
+int32_t hush_isrealtime(int32_t *hushheightp)
 {
     struct hush_state *sp; CBlockIndex *pindex;
     if ( (sp= hush_stateptrget((char *)"HUSH3")) != 0 )
-        *kmdheightp = sp->CURRENT_HEIGHT;
-    else *kmdheightp = 0;
+        *hushheightp = sp->CURRENT_HEIGHT;
+    else *hushheightp = 0;
     if ( (pindex= chainActive.LastTip()) != 0 && pindex->GetHeight() >= (int32_t)hush_longestchain() )
         return(1);
     else return(0);
@@ -1212,7 +1212,7 @@ void hush_segids(uint8_t *hashbuf,int32_t height,int32_t n)
     }
 }
 
-arith_uint256 komodo_adaptivepow_target(int32_t height,arith_uint256 bnTarget,uint32_t nTime)
+arith_uint256 hush_adaptivepow_target(int32_t height,arith_uint256 bnTarget,uint32_t nTime)
 {
     arith_uint256 origtarget,easy; int32_t diff,tipdiff; int64_t mult; bool fNegative,fOverflow; CBlockIndex *tipindex;
     if ( height > 10 && (tipindex= hush_chainactive(height - 1)) != 0 ) // disable offchain diffchange
@@ -1238,7 +1238,7 @@ arith_uint256 komodo_adaptivepow_target(int32_t height,arith_uint256 bnTarget,ui
     return(bnTarget);
 }
 
-arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc)
+arith_uint256 hush_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc)
 {
     int32_t oldflag = 0,dispflag = 0;
     CBlockIndex *pindex; arith_uint256 easydiff,bnTarget,hashval,sum,ave; bool fNegative,fOverflow; int32_t i,n,m,ht,percPoS,diff,val;
@@ -1543,7 +1543,7 @@ uint64_t hush_checknotarypay(CBlock *pblock,int32_t height)
     return(0);
 }
 
-bool komodo_appendACscriptpub()
+bool hush_appendACscriptpub()
 {
     static bool didinit = false;
     if ( didinit ) 
@@ -1638,7 +1638,7 @@ int64_t hush_checkcommission(CBlock *pblock,int32_t height)
             if ( ASSETCHAINS_SCRIPTPUB.size() > 1 )
             {
                 static bool didinit = false;
-                if ( !didinit && height > HUSH_EARLYTXID_HEIGHT && HUSH_EARLYTXID != zeroid && komodo_appendACscriptpub() )
+                if ( !didinit && height > HUSH_EARLYTXID_HEIGHT && HUSH_EARLYTXID != zeroid && hush_appendACscriptpub() )
                 {
                     fprintf(stderr, "appended CC_op_return to ASSETCHAINS_SCRIPTPUB.%s\n", ASSETCHAINS_SCRIPTPUB.c_str());
                     didinit = true;

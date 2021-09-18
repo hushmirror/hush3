@@ -443,8 +443,6 @@ UniValue listaddresses(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    string strAccount = AccountFromValue(params[0]);
-
     // Find all taddrs
     UniValue ret(UniValue::VARR);
     for (const std::pair<CTxDestination, CAddressBookData>& item : pwalletMain->mapAddressBook) {
@@ -614,7 +612,7 @@ int32_t hush_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t 
 extern int32_t HUSH_PAX;
 int32_t hush_is_issuer();
 int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
-int32_t hush_isrealtime(int32_t *kmdheightp);
+int32_t hush_isrealtime(int32_t *hushheightp);
 int32_t pax_fiatstatus(uint64_t *available,uint64_t *deposited,uint64_t *issued,uint64_t *withdrawn,uint64_t *approved,uint64_t *redeemed,char *base);
 int32_t hush_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
 int32_t hush_kvcmp(uint8_t *refvalue,uint16_t refvaluesize,uint8_t *value,uint16_t valuesize);
@@ -768,7 +766,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
 UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    uint64_t available,deposited,issued,withdrawn,approved,redeemed,seed,komodoshis = 0; int32_t height; char destaddr[64]; uint8_t i,pubkey37[33];
+    uint64_t available,deposited,issued,withdrawn,approved,redeemed,seed,puposhis = 0; int32_t height; char destaddr[64]; uint8_t i,pubkey37[33];
     bool fSubtractFeeFromAmount = false;
     if ( HUSH_PAX == 0 )
     {
@@ -793,28 +791,28 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
         fprintf(stderr,"available %llu vs fiatoshis %llu\n",(long long)available,(long long)fiatoshis);
         throw runtime_error("paxdeposit not enough available inventory");
     }
-    komodoshis = PAX_fiatdest(&seed,0,destaddr,pubkey37,(char *)params[0].get_str().c_str(),height,(char *)base.c_str(),fiatoshis);
+    puposhis = PAX_fiatdest(&seed,0,destaddr,pubkey37,(char *)params[0].get_str().c_str(),height,(char *)base.c_str(),fiatoshis);
     dest.append(destaddr);
     CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
     if (!destaddress.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
     for (i=0; i<33; i++)
         fprintf(stderr,"%02x",pubkey37[i]);
-    fprintf(stderr," ht.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) komodoshis.%llu seed.%llx\n",height,(char *)params[0].get_str().c_str(),(char *)base.c_str(),(long long)fiatoshis,destaddr,(long long)komodoshis,(long long)seed);
+    fprintf(stderr," ht.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) puposhis.%llu seed.%llx\n",height,(char *)params[0].get_str().c_str(),(char *)base.c_str(),(long long)fiatoshis,destaddr,(long long)puposhis,(long long)seed);
     EnsureWalletIsUnlocked();
     CWalletTx wtx;
-    uint8_t opretbuf[64]; int32_t opretlen; uint64_t fee = komodoshis / 1000;
+    uint8_t opretbuf[64]; int32_t opretlen; uint64_t fee = puposhis / 1000;
     if ( fee < 10000 )
         fee = 10000;
     dragon_rwnum(1,&pubkey37[33],sizeof(height),&height);
     opretlen = hush_opreturnscript(opretbuf,'D',pubkey37,37);
-    SendMoney(address.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,komodoshis);
+    SendMoney(address.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,puposhis);
     return wtx.GetHash().GetHex();
 }
 
 UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    CWalletTx wtx; std::string dest; int32_t kmdheight; uint64_t seed,komodoshis = 0; char destaddr[64]; uint8_t i,pubkey37[37]; bool fSubtractFeeFromAmount = false;
+    CWalletTx wtx; std::string dest; int32_t hushheight; uint64_t seed,puposhis = 0; char destaddr[64]; uint8_t i,pubkey37[37]; bool fSubtractFeeFromAmount = false;
     if ( SMART_CHAIN_SYMBOL[0] == 0 )
         return(0);
     if (!EnsureWalletIsAvailable(fHelp))
@@ -822,26 +820,26 @@ UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
     throw runtime_error("paxwithdraw deprecated");
     if (fHelp || params.size() != 2)
         throw runtime_error("paxwithdraw address fiatamount");
-    if ( hush_isrealtime(&kmdheight) == 0 )
+    if ( hush_isrealtime(&hushheight) == 0 )
         return(0);
     LOCK2(cs_main, pwalletMain->cs_wallet);
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bitcoin address");
     int64_t fiatoshis = atof(params[1].get_str().c_str()) * COIN;
-    komodoshis = PAX_fiatdest(&seed,1,destaddr,pubkey37,(char *)params[0].get_str().c_str(),kmdheight,SMART_CHAIN_SYMBOL,fiatoshis);
+    puposhis = PAX_fiatdest(&seed,1,destaddr,pubkey37,(char *)params[0].get_str().c_str(),hushheight,SMART_CHAIN_SYMBOL,fiatoshis);
     dest.append(destaddr);
     CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
     if (!destaddress.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
     for (i=0; i<33; i++)
         printf("%02x",pubkey37[i]);
-    printf(" kmdheight.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) komodoshis.%llu seed.%llx\n",kmdheight,(char *)params[0].get_str().c_str(),SMART_CHAIN_SYMBOL,(long long)fiatoshis,destaddr,(long long)komodoshis,(long long)seed);
+    printf(" hushheight.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) puposhis.%llu seed.%llx\n",hushheight,(char *)params[0].get_str().c_str(),SMART_CHAIN_SYMBOL,(long long)fiatoshis,destaddr,(long long)puposhis,(long long)seed);
     EnsureWalletIsUnlocked();
     uint8_t opretbuf[64]; int32_t opretlen; uint64_t fee = fiatoshis / 1000;
     if ( fee < 10000 )
         fee = 10000;
-    dragon_rwnum(1,&pubkey37[33],sizeof(kmdheight),&kmdheight);
+    dragon_rwnum(1,&pubkey37[33],sizeof(hushheight),&hushheight);
     opretlen = hush_opreturnscript(opretbuf,'W',pubkey37,37);
     SendMoney(destaddress.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,fiatoshis);
     return wtx.GetHash().GetHex();

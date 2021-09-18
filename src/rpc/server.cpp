@@ -829,8 +829,10 @@ UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params
             // Others may not have data loaded yet, such as wallet details, but
             // those RPCs are written defensively to deal with that. Allowing these
             // few RPCs means we can see our addresses and make private key backups
-            // while a very long wallet rescan is happening
+            // while a very long wallet rescan is happening and do other read-only devopz
             if (pcmd->name != "stop" && pcmd->name != "help" && pcmd->name != "z_listaddresses" && pcmd->name != "z_exportkey" &&
+                pcmd->name != "getNotarizationsForBlock" && pcmd->name != "scanNotarizationsDB" &&
+                pcmd->name != "getnotarysendmany" && pcmd->name != "geterablockheights" &&
                 pcmd->name != "getaddressesbyaccount" && pcmd->name != "listaddresses" && pcmd->name != "z_exportwallet" &&
                 pcmd->name != "notaries" && pcmd->name != "signmessage" && pcmd->name != "decoderawtransaction" &&
                 pcmd->name != "dumpprivkey" && pcmd->name != "getpeerinfo" && pcmd->name != "getnetworkinfo" ) {

@@ -84,7 +84,7 @@ However, this is the CC contract basics chapter, so let us ignore mempool issues
 
 That means to just follow a known working template and only changing the things where the existing templates are not sufficient, ie. the core differentiator of your CC contract.
 
-In the ~/komodo/src/cc/eval.h file all the eval codes are defined, currently:
+In the hush3/src/cc/eval.h file all the eval codes are defined, currently:
 
 #define FOREACH_EVAL(EVAL)             \
 EVAL(EVAL_IMPORTPAYOUT, 0xe1)  \
@@ -201,7 +201,7 @@ You do need to be careful not to cause a deadlock as the CC validation code is c
 Chapter 6 - faucet example
 Finally, we are ready for the first actual example of a CC contract. The faucet. This is a very simple contract and it ran into some interesting bugs in the first incarnation.
 
-The code in ~/komodo/src/cc/faucet.cpp is the ultimate documentation for it with all the details, so I will just address the conceptual issues here.
+The code in hush3/src/cc/faucet.cpp is the ultimate documentation for it with all the details, so I will just address the conceptual issues here.
 
 The idea is that people send funds to the faucet by locking it in faucet's global CC address and anybody is allowed to create a faucetget transaction that spends it.
 

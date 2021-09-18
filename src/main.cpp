@@ -82,7 +82,7 @@ int32_t hush_block2pubkey33(uint8_t *pubkey33,CBlock *block);
 bool Getscriptaddress(char *destaddr,const CScript &scriptPubKey);
 void hush_setactivation(int32_t height);
 void hush_changeblocktime();
-void komodo_pricesupdate(int32_t height,CBlock *pblock);
+void hush_pricesupdate(int32_t height,CBlock *pblock);
 BlockMap mapBlockIndex;
 CChain chainActive;
 CBlockIndex *pindexBestHeader = NULL;
@@ -1423,7 +1423,7 @@ bool CheckTransaction(uint32_t tiptime,const CTransaction& tx, CValidationState 
 {
     static uint256 array[64]; static int32_t numbanned,indallvouts; int32_t j,k,n;
     if ( *(int32_t *)&array[0] == 0 )
-        numbanned = komodo_bannedset(&indallvouts,array,(int32_t)(sizeof(array)/sizeof(*array)));
+        numbanned = hush_bannedset(&indallvouts,array,(int32_t)(sizeof(array)/sizeof(*array)));
     n = tx.vin.size();
     if ( SMART_CHAIN_SYMBOL[0] == 0 )
     {
@@ -1455,8 +1455,9 @@ bool CheckTransaction(uint32_t tiptime,const CTransaction& tx, CValidationState 
 // This is used only in RPC currently but hush_notaries()/gethushseason/getacseason is consensus
 int32_t hush_isnotaryvout(char *coinaddr,uint32_t tiptime) {
     bool ishush3   = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
+    bool istush    = strncmp(SMART_CHAIN_SYMBOL, "TUSH",4) == 0 ? true : false;
     int32_t height = chainActive.LastTip()->GetHeight();
-    int32_t season = ishush3 ? gethushseason(height) : getacseason(tiptime);
+    int32_t season = (ishush3 || istush) ? gethushseason(height) : getacseason(tiptime);
     fprintf(stderr,"%s: season=%d, tiptime=%d\n", __func__, season,tiptime);
     if ( NOTARY_ADDRESSES[season-1][0][0] == 0 ) {
         uint8_t pubkeys[64][33];
@@ -4040,7 +4041,7 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *
     {
 		//fprintf(stderr,"%s: HUSH_NSPV_FULLNODE\n", __FUNCTION__);
         if ( ASSETCHAINS_CBOPRET != 0 )
-            komodo_pricesupdate(pindexNew->GetHeight(),pblock);
+            hush_pricesupdate(pindexNew->GetHeight(),pblock);
         if ( ASSETCHAINS_SAPLING <= 0 && pindexNew->nTime > HUSH_SAPING_ACTIVATION - 24*3600 )
             hush_activate_sapling(pindexNew);
         if ( ASSETCHAINS_CC != 0 && HUSH_SNAPSHOT_INTERVAL != 0 && (pindexNew->GetHeight() % HUSH_SNAPSHOT_INTERVAL) == 0 && pindexNew->GetHeight() >= HUSH_SNAPSHOT_INTERVAL )
@@ -4471,7 +4472,7 @@ CBlockIndex* AddToBlockIndex(const CBlockHeader& block)
 
     if (it != mapBlockIndex.end())
     {
-        if ( it->second != 0 ) // vNodes.size() >= HUSH_LIMITED_NETWORKSIZE, change behavior to allow komodo_ensure to work
+        if ( it->second != 0 ) // vNodes.size() >= HUSH_LIMITED_NETWORKSIZE
         {
             // this is the strange case where somehow the hash is in the mapBlockIndex via as yet undetermined process, but the pindex for the hash is not there. Theoretically it is due to processing the block headers, but I have seen it get this case without having received it from the block headers or anywhere else... jl777
             //fprintf(stderr,"addtoblockindex already there %p\n",it->second);
@@ -4479,7 +4480,7 @@ CBlockIndex* AddToBlockIndex(const CBlockHeader& block)
         }
         if ( miPrev != mapBlockIndex.end() && (*miPrev).second == 0 )
         {
-            //fprintf(stderr,"edge case of both block and prevblock in the strange state\n");
+            fprintf(stderr,"%s: edge case of both block and prevblock in the strange state\n", __func__);
             return(0); // return here to avoid the state of pindex->GetHeight() not set and pprev NULL
         }
     }
@@ -7074,7 +7075,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         }
         std::vector<uint8_t> payload;
         vRecv >> payload;
-        komodo_netevent(payload);
+        hush_netevent(payload);
         return(true);
     } else if (strCommand == "verack") {
         pfrom->SetRecvVersion(min(pfrom->nVersion, PROTOCOL_VERSION));
@@ -7274,7 +7275,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         {
             std::vector<uint8_t> payload;
             vRecv >> payload;
-            komodo_nSPVreq(pfrom,payload);
+            hush_nSPVreq(pfrom,payload);
         }
         return(true);
     } else if (strCommand == "nSPV") {
@@ -7282,7 +7283,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         {
             std::vector<uint8_t> payload;
             vRecv >> payload;
-            komodo_nSPVresp(pfrom,payload);
+            hush_nSPVresp(pfrom,payload);
         }
         return(true);
     }
@@ -8009,7 +8010,7 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
         }
         if ( HUSH_NSPV_SUPERLITE )
         {
-            komodo_nSPV(pto);
+            hush_nSPV(pto);
             return(true);
         }
         BOOST_FOREACH(const CBlockReject& reject, state.rejects)
