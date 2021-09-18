@@ -10,5 +10,6 @@ cd $DIR
 DIR="$( cd "$( dirname "$( readlink "${BASH_SOURCE[0]}" )" )" && pwd )"
 cd $DIR
 
-./hushd -ac_name=TUSH -ac_private=1 -gen=1 -testnode=1
+# ./hushd -ac_name=TUSH -ac_private=1 -gen=1 -testnode=1
+./hushd -ac_name=TUSH -ac_private=1 -ac_supply=55555
 
