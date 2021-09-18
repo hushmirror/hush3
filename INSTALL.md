@@ -1,14 +1,6 @@
 # Installing Hush
 
-## Installing Binaries
-
-To install a Debian package:
-
-	dpkg -i hush-3.6.2-amd4.deb
-
-To uninstall:
-
-	apt-get remove hush
+Instructions to compile Hush yourself.
 
 ## Build HUSH dependencies
 
@@ -29,7 +21,6 @@ sudo swapon /swapfile
 
 ## Build on Linux:
 
-
 ```sh
 # install build depedencies
 sudo apt-get install build-essential pkg-config libc6-dev m4 g++-multilib \
@@ -42,7 +33,7 @@ cd hush3
 ./build.sh -j$(nproc)
 ```
 
-## Building On Ubuntu 16.04 and older systems
+### Building On Ubuntu 16.04 and older systems
 
 Some older compilers may not be able to compile modern code, such as gcc 5.4 which comes with Ubuntu 16.04 by default. Here is how to install gcc 7 on Ubuntu 16.04. Run these commands as root:
 
@@ -55,6 +46,8 @@ apt-get install -y gcc-7 g++-7 && \
 ```
 
 ## Run a HUSH Node
+
+After you have compiled Hush, then you can run it with the following command:
 
 ```sh
 ./src/hushd
@@ -81,11 +74,7 @@ cd hush
 ./src/hushd
 ```
 
-Currently Linux,  Windows and Mac OS X are our supported platforms. If you
-are interested in porting Hush to a new operating system, we are interested
-to talk with you. Experimental FreeBSD support is in progress, thanks to radix42.
-
-We aim to support all platforms, but there is only so much time in the day.
+## ARM Architecture
 
 Currently, any ARMv7 machine will not be able to build this repo, because the
 underlying tech (zcash and the zksnark library) do not support that instruction

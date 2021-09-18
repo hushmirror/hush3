@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2018-2020 The Hush developers
+# Copyright (c) 2018-2021 The Hush developers
 set -eo pipefail
 
 # You can now add delay line to pubkey.txt file
