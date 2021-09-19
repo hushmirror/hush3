@@ -44,10 +44,15 @@ If you have an older wallet, then refer to [OLD_WALLETS.md](OLD_WALLETS.md).
 
 ### Official Explorer
 
-The link for the Official Hush explorer is: <a href="https://explorer.hush.is">explorer.hush.is</a>
+The link for the Official Hush explorer is: [explorer.hush.is](https://explorer.hush.is)
 
 We are looking for alternate explorers to be run on Tor, i2P and other TLDs, if you are interested
 please join Telegram and ask questions.
+
+### For system admins
+
+There is a new systemd user service script so you can easily start/stop/restart your hushd service on your server.
+[Try it out today](doc/hushd-systemd.md) and the systemd script is located in the doc directory of the source tree.
 
 ## Support and Socials
 
