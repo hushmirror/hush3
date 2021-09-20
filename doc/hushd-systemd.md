@@ -3,7 +3,7 @@
 ## Set it up
 
 First set it up as follows:
-* Copy hushd.service to the /usr/lib/systemd/user directory (on Arch Linux, but I believe it's the same for the others too)
+* Copy hushd.service to the systemd user directory, which is /usr/lib/systemd/user directory
 
 ## Basic Usage
 
@@ -23,4 +23,8 @@ Use the following:
 
 ## Troubleshooting
 
-Don't run it with sudo or root, or it won't work with the wallet.
+* Don't run it with sudo or root, or it won't work with the wallet.
+
+### To-do
+
+* determine best method to get logs when using on Ubuntu server as it is not displayed when watching it or when start/stopping the systemd service (testd on Ubuntu server 20.04 running on VPS)
