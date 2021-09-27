@@ -14,12 +14,15 @@ How to stop the script:
 `systemctl stop --user hushd.service`
 
 How to restart the script:
-`systemctl stop --user hushd.service`
+`systemctl restart --user hushd.service`
 
 ## How to watch it as it starts
 
-Use the following:
+Use the following on most Linux distros:
 `watch systemctl status --user hushd.service`
+
+If you're using Ubuntu 20.04, then try this instead as the above did not work for me on Ubuntu 20.04 server:
+`tail -f ~/.hush/HUSH3/debug.log`
 
 ## Troubleshooting
 
@@ -27,4 +30,6 @@ Use the following:
 
 ### To-do
 
-* determine best method to get logs when using on Ubuntu server as it is not displayed when watching it or when start/stopping the systemd service (testd on Ubuntu server 20.04 running on VPS)
+* Determine why Ubuntu 20.04 didn't produce the expected outcome with watch and systemctl
+* Create the hushd rc.d script
+* Create the hushd runit script

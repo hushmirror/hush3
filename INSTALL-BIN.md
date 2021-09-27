@@ -1,9 +1,11 @@
 # Installing Hush binaries
 
-To install a Debian package (change the version to what to downloaded):
+1. First [download the release](https://git.hush.is/hush/hush3/releases) you want to install. It will have a .deb file extension.
 
-	dpkg -i hush-3.6.2-amd4.deb
+1. Next install the Debian package (change the version to what you downloaded above):
 
-To uninstall:
+	`dpkg -i hush-3.8.0-amd64.deb`
 
-	apt-get remove hush
+1. If you want to remove it, then run this to uninstall:
+
+	`apt-get remove hush`
