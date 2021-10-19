@@ -22,7 +22,7 @@ sudo swapon /swapfile
 ## Build on Linux:
 
 ```sh
-# install build depedencies
+# install build dependencies
 sudo apt-get install build-essential pkg-config libc6-dev m4 g++-multilib \
       autoconf libtool ncurses-dev unzip git python zlib1g-dev wget \
       bsdmainutils automake curl unzip nano libsodium-dev
