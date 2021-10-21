@@ -960,7 +960,7 @@ void *chainparams_commandline() {
                 (662000,     uint256S("0x00000011c4659f0bbe3559c32ff24588d78a3822e8b0e31bb9298a16213fe154"))
                 (663000,     uint256S("0x000000076756708535e3daeaca6bc32aa1dc360228af6a0c5e5e07b5d9f5f00b"))
                 (664000,     uint256S("0x000000181806c17b47bb843537cc91c95ca1e3596bb9e049d18c2e73c1026258"))
-                (665000,     uint256S("0x0000001e966c9edae76c40262e65a6c9ab764a09154eb802fb892ceebc2d1935")),
+                (665000,     uint256S("0x0000001e966c9edae76c40262e65a6c9ab764a09154eb802fb892ceebc2d1935"))
                 (666000,     uint256S("0x0000000b7594c1e8f6ccdf1559e230fdc6c276e8df0a800b7f7c82a237a6c14e"))
                 (667000,     uint256S("0x000000101801a801c21a2e50d4a5173e494f2e9ee604cec5886a8547680accaa"))
                 (668000,     uint256S("0x00000001ee22e21a6d5a5b322ea1ec69231b35d72d54f9fbdfa5dfdc5c7e2f4a"))
@@ -1000,7 +1000,7 @@ void *chainparams_commandline() {
                 (702000,     uint256S("0x00000000f135d58892ddb7f17a7d1d34d108b177152bce2adde48d58a72480cd"))
                 (703000,     uint256S("0x0000000a469db4ff74c9bdf7903981a3247cb11cbc6ece12fb0e8d34206ba583"))
                 (704000,     uint256S("0x000000024f09cabdd6fbdd379b74d4535c20d5bc78f78725f2d87b257ab3a64d"))
-                (705000,     uint256S("0x0000000c122244118777ca474fe3f30151849ff253ae730dc433900aea5616c5"))
+                (705000,     uint256S("0x0000000c122244118777ca474fe3f30151849ff253ae730dc433900aea5616c5")),
                 (int64_t)  1634769309, // time of last checkpointed block
                 (int64_t) 1119376,      // total txs
                 (double)  1529        // txs in the last day before block 705072
