@@ -16,9 +16,9 @@ mkdir build
 cp contrib/asmap/asmap.dat build/
 cp sapling*.params build/
 cd src
-cp komodod komodo-cli komodo-tx hushd hush-cli hush-tx hush-smart-chain ../build
+cp hushd hush-cli hush-tx hush-smart-chain ../build
 cd ../build
-strip komodo*
+strip hushd hush-cli hush-tx
 tar -f $FILE -c  *
 gzip -9 $FILE
 sha256sum *.gz
