@@ -893,7 +893,7 @@ UniValue kvsearch(const UniValue& params, bool fHelp, const CPubKey& mypk)
         if ( keylen < sizeof(key) )
         {
             memcpy(key,params[0].get_str().c_str(),keylen);
-            if ( (valuesize= komodo_kvsearch(&refpubkey,chainActive.LastTip()->GetHeight(),&flags,&height,value,key,keylen)) >= 0 )
+            if ( (valuesize= hush_kvsearch(&refpubkey,chainActive.LastTip()->GetHeight(),&flags,&height,value,key,keylen)) >= 0 )
             {
                 std::string val; char *valuestr;
                 val.resize(valuesize);
@@ -928,7 +928,7 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
         if ( pblockindex != 0 )
             timestamp = pblockindex->GetBlockTime();
     }
-    if ( (n= komodo_minerids(minerids,height,(int32_t)(sizeof(minerids)/sizeof(*minerids)))) > 0 )
+    if ( (n= hush_minerids(minerids,height,(int32_t)(sizeof(minerids)/sizeof(*minerids)))) > 0 )
     {
         memset(tally,0,sizeof(tally));
         numnotaries = hush_notaries(pubkeys,height,timestamp);
@@ -942,18 +942,18 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
             }
             for (i=0; i<64; i++)
             {
-                UniValue item(UniValue::VOBJ); std::string hex,hushaddress; char *hexstr,kmdaddr[64],*ptr; int32_t m;
+                UniValue item(UniValue::VOBJ); std::string hex,hushaddress; char *hexstr,hushaddr[64],*ptr; int32_t m;
                 hex.resize(66);
                 hexstr = (char *)hex.data();
                 for (j=0; j<33; j++)
                     sprintf(&hexstr[j*2],"%02x",pubkeys[i][j]);
                 item.push_back(Pair("notaryid", i));
 
-                bitcoin_address(kmdaddr,60,pubkeys[i],33);
-                m = (int32_t)strlen(kmdaddr);
+                bitcoin_address(hushaddr,60,pubkeys[i],33);
+                m = (int32_t)strlen(hushaddr);
                 hushaddress.resize(m);
                 ptr = (char *)hushaddress.data();
-                memcpy(ptr,kmdaddr,m);
+                memcpy(ptr,hushaddr,m);
                 item.push_back(Pair("HUSHaddress", hushaddress));
 
                 item.push_back(Pair("pubkey", hex));
@@ -973,7 +973,7 @@ UniValue minerids(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
 UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    UniValue a(UniValue::VARR); uint32_t timestamp=0; UniValue ret(UniValue::VOBJ); int32_t i,j,n,m; char *hexstr;  uint8_t pubkeys[64][33]; char btcaddr[64],kmdaddr[64],*ptr;
+    UniValue a(UniValue::VARR); uint32_t timestamp=0; UniValue ret(UniValue::VOBJ); int32_t i,j,n,m; char *hexstr;  uint8_t pubkeys[64][33]; char btcaddr[64],hushaddr[64],*ptr;
     if ( fHelp || (params.size() != 1 && params.size() != 2) )
         throw runtime_error("notaries height timestamp\n");
     LOCK(cs_main);
@@ -1011,11 +1011,11 @@ UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
             memcpy(ptr,btcaddr,m);
             item.push_back(Pair("BTCaddress", btcaddress));
 
-            bitcoin_address(kmdaddr,60,pubkeys[i],33);
-            m = (int32_t)strlen(kmdaddr);
+            bitcoin_address(hushaddr,60,pubkeys[i],33);
+            m = (int32_t)strlen(hushaddr);
             hushaddress.resize(m);
             ptr = (char *)hushaddress.data();
-            memcpy(ptr,kmdaddr,m);
+            memcpy(ptr,hushaddr,m);
             item.push_back(Pair("HUSHaddress", hushaddress));
             a.push_back(item);
         }
@@ -1027,7 +1027,7 @@ UniValue notaries(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return ret;
 }
 
-int32_t komodo_pending_withdraws(char *opretstr);
+int32_t hush_pending_withdraws(char *opretstr);
 int32_t pax_fiatstatus(uint64_t *available,uint64_t *deposited,uint64_t *issued,uint64_t *withdrawn,uint64_t *approved,uint64_t *redeemed,char *base);
 extern char CURRENCIES[][8];
 
@@ -1037,7 +1037,7 @@ UniValue paxpending(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( fHelp || params.size() != 0 )
         throw runtime_error("paxpending needs no args\n");
     LOCK(cs_main);
-    if ( (opretlen= komodo_pending_withdraws(opretbuf)) > 0 )
+    if ( (opretlen= hush_pending_withdraws(opretbuf)) > 0 )
         ret.push_back(Pair("withdraws", opretbuf));
     else ret.push_back(Pair("withdraws", (char *)""));
     for (baseid=0; baseid<32; baseid++)
@@ -1076,7 +1076,7 @@ UniValue paxprice(const UniValue& params, bool fHelp, const CPubKey& mypk)
     else height = atoi(params[2].get_str().c_str());
     //if ( params.size() == 3 || (basevolume= COIN * atof(params[3].get_str().c_str())) == 0 )
         basevolume = 100000;
-    relvolume = komodo_paxprice(&seed,height,(char *)base.c_str(),(char *)rel.c_str(),basevolume);
+    relvolume = hush_paxprice(&seed,height,(char *)base.c_str(),(char *)rel.c_str(),basevolume);
     ret.push_back(Pair("base", base));
     ret.push_back(Pair("rel", rel));
     ret.push_back(Pair("height", height));
@@ -1567,7 +1567,6 @@ inline CBlockIndex* LookupBlockIndex(const uint256& hash)
 
 UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    THROW_IF_SYNCING(HUSH_INSYNC);
 
     if (fHelp || params.size() > 2)
         throw runtime_error(
@@ -1630,6 +1629,8 @@ UniValue getchaintxstats(const UniValue& params, bool fHelp, const CPubKey& mypk
             + HelpExampleCli("getchaintxstats", "")
             + HelpExampleRpc("getchaintxstats", "2016")
         );
+
+    THROW_IF_SYNCING(HUSH_INSYNC);
 
     const CBlockIndex* pindex;
     int blockcount = 30 * 24 * 60 * 60 / Params().GetConsensus().nPowTargetSpacing; // By default: 1 month

@@ -2,13 +2,10 @@
 // Distributed under the GPLv3 software license, see the accompanying
 // file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
 #include <gtest/gtest.h>
-
 #include "cc/eval.h"
 #include "core_io.h"
 #include "key.h"
-
 #include "testutils.h"
-
 
 namespace TestParseNotarization {
 
@@ -52,6 +49,6 @@ TEST(TestParseNotarization, test__b)
 
 
 
-// for l in `g 'parse notarisation' ~/.komodo/debug.log | pyline 'l.split()[8]'`; do hoek decodeTx '{"hex":"'`src/komodo-cli getrawtransaction "$l"`'"}' | jq '.outputs[1].script.op_return' | pyline 'import base64; print base64.b64decode(l).encode("hex")'; done
+// for l in `g 'parse notarisation' ~/.hush/HUSH3/debug.log | pyline 'l.split()[8]'`; do hoek decodeTx '{"hex":"'`src/hush-cli getrawtransaction "$l"`'"}' | jq '.outputs[1].script.op_return' | pyline 'import base64; print base64.b64decode(l).encode("hex")'; done
 
 }

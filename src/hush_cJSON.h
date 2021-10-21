@@ -36,8 +36,8 @@
  * Removal or modification of this copyright notice is prohibited.            *
  *                                                                            *
  ******************************************************************************/
-#ifndef komodo_cJSON__h
-#define komodo_cJSON__h
+#ifndef hush_cJSON__h
+#define hush_cJSON__h
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

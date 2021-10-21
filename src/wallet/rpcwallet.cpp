@@ -423,6 +423,35 @@ UniValue getaccount(const UniValue& params, bool fHelp, const CPubKey& mypk)
     return strAccount;
 }
 
+UniValue listaddresses(const UniValue& params, bool fHelp, const CPubKey& mypk)
+{
+    if (!EnsureWalletIsAvailable(fHelp))
+        return NullUniValue;
+
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "listaddresses\n"
+            "\nResult:\n"
+            "[                     (json array of string)\n"
+            "  \"" + strprintf("%s",hush_chainname()) + "_address\"  (string) a " + strprintf("%s",hush_chainname()) + " address\n"
+            "  ,...\n"
+            "]\n"
+            "\nExamples:\n"
+            + HelpExampleCli("listaddresses", "")
+            + HelpExampleRpc("listaddresses", "")
+        );
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    // Find all taddrs
+    UniValue ret(UniValue::VARR);
+    for (const std::pair<CTxDestination, CAddressBookData>& item : pwalletMain->mapAddressBook) {
+        const CTxDestination& dest = item.first;
+        const std::string& strName = item.second.name;
+        ret.push_back(EncodeDestination(dest));
+    }
+    return ret;
+}
 
 UniValue getaddressesbyaccount(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
@@ -441,8 +470,8 @@ UniValue getaddressesbyaccount(const UniValue& params, bool fHelp, const CPubKey
             "  ,...\n"
             "]\n"
             "\nExamples:\n"
-            + HelpExampleCli("getaddressesbyaccount", "\"tabby\"")
-            + HelpExampleRpc("getaddressesbyaccount", "\"tabby\"")
+            + HelpExampleCli("getaddressesbyaccount", "\"\"")
+            + HelpExampleRpc("getaddressesbyaccount", "\"\"")
         );
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -579,25 +608,25 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk)
 #define HUSH_KVDURATION 1440
 #define DRAGON_MAXSCRIPTSIZE 10001
 uint64_t PAX_fiatdest(uint64_t *seedp,int32_t tokomodo,char *destaddr,uint8_t pubkey37[37],char *coinaddr,int32_t height,char *base,int64_t fiatoshis);
-int32_t komodo_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen);
+int32_t hush_opreturnscript(uint8_t *script,uint8_t type,uint8_t *opret,int32_t opretlen);
 extern int32_t HUSH_PAX;
-int32_t komodo_is_issuer();
+int32_t hush_is_issuer();
 int32_t dragon_rwnum(int32_t rwflag,uint8_t *serialized,int32_t len,void *endianedp);
-int32_t komodo_isrealtime(int32_t *kmdheightp);
+int32_t hush_isrealtime(int32_t *hushheightp);
 int32_t pax_fiatstatus(uint64_t *available,uint64_t *deposited,uint64_t *issued,uint64_t *withdrawn,uint64_t *approved,uint64_t *redeemed,char *base);
-int32_t komodo_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
-int32_t komodo_kvcmp(uint8_t *refvalue,uint16_t refvaluesize,uint8_t *value,uint16_t valuesize);
-uint64_t komodo_kvfee(uint32_t flags,int32_t opretlen,int32_t keylen);
-uint256 komodo_kvsig(uint8_t *buf,int32_t len,uint256 privkey);
-int32_t komodo_kvduration(uint32_t flags);
-uint256 komodo_kvprivkey(uint256 *pubkeyp,char *passphrase);
-int32_t komodo_kvsigverify(uint8_t *buf,int32_t len,uint256 _pubkey,uint256 sig);
+int32_t hush_kvsearch(uint256 *refpubkeyp,int32_t current_height,uint32_t *flagsp,int32_t *heightp,uint8_t value[DRAGON_MAXSCRIPTSIZE],uint8_t *key,int32_t keylen);
+int32_t hush_kvcmp(uint8_t *refvalue,uint16_t refvaluesize,uint8_t *value,uint16_t valuesize);
+uint64_t hush_kvfee(uint32_t flags,int32_t opretlen,int32_t keylen);
+uint256 hush_kvsig(uint8_t *buf,int32_t len,uint256 privkey);
+int32_t hush_kvduration(uint32_t flags);
+uint256 hush_kvprivkey(uint256 *pubkeyp,char *passphrase);
+int32_t hush_kvsigverify(uint8_t *buf,int32_t len,uint256 _pubkey,uint256 sig);
 
 UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     static uint256 zeroes;
     CWalletTx wtx; UniValue ret(UniValue::VOBJ);
-    uint8_t keyvalue[DRAGON_MAXSCRIPTSIZE*8],opretbuf[DRAGON_MAXSCRIPTSIZE*8]; int32_t i,coresize,haveprivkey,duration,opretlen,height; uint16_t keylen=0,valuesize=0,refvaluesize=0; uint8_t *key,*value=0; uint32_t flags,tmpflags,n; struct komodo_kv *ptr; uint64_t fee; uint256 privkey,pubkey,refpubkey,sig;
+    uint8_t keyvalue[DRAGON_MAXSCRIPTSIZE*8],opretbuf[DRAGON_MAXSCRIPTSIZE*8]; int32_t i,coresize,haveprivkey,duration,opretlen,height; uint16_t keylen=0,valuesize=0,refvaluesize=0; uint8_t *key,*value=0; uint32_t flags,tmpflags,n; struct hush_kv *ptr; uint64_t fee; uint256 privkey,pubkey,refpubkey,sig;
     if (fHelp || params.size() < 3 )
         throw runtime_error(
             "kvupdate key \"value\" days passphrase\n"
@@ -639,7 +668,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         //printf("flags.%d (%s) n.%d\n",flags,params[2].get_str().c_str(),n);
     } else flags = 0;
     if ( n >= 4 )
-        privkey = komodo_kvprivkey(&pubkey,(char *)(n >= 4 ? params[3].get_str().c_str() : "password"));
+        privkey = hush_kvprivkey(&pubkey,(char *)(n >= 4 ? params[3].get_str().c_str() : "password"));
     haveprivkey = 1;
     flags |= 1;
     /*for (i=0; i<32; i++)
@@ -659,7 +688,7 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
             valuesize = (int32_t)strlen(params[1].get_str().c_str());
         }
         memcpy(keyvalue,key,keylen);
-        if ( (refvaluesize= komodo_kvsearch(&refpubkey,chainActive.LastTip()->GetHeight(),&tmpflags,&height,&keyvalue[keylen],key,keylen)) >= 0 )
+        if ( (refvaluesize= hush_kvsearch(&refpubkey,chainActive.LastTip()->GetHeight(),&tmpflags,&height,&keyvalue[keylen],key,keylen)) >= 0 )
         {
             if ( (tmpflags & HUSH_KVPROTECTED) != 0 )
             {
@@ -671,8 +700,8 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
             }
             if ( keylen+refvaluesize <= sizeof(keyvalue) )
             {
-                sig = komodo_kvsig(keyvalue,keylen+refvaluesize,privkey);
-                if ( komodo_kvsigverify(keyvalue,keylen+refvaluesize,refpubkey,sig) < 0 )
+                sig = hush_kvsig(keyvalue,keylen+refvaluesize,privkey);
+                if ( hush_kvsigverify(keyvalue,keylen+refvaluesize,refpubkey,sig) < 0 )
                 {
                     ret.push_back(Pair("error",(char *)"error verifying sig, passphrase is probably wrong"));
                     printf("VERIFY ERROR\n");
@@ -683,12 +712,12 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
         //for (i=0; i<32; i++)
         //    printf("%02x",((uint8_t *)&sig)[i]);
         //printf(" sig for keylen.%d + valuesize.%d\n",keylen,refvaluesize);
-        ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "KMD" : SMART_CHAIN_SYMBOL)));
+        ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH3" : SMART_CHAIN_SYMBOL)));
         height = chainActive.LastTip()->GetHeight();
         if ( memcmp(&zeroes,&refpubkey,sizeof(refpubkey)) != 0 )
             ret.push_back(Pair("owner",refpubkey.GetHex()));
         ret.push_back(Pair("height", (int64_t)height));
-        duration = komodo_kvduration(flags); //((flags >> 2) + 1) * HUSH_KVDURATION;
+        duration = hush_kvduration(flags); //((flags >> 2) + 1) * HUSH_KVDURATION;
         ret.push_back(Pair("expiration", (int64_t)(height+duration)));
         ret.push_back(Pair("flags",(int64_t)flags));
         ret.push_back(Pair("key",params[0].get_str()));
@@ -718,13 +747,13 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
                 coresize += 32;
             }
         }
-        if ( (opretlen= komodo_opreturnscript(opretbuf,'K',keyvalue,coresize)) == 40 )
+        if ( (opretlen= hush_opreturnscript(opretbuf,'K',keyvalue,coresize)) == 40 )
             opretlen++;
         //for (i=0; i<opretlen; i++)
         //    printf("%02x",opretbuf[i]);
         //printf(" opretbuf keylen.%d valuesize.%d height.%d (%02x %02x %02x)\n",*(uint16_t *)&keyvalue[0],*(uint16_t *)&keyvalue[2],*(uint32_t *)&keyvalue[4],keyvalue[8],keyvalue[9],keyvalue[10]);
         EnsureWalletIsUnlocked();
-        fee = komodo_kvfee(flags,opretlen,keylen);
+        fee = hush_kvfee(flags,opretlen,keylen);
         ret.push_back(Pair("fee",(double)fee/COIN));
         CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
         if (!destaddress.IsValid())
@@ -737,13 +766,13 @@ UniValue kvupdate(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
 UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    uint64_t available,deposited,issued,withdrawn,approved,redeemed,seed,komodoshis = 0; int32_t height; char destaddr[64]; uint8_t i,pubkey37[33];
+    uint64_t available,deposited,issued,withdrawn,approved,redeemed,seed,puposhis = 0; int32_t height; char destaddr[64]; uint8_t i,pubkey37[33];
     bool fSubtractFeeFromAmount = false;
     if ( HUSH_PAX == 0 )
     {
         throw runtime_error("paxdeposit disabled without -pax");
     }
-    if ( komodo_is_issuer() != 0 )
+    if ( hush_is_issuer() != 0 )
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "paxdeposit only from KYC");
     if (!EnsureWalletIsAvailable(fHelp))
         throw runtime_error("paxdeposit needs wallet"); //return Value::null;
@@ -762,28 +791,28 @@ UniValue paxdeposit(const UniValue& params, bool fHelp, const CPubKey& mypk)
         fprintf(stderr,"available %llu vs fiatoshis %llu\n",(long long)available,(long long)fiatoshis);
         throw runtime_error("paxdeposit not enough available inventory");
     }
-    komodoshis = PAX_fiatdest(&seed,0,destaddr,pubkey37,(char *)params[0].get_str().c_str(),height,(char *)base.c_str(),fiatoshis);
+    puposhis = PAX_fiatdest(&seed,0,destaddr,pubkey37,(char *)params[0].get_str().c_str(),height,(char *)base.c_str(),fiatoshis);
     dest.append(destaddr);
     CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
     if (!destaddress.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
     for (i=0; i<33; i++)
         fprintf(stderr,"%02x",pubkey37[i]);
-    fprintf(stderr," ht.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) komodoshis.%llu seed.%llx\n",height,(char *)params[0].get_str().c_str(),(char *)base.c_str(),(long long)fiatoshis,destaddr,(long long)komodoshis,(long long)seed);
+    fprintf(stderr," ht.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) puposhis.%llu seed.%llx\n",height,(char *)params[0].get_str().c_str(),(char *)base.c_str(),(long long)fiatoshis,destaddr,(long long)puposhis,(long long)seed);
     EnsureWalletIsUnlocked();
     CWalletTx wtx;
-    uint8_t opretbuf[64]; int32_t opretlen; uint64_t fee = komodoshis / 1000;
+    uint8_t opretbuf[64]; int32_t opretlen; uint64_t fee = puposhis / 1000;
     if ( fee < 10000 )
         fee = 10000;
     dragon_rwnum(1,&pubkey37[33],sizeof(height),&height);
-    opretlen = komodo_opreturnscript(opretbuf,'D',pubkey37,37);
-    SendMoney(address.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,komodoshis);
+    opretlen = hush_opreturnscript(opretbuf,'D',pubkey37,37);
+    SendMoney(address.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,puposhis);
     return wtx.GetHash().GetHex();
 }
 
 UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    CWalletTx wtx; std::string dest; int32_t kmdheight; uint64_t seed,komodoshis = 0; char destaddr[64]; uint8_t i,pubkey37[37]; bool fSubtractFeeFromAmount = false;
+    CWalletTx wtx; std::string dest; int32_t hushheight; uint64_t seed,puposhis = 0; char destaddr[64]; uint8_t i,pubkey37[37]; bool fSubtractFeeFromAmount = false;
     if ( SMART_CHAIN_SYMBOL[0] == 0 )
         return(0);
     if (!EnsureWalletIsAvailable(fHelp))
@@ -791,27 +820,27 @@ UniValue paxwithdraw(const UniValue& params, bool fHelp, const CPubKey& mypk)
     throw runtime_error("paxwithdraw deprecated");
     if (fHelp || params.size() != 2)
         throw runtime_error("paxwithdraw address fiatamount");
-    if ( komodo_isrealtime(&kmdheight) == 0 )
+    if ( hush_isrealtime(&hushheight) == 0 )
         return(0);
     LOCK2(cs_main, pwalletMain->cs_wallet);
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bitcoin address");
     int64_t fiatoshis = atof(params[1].get_str().c_str()) * COIN;
-    komodoshis = PAX_fiatdest(&seed,1,destaddr,pubkey37,(char *)params[0].get_str().c_str(),kmdheight,SMART_CHAIN_SYMBOL,fiatoshis);
+    puposhis = PAX_fiatdest(&seed,1,destaddr,pubkey37,(char *)params[0].get_str().c_str(),hushheight,SMART_CHAIN_SYMBOL,fiatoshis);
     dest.append(destaddr);
     CBitcoinAddress destaddress(CRYPTO555_HUSHADDR);
     if (!destaddress.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid dest Bitcoin address");
     for (i=0; i<33; i++)
         printf("%02x",pubkey37[i]);
-    printf(" kmdheight.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) komodoshis.%llu seed.%llx\n",kmdheight,(char *)params[0].get_str().c_str(),SMART_CHAIN_SYMBOL,(long long)fiatoshis,destaddr,(long long)komodoshis,(long long)seed);
+    printf(" hushheight.%d srcaddr.(%s) %s fiatoshis.%lld -> dest.(%s) puposhis.%llu seed.%llx\n",hushheight,(char *)params[0].get_str().c_str(),SMART_CHAIN_SYMBOL,(long long)fiatoshis,destaddr,(long long)puposhis,(long long)seed);
     EnsureWalletIsUnlocked();
     uint8_t opretbuf[64]; int32_t opretlen; uint64_t fee = fiatoshis / 1000;
     if ( fee < 10000 )
         fee = 10000;
-    dragon_rwnum(1,&pubkey37[33],sizeof(kmdheight),&kmdheight);
-    opretlen = komodo_opreturnscript(opretbuf,'W',pubkey37,37);
+    dragon_rwnum(1,&pubkey37[33],sizeof(hushheight),&hushheight);
+    opretlen = hush_opreturnscript(opretbuf,'W',pubkey37,37);
     SendMoney(destaddress.Get(),fee,fSubtractFeeFromAmount,wtx,opretbuf,opretlen,fiatoshis);
     return wtx.GetHash().GetHex();
 }
@@ -4996,8 +5025,8 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
             "\nShield transparent coinbase funds by sending to a shielded zaddr.  This is an asynchronous operation and utxos"
             "\nselected for shielding will be locked.  If there is an error, they are unlocked.  The RPC call `listlockunspent`"
             "\ncan be used to return a list of locked utxos.  The number of coinbase utxos selected for shielding can be limited"
-            "\nby the caller.  If the limit parameter is set to zero, and Overwinter is not yet active, the -mempooltxinputlimit"
-            "\noption will determine the number of uxtos.  Any limit is constrained by the consensus rule defining a maximum"
+            "\nby the caller.  If the limit parameter is set to zero, as many as will fit will be used."
+            "\nAny limit is constrained by the consensus rule defining a maximum"
             "\ntransaction size of " + strprintf("%d bytes.", MAX_TX_SIZE_AFTER_SAPLING)
             + HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
@@ -5006,7 +5035,7 @@ UniValue z_shieldcoinbase(const UniValue& params, bool fHelp, const CPubKey& myp
             "3. fee                   (numeric, optional, default="
             + strprintf("%s", FormatMoney(SHIELD_COINBASE_DEFAULT_MINERS_FEE)) + ") The fee amount to attach to this transaction.\n"
             "4. limit                 (numeric, optional, default="
-            + strprintf("%d", SHIELD_COINBASE_DEFAULT_LIMIT) + ") Limit on the maximum number of utxos to shield.  Set to 0 to use node option -mempooltxinputlimit (before Overwinter), or as many as will fit in the transaction (after Overwinter).\n"
+            + strprintf("%d", SHIELD_COINBASE_DEFAULT_LIMIT) + ") Limit on the maximum number of utxos to shield.  Set to 0 to use as many as will fit in the transaction.\n"
             "\nResult:\n"
             "{\n"
             "  \"remainingUTXOs\": xxx       (numeric) Number of coinbase utxos still available for shielding.\n"
@@ -8277,6 +8306,7 @@ static const CRPCCommand commands[] =
     { "wallet",             "getaccount",               &getaccount,               true  },
     { "wallet",             "getalldata",               &getalldata,               true  },
     { "wallet",             "getaddressesbyaccount",    &getaddressesbyaccount,    true  },
+    { "wallet",             "listaddresses",            &listaddresses        ,    true  },
     { "wallet",             "getbalance",               &getbalance,               false },
     { "wallet",             "getnewaddress",            &getnewaddress,            true  },
     { "wallet",             "getrawchangeaddress",      &getrawchangeaddress,      true  },

@@ -52,7 +52,7 @@ using namespace std;
 extern int32_t ASSETCHAINS_FOUNDERS;
 uint64_t the_commission(const CBlock *pblock,int32_t height);
 int32_t hush_blockload(CBlock& block,CBlockIndex *pindex);
-arith_uint256 komodo_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
+arith_uint256 hush_PoWtarget(int32_t *percPoSp,arith_uint256 target,int32_t height,int32_t goalperc);
 
 /**
  * Return average network hashes per second based on the last 'lookup' blocks,

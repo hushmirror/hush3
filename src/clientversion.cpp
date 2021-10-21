@@ -32,7 +32,7 @@
  * for both bitcoind and bitcoin-core, to make it harder for attackers to
  * target servers or GUI users specifically.
  */
-const std::string CLIENT_NAME = GetArg("-clientname", "jl777sRemorse");
+const std::string CLIENT_NAME = GetArg("-clientname", "GoldenSandtrout");
 
 /**
  * Client version number

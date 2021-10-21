@@ -1,1 +1,1 @@
-dist_man1_MANS=komodod.1 komodo-cli.1 komodo-tx.1
+dist_man1_MANS=hushd.1 hush-cli.1 hush-tx.1

@@ -672,14 +672,14 @@ bool CheckEquihashSolution(const CBlockHeader *pblock, const CChainParams& param
 
 int32_t hush_chosennotary(int32_t *notaryidp,int32_t height,uint8_t *pubkey33,uint32_t timestamp);
 int32_t hush_currentheight();
-void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
+void hush_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
 bool hush_checkopret(CBlock *pblock, CScript &merkleroot);
-CScript komodo_makeopret(CBlock *pblock, bool fNew);
+CScript hush_makeopret(CBlock *pblock, bool fNew);
 extern int32_t HUSH_CHOSEN_ONE;
 extern char SMART_CHAIN_SYMBOL[HUSH_SMART_CHAIN_MAXLEN];
-#define KOMODO_ELECTION_GAP 2000
+#define HUSH_DPOW_GAP 2000
 
-int32_t komodo_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blocktimes[66],int32_t *nonzpkeysp,int32_t height);
+int32_t hush_eligiblenotary(uint8_t pubkeys[66][33],int32_t *mids,uint32_t blocktimes[66],int32_t *nonzpkeysp,int32_t height);
 int32_t HUSH_LOADINGBLOCKS = 1;
 
 extern std::string NOTARY_PUBKEY;
@@ -749,7 +749,7 @@ bool CheckProofOfWork(const CBlockHeader &blkHeader, uint8_t *pubkey33, int32_t 
 
 CChainPower GetBlockProof(const CBlockIndex& block)
 {
-    arith_uint256 bnWorkTarget, bnStakeTarget = arith_uint256(0);
+    arith_uint256 bnWorkTarget;
 
     bool fNegative;
     bool fOverflow;
@@ -758,7 +758,7 @@ CChainPower GetBlockProof(const CBlockIndex& block)
     if (fNegative || fOverflow || bnWorkTarget == 0)
         return CChainPower(0);
 
-    return CChainPower(0, bnStakeTarget, (~bnWorkTarget / (bnWorkTarget + 1)) + 1);
+    return CChainPower(0, (~bnWorkTarget / (bnWorkTarget + 1)) + 1);
 }
 
 int64_t GetBlockProofEquivalentTime(const CBlockIndex& to, const CBlockIndex& from, const CBlockIndex& tip, const Consensus::Params& params)

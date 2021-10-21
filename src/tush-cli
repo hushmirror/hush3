@@ -8,8 +8,9 @@ cd $DIR
 DIR="$( cd "$( dirname "$( readlink "${BASH_SOURCE[0]}" )" )" && pwd )"
 cd $DIR
 
-NAME=ZUSH
+NAME=TUSH
 
+# Use the HUSHCLI env var to over-ride using the same directory as this file
 CLI=${HUSHCLI:-./hush-cli}
 if [ -f $CLI ]; then
    $CLI -ac_name=$NAME "$@"

@@ -429,23 +429,8 @@ bool getAddressFromIndex(const int &type, const uint160 &hash, std::string &addr
 uint32_t hush_segid32(char *coinaddr);
 
 #define DECLARE_IGNORELIST std::map <std::string,int> ignoredMap = { \
-    {"RReUxSs5hGE39ELU23DfydX8riUuzdrHAE", 1}, \
-    {"RMUF3UDmzWFLSKV82iFbMaqzJpUnrWjcT4", 1}, \
-    {"RA5imhVyJa7yHhggmBytWuDr923j2P1bxx", 1}, \
-    {"RBM5LofZFodMeewUzoMWcxedm3L3hYRaWg", 1}, \
-    {"RAdcko2d94TQUcJhtFHZZjMyWBKEVfgn4J", 1}, \
-    {"RLzUaZ934k2EFCsAiVjrJqM8uU1vmMRFzk", 1}, \
-    {"RMSZMWZXv4FhUgWhEo4R3AQXmRDJ6rsGyt", 1}, \
-    {"RUDrX1v5toCsJMUgtvBmScKjwCB5NaR8py", 1}, \
-    {"RMSZMWZXv4FhUgWhEo4R3AQXmRDJ6rsGyt", 1}, \
-    {"RRvwmbkxR5YRzPGL5kMFHMe1AH33MeD8rN", 1}, \
-    {"RQLQvSgpPAJNPgnpc8MrYsbBhep95nCS8L", 1}, \
-    {"RK8JtBV78HdvEPvtV5ckeMPSTojZPzHUTe", 1}, \
-    {"RHVs2KaCTGUMNv3cyWiG1jkEvZjigbCnD2", 1}, \
-    {"RE3SVaDgdjkRPYA6TRobbthsfCmxQedVgF", 1}, \
-    {"RW6S5Lw5ZCCvDyq4QV9vVy7jDHfnynr5mn", 1}, \
-    {"RTkJwAYtdXXhVsS3JXBAJPnKaBfMDEswF8", 1}, \
-    {"RD6GgnrMpPaTSMn8vai6yiGA7mN4QGPVMY", 1} \
+    {"RUeUxSs5hGE39ELU23DfydX8riUuzdrHAE", 1}, \
+    {"R2d2gnrMpPaTSMn8vai6yiGA7mN4QGPVMY", 1}  \
 };
 
 bool CBlockTreeDB::Snapshot2(std::map <std::string, CAmount> &addressAmounts, UniValue *ret)
@@ -662,7 +647,7 @@ bool CBlockTreeDB::ReadFlag(const std::string &name, bool &fValue) {
     return true;
 }
 
-void komodo_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
+void hush_index2pubkey33(uint8_t *pubkey33,CBlockIndex *pindex,int32_t height);
 
 bool CBlockTreeDB::blockOnchainActive(const uint256 &hash) {
     BlockMap::const_iterator it = mapBlockIndex.find(hash);
@@ -738,7 +723,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 if ( 0 ) // POW will be checked before any block is connected
                 {
                     uint8_t pubkey33[33];
-                    komodo_index2pubkey33(pubkey33,pindexNew,pindexNew->GetHeight());
+                    hush_index2pubkey33(pubkey33,pindexNew,pindexNew->GetHeight());
                     if (!CheckProofOfWork(header,pubkey33,pindexNew->GetHeight(),Params().GetConsensus()))
                         return error("LoadBlockIndex(): CheckProofOfWork failed: %s", pindexNew->ToString());
                 }

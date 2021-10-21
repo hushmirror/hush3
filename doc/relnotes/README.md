@@ -10,6 +10,56 @@ and no longer on Github, since they banned Duke Leto and
 also because they censor many people around the world and work with
 evil organizations.
 
+# Hush 3.9.0 "Unusual Ursid"
+```
+ 136 files changed, 3881 insertions(+), 3156 deletions(-)
+```
+
+This is a MANDATORY release, please update as soon as you can! At some point, full nodes older than 3.9.0
+will no longer be able to sync the current HUSH network correctly. More details will be given in a future update.
+
+  * :rainbow: hushd/hush-cli/hush-tx are now true binaries instead of shell scripts
+    * This means hushd.bat, hush-cli.bat and hush-tx.bat are no longer needed on Windows
+      and simplifies the maintenance of internals
+  * :tada: New official location for full node data is ~/.hush !
+    * New full nodes will install and use ~/.hush
+    * Existing full nodes will continue to use the legacy ~/.komodo directory
+    * If both ~/.hush/HUSH3 and ~/.komodo/HUSH3 exist, the ~/.hush directory will be used
+  * :kiss: Hush full nodes will now attempt to talk to two more nodes by default:
+    * node1.hush.land
+    * node2.hush.land
+  * :fork_and_knife: New RPCs:
+    * listaddresses - Show all taddrs in this wallet.dat
+    * rpcinfo - Shows stats about RPC internals
+  * :unicorn: These RPCs can now be run during RPC warmup:
+    * listaddresses
+    * z\_exportwallet
+    * signmessage
+    * decoderawtransaction
+    * getnetworkinfo
+  * :sweat_drops: New doc/hushd.service to use hushd with systemd
+    * Learn more at doc/hushd-systemd.md
+  * :rocket: Many updates to Hush Smart Chains and Hush internals
+    * Optimize zaddrs by only building witness caches for blocks that involve our wallet
+    * When RPC connection fails hush-cli now tells you which port it was trying to connect to
+    * Calculation of HSC "network magic" has changed as of 3.9.0
+        * If using or developing an HSC, all nodes must use either 3.8.0 or earlier, or
+          preferably, all use 3.9.0 code or later. HSC networks using both 3.8.0 and 3.9.0 will not work.
+        * This was required by internals changes and we do not plan to do this again.
+  * :hammer: New Stratum API so you can Solo mine with your full node!
+    * This is an optional feature that defaults to disabled. Enable it with `-stratum=1`
+    * Example usage: `hushd -stratum=1 -stratumport=31337 -stratumallowip=192.168.0.0/24'
+        * This allows mining connections from your local network where computers have IPs like 192.168.0.x .
+        * Your ASICs must be able to connect to the IP and port of your full node. Firewall rules may be needed.
+    * It offers the highest privacy for miners, since mining pools know your IP and address metadata and can be
+      hacked or coerced into giving that data. Solo mining with your own full node gives the absolute least metadata
+      to third parties.
+    * This is also the cheapest possible way to mine HUSH, since there are NO POOL FEES and NO PAYOUT TRANSACTION FEES! :smile:
+    * Miners can mine entire HUSH blocks from the privacy of their own server
+    * As many ASICs as you like can be used with a single Hush full node, just use an address inside a wallet you control,
+      and set your pool to the IP and port of your Hush full node with Stratum enabled.
+  * :nerd_face: The hush-smart-chain script is now installed in Debian packages
+
 # Hush 3.8.0 "Chuckling Chupacabra"
 
 ```

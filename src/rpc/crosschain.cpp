@@ -56,10 +56,10 @@ int32_t ensure_CCrequirements(uint8_t evalcode);
 bool EnsureWalletIsAvailable(bool avoidException);
 
 
-int32_t hush_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *kmdtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *kmdstartip,int32_t *kmdendip);
-int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mdata,char *symbol,int32_t kmdheight,int32_t notarized_height);
-struct hush_ccdata_entry *komodo_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t kmdstarti,int32_t kmdendi);
-uint256 komodo_calcMoM(int32_t height,int32_t MoMdepth);
+int32_t hush_MoM(int32_t *notarized_htp,uint256 *MoMp,uint256 *hushtxidp,int32_t nHeight,uint256 *MoMoMp,int32_t *MoMoMoffsetp,int32_t *MoMoMdepthp,int32_t *hushstartip,int32_t *hushendip);
+int32_t hush_MoMoMdata(char *hexstr,int32_t hexsize,struct hush_ccdataMoMoM *mdata,char *symbol,int32_t hushheight,int32_t notarized_height);
+struct hush_ccdata_entry *hush_allMoMs(int32_t *nump,uint256 *MoMoMp,int32_t hushstarti,int32_t hushendi);
+uint256 hush_calcMoM(int32_t height,int32_t MoMdepth);
 int32_t hush_notaries(uint8_t pubkeys[64][33],int32_t height,uint32_t timestamp);
 extern std::string ASSETCHAINS_SELFIMPORT;
 
@@ -71,7 +71,7 @@ UniValue assetchainproof(const UniValue& params, bool fHelp, const CPubKey& mypk
 {
     uint256 hash;
 
-    // parse params and get notarisation data for tx
+    // parse params and get notarization data for tx
     if ( fHelp || params.size() != 1)
         throw runtime_error("assetchainproof needs a txid");
 
@@ -93,7 +93,7 @@ UniValue crosschainproof(const UniValue& params, bool fHelp, const CPubKey& mypk
 
 UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
-    int32_t height,depth,notarized_height,MoMoMdepth,MoMoMoffset,kmdstarti,kmdendi; uint256 MoM,MoMoM,kmdtxid; uint32_t timestamp = 0; UniValue ret(UniValue::VOBJ); UniValue a(UniValue::VARR);
+    int32_t height,depth,notarized_height,MoMoMdepth,MoMoMoffset,hushstarti,hushendi; uint256 MoM,MoMoM,hushtxid; uint32_t timestamp = 0; UniValue ret(UniValue::VOBJ); UniValue a(UniValue::VARR);
     if ( fHelp || params.size() != 1 )
         throw runtime_error("height_MoM height\n");
     LOCK(cs_main);
@@ -108,7 +108,7 @@ UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
         height = chainActive.Tip()->GetHeight();
     }
     //fprintf(stderr,"height_MoM height.%d\n",height);
-    depth = hush_MoM(&notarized_height,&MoM,&kmdtxid,height,&MoMoM,&MoMoMoffset,&MoMoMdepth,&kmdstarti,&kmdendi);
+    depth = hush_MoM(&notarized_height,&MoM,&hushtxid,height,&MoMoM,&MoMoMoffset,&MoMoMdepth,&hushstarti,&hushendi);
     ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL)));
     ret.push_back(Pair("height",height));
     ret.push_back(Pair("timestamp",(uint64_t)timestamp));
@@ -117,14 +117,14 @@ UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
         ret.push_back(Pair("depth",depth));
         ret.push_back(Pair("notarized_height",notarized_height));
         ret.push_back(Pair("MoM",MoM.GetHex()));
-        ret.push_back(Pair("kmdtxid",kmdtxid.GetHex()));
+        ret.push_back(Pair("hushtxid",hushtxid.GetHex()));
         if ( SMART_CHAIN_SYMBOL[0] != 0 )
         {
             ret.push_back(Pair("MoMoM",MoMoM.GetHex()));
             ret.push_back(Pair("MoMoMoffset",MoMoMoffset));
             ret.push_back(Pair("MoMoMdepth",MoMoMdepth));
-            ret.push_back(Pair("kmdstarti",kmdstarti));
-            ret.push_back(Pair("kmdendi",kmdendi));
+            ret.push_back(Pair("hushstarti",hushstarti));
+            ret.push_back(Pair("hushendi",hushendi));
         }
     } else ret.push_back(Pair("error",(char *)"no MoM for height"));
 
@@ -134,18 +134,18 @@ UniValue height_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
 UniValue MoMoMdata(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     if ( fHelp || params.size() != 3 )
-        throw runtime_error("MoMoMdata symbol kmdheight ccid\n");
+        throw runtime_error("MoMoMdata symbol hushheight ccid\n");
     UniValue ret(UniValue::VOBJ);
     char* symbol = (char *)params[0].get_str().c_str();
-    int kmdheight = atoi(params[1].get_str().c_str());
+    int hushheight = atoi(params[1].get_str().c_str());
     uint32_t ccid = atoi(params[2].get_str().c_str());
     ret.push_back(Pair("coin",symbol));
-    ret.push_back(Pair("kmdheight",kmdheight-5));
+    ret.push_back(Pair("hushheight",hushheight-5));
     ret.push_back(Pair("ccid", (int) ccid));
 
     uint256 destNotarizationTxid;
     std::vector<uint256> moms;
-    uint256 MoMoM = CalculateProofRoot(symbol, ccid, kmdheight-5, moms, destNotarizationTxid);
+    uint256 MoMoM = CalculateProofRoot(symbol, ccid, hushheight-5, moms, destNotarizationTxid);
 
     UniValue valMoms(UniValue::VARR);
     for (int i=0; i<moms.size(); i++) valMoms.push_back(moms[i].GetHex());
@@ -169,7 +169,7 @@ UniValue calc_MoM(const UniValue& params, bool fHelp, const CPubKey& mypk)
     if ( height <= 0 || MoMdepth <= 0 || MoMdepth >= height )
         throw runtime_error("calc_MoM illegal height or MoMdepth\n");
     //fprintf(stderr,"height_MoM height.%d\n",height);
-    MoM = komodo_calcMoM(height,MoMdepth);
+    MoM = hush_calcMoM(height,MoMdepth);
     ret.push_back(Pair("coin",(char *)(SMART_CHAIN_SYMBOL[0] == 0 ? "HUSH" : SMART_CHAIN_SYMBOL)));
     ret.push_back(Pair("height",height));
     ret.push_back(Pair("MoMdepth",MoMdepth));
@@ -670,7 +670,7 @@ UniValue migrate_createnotaryapprovaltransaction(const UniValue& params, bool fH
     if (fHelp || params.size() != 2)
         throw runtime_error("migrate_createnotaryapprovaltransaction burntxid txoutproof\n\n"
             "Creates a tx for destination chain with burn tx proof\n"
-            "txoutproof should be retrieved by komodo-cli migrate_checkburntransactionsource call on the source chain\n" );
+            "txoutproof should be retrieved by hush-cli migrate_checkburntransactionsource call on the source chain\n" );
 
     if (SMART_CHAIN_SYMBOL[0] == 0)
         throw runtime_error("Must be called on asset chain");
@@ -1126,7 +1126,7 @@ UniValue getNotarizationsForBlock(const UniValue& params, bool fHelp, const CPub
     // TODO take timestamp as param, and loop blockindex to get starting/finish height.
     if (fHelp || params.size() != 1)
         throw runtime_error("getNotarizationsForBlock height\n\n"
-                "Takes a block height and returns notarisation information "
+                "Takes a block height and returns notarization information "
                 "within the block");
 
     LOCK(cs_main);
@@ -1168,34 +1168,11 @@ UniValue getNotarizationsForBlock(const UniValue& params, bool fHelp, const CPub
     return out;
 }
 
-/*UniValue getNotarizationsForBlock(const UniValue& params, bool fHelp, const CPubKey& mypk)
-{
-    if (fHelp || params.size() != 1)
-        throw runtime_error("getNotarizationsForBlock blockHash\n\n"
-                "Takes a block hash and returns notarisation transactions "
-                "within the block");
-
-    uint256 blockHash = uint256S(params[0].get_str());
-
-    NotarizationsInBlock nibs;
-    GetBlockNotarizations(blockHash, nibs);
-    UniValue out(UniValue::VARR);
-    BOOST_FOREACH(const Notarization& n, nibs)
-    {
-        UniValue item(UniValue::VARR);
-        item.push_back(n.first.GetHex());
-        item.push_back(HexStr(E_MARSHAL(ss << n.second)));
-        out.push_back(item);
-    }
-    return out;
-}*/
-
-
 UniValue scanNotarizationsDB(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     if (fHelp || params.size() < 2 || params.size() > 3)
         throw runtime_error("scanNotarizationsDB blockHeight symbol [blocksLimit=1440]\n\n"
-                "Scans notarisationsdb backwards from height for a notarisation"
+                "Scans notarizationsdb backwards from height for a notarization"
                 " of given symbol");
     int height = atoi(params[0].get_str().c_str());
     std::string symbol = params[1].get_str().c_str();

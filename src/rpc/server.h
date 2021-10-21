@@ -351,6 +351,7 @@ extern UniValue getrawchangeaddress(const UniValue& params, bool fHelp, const CP
 extern UniValue setaccount(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getaccount(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getaddressesbyaccount(const UniValue& params, bool fHelp, const CPubKey& mypk);
+extern UniValue listaddresses(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue sendtoaddress(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue signmessage(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue verifymessage(const UniValue& params, bool fHelp, const CPubKey& mypk);

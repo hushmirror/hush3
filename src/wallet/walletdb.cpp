@@ -441,7 +441,7 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
             ssValue >> wtx;
             CValidationState state;
             auto verifier = libzcash::ProofVerifier::Strict();
-            // ac_public chains set at height like KMD and ZEX, will force a rescan if we dont ignore this error: bad-txns-acpublic-chain
+            // ac_public chains which enable at a certain height instead of from genesis, this will force a rescan if we dont ignore this error: bad-txns-acpublic-chain
             // there cannot be any ztx in the wallet on ac_public chains that started from block 1, so this wont affect those. 
             // ac_private chains fail this check for notary nodes, need exception. Triggers full rescan without it. 
             if ( !(CheckTransaction(0,wtx, state, verifier, 0, 0) && (wtx.GetHash() == hash) && state.IsValid()) && (state.GetRejectReason() != "bad-txns-acpublic-chain" && state.GetRejectReason() != "bad-txns-acprivacy-chain" && state.GetRejectReason() != "bad-txns-stakingtx") )

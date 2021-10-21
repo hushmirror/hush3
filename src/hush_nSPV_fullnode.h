@@ -38,7 +38,7 @@ struct NSPV_ntzargs
 int32_t NSPV_notarization_find(struct NSPV_ntzargs *args,int32_t height,int32_t dir)
 {
     int32_t ntzheight = 0; uint256 hashBlock; CTransaction tx; Notarization nota; char *symbol; std::vector<uint8_t> opret;
-    symbol = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"KMD" : SMART_CHAIN_SYMBOL;
+    symbol = (SMART_CHAIN_SYMBOL[0] == 0) ? (char *)"HUSH3" : SMART_CHAIN_SYMBOL;
     memset(args,0,sizeof(*args));
     if ( dir > 0 )
         height += 10;
@@ -863,7 +863,7 @@ int32_t NSPV_getspentinfo(struct NSPV_spentinfo *ptr,uint256 txid,int32_t vout)
     return(len);
 }
 
-void komodo_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a request
+void hush_nSPVreq(CNode *pfrom,std::vector<uint8_t> request) // received a request
 {
     int32_t len,slen,ind,reqheight,n; std::vector<uint8_t> response; uint32_t timestamp = (uint32_t)time(NULL);
     if ( (len= request.size()) > 0 )

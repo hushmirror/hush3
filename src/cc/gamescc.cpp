@@ -479,7 +479,7 @@ int32_t games_event(uint32_t timestamp,uint256 gametxid,int32_t eventid,std::vec
     {
         GetOpReturnData(games_eventopret(timestamp,mypk,sig,payload),vopret);
         games_payloadrecv(mypk,timestamp,payload);
-        komodo_sendmessage(4,8,"events",vopret);
+        hush_sendmessage(4,8,"events",vopret);
         return(0);
     }
     fprintf(stderr,"games_eventsign error\n");
@@ -539,7 +539,7 @@ UniValue games_events(uint64_t txfee,struct CCcontract_info *cp,cJSON *params)
     return(result);
 }
 
-void komodo_netevent(std::vector<uint8_t> message)
+void hush_netevent(std::vector<uint8_t> message)
 {
     int32_t i,retval,lag,lagerr=0; uint32_t timestamp,now; CPubKey pk; std::vector<uint8_t> sig,payload; char str[67];
     if ( games_eventdecode(timestamp,pk,sig,payload,message) == 'E' )
@@ -560,7 +560,7 @@ void komodo_netevent(std::vector<uint8_t> message)
                 if ( (rand() % 10) == 0 )
                 {
                     //fprintf(stderr,"relay message.[%d]\n",(int32_t)message.size());
-                    komodo_sendmessage(2,2,"events",message);
+                    hush_sendmessage(2,2,"events",message);
                 }
             }
         }
@@ -874,7 +874,7 @@ uint64_t games_gamefields(UniValue &obj,int64_t maxplayers,int64_t buyin,uint256
                 obj.push_back(Pair("seed",(int64_t)seed));
                 if ( games_iamregistered(maxplayers,gametxid,tx,mygamesaddr) > 0 )
                     sprintf(cmd,"cc/%s %llu %s",GAMENAME,(long long)seed,gametxid.ToString().c_str());
-                else sprintf(cmd,"./komodo-cli -ac_name=%s cclib register %d \"[%%22%s%%22]\"",SMART_CHAIN_SYMBOL,EVAL_GAMES,gametxid.ToString().c_str());
+                else sprintf(cmd,"./hush-cli -ac_name=%s cclib register %d \"[%%22%s%%22]\"",SMART_CHAIN_SYMBOL,EVAL_GAMES,gametxid.ToString().c_str());
                 obj.push_back(Pair("run",cmd));
             }
         }

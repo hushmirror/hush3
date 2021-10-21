@@ -2717,10 +2717,12 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
                 ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), pindex, false) - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
 
             CBlock block;
+            bool involvesMe = false;
             ReadBlockFromDisk(block, pindex,1);
             BOOST_FOREACH(CTransaction& tx, block.vtx)
             {
                 if (AddToWalletIfInvolvingMe(tx, &block, fUpdate)) {
+                    involvesMe = true;
                     ret++;
                 }
             }
@@ -2734,8 +2736,11 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
                 }
             }
 
-            // Build initial witness caches
-            BuildWitnessCache(pindex, true);
+            // Build initial witness caches for blocks involving one of our addresses
+            if (involvesMe) {
+                LogPrintf("%s: block has one of our transactions, building witness cache\n", __func__);
+                BuildWitnessCache(pindex, true);
+            }
 
             //Delete Transactions
             if (fTxDeleteEnabled) {
@@ -3056,7 +3061,7 @@ std::vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
 
         if ( (wtx.nLockTime >= LOCKTIME_THRESHOLD && wtx.nLockTime < now-HUSH_MAXMEMPOOLTIME) )
         {
-            //LogPrintf("skip Relaying wtx %s nLockTime %u vs now.%u\n", wtx.GetHash().ToString(),(uint32_t)wtx.nLockTime,now);
+            LogPrintf("%s: skip Relaying wtx %s nLockTime %u vs now.%u\n", __func__, wtx.GetHash().ToString(),(uint32_t)wtx.nLockTime,now);
             //vwtxh.push_back(wtx.GetHash());
             continue;
         }

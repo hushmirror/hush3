@@ -497,17 +497,42 @@ boost::filesystem::path GetDefaultDataDir()
     if ( SMART_CHAIN_SYMBOL[0] != 0 )
         strcpy(symbol,SMART_CHAIN_SYMBOL);
     else symbol[0] = 0;
+    // OLD NAMES:
     // Windows < Vista: C:\Documents and Settings\Username\Application Data\Komodo
     // Windows >= Vista: C:\Users\Username\AppData\Roaming\Komodo
     // Mac: ~/Library/Application Support/Komodo
     // Unix: ~/.komodo
+
+    // NEW NAMES:
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Hush
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Hush
+    // Mac: ~/Library/Application Support/Hush
+    // Unix: ~/.hush
+
+    // ~/.hush was actually used by the original 1.x version of Hush, but we will
+    // only make subdirectories inside of it, so we won't be able to overwrite
+    // an old wallet.dat from the Ice Ages :)
+
+    fs::path pathRet;
 #ifdef _WIN32
     // Windows
-    if ( symbol[0] == 0 )
-        return GetSpecialFolderPath(CSIDL_APPDATA) / "Komodo";
-    else return GetSpecialFolderPath(CSIDL_APPDATA) / "Komodo" / symbol;
+    pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Hush" / symbol;
+    // Always use .hush/HUSH3, if it exists (even if .komodo/HUSH3 exists)
+    if(fs::is_directory(pathRet)) {
+        return pathRet;
+    } else {
+        pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Komodo" / symbol;
+        if(fs::is_directory(pathRet)) {
+            // existing legacy directory, use that for backward compat
+            return pathRet;
+        } else {
+            // For new clones, use Hush/HUSH3
+            pathRet = GetSpecialFolderPath(CSIDL_APPDATA) / "Hush" / symbol;
+            return pathRet;
+        }
+    }
+    return pathRet;
 #else
-    fs::path pathRet;
     char* pszHome = getenv("HOME");
     if (pszHome == NULL || strlen(pszHome) == 0)
         pathRet = fs::path("/");
@@ -517,19 +542,49 @@ boost::filesystem::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectory(pathRet);
-    if ( symbol[0] == 0 )
-        return pathRet / "Komodo";
-    else
-    {
-        pathRet /= "Komodo";
-        TryCreateDirectory(pathRet);
-        return pathRet / symbol;
+    fs::path tmppath;
+    tmppath = pathRet;
+    tmppath /= "Hush";
+
+    // create Library/Application Support/Hush if it doesn't exist
+    TryCreateDirectory(tmppath);
+
+    // Always use Hush/HUSH3 if it exists
+    if(fs::is_directory(tmppath / symbol)) {
+        return tmppath / symbol;
+    } else {
+        // Check for legacy dir
+        tmppath = pathRet;
+        tmppath /= "Komodo";
+        //TryCreateDirectory(tmppath);
+        if(fs::is_directory( tmppath / symbol) {
+            // Found legacy dir, use that
+            return tmppath / symbol;
+        } else {
+            // For new clones, use Hush/HUSH3
+            tmppath = pathRet / "Hush" / HUSH3;
+        }
+        return tmppath;
     }
 #else
     // Unix
-    if ( symbol[0] == 0 )
-        return pathRet / ".komodo";
-    else return pathRet / ".komodo" / symbol;
+    // New directory :)
+    fs::path tmppath = pathRet / ".hush" / symbol;
+    // Always use .hush/HUSH3, if it exists (even if .komodo/HUSH3 exists)
+    if(fs::is_directory(tmppath)) {
+        return tmppath;
+    } else {
+        // This is the legacy location
+        tmppath = pathRet / ".komodo" / symbol;
+        if(fs::is_directory(tmppath)) {
+            // existing legacy directory, use that for backward compat
+            return tmppath;
+        } else {
+            // For new clones, use .hush/HUSH3
+            tmppath = pathRet / ".hush" / symbol;
+        }
+        return tmppath;
+    }
 #endif
 #endif
 }
@@ -638,8 +693,6 @@ const boost::filesystem::path &GetDataDir(bool fNetSpecific)
         path /= BaseParams().DataDir();
 
     fs::create_directories(path);
-    //std::string assetpath = path + "/assets";
-    //boost::filesystem::create_directory(assetpath);
     return path;
 }
 
@@ -652,15 +705,10 @@ void ClearDatadirCache()
 boost::filesystem::path GetConfigFile()
 {
     char confname[512];
-    if ( SMART_CHAIN_SYMBOL[0] != 0 )
+    if ( SMART_CHAIN_SYMBOL[0] != 0 ) {
         sprintf(confname,"%s.conf",SMART_CHAIN_SYMBOL);
-    else
-    {
-#ifdef __APPLE__
-        strcpy(confname,"Komodo.conf");
-#else
-        strcpy(confname,"komodo.conf");
-#endif
+    } else {
+        strcpy(confname,"HUSH3.conf");
     }
     boost::filesystem::path pathConfigFile(GetArg("-conf",confname));
     if (!pathConfigFile.is_complete())
@@ -674,14 +722,14 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
 {
     boost::filesystem::ifstream streamConfig(GetConfigFile());
     if (!streamConfig.good())
-        throw missing_zcash_conf();
+        throw missing_hush_conf();
 
     set<string> setOptions;
     setOptions.insert("*");
 
     for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it)
     {
-        // Don't overwrite existing settings so command line settings override komodo.conf
+        // Don't overwrite existing settings so command line settings override HUSH3.conf
         string strKey = string("-") + it->string_key;
         if (mapSettingsRet.count(strKey) == 0)
         {
