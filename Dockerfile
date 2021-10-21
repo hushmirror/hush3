@@ -22,8 +22,7 @@ RUN cd /hush && \
     ./configure --with-incompatible-bdb --with-gui || true && \
     ./build.sh -j$(nproc)
 
-RUN ln -sf /hush/src/komodod /usr/bin/komodod && \
-    ln -sf /hush/src/hushd /usr/bin/hushd && \
+RUN ln -sf /hush/src/hushd /usr/bin/hushd && \
     ln -sf /hush/src/hush-tx /usr/bin/hush-tx && \
     ln -sf /hush/src/wallet-utility /usr/bin/hush-wallet-utility && \
     ln -sf /hush/src/hush-smart-chain /usr/bin/hush-smart-chain && \
