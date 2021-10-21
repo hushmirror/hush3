@@ -38,7 +38,7 @@ Run `hushd --version` to find out
 
 ### Any extra information that might be useful in the debugging process.
 
-This includes the relevant contents of `~/.komodo/HUSH3/debug.log`. You can paste raw text, attach the file directly in the issue or link to the text via a pastebin type site.
+This includes the relevant contents of `~/.hush/HUSH3/debug.log` or `~/.komodo/HUSH3/debug.log` if you have a legacy install. You can paste raw text, attach the file directly in the issue or link to the text via a pastebin type site.
 Please also include any non-standard things you did during compilation (extra flags, dependency version changes etc.) if applicable.
 
 Beware that usernames and IP addresses and other metadata is definitely in this log file!
