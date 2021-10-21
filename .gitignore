@@ -109,14 +109,7 @@ contrib/debian/files
 contrib/debian/substvars
 
 src/rpcmisc~.cpp
-src/komodo-cli
-src/komodod
-src/komodo-tx
-src/komodo-test
 src/wallet-utility
-src/komodo-cli.exe
-src/komodod.exe
-src/komodo-tx.exe
 
 src/hush-cli
 src/hushd
