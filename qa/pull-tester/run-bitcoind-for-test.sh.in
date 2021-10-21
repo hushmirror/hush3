@@ -5,7 +5,9 @@
 # Released under the GPLv3
 #
 HUSH_LOAD_TIMEOUT=500
-DATADIR="@abs_top_builddir@/.komodo/HUSH3"
+# TODO: support legacy directory. For now, those that want
+# to run tests must use the non-legacy directory
+DATADIR="@abs_top_builddir@/.hush/HUSH3"
 rm -rf "$DATADIR"
 mkdir -p "$DATADIR"/regtest
 touch "$DATADIR/HUSH3.conf"
