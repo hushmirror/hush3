@@ -42,7 +42,7 @@ If you get into a bad state, you should be able to recover with:
 
 ```bash
 rm -rf cache
-killall komodod
+killall hushd
 ```
 
 but beware that could kill various other processes you might not want to kill!
