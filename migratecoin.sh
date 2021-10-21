@@ -11,7 +11,7 @@ address="Rxxx"
 amount=1
 
 # Alias for running cli on source chain
-cli_source="komodo-cli -ac_name=$source"
+cli_source="hush-cli -ac_name=$source"
 
 # Raw tx that we will work with
 txraw=`$cli_source createrawtransaction "[]" "{\"$address\":$amount}"`
@@ -37,7 +37,7 @@ read -p "Wait for a notarization to HUSH, and then two more notarizations from t
 
 # Create import
 importTx=`$cli_source migrate_createimporttransaction $exportSignedTx $payouts`
-importTx=`komodo-cli migrate_completeimporttransaction $importTx`
+importTx=`hush-cli migrate_completeimporttransaction $importTx`
 
 # Send import
-komodo-cli -ac_name=$target sendrawtransaction $importTx
+hush-cli -ac_name=$target sendrawtransaction $importTx
