@@ -43,33 +43,24 @@ chmod 0755 -R $BUILD_DIR/*
 #cp $SRC_DEB/postrm $BUILD_DIR/DEBIAN
 #cp $SRC_DEB/preinst $BUILD_DIR/DEBIAN
 #cp $SRC_DEB/prerm $BUILD_DIR/DEBIAN
-# Copy binaries. We prefix our komodod binaries with hush- to prevent conflicting with
-# a stock komodod or other flavors of KMD
+
 cp $SRC_PATH/contrib/asmap/asmap.dat $DEB_SHR
 cp $SRC_PATH/sapling-spend.params $DEB_SHR
 cp $SRC_PATH/sapling-output.params $DEB_SHR
-cp $SRC_PATH/src/komodod $DEB_BIN/hush-komodod
-strip $DEB_BIN/hush-komodod
-cp $SRC_PATH/src/komodo-cli $DEB_BIN/hush-komodo-cli
-strip $DEB_BIN/hush-komodo-cli
-cp $SRC_PATH/src/komodo-tx $DEB_BIN/hush-komodo-tx
-strip $DEB_BIN/hush-komodo-tx
 cp $SRC_PATH/src/hushd $DEB_BIN
+strip $DEB_BIN/hushd
 cp $SRC_PATH/src/hush-cli $DEB_BIN
+strip $DEB_BIN/hush-cli
 cp $SRC_PATH/src/hush-tx $DEB_BIN
+strip $DEB_BIN/hush-tx
 cp $SRC_PATH/src/hush-smart-chain $DEB_BIN
 #cp $SRC_DEB/changelog $DEB_DOC/changelog.Debian
 cp $SRC_DEB/copyright $DEB_DOC
 cp -r $SRC_DEB/examples $DEB_DOC
 # Copy manpages
-cp $SRC_DOC/man/komodod.1 $DEB_MAN/hush-komodod.1
-cp $SRC_DOC/man/komodo-cli.1 $DEB_MAN/hush-komodo-cli.1
-cp $SRC_DOC/man/komodo-tx.1 $DEB_MAN/hush-komodo-tx.1
-
-cp $SRC_DOC/man/komodod.1 $DEB_MAN/hushd.1
-cp $SRC_DOC/man/komodo-cli.1 $DEB_MAN/hush-cli.1
-cp $SRC_DOC/man/komodo-tx.1 $DEB_MAN/hush-tx.1
-#TODO: process these copies and update names/binaries/etc
+cp $SRC_DOC/man/hushd.1 $DEB_MAN/hushd.1
+cp $SRC_DOC/man/hush-cli.1 $DEB_MAN/hush-cli.1
+cp $SRC_DOC/man/hush-tx.1 $DEB_MAN/hush-tx.1
 
 # Copy bash completion files
 cp $SRC_PATH/contrib/hushd.bash-completion $DEB_CMP/hushd
@@ -78,9 +69,6 @@ cp $SRC_PATH/contrib/hush-tx.bash-completion $DEB_CMP/hush-tx
 # Gzip files
 #gzip --best -n $DEB_DOC/changelog
 #gzip --best -n $DEB_DOC/changelog.Debian
-gzip --best -n $DEB_MAN/hush-komodod.1
-gzip --best -n $DEB_MAN/hush-komodo-cli.1
-gzip --best -n $DEB_MAN/hush-komodo-tx.1
 gzip --best -n $DEB_MAN/hushd.1
 gzip --best -n $DEB_MAN/hush-cli.1
 gzip --best -n $DEB_MAN/hush-tx.1
@@ -88,7 +76,7 @@ gzip --best -n $DEB_MAN/hush-tx.1
 cd $SRC_PATH/contrib
 
 # Create the control file
-dpkg-shlibdeps $DEB_BIN/hush-komodod $DEB_BIN/hush-komodo-cli $DEB_BIN/hush-komodo-tx
+dpkg-shlibdeps $DEB_BIN/hushd $DEB_BIN/hush-cli $DEB_BIN/hush-tx
 dpkg-gencontrol -P$BUILD_DIR -v$DEBVERSION
 #dpkg-gencontrol -P$BUILD_DIR
 
