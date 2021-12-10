@@ -22,7 +22,26 @@ cd ~/.hush/HUSH3
 rm zindex.dat blocks chainstate database notarizations hushstate
 ```
 
-It's possible to confused hush if you ran old code, stop, restart, and then write out zindex.dat that is incorrect, with later hushds will load from disk and believe.
+It's possible to confused hush if you ran old code, stop, restart, and then write out zindex.dat that is incorrect, which later hushds will load from disk and believe.
+
+# Parsing RPC output with jq
+
+jq is a very useful tool to parse JSON output, install it with:
+
+    apt install jq
+
+Let's say you want to parse a very large output from `listunspent` which has spendable and
+unspendable funds mixed together. This can happen when you import a viewing key. Funds from
+the address of a viewing key will have `spendable = false` :
+
+
+    hush-cli listunspent|jq '.[] | {spendable, address, amount} | select(.spendable != false)'
+
+The above command will only show spendable UTXOs. The jq language is very powerful and is very
+useful for devops and developer scripts.
+
+The jq manual can be found here: https://stedolan.github.io/jq/manual/
+
 
 # Making a new release of Hush
 
