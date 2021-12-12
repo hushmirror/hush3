@@ -5697,9 +5697,9 @@ bool CheckDiskSpace(uint64_t nAdditionalBytes)
     if(fDebug) {
         fprintf(stderr,"Free bytes on disk: %lu\n", nFreeBytesAvailable);
     }
-    // Check for nMinDiskSpace bytes (currently 50MB)
+    // Check for nMinDiskSpace bytes (defined in main.h)
     if (nFreeBytesAvailable < nMinDiskSpace + nAdditionalBytes)
-        return AbortNode("Disk space is low!", _("Error: Disk space is low!"));
+        return AbortNode("Disk space is low!!!", _("Error: Disk space is low!!!"));
 
     return true;
 }
