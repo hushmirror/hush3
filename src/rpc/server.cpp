@@ -42,7 +42,7 @@ using namespace RPCServer;
 using namespace std;
 extern uint16_t ASSETCHAINS_P2PPORT,ASSETCHAINS_RPCPORT;
 
-static bool fRPCRunning = false;
+static std::atomic<bool> fRPCRunning {false};
 static bool fRPCInWarmup = true;
 static std::string rpcWarmupStatus("RPC server started");
 static CCriticalSection cs_rpcWarmup;
