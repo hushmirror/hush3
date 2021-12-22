@@ -36,6 +36,7 @@ public:
 
 static const CRPCConvertParam vRPCConvertParams[] =
 {
+    { "rescan", 0 },
     { "stop", 0 },
     { "setmocktime", 0 },
     { "getaddednodeinfo", 0 },

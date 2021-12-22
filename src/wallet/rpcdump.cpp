@@ -178,9 +178,12 @@ UniValue rescan(const UniValue& params, bool fHelp, const CPubKey& mypk)
     }
 
     LogPrintf("Rescanning from height=%d\n", nRescanHeight);
-    //pwalletMain->ScanForWalletTransactions(chainActive[nRescanHeight],true);
-    bool update = false;
-    pwalletMain->ScanForWalletTransactions(chainActive.Genesis(),update);
+    bool update = true;
+    if (nRescanHeight > 0) {
+        pwalletMain->ScanForWalletTransactions(chainActive[nRescanHeight],update);
+    } else {
+        pwalletMain->ScanForWalletTransactions(chainActive.Genesis(),update);
+    }
     //TODO: can we return something more useful?
     return NullUniValue;
 }
