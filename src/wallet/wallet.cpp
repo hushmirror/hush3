@@ -1662,6 +1662,9 @@ void CWallet::EraseFromWallet(const uint256 &hash)
         if (mapWallet.erase(hash))
             CWalletDB(strWalletFile).EraseTx(hash);
     }
+    if(fDebug) {
+        LogPrintf("%s: erased txid %s\n", __func__, hash.ToString().c_str() );
+    }
     return;
 }
 
@@ -3052,6 +3055,8 @@ std::vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
     multimap<unsigned int, CWalletTx*> mapSorted;
     uint32_t now = (uint32_t)time(NULL);
     std::vector<uint256> vwtxh;
+    uint32_t erased = 0;
+
     BOOST_FOREACH(PAIRTYPE(const uint256, CWalletTx)& item, mapWallet)
     {
         CWalletTx& wtx = item.second;
@@ -3061,12 +3066,16 @@ std::vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
 
         if ( (wtx.nLockTime >= LOCKTIME_THRESHOLD && wtx.nLockTime < now-HUSH_MAXMEMPOOLTIME) )
         {
-            LogPrintf("%s: skip Relaying wtx %s nLockTime %u vs now.%u\n", __func__, wtx.GetHash().ToString(),(uint32_t)wtx.nLockTime,now);
-            //vwtxh.push_back(wtx.GetHash());
+            if(fDebug) {
+                LogPrintf("%s: skip Relaying wtx %s nLockTime %u vs now.%u\n", __func__, wtx.GetHash().ToString(),(uint32_t)wtx.nLockTime,now);
+            }
+            erased++;
+            vwtxh.push_back(wtx.GetHash());
             continue;
         }
         mapSorted.insert(make_pair(wtx.nTimeReceived, &wtx));
     }
+
     BOOST_FOREACH(PAIRTYPE(const unsigned int, CWalletTx*)& item, mapSorted)
     {
         if ( item.second != 0 )
@@ -3076,10 +3085,19 @@ std::vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
                 result.push_back(wtx.GetHash());
         }
     }
+
+    // Unless we remove these unconfirmed txs from the wallet, they will
+    // persist there forever. They are too old to be accepted by network
+    // consensus rules, so we erase them.
     for (auto hash : vwtxh)
     {
-        EraseFromWallets(hash);
+        EraseFromWallet(hash);
     }
+
+    if(erased > 0) {
+        LogPrintf("%s: Prevented relaying and erased %d transactions which are too old\n", __func__, erased);
+    }
+
     return result;
 }
 
