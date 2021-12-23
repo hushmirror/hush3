@@ -3055,7 +3055,7 @@ std::vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
     multimap<unsigned int, CWalletTx*> mapSorted;
     uint32_t now = (uint32_t)time(NULL);
     std::vector<uint256> vwtxh;
-    uint32_t erased = 0;
+    uint32_t erased = 0, skipped = 0;
 
     BOOST_FOREACH(PAIRTYPE(const uint256, CWalletTx)& item, mapWallet)
     {
@@ -3069,8 +3069,8 @@ std::vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
             if(fDebug) {
                 LogPrintf("%s: skip Relaying wtx %s nLockTime %u vs now.%u\n", __func__, wtx.GetHash().ToString(),(uint32_t)wtx.nLockTime,now);
             }
-            erased++;
-            vwtxh.push_back(wtx.GetHash());
+            skipped++;
+            //vwtxh.push_back(wtx.GetHash());
             continue;
         }
         mapSorted.insert(make_pair(wtx.nTimeReceived, &wtx));
@@ -3086,16 +3086,18 @@ std::vector<uint256> CWallet::ResendWalletTransactionsBefore(int64_t nTime)
         }
     }
 
+    // TODO: this does not seem to handle rescanning+finding old coinbase txs correctly
     // Unless we remove these unconfirmed txs from the wallet, they will
     // persist there forever. They are too old to be accepted by network
     // consensus rules, so we erase them.
     for (auto hash : vwtxh)
     {
         EraseFromWallet(hash);
+        erased++;
     }
 
-    if(erased > 0) {
-        LogPrintf("%s: Prevented relaying and erased %d transactions which are too old\n", __func__, erased);
+    if(erased > 0 || skipped > 0) {
+        LogPrintf("%s: Prevented relaying %d and erased %d transactions which are too old\n", __func__, skipped, erased);
     }
 
     return result;
