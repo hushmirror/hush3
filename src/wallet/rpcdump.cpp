@@ -184,6 +184,7 @@ UniValue rescan(const UniValue& params, bool fHelp, const CPubKey& mypk)
     } else {
         pwalletMain->ScanForWalletTransactions(chainActive.Genesis(),update);
     }
+    LogPrintf("Done rescanning from height=%d\n", nRescanHeight);
     //TODO: can we return something more useful?
     return NullUniValue;
 }
