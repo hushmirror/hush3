@@ -635,6 +635,7 @@ UniValue listbanned(const UniValue& params, bool fHelp, const CPubKey& mypk)
 
     std::map<CSubNet, int64_t> banMap;
     CNode::GetBanned(banMap);
+    const int64_t current_time{GetTime()};
 
     UniValue bannedAddresses(UniValue::VARR);
     for (std::map<CSubNet, int64_t>::iterator it = banMap.begin(); it != banMap.end(); it++)
@@ -642,6 +643,7 @@ UniValue listbanned(const UniValue& params, bool fHelp, const CPubKey& mypk)
         UniValue rec(UniValue::VOBJ);
         rec.push_back(Pair("address", (*it).first.ToString()));
         rec.push_back(Pair("banned_until", (*it).second));
+        rec.push_back(Pair("time_remaining", (*it).second - current_time));
         bannedAddresses.push_back(rec);
     }
 
